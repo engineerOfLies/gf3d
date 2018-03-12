@@ -1,8 +1,6 @@
 #ifndef __GF3D_GRAPHICS_C__
 #define __GF3D_GRAPHICS_C__
 
-#include <SDL.h>
-
 #include "gf3d_types.h"
 #include "gf3d_vector.h"
 
@@ -15,6 +13,8 @@
  * @param renderHeight How much draw height you want to work with logically
  * @param bgcolor what you want the default background color to be
  * @param fullscreen if you want the window to render full screen or not
+ * @param major what major version of opengl you want to use
+ * @param minor what minor version of opengl you want to use
  */
 void gf3d_graphics_initialize(
     char *windowName,
@@ -23,7 +23,9 @@ void gf3d_graphics_initialize(
     int renderWidth,
     int renderHeight,
     Vector4D bgcolor,
-    Bool fullscreen
+    Bool fullscreen,
+    int major,
+    int minor
 );
 
 /**
@@ -39,12 +41,6 @@ void gf3d_graphics_set_frame_delay(Uint32 frameDelay);
 float gf3d_graphics_get_frames_per_second();
 
 /**
- * @brief get the current rendering context
- * @return NULL on error or the current rendering context
- */
-SDL_Renderer *gf3d_graphics_get_renderer();
-
-/**
  * @brief render the current frame to screen
  */
 void gf3d_grahics_next_frame();
@@ -54,21 +50,5 @@ void gf3d_grahics_next_frame();
  */
 void gf3d_graphics_clear_screen();
 
-/*drawing support functions*/
-
-/**
- * @brief creates an SDL_Surface that is compatible with the current drawing context
- * @param w the width of the surface to create
- * @param h the height of the surface to create
- * @return NULL on error or the SDL_Surface created
- */
-SDL_Surface *gf3d_graphics_create_surface(Uint32 w,Uint32 h);
-
-/**
- * @brief convert an SDL Surface to the format compatible with the rendering context
- * @param surface a pointer to your surface pointer.  The surface is automatically freed upon success
- * @returns NULL on error, or the new SDL Surface upon success
- */
-SDL_Surface *gf3d_graphics_screen_convert(SDL_Surface **surface);
 
 #endif
