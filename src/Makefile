@@ -13,9 +13,10 @@
 PROJECT = gf3d
 CC      = gcc
 #CC      = clang
-MGL_LIBS = 
-#MGL_STATIC_LIBS = 
-MGL_LIB_PATH = ../libs
+
+LIB_PATH = ../libs
+STATIC_LIBS = libsj.a
+LDFLAGS = -L$(LIB_PATH) $(foreach d, $(STATIC_LIBS),$(LIB_PATH)/$d)
 
 OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c))
 
@@ -35,7 +36,7 @@ DOXYGEN = doxygen
 #
 
 $(PROJECT): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LFLAGS) $(SDL_LDFLAGS) 
+	$(CC) $(OBJECTS) $(LFLAGS) $(LDFLAGS) $(SDL_LDFLAGS) 
 
 docs:
 	$(DOXYGEN) doxygen.cfg

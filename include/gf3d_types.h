@@ -2,6 +2,15 @@
 #define __GF3D_TYPES_H__
 
 #include <stdlib.h>
+#include <SDL.h>
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
