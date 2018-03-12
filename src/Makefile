@@ -19,7 +19,7 @@ MGL_LIB_PATH = ../libs
 
 OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c))
 
-INC_PATHS = ../include
+INC_PATHS = ../include ../libs/include
 INC_PARAMS =$(foreach d, $(INC_PATHS), -I$d)
 
 SDL_CFLAGS = `sdl2-config --cflags` $(INC_PARAMS)
