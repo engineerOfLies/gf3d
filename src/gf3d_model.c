@@ -1,3 +1,5 @@
+#include <GL/glew.h>
+
 #include "gf3d_model.h"
 #include "simple_json.h"
 #include "simple_logger.h"
@@ -40,7 +42,9 @@ void gf3d_model_delete(Model *model)
 {
     if (!model)return;
     // cleanup
-
+    glDeleteBuffers(1,&model->vertex_buffer);
+    glDeleteBuffers(1,&model->normal_buffer);
+    glDeleteBuffers(1,&model->texel_buffer);
     memset(model,0,sizeof(Model));//clean up all other data
 }
 
@@ -88,6 +92,64 @@ Model *gf3d_model_get_by_filename(char * filename)
     return NULL;// not found
 }
 
+GLuint gf3d_model_buffer_new(
+    GLenum buffer_type,
+    const void *data,
+    GLsizei buffer_size
+)
+{
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(buffer_type, buffer);
+    glBufferData(buffer_type, buffer_size, data, GL_DYNAMIC_DRAW);
+    return buffer;
+}
+
+GLuint gf3d_model_json_parse_array_data(SJson *array)
+{
+    SJson *item;
+    Uint32 count,i;
+    float *list;
+    count = sj_array_get_count(array);
+    if (count)
+    {
+        list = (float *)malloc(sizeof(float)*count);
+        memset(list,0,sizeof(float)*count);
+        for (i = 0; i < count; i++)
+        {
+            item = sj_array_get_nth(array,i);
+            sj_get_float_value(item,&list[i]);
+        }
+        // data validation
+        slog("data gathered from json file array:");
+        for (i = 0; i < count;i++)
+        {
+            slog("value [%i] = %f",i,list[i]);
+        }
+        return gf3d_model_buffer_new(GL_ARRAY_BUFFER,list,sizeof(float)*count);
+    }
+    return 0;
+}
+
+int gf3d_model_json_parse(Model *model,SJson *data)
+{
+    SJson *attributes,*positions;
+    if ((!model)||(!data))
+    {
+        slog("gf3d_model_json_parse: missing model or data to parse!");
+        return -1;
+    }
+    attributes = sj_object_get_value(data,"attributes");
+    if (attributes)
+    {
+        positions = sj_object_get_value(attributes,"position");
+        model->vertex_buffer = gf3d_model_json_parse_array_data(sj_object_get_value(positions,"array"));
+        positions = sj_object_get_value(attributes,"normal");
+        model->normal_buffer = gf3d_model_json_parse_array_data(sj_object_get_value(positions,"array"));
+    }
+    return 0;
+}
+
 Model *gf3d_model_load_from_json_file(char *filename)
 {
     Model *model;
@@ -105,6 +167,12 @@ Model *gf3d_model_load_from_json_file(char *filename)
         return NULL;
     }
     //parse the json
+    if (gf3d_model_json_parse(model,sj_object_get_value(json,"data")) != 0)
+    {
+        gf3d_model_delete(model);
+        sj_free(json);
+        return NULL;
+    }
     //cleanup
     sj_free(json);
     return model;

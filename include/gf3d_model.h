@@ -32,7 +32,9 @@ typedef struct
     Uint32 ref_count;
     TextLine filepath;
     
-    GLuint vertex_buffer, element_buffer;
+    GLuint vertex_buffer;
+    GLuint normal_buffer;
+    GLuint texel_buffer;
     GLuint textures[2];
 }Model;
 
