@@ -1,12 +1,15 @@
 #include <SDL.h>
 
-#include "gf3d_graphics.h"
 #include "simple_logger.h"
+#include "gf3d_graphics.h"
+#include "gf3d_model.h"
 
 int main(int argc,char *argv[])
 {
     int done = 0;
     const Uint8 * keys;
+    
+    Model *testmodel;
 
     init_logger("gf2d.log");
     slog("gf3d begin");
@@ -21,6 +24,9 @@ int main(int argc,char *argv[])
         0,
         3,1 // opengl major,minor 
     );
+    gf3d_model_manager_init(1024);
+    
+    testmodel = gf3d_model_load_from_json_file("models/cube.json");
     
     // main game loop
     while(!done)
@@ -34,6 +40,8 @@ int main(int argc,char *argv[])
         gf3d_grahics_next_frame();
     }    
     
+    //cleanup
+    gf3d_model_free(testmodel);
     slog("gf3d program end");
     slog_sync();
     return 0;

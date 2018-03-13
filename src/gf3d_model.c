@@ -105,6 +105,8 @@ Model *gf3d_model_load_from_json_file(char *filename)
         return NULL;
     }
     //parse the json
+    //cleanup
+    sj_free(json);
     return model;
 }
 

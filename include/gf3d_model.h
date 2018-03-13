@@ -47,4 +47,17 @@ void gf3d_model_manager_init(Uint32 max);
  */
 void gf3d_model_clear_all();
 
+/**
+ * @brief load 3d model data from a json file
+ * @param filename the path to the file to load
+ * @returns NULL on error or a pointer to a setup model
+ */
+Model *gf3d_model_load_from_json_file(char *filename);
+
+/**
+ * @brief free a previously loaded model
+ * @param model pointer to the model data to free
+ */
+void gf3d_model_free(Model *model);
+
 #endif
