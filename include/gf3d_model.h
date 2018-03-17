@@ -57,6 +57,12 @@ void gf3d_model_clear_all();
 Model *gf3d_model_load_from_json_file(char *filename);
 
 /**
+ * @brief render a model this frame
+ * @param model the model to render
+ */
+void gf3d_model_render(Model *model);
+
+/**
  * @brief free a previously loaded model
  * @param model pointer to the model data to free
  */
