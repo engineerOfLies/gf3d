@@ -151,7 +151,7 @@ void gf3d_grahics_next_frame()
 
 void gf3d_graphics_clear_screen()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 SDL_Surface *gf3d_graphics_create_surface(Uint32 w,Uint32 h)

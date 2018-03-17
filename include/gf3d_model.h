@@ -57,6 +57,12 @@ void gf3d_model_clear_all();
 Model *gf3d_model_load_from_json_file(char *filename);
 
 /**
+ * @brief make a model object that contains only a triange
+ * @return NULL if error, or a handle to a triangle model otherwise
+ */
+Model *gf3d_model_new_triangle();
+
+/**
  * @brief render a model this frame
  * @param model the model to render
  */

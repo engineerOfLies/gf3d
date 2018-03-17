@@ -7,12 +7,14 @@
 #include <stdlib.h>
 
 
+
 GLuint gf3d_shader_load(const char * filepath,GLuint shader_type)
 {
     FILE* file;
     char *buffer = NULL;
     GLuint shader_id = 0;
     GLint length,compiled;
+    char error[1024];
     file = fopen(filepath, "r");
     if (!file)
     {
@@ -44,12 +46,53 @@ GLuint gf3d_shader_load(const char * filepath,GLuint shader_type)
     glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compiled);
     if (compiled != GL_TRUE)
     {
-        slog("failed to compile shader %s",filepath);
+        glGetShaderInfoLog(shader_id,1024,NULL,(GLchar *)error);
+        slog("failed to compile shader %s, re: %s",filepath,error);
         return 0;
     }
     
     return shader_id;
 }
+
+GLuint gf3d_shader_program_load(char *vertfile, char *fragfile)
+{
+    GLuint program,vert,frag;
+    GLint linked = 0;
+    vert = gf3d_shader_load(vertfile, GL_VERTEX_SHADER);
+    frag = gf3d_shader_load(fragfile, GL_FRAGMENT_SHADER);
+    if ((!vert)||(!frag))
+    {
+        slog("failed to load shader progam");
+        return 0;
+    }
+
+    program = glCreateProgram();
+    if (!program)
+    {
+        slog("failed to create shader program");
+        return 0;
+    }
+    glAttachShader(program, vert);
+    glAttachShader(program, frag);
+    glLinkProgram(program);
+
+    glGetProgramiv(program, GL_LINK_STATUS, &linked);
+    if (!linked)
+    {
+      slog("failed to link shader");
+      return 0;
+    }
+    if (vert)
+    {
+      glDeleteShader(vert);
+    }
     
+    if (frag)
+    {
+      glDeleteShader(frag);
+    }
+    return program;
+}
+
     
 /*eol@eof*/

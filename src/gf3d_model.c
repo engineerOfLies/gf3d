@@ -79,6 +79,26 @@ Model *gf3d_model_new()
     return NULL;
 }
 
+Model *gf3d_model_new_triangle()
+{
+    Model *model;
+    GLuint vertexbuffer;
+    static const GLfloat g_vertex_buffer_data[] = {
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        0.0f,  1.0f, 0.0f,
+    }; 
+    model = gf3d_model_new();
+    if (!model)return NULL;
+
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    model->vertex_buffer = vertexbuffer;
+    sprintf(model->filepath,"triangle");
+    return model;
+}
+
 Model *gf3d_model_get_by_filename(char * filename)
 {
     int i;
@@ -97,8 +117,8 @@ void gf3d_model_render(
 )
 {
     if (!model)return;
-    slog("rendering model: %s",model->filepath);
     glEnableVertexAttribArray(0);
+    slog("rendering model %s, vertex buffer %i",model->filepath,model->vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, model->vertex_buffer);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
