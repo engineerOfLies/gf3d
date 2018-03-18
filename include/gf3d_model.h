@@ -36,6 +36,8 @@ typedef struct
     GLuint normal_buffer;
     GLuint texel_buffer;
     GLuint textures[2];
+    Uint32 vertex_count;
+    Uint32 normal_count;
 }Model;
 
 /**

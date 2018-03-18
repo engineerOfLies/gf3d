@@ -22,7 +22,7 @@ int main(int argc,char *argv[])
     
     Model *testmodel;
     
-    Matrix4 projection,view,model,pv,vp,pvm,vpm,mvp;
+    Matrix4 projection,view,model,pv,pvm;
 
     init_logger("gf2d.log");
     slog("gf3d begin");
@@ -40,8 +40,8 @@ int main(int argc,char *argv[])
 
     gf3d_model_manager_init(1024);
 
-//    testmodel = gf3d_model_load_from_json_file("models/cube.json");
-    testmodel = gf3d_model_new_triangle();
+    testmodel = gf3d_model_load_from_json_file("models/cube.json");
+//    testmodel = gf3d_model_new_triangle();
     program = gf3d_shader_program_load("shaders/basic.vert", "shaders/basic.frag");
 
     gf3d_matrix_perspective(
@@ -59,7 +59,6 @@ int main(int argc,char *argv[])
     );
     gf3d_matrix_identity(model);
     
-    gf3d_matrix_multiply(vp,view,projection);
     gf3d_matrix_multiply(pv,projection,view);
     
     slog("projection:");
@@ -69,18 +68,10 @@ int main(int argc,char *argv[])
 
     slog("projection * view:");
     gf3d_matrix_slog(pv);
-    slog("view * projection:");
-    gf3d_matrix_slog(vp);
- /*   
 
-    gf3d_matrix_multiply(vpm,vp,model);
     gf3d_matrix_multiply(pvm,pv,model);
+    
 
-    slog("view * projection * model:");
-    gf3d_matrix_slog(vpm);
-    slog("projection * view * model:");
-    gf3d_matrix_slog(pvm);
-*/
     // main game loop
     while(!done)
     {

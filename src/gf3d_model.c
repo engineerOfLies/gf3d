@@ -129,7 +129,7 @@ void gf3d_model_render(
         (void*)0            // array buffer offset
         );
     // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, model->vertex_count); // Starting from vertex 0; 3 vertices total -> 1 triangle
     glDisableVertexAttribArray(0);
 }
 
@@ -146,7 +146,7 @@ GLuint gf3d_model_buffer_new(
     return buffer;
 }
 
-GLuint gf3d_model_json_parse_array_data(SJson *array)
+GLuint gf3d_model_json_parse_array_data(SJson *array,Uint32 *outcount)
 {
     SJson *item;
     Uint32 count,i;
@@ -167,6 +167,7 @@ GLuint gf3d_model_json_parse_array_data(SJson *array)
         {
             slog("value [%i] = %f",i,list[i]);
         }
+        if (outcount)*outcount = count;
         return gf3d_model_buffer_new(GL_ARRAY_BUFFER,list,sizeof(float)*count);
     }
     return 0;
@@ -184,9 +185,9 @@ int gf3d_model_json_parse(Model *model,SJson *data)
     if (attributes)
     {
         positions = sj_object_get_value(attributes,"position");
-        model->vertex_buffer = gf3d_model_json_parse_array_data(sj_object_get_value(positions,"array"));
+        model->vertex_buffer = gf3d_model_json_parse_array_data(sj_object_get_value(positions,"array"),&model->vertex_count);
         positions = sj_object_get_value(attributes,"normal");
-        model->normal_buffer = gf3d_model_json_parse_array_data(sj_object_get_value(positions,"array"));
+        model->normal_buffer = gf3d_model_json_parse_array_data(sj_object_get_value(positions,"array"),&model->normal_count);
     }
     return 0;
 }
