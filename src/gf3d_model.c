@@ -118,7 +118,7 @@ void gf3d_model_render(
 {
     if (!model)return;
     glEnableVertexAttribArray(0);
-    slog("rendering model %s, vertex buffer %i",model->filepath,model->vertex_buffer);
+//    slog("rendering model %s, vertex buffer %i",model->filepath,model->vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, model->vertex_buffer);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
