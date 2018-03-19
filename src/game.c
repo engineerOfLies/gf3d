@@ -1,29 +1,20 @@
 #include <SDL.h>            
 #include <GL/glew.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "simple_logger.h"
 #include "gf3d_graphics.h"
 #include "gf3d_model.h"
 #include "gf3d_matrix.h"
-#include "gf3d_shaders.h"
-#ifdef __cplusplus
-}
-#endif
+#include "gf3d_camera.h"
 
 int main(int argc,char *argv[])
 {
     int done = 0;
     const Uint8 * keys;
-    
-    GLuint program,mvp_id;
-    
+    GLuint program = 0;
     Model *testmodel;
+    Matrix4 model;
     
-    Matrix4 projection,view,model,pv,pvm;
-
     init_logger("gf2d.log");
     slog("gf3d begin");
     
@@ -42,36 +33,15 @@ int main(int argc,char *argv[])
 
     testmodel = gf3d_model_load_from_json_file("models/cube.json");
 //    testmodel = gf3d_model_new_triangle();
-    program = gf3d_shader_program_load("shaders/basic.vert", "shaders/basic.frag");
 
-    gf3d_matrix_perspective(
-        projection,
-        45,
-        1200.0/700.0,
-        0.1,
-        100.0
-    );
-    gf3d_matrix_view(
-        view,
+    gf3d_camera_look_at(
         vector3d(4,3,3),
         vector3d(0,0,0),
         vector3d(0,1,0)
     );
     gf3d_matrix_identity(model);
     
-    gf3d_matrix_multiply(pv,projection,view);
-    
-    slog("projection:");
-    gf3d_matrix_slog(projection);
-    slog("view:");
-    gf3d_matrix_slog(view);
-
-    slog("projection * view:");
-    gf3d_matrix_slog(pv);
-
-    gf3d_matrix_multiply(pvm,pv,model);
-    
-
+    program = gf3d_graphics_get_shader_program_id();
     // main game loop
     while(!done)
     {
@@ -80,11 +50,8 @@ int main(int argc,char *argv[])
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         /*update things here*/
         
-        glUseProgram(program);        
 //        slog("using shader program %i",program);
-        mvp_id = glGetUniformLocation(program, "MVP");
-        glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &pvm[0][0]);
-        gf3d_model_render(testmodel);
+        gf3d_model_render(testmodel,model,program);
         
         gf3d_grahics_next_frame();
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition

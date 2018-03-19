@@ -7,6 +7,17 @@
 
 typedef GLfloat Matrix4[4][4];
 
+
+/**
+ * @brief copy the contents of one matrix into another
+ * @param d the destination matrix
+ * @param s the source matrix
+ */
+void gf3d_matrix_copy(
+    Matrix4 d,
+    Matrix4 s
+  );
+
 /**
  * @brief set the matrix to an identity matrix
  * @param one the matrix to become an identity
@@ -18,6 +29,16 @@ void gf3d_matrix_identity(Matrix4 one);
  * @param zero the matrix to be set to zero
  */
 void gf3d_matrix_zero(Matrix4 zero);
+
+/**
+ * @brief create a translation matrix given the vector
+ * @param out the output matrix, the contents of this matrix are overwritten
+ * @param move the vector describing the translation
+ */
+void gf3d_matrix_make_translation(
+    Matrix4 out,
+    Vector3D move
+);
 
 /**
  * @brief setup a view matrix for a frustum centered at position, pointed at target, with up as the up direction

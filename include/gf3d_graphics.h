@@ -3,6 +3,7 @@
 
 #include "gf3d_types.h"
 #include "gf3d_vector.h"
+#include "gf3d_matrix.h"
 
 /**
  * @brief initializes SDL and setups up basic window and rendering contexts
@@ -29,6 +30,12 @@ void gf3d_graphics_initialize(
 );
 
 /**
+ * @brief get the loaded shader program
+ * @returns 0 if no program is loaded or error, a valid program id otherwise
+ */
+GLuint gf3d_graphics_get_shader_program_id();
+
+/**
  * @brief sets the amount of delay to aim for between frames.
  * @param frameDelay the amount of time, in milliseconds, that each frame should take
  */
@@ -50,5 +57,17 @@ void gf3d_grahics_next_frame();
  */
 void gf3d_graphics_clear_screen();
 
+/**
+ * @brief get the current project matrix
+ * default is set based on a fov of 45, aspect ratio based on sceen resolution, near plane at 0.1 and far plane at 100.0
+ * @param projection output the matrix pointed to by projection is set to the projection matrix
+ */
+void gf3d_graphics_get_projection(Matrix4 projection);
+
+/**
+ * @brief set a custom projection matrix
+ * @param projection the new matrix to use for projections
+ */
+void gf3d_graphics_set_projection(Matrix4 projection);
 
 #endif

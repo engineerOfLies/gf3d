@@ -10,6 +10,17 @@ void gf3d_matrix_slog(Matrix4 mat)
     slog("%f,%f,%f,%f",mat[3][0],mat[3][1],mat[3][2],mat[3][3]);
 }
 
+void gf3d_matrix_copy(
+    Matrix4 d,
+    Matrix4 s
+  )
+{
+    if ((!d)||(!s))return;
+    if (d == s)return;
+    memcpy(d,s,sizeof(Matrix4));
+}
+
+
 void gf3d_matrix_multiply(
     Matrix4 out,
     Matrix4 m1,
@@ -142,4 +153,27 @@ void gf3d_matrix_view(
     out[3][1] = vector3d_dot_product(u, position)?-vector3d_dot_product(u, position):0;
     out[3][2] = vector3d_dot_product(f, position)?vector3d_dot_product(f, position):0;
     
+}
+
+void gf3d_matrix_make_translation(
+    Matrix4 out,
+    Vector3D move
+)
+{
+    if (!out)return;
+    gf3d_matrix_identity(out);
+    out[0][3] = move.x;
+    out[1][3] = move.y;
+    out[2][3] = move.z;
+}
+
+void gf3d_matrix_translate(
+    Matrix4 out,
+    Vector3D move
+)
+{
+    Matrix4 translate,temp;
+    gf3d_matrix_make_translation(translate,move);
+    gf3d_matrix_multiply(temp,translate,out);
+    gf3d_matrix_copy(out,temp);
 }

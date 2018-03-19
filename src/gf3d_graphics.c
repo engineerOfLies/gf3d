@@ -4,6 +4,7 @@
 
 #include "gf3d_graphics.h"
 #include "simple_logger.h"
+#include "gf3d_shaders.h"
 
 /*local types*/
 typedef struct
@@ -26,6 +27,9 @@ typedef struct
     Uint32 gmask;
     Uint32 bmask;
     Uint32 amask;
+    
+    GLuint program;                 /**<shader program*/
+    Matrix4 projection;
 }Graphics;
 
 /*local gobals*/
@@ -101,6 +105,16 @@ void gf3d_graphics_initialize(
     SDL_GL_SwapWindow(gf3d_graphics.main_window);
     
     vector4d_set(gf3d_graphics.background_color_v,bgcolor.x,bgcolor.y,bgcolor.z,bgcolor.w);
+    
+    gf3d_matrix_perspective(
+        gf3d_graphics.projection,
+        45,
+        (float)renderWidth/(float)renderHeight,
+        0.1,
+        100.0
+    );
+
+    gf3d_graphics.program = gf3d_shader_program_load("shaders/basic.vert", "shaders/basic.frag");
 
     srand(SDL_GetTicks());
     atexit(gf3d_graphics_close);
@@ -167,5 +181,27 @@ SDL_Surface *gf3d_graphics_create_surface(Uint32 w,Uint32 h)
     return surface;
 }
 
+void gf3d_graphics_get_projection(Matrix4 projection)
+{
+    if (!projection)return;
+    gf3d_matrix_copy(
+        projection,
+        gf3d_graphics.projection
+    );
+}
+
+void gf3d_graphics_set_projection(Matrix4 projection)
+{
+    if (!projection)return;
+    gf3d_matrix_copy(
+        gf3d_graphics.projection,
+        projection
+    );
+}
+
+GLuint gf3d_graphics_get_shader_program_id()
+{
+    return gf3d_graphics.program;
+}
 
 /*eol@eof*/

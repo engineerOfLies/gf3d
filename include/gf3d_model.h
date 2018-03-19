@@ -25,6 +25,7 @@
 #include "gf3d_graphics.h"
 #include "gf3d_types.h"
 #include "gf3d_vector.h"
+#include "gf3d_matrix.h"
 #include "gf3d_text.h"
 
 typedef struct
@@ -67,8 +68,10 @@ Model *gf3d_model_new_triangle();
 /**
  * @brief render a model this frame
  * @param model the model to render
+ * @param mat the model matrix, containing the translation, rotation, and scaling of the model, if NULL identity matrix is used
+ * @param program the shader program to use
  */
-void gf3d_model_render(Model *model);
+void gf3d_model_render(Model *model,Matrix4 mat,GLuint program);
 
 /**
  * @brief free a previously loaded model

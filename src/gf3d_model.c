@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 
 #include "gf3d_model.h"
+#include "gf3d_camera.h"
 #include "simple_json.h"
 #include "simple_logger.h"
 
@@ -113,12 +114,34 @@ Model *gf3d_model_get_by_filename(char * filename)
 }
 
 void gf3d_model_render(
-    Model *model
+    Model *model,
+    Matrix4 mat,
+    GLuint program
 )
 {
+    Matrix4 identity,mvp,v,p,pv;
+    GLuint mvp_id;
     if (!model)return;
+    if (!mat)
+    {
+        gf3d_matrix_identity(identity);
+        mat = identity;
+    }
+//  slog("rendering model %s, vertex buffer %i",model->filepath,model->vertex_buffer);
+
+    // calculate Model View Projection
+    
+    gf3d_graphics_get_projection(p);
+    gf3d_camera_get_view(v);
+    
+    gf3d_matrix_multiply(pv,p,v);
+    gf3d_matrix_multiply(mvp,pv,mat);
+
+    glUseProgram(program);
+    mvp_id = glGetUniformLocation(program, "MVP");
+    glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp[0][0]);
+
     glEnableVertexAttribArray(0);
-//    slog("rendering model %s, vertex buffer %i",model->filepath,model->vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, model->vertex_buffer);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
