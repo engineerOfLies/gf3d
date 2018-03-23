@@ -156,7 +156,7 @@ void gf3d_graphics_frame_delay()
     gf3d_graphics.fps = 1000.0/MAX(SDL_GetTicks() - gf3d_graphics.then,0.001);
 }
 
-void gf3d_grahics_next_frame()
+void gf3d_graphics_next_frame()
 {
     SDL_GL_SwapWindow(gf3d_graphics.main_window);
     gf3d_graphics_frame_delay();
