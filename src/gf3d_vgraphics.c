@@ -12,18 +12,59 @@
 
 typedef struct
 {
-    SDL_Window * main_window;
-    VkApplicationInfo vk_app_info;
-    VkInstance vk_instance;
-    VkInstanceCreateInfo vk_instance_info;
-    unsigned int enabled_extension_count;
-    const char **enabled_extension_names;
-    unsigned int enabled_layer_count;
-    Uint32 device_count;
-    VkPhysicalDevice *devices;
-    VkPhysicalDevice gpu;
-    Uint32 queue_property_count;
-    VkQueueFamilyProperties *queue_properties;
+    VkImage image;
+    VkImageView view;
+}SwapChainBuffer;
+
+typedef struct
+{
+    SDL_Window                 *main_window;
+
+    VkApplicationInfo           vk_app_info;
+
+    VkInstance                  vk_instance;
+    VkInstanceCreateInfo        vk_instance_info;
+
+    unsigned int                enabled_extension_count;
+    const char                **enabled_extension_names;
+
+    unsigned int                enabled_layer_count;
+
+    //devices
+    Uint32                      device_count;
+    VkPhysicalDevice           *devices;
+    VkPhysicalDevice            gpu;
+    VkDevice                    device;
+    VkSurfaceKHR                surface;
+    VkDeviceCreateInfo          device_info;
+
+    //Queues
+    VkDeviceQueueCreateInfo     queue_info;
+    Uint32                      queue_property_count;
+    VkQueueFamilyProperties    *queue_properties;
+    Uint32                      render_queue_index;
+    VkQueue                     device_queue;
+
+    // color space
+    VkFormat                    color_format;
+    VkColorSpaceKHR             color_space;
+
+    // swap chain
+    VkSwapchainKHR              swap_chain;
+    SwapChainBuffer            *buffers;
+    VkImage                    *images;
+    size_t                      node_index;
+    
+    // function pointers
+//    PFN_vkGetPhysicalDeviceSupportKHR               fpGetPhysicalDeviceSurfaceSupportKHR;
+//    PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR   fpGetPhysicalDeviceSurfaceCapabilitiesKHR;
+    PFN_vkGetPhysicalDeviceSurfaceFormatsKHR        fpGetPhysicalDeviceSurfaceFormatsKHR;
+    PFN_vkGetPhysicalDeviceSurfacePresentModesKHR   fpGetPhysicalDeviceSurfacePresentModesKHR;
+    PFN_vkCreateSwapchainKHR                        fpCreateSwapchainKHR;
+    PFN_vkDestroySwapchainKHR                       fpDestroySwapchainKHR;
+    PFN_vkGetSwapchainImagesKHR                     fpGetSwapchainImagesKHR;
+  //  PFN_vkAcquireNExtImageKHR                       fpAcquireNextImageKHR;
+    PFN_vkQueuePresentKHR                           fpQueuePresentKHR;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -42,6 +83,8 @@ void gf3d_vgraphics_init(
 {
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
+    VkBool32 supported;
+    
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         slog("Unable to initilaize SDL system: %s",SDL_GetError());
@@ -153,10 +196,51 @@ void gf3d_vgraphics_init(
              gf3d_vgraphics.queue_properties[i].minImageTransferGranularity.height,
              gf3d_vgraphics.queue_properties[i].minImageTransferGranularity.depth);
     }
+    // create a surface for the window
+    SDL_Vulkan_CreateSurface(gf3d_vgraphics.main_window, gf3d_vgraphics.vk_instance, &gf3d_vgraphics.surface);
+    // setup a queue for rendering calls
+    for (i = 0; i < gf3d_vgraphics.queue_property_count; i++)
+    {
+        vkGetPhysicalDeviceSurfaceSupportKHR(
+            gf3d_vgraphics.gpu,
+            i,
+            gf3d_vgraphics.surface,
+            &supported);
+        if (supported)
+        {
+            gf3d_vgraphics.render_queue_index = i;
+            slog("can use queue %i for render pipeline",i);
+        }
+    }
+    slog("using queue %i for rendering pipeline",gf3d_vgraphics.render_queue_index);
+    
+/*    if (vkCreateDevice(gf3d_vgraphics.gpu, &createInfo, nullptr, &device) != VK_SUCCESS) {
+        slog("failed to create logical device!");
+        gf3d_vgraphics_close();
+        return;
+    }*/
+    
+//    vkGetDeviceQueue(gf3d_vgraphics.device,gf3d_vgraphics.render_queue_index,0,&gf3d_vgraphics.device_queue);
+    
+    atexit(gf3d_vgraphics_close);
 }
 
 void gf3d_vgraphics_close()
 {
+    if (gf3d_vgraphics.queue_properties)
+    {
+        free(gf3d_vgraphics.queue_properties);
+    }
+    if (gf3d_vgraphics.devices)
+    {
+        free(gf3d_vgraphics.devices);
+    }
+    if (gf3d_vgraphics.enabled_extension_names)
+    {
+        free(gf3d_vgraphics.enabled_extension_names);
+    }
+    vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
+    vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
     if (gf3d_vgraphics.main_window)
     {
         SDL_DestroyWindow(gf3d_vgraphics.main_window);
