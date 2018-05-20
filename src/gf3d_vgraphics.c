@@ -112,6 +112,7 @@ void gf3d_vgraphics_init(
     {
         slog("failed to create main window: %s",SDL_GetError());
         gf3d_vgraphics_close();
+        exit(0);
         return;
     }
     
@@ -239,8 +240,14 @@ void gf3d_vgraphics_close()
     {
         free(gf3d_vgraphics.enabled_extension_names);
     }
-    vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
-    vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
+    if(gf3d_vgraphics.surface)
+    {
+        vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
+    }
+    if (gf3d_vgraphics.vk_instance)
+    {
+        vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
+    }
     if (gf3d_vgraphics.main_window)
     {
         SDL_DestroyWindow(gf3d_vgraphics.main_window);

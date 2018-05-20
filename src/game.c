@@ -12,7 +12,7 @@ int main(int argc,char *argv[])
     int done = 0;
     const Uint8 * keys;
     
-    init_logger("gf2d.log");
+    init_logger("gf3d.log");
     slog("gf3d begin");
     gf3d_vgraphics_init(
         "gf3d",
