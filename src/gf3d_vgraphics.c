@@ -10,6 +10,7 @@
 #include "gf3d_types.h"
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
+#include "gf3d_vqueues.h"
 #include "simple_logger.h"
 
 typedef struct
@@ -40,13 +41,6 @@ typedef struct
     VkSurfaceKHR                surface;
     VkDeviceCreateInfo          device_info;
 
-    //Queues
-    VkDeviceQueueCreateInfo     queue_info;
-    Uint32                      queue_property_count;
-    VkQueueFamilyProperties    *queue_properties;
-    Uint32                      render_queue_index;
-    VkQueue                     device_queue;
-
     // color space
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
@@ -58,14 +52,11 @@ typedef struct
     size_t                      node_index;
     
     // function pointers
-//    PFN_vkGetPhysicalDeviceSupportKHR               fpGetPhysicalDeviceSurfaceSupportKHR;
-//    PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR   fpGetPhysicalDeviceSurfaceCapabilitiesKHR;
     PFN_vkGetPhysicalDeviceSurfaceFormatsKHR        fpGetPhysicalDeviceSurfaceFormatsKHR;
     PFN_vkGetPhysicalDeviceSurfacePresentModesKHR   fpGetPhysicalDeviceSurfacePresentModesKHR;
     PFN_vkCreateSwapchainKHR                        fpCreateSwapchainKHR;
     PFN_vkDestroySwapchainKHR                       fpDestroySwapchainKHR;
     PFN_vkGetSwapchainImagesKHR                     fpGetSwapchainImagesKHR;
-  //  PFN_vkAcquireNExtImageKHR                       fpAcquireNextImageKHR;
     PFN_vkQueuePresentKHR                           fpQueuePresentKHR;
 }vGraphics;
 
@@ -74,6 +65,7 @@ static vGraphics gf3d_vgraphics = {0};
 void gf3d_vgraphics_close();
 void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
+VkPhysicalDevice gf3d_vgraphics_select_device();
 
 void gf3d_vgraphics_init(
     char *windowName,
@@ -86,7 +78,6 @@ void gf3d_vgraphics_init(
 {
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
-    VkBool32 supported;
     Uint32 enabledExtensionCount = 0;
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -198,68 +189,24 @@ void gf3d_vgraphics_init(
         gf3d_vgraphics_close();
         return;
     }
+
     gf3d_vgraphics.devices = (VkPhysicalDevice *)malloc(sizeof(VkPhysicalDevice)*gf3d_vgraphics.device_count);
     vkEnumeratePhysicalDevices(gf3d_vgraphics.vk_instance, &gf3d_vgraphics.device_count, gf3d_vgraphics.devices);
     
-    gf3d_vgraphics.gpu = gf3d_vgraphics.devices[0];
+    gf3d_vgraphics.gpu = gf3d_vgraphics_select_device();
     
-    // setup queues
-    
-    vkGetPhysicalDeviceQueueFamilyProperties(
-        gf3d_vgraphics.gpu,
-        &gf3d_vgraphics.queue_property_count,
-        NULL);
-    
-    if (!gf3d_vgraphics.queue_property_count)
-    {
-        slog("failed to get any queue properties");
-        gf3d_vgraphics_close();
-        return;
-    }
-    gf3d_vgraphics.queue_properties = (VkQueueFamilyProperties*)malloc(sizeof(VkQueueFamilyProperties) * gf3d_vgraphics.queue_property_count);
-    vkGetPhysicalDeviceQueueFamilyProperties(
-        gf3d_vgraphics.gpu,
-        &gf3d_vgraphics.queue_property_count,
-        gf3d_vgraphics.queue_properties);
-    slog("discoverd %i queue family properties",gf3d_vgraphics.queue_property_count);
-    for (i = 0; i < gf3d_vgraphics.queue_property_count; i++)
-    {
-        slog("Queue family %i:",i);
-        slog("queue flag bits %i",gf3d_vgraphics.queue_properties[i].queueFlags);
-        slog("queue count %i",gf3d_vgraphics.queue_properties[i].queueCount);
-        slog("queue timestamp valid bits %i",gf3d_vgraphics.queue_properties[i].timestampValidBits);
-        slog("queue min image transfer granularity %iw %ih %id",
-             gf3d_vgraphics.queue_properties[i].minImageTransferGranularity.width,
-             gf3d_vgraphics.queue_properties[i].minImageTransferGranularity.height,
-             gf3d_vgraphics.queue_properties[i].minImageTransferGranularity.depth);
-    }
     // create a surface for the window
     SDL_Vulkan_CreateSurface(gf3d_vgraphics.main_window, gf3d_vgraphics.vk_instance, &gf3d_vgraphics.surface);
     // setup a queue for rendering calls
-    for (i = 0; i < gf3d_vgraphics.queue_property_count; i++)
-    {
-        vkGetPhysicalDeviceSurfaceSupportKHR(
-            gf3d_vgraphics.gpu,
-            i,
-            gf3d_vgraphics.surface,
-            &supported);
-        if (supported)
-        {
-            gf3d_vgraphics.render_queue_index = i;
-            slog("can use queue %i for render pipeline",i);
-        }
-    }
-    slog("using queue %i for rendering pipeline",gf3d_vgraphics.render_queue_index);
-    
+        
+    // setup queues
+    gf3d_vqueues_init(gf3d_vgraphics.gpu,gf3d_vgraphics.surface);
+
     atexit(gf3d_vgraphics_close);
 }
 
 void gf3d_vgraphics_close()
 {
-    if (gf3d_vgraphics.queue_properties)
-    {
-        free(gf3d_vgraphics.queue_properties);
-    }
     if (gf3d_vgraphics.devices)
     {
         free(gf3d_vgraphics.devices);
@@ -291,6 +238,45 @@ void gf3d_vgraphics_render()
 {
     
 }
+
+/**
+ * VULKAN DEVEICE SUPPORT
+ */
+
+Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)
+{
+    VkPhysicalDeviceProperties deviceProperties;
+    VkPhysicalDeviceFeatures deviceFeatures;
+    
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    
+    slog("Device Name: %s",deviceProperties.deviceName);
+    slog("Dedicated GPU: %i",(deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)?1:0);
+    slog("apiVersion: %i",deviceProperties.apiVersion);
+    slog("driverVersion: %i",deviceProperties.driverVersion);
+    slog("supports Geometry Shader: %i",deviceFeatures.geometryShader);
+    return (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)&&(deviceFeatures.geometryShader);
+}
+
+VkPhysicalDevice gf3d_vgraphics_select_device()
+{
+    int i;
+    VkPhysicalDevice chosen = VK_NULL_HANDLE;
+    for (i = 0; i < gf3d_vgraphics.device_count; i++)
+    {
+        if (gf3d_vgraphics_device_validate(gf3d_vgraphics.devices[i]))
+        {
+            chosen = gf3d_vgraphics.devices[i];
+        }
+    }
+    return chosen;
+}
+
+
+/**
+ * VULKAN DEBUGGING CALLBACK SETUP
+ */
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL gf3d_vgraphics_debug_parse(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
