@@ -30,6 +30,8 @@ typedef struct
 
     Uint32                      sdl_extension_count;
     const char                **sdl_extension_names;
+    Bool                        enableValidationLayers;
+    VkDebugUtilsMessengerEXT    debug_callback;    
     
     unsigned int                enabled_layer_count;
 
@@ -37,9 +39,9 @@ typedef struct
     Uint32                      device_count;
     VkPhysicalDevice           *devices;
     VkPhysicalDevice            gpu;
+    Bool                        logicalDeviceCreated;
     VkDevice                    device;
     VkSurfaceKHR                surface;
-    VkDeviceCreateInfo          device_info;
 
     // color space
     VkFormat                    color_format;
@@ -50,6 +52,9 @@ typedef struct
     SwapChainBuffer            *buffers;
     VkImage                    *images;
     size_t                      node_index;
+    
+    VkDeviceQueueCreateInfo     queueCreateInfo;
+    VkPhysicalDeviceFeatures    deviceFeatures;
     
     // function pointers
     PFN_vkGetPhysicalDeviceSurfaceFormatsKHR        fpGetPhysicalDeviceSurfaceFormatsKHR;
@@ -63,9 +68,13 @@ typedef struct
 static vGraphics gf3d_vgraphics = {0};
 
 void gf3d_vgraphics_close();
+void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
 VkPhysicalDevice gf3d_vgraphics_select_device();
+VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
+void gf3d_vgraphics_debug_close();
+void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
 
 void gf3d_vgraphics_init(
     char *windowName,
@@ -79,6 +88,7 @@ void gf3d_vgraphics_init(
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
     Uint32 enabledExtensionCount = 0;
+    VkDeviceCreateInfo createInfo = {0};    
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -150,6 +160,7 @@ void gf3d_vgraphics_init(
     
     if (enableValidation)
     {
+        gf3d_vgraphics.enableValidationLayers = true;
         gf3d_validation_init();
         gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_validation_layer_count();
         gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
@@ -201,12 +212,53 @@ void gf3d_vgraphics_init(
         
     // setup queues
     gf3d_vqueues_init(gf3d_vgraphics.gpu,gf3d_vgraphics.surface);
-
+    
+    createInfo = gf3d_vgraphics_get_device_info(enableValidation);
+    
+    if (vkCreateDevice(gf3d_vgraphics.gpu, &createInfo, NULL, &gf3d_vgraphics.device) != VK_SUCCESS)
+    {
+        slog("failed to create logical device");
+        gf3d_vgraphics_close();
+        return;
+    }
+    gf3d_vgraphics.logicalDeviceCreated = true;
     atexit(gf3d_vgraphics_close);
+}
+
+VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
+{
+    VkDeviceCreateInfo createInfo = {0};
+    
+    gf3d_vgraphics.queueCreateInfo = gf3d_vqueues_get_graphics_queue_info();
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    
+    createInfo.pQueueCreateInfos = &gf3d_vgraphics.queueCreateInfo;
+    createInfo.queueCreateInfoCount = 1;
+
+    createInfo.pEnabledFeatures = &gf3d_vgraphics.deviceFeatures;
+    
+    createInfo.enabledExtensionCount = 0;
+
+    if (enableValidationLayers)
+    {
+        createInfo.enabledLayerCount = gf3d_validation_get_validation_layer_count();
+        createInfo.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+    }
+    else
+    {
+        createInfo.enabledLayerCount = 0;
+    }
+    
+    return createInfo;
 }
 
 void gf3d_vgraphics_close()
 {
+    gf3d_vgraphics_debug_close();
+    if (gf3d_vgraphics.logicalDeviceCreated)
+    {
+        vkDestroyDevice(gf3d_vgraphics.device, NULL);
+    }
     if (gf3d_vgraphics.devices)
     {
         free(gf3d_vgraphics.devices);
@@ -306,10 +358,27 @@ VkResult CreateDebugUtilsMessengerEXT(
     }
 }
 
+void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator)
+{
+    auto PFN_vkDestroyDebugUtilsMessengerEXT func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (func != NULL)
+    {
+        func(instance, callback, pAllocator);
+    }
+}
+
+void gf3d_vgraphics_debug_close()
+{
+    if (gf3d_vgraphics.enableValidationLayers)
+    {
+        DestroyDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, gf3d_vgraphics.debug_callback, NULL);
+    }
+}
+
 void gf3d_vgraphics_setup_debug()
 {
     VkDebugUtilsMessengerCreateInfoEXT createInfo = {0};
-    VkDebugUtilsMessengerEXT callback;
+
     
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     
@@ -320,7 +389,7 @@ void gf3d_vgraphics_setup_debug()
     createInfo.pfnUserCallback = gf3d_vgraphics_debug_parse;
     createInfo.pUserData = NULL; // Optional
     
-    CreateDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, &createInfo, NULL, &callback);
+    CreateDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, &createInfo, NULL, &gf3d_vgraphics.debug_callback);
 }
 
 /*eol@eof*/
