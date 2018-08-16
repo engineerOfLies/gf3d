@@ -8,6 +8,7 @@
 
 #include "gf3d_vector.h"
 #include "gf3d_types.h"
+#include "gf3d_validation.h"
 #include "simple_logger.h"
 
 typedef struct
@@ -68,7 +69,6 @@ typedef struct
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
-
 
 void gf3d_vgraphics_close();
 
@@ -223,6 +223,7 @@ void gf3d_vgraphics_init(
     
 //    vkGetDeviceQueue(gf3d_vgraphics.device,gf3d_vgraphics.render_queue_index,0,&gf3d_vgraphics.device_queue);
     
+    gf3d_validation_init();
     atexit(gf3d_vgraphics_close);
 }
 
@@ -263,5 +264,6 @@ void gf3d_vgraphics_render()
 {
     
 }
+
 /*eol@eof*/
 
