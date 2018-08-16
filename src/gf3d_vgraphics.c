@@ -9,6 +9,7 @@
 #include "gf3d_vector.h"
 #include "gf3d_types.h"
 #include "gf3d_validation.h"
+#include "gf3d_extensions.h"
 #include "simple_logger.h"
 
 typedef struct
@@ -26,9 +27,9 @@ typedef struct
     VkInstance                  vk_instance;
     VkInstanceCreateInfo        vk_instance_info;
 
-    unsigned int                enabled_extension_count;
-    const char                **enabled_extension_names;
-
+    Uint32                      sdl_extension_count;
+    const char                **sdl_extension_names;
+    
     unsigned int                enabled_layer_count;
 
     //devices
@@ -71,19 +72,22 @@ typedef struct
 static vGraphics gf3d_vgraphics = {0};
 
 void gf3d_vgraphics_close();
-
+void gf3d_vgraphics_extension_init();
+void gf3d_vgraphics_setup_debug();
 
 void gf3d_vgraphics_init(
     char *windowName,
     int renderWidth,
     int renderHeight,
     Vector4D bgcolor,
-    Bool fullscreen
+    Bool fullscreen,
+    Bool enableValidation
 )
 {
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
     VkBool32 supported;
+    Uint32 enabledExtensionCount = 0;
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -115,17 +119,31 @@ void gf3d_vgraphics_init(
         exit(0);
         return;
     }
+
+    // extension configuration
+    gf3d_extensions_init();
     
-    SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.enabled_extension_count), NULL);
-    if (gf3d_vgraphics.enabled_extension_count > 0)
+    // get the extensions that are needed for rendering to an SDL Window
+    SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), NULL);
+    if (gf3d_vgraphics.sdl_extension_count > 0)
     {
-        gf3d_vgraphics.enabled_extension_names = malloc(sizeof(const char *) * gf3d_vgraphics.enabled_extension_count);
-        SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.enabled_extension_count), gf3d_vgraphics.enabled_extension_names);
-        for (i = 0; i < gf3d_vgraphics.enabled_extension_count;i++)
+        gf3d_vgraphics.sdl_extension_names = gf3d_allocate_array(sizeof(const char *),gf3d_vgraphics.sdl_extension_count);
+        
+        SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), gf3d_vgraphics.sdl_extension_names);
+        for (i = 0; i < gf3d_vgraphics.sdl_extension_count;i++)
         {
-            slog("extensions loaded: %s",gf3d_vgraphics.enabled_extension_names[i]);
+            slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
+            gf3d_extensions_enable(gf3d_vgraphics.sdl_extension_names[i]);
         }
     }
+    else
+    {
+        slog("SDL / Vulkan not supported");
+        gf3d_vgraphics_close();
+        exit(0);
+        return;
+    }
+
     // setup app info
     gf3d_vgraphics.vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     gf3d_vgraphics.vk_app_info.pNext = NULL;
@@ -134,23 +152,41 @@ void gf3d_vgraphics_init(
     gf3d_vgraphics.vk_app_info.pEngineName = windowName;
     gf3d_vgraphics.vk_app_info.engineVersion = 0;
     gf3d_vgraphics.vk_app_info.apiVersion = VK_API_VERSION_1_0;
-    //setup instance info
+    
     gf3d_vgraphics.vk_instance_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     gf3d_vgraphics.vk_instance_info.pNext = NULL;
     gf3d_vgraphics.vk_instance_info.pApplicationInfo = &gf3d_vgraphics.vk_app_info;
-    gf3d_vgraphics.vk_instance_info.enabledLayerCount = 0;
-    gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = NULL;
-    gf3d_vgraphics.vk_instance_info.enabledExtensionCount = gf3d_vgraphics.enabled_extension_count;
-    gf3d_vgraphics.vk_instance_info.ppEnabledExtensionNames = gf3d_vgraphics.enabled_extension_names;
+    
+    if (enableValidation)
+    {
+        gf3d_validation_init();
+        gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_validation_layer_count();
+        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+        gf3d_extensions_enable("VK_EXT_debug_utils");
+    }
+    else
+    {
+        //setup instance info
+        gf3d_vgraphics.vk_instance_info.enabledLayerCount = 0;
+        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = NULL;
+    }
+    
+    gf3d_vgraphics.vk_instance_info.ppEnabledExtensionNames = gf3d_extensions_get_enabled_names(&enabledExtensionCount);
+    gf3d_vgraphics.vk_instance_info.enabledExtensionCount = enabledExtensionCount;
 
     // create instance
     vkCreateInstance(&gf3d_vgraphics.vk_instance_info, NULL, &gf3d_vgraphics.vk_instance);
-    
+
     if (!gf3d_vgraphics.vk_instance)
     {
         slog("failed to create a vulkan instance");
         gf3d_vgraphics_close();
         return;
+    }
+    
+    if (enableValidation)
+    {
+        gf3d_vgraphics_setup_debug();
     }
     
     //get a gpu to do work with
@@ -215,15 +251,6 @@ void gf3d_vgraphics_init(
     }
     slog("using queue %i for rendering pipeline",gf3d_vgraphics.render_queue_index);
     
-/*    if (vkCreateDevice(gf3d_vgraphics.gpu, &createInfo, nullptr, &device) != VK_SUCCESS) {
-        slog("failed to create logical device!");
-        gf3d_vgraphics_close();
-        return;
-    }*/
-    
-//    vkGetDeviceQueue(gf3d_vgraphics.device,gf3d_vgraphics.render_queue_index,0,&gf3d_vgraphics.device_queue);
-    
-    gf3d_validation_init();
     atexit(gf3d_vgraphics_close);
 }
 
@@ -237,9 +264,9 @@ void gf3d_vgraphics_close()
     {
         free(gf3d_vgraphics.devices);
     }
-    if (gf3d_vgraphics.enabled_extension_names)
+    if (gf3d_vgraphics.sdl_extension_names)
     {
-        free(gf3d_vgraphics.enabled_extension_names);
+        free(gf3d_vgraphics.sdl_extension_names);
     }
     if(gf3d_vgraphics.surface)
     {
@@ -263,6 +290,51 @@ void gf3d_vgraphics_clear()
 void gf3d_vgraphics_render()
 {
     
+}
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL gf3d_vgraphics_debug_parse(
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+    void* pUserData)
+{
+    //setting this up to always log the message, but this can be adjusted later
+    slog("VULKAN DEBUG [%i]:%s",messageSeverity,pCallbackData->pMessage);
+    return VK_FALSE;
+}
+
+VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance,
+    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pCallback)
+{
+    auto PFN_vkCreateDebugUtilsMessengerEXT func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    if (func != NULL)
+    {
+        return func(instance, pCreateInfo, pAllocator, pCallback);
+    }
+    else
+    {
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+}
+
+void gf3d_vgraphics_setup_debug()
+{
+    VkDebugUtilsMessengerCreateInfoEXT createInfo = {0};
+    VkDebugUtilsMessengerEXT callback;
+    
+    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    
+    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    
+    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    
+    createInfo.pfnUserCallback = gf3d_vgraphics_debug_parse;
+    createInfo.pUserData = NULL; // Optional
+    
+    CreateDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, &createInfo, NULL, &callback);
 }
 
 /*eol@eof*/

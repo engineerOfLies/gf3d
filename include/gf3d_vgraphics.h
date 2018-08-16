@@ -8,7 +8,8 @@ void gf3d_vgraphics_init(
     int renderWidth,
     int renderHeight,
     Vector4D bgcolor,
-    Bool fullscreen
+    Bool fullscreen,
+    Bool enableValidation
 );
 
 void gf3d_vgraphics_clear();
