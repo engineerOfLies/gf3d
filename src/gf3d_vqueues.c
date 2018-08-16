@@ -1,4 +1,5 @@
 #include "gf3d_vqueues.h"
+#include "gf3d_vector.h"
 #include "simple_logger.h"
 
 typedef struct
@@ -30,11 +31,14 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
         gf3d_vqueues_close();
         return;
     }
-    gf3d_vqueues.queue_properties = (VkQueueFamilyProperties*)malloc(sizeof(VkQueueFamilyProperties) * gf3d_vqueues.queue_property_count);
+    
+    gf3d_vqueues.queue_properties = (VkQueueFamilyProperties*)gf3d_allocate_array(sizeof(VkQueueFamilyProperties),gf3d_vqueues.queue_property_count);
+    
     vkGetPhysicalDeviceQueueFamilyProperties(
         device,
         &gf3d_vqueues.queue_property_count,
         gf3d_vqueues.queue_properties);
+    
     slog("discoverd %i queue family properties",gf3d_vqueues.queue_property_count);
     for (i = 0; i < gf3d_vqueues.queue_property_count; i++)
     {
