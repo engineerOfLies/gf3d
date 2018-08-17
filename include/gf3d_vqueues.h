@@ -18,5 +18,11 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface);
  */
 VkDeviceQueueCreateInfo gf3d_vqueues_get_graphics_queue_info();
 
+/**
+ * @brief after setting up the logical device, store the queue handle to use for graphics commands with this
+ * @param graphicsQueue the queue handle to use for graphics calls
+ */
+void gf3d_vqueues_set_graphics_queue(VkQueue graphicsQueue);
+
 
 #endif

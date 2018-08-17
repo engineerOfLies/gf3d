@@ -88,7 +88,8 @@ void gf3d_vgraphics_init(
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
     Uint32 enabledExtensionCount = 0;
-    VkDeviceCreateInfo createInfo = {0};    
+    VkDeviceCreateInfo createInfo = {0};
+    VkQueue graphicsQueue = 0;
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -222,6 +223,9 @@ void gf3d_vgraphics_init(
         return;
     }
     gf3d_vgraphics.logicalDeviceCreated = true;
+    
+    vkGetDeviceQueue(gf3d_vgraphics.device, gf3d_vgraphics.queueCreateInfo.queueFamilyIndex, 0, &graphicsQueue);
+    
     atexit(gf3d_vgraphics_close);
 }
 

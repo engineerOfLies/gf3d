@@ -5,12 +5,14 @@
 typedef struct
 {
     VkDeviceQueueCreateInfo     queue_info;
-    Uint32                      queue_property_count;
+    Uint32                      queue_family_count;
     VkQueueFamilyProperties    *queue_properties;
     VkQueue                     device_queue;
     Uint32                      graphics_queue_family;
     float                       queue_priority;
     VkQueue                     graphics_queue;
+    VkQueue                     present_queue;
+    VkDeviceQueueCreateInfo    *presentation_queue_info;
 }vQueues;
 
 static vQueues gf3d_vqueues = {0};
@@ -25,25 +27,25 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     
     vkGetPhysicalDeviceQueueFamilyProperties(
         device,
-        &gf3d_vqueues.queue_property_count,
+        &gf3d_vqueues.queue_family_count,
         NULL);
     
-    if (!gf3d_vqueues.queue_property_count)
+    if (!gf3d_vqueues.queue_family_count)
     {
         slog("failed to get any queue properties");
         gf3d_vqueues_close();
         return;
     }
     
-    gf3d_vqueues.queue_properties = (VkQueueFamilyProperties*)gf3d_allocate_array(sizeof(VkQueueFamilyProperties),gf3d_vqueues.queue_property_count);
+    gf3d_vqueues.queue_properties = (VkQueueFamilyProperties*)gf3d_allocate_array(sizeof(VkQueueFamilyProperties),gf3d_vqueues.queue_family_count);
     
     vkGetPhysicalDeviceQueueFamilyProperties(
         device,
-        &gf3d_vqueues.queue_property_count,
+        &gf3d_vqueues.queue_family_count,
         gf3d_vqueues.queue_properties);
     
-    slog("discoverd %i queue family properties",gf3d_vqueues.queue_property_count);
-    for (i = 0; i < gf3d_vqueues.queue_property_count; i++)
+    slog("discoverd %i queue family properties",gf3d_vqueues.queue_family_count);
+    for (i = 0; i < gf3d_vqueues.queue_family_count; i++)
     {
         slog("Queue family %i:",i);
         slog("queue flag bits %i",gf3d_vqueues.queue_properties[i].queueFlags);
@@ -81,6 +83,11 @@ VkDeviceQueueCreateInfo gf3d_vqueues_get_graphics_queue_info()
     return queueCreateInfo;
 }
 
+void gf3d_vqueues_set_graphics_queue(VkQueue graphicsQueue)
+{
+    gf3d_vqueues.graphics_queue = graphicsQueue;
+}
+
 void gf3d_vqueues_close()
 {
     if (gf3d_vqueues.queue_properties)
@@ -89,4 +96,8 @@ void gf3d_vqueues_close()
     }
 }
 
+void gf3d_vqueues_create_presentation_queues()
+{
+    gf3d_vqueues.presentation_queue_info = (VkDeviceQueueCreateInfo*)gf3d_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.queue_family_count);
+}
 /*eol@eof*/
