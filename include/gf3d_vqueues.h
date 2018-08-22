@@ -13,16 +13,17 @@
 void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface);
 
 /**
- * @brief get queue information needed to create a logical device based on discovered queue properties
- * @returns the VkDeviceQueueCreateInfo populated
+ * @brief get graphics queue information needed to create a logical device based on discovered queue properties
+ * @param count a pointer to an integer to populate the count of create info returned
+ * @returns a pointer to an array of VkDeviceQueueCreateInfo populated
  */
-VkDeviceQueueCreateInfo gf3d_vqueues_get_graphics_queue_info();
+const VkDeviceQueueCreateInfo *gf3d_vqueues_get_queue_create_info(Uint32 *count);
 
 /**
- * @brief after setting up the logical device, store the queue handle to use for graphics commands with this
- * @param graphicsQueue the queue handle to use for graphics calls
+ * @brief after device creation call this to setup internal queue handles
+ * @param device the logical device handle
  */
-void gf3d_vqueues_set_graphics_queue(VkQueue graphicsQueue);
+void gf3d_vqueues_setup_device_queues(VkDevice device);
 
 
 #endif
