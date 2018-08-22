@@ -25,5 +25,16 @@ const VkDeviceQueueCreateInfo *gf3d_vqueues_get_queue_create_info(Uint32 *count)
  */
 void gf3d_vqueues_setup_device_queues(VkDevice device);
 
+/**
+ * @brief get the queue family index for the presentation queue
+ * @return the index of the presentation queue family
+ */
+Sint32 gf3d_vqueues_get_present_queue_family();
+
+/**
+ * @brief get the queue family index for the graphics queue
+ * @return the index of the graphics queue family
+ */
+Sint32 gf3d_vqueues_get_graphics_queue_family();
 
 #endif

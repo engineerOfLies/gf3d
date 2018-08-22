@@ -331,12 +331,5 @@ void vector3d_rotate_about_x(Vector3D *vect, float angle);
 void vector3d_rotate_about_y(Vector3D *vect, float angle);
 void vector3d_rotate_about_z(Vector3D *vect, float angle);
 
-/**
- * @brief helper function to allocate and initialize arrays.  The array returned needs to be free'd
- * @param typeSize the size of the type for the array
- * @param count the number of elements in the array
- * @returns NULL on error (check logs), an array allocated and initialized to zero otherwise
- */
-void *gf3d_allocate_array(size_t typeSize,size_t count);
 
 #endif

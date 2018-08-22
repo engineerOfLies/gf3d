@@ -47,6 +47,7 @@ void gf3d_validation_close()
         free(gf3d_validation.layerNames);
         gf3d_validation.layerNames = NULL;
     }
+    memset(&gf3d_validation,0,sizeof(vValidation));
 }
 
 void gf3d_validation_init()

@@ -545,27 +545,4 @@ void vector3d_cross_product(Vector3D *out, Vector3D v1, Vector3D v2)
   out->z = v1.x*v2.y - v1.y*v2.x;
 }
 
-void *gf3d_allocate_array(size_t typeSize,size_t count)
-{
-    void *array;
-    if (count <= 0)
-    {
-        slog("cannot allocate zero elements");
-        return NULL;
-    }
-    if (typeSize <= 0)
-    {
-        slog("cannot initialize an array of elements with zero size");
-        return NULL;
-    }
-    array = malloc(typeSize * count);
-    if (!array)
-    {
-        slog("failed to allocation space for %i elements of size %i",count,typeSize);
-        return NULL;
-    }
-    memset(array,0,typeSize*count);
-    return array;
-}
-
 /*eol@eof*/

@@ -156,10 +156,21 @@ void gf3d_vqueues_close()
     {
         free(gf3d_vqueues.queue_properties);
     }
+    memset(&gf3d_vqueues,0,sizeof(vQueues));
 }
 
 void gf3d_vqueues_create_presentation_queues()
 {
     gf3d_vqueues.presentation_queue_info = (VkDeviceQueueCreateInfo*)gf3d_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.queue_family_count);
+}
+
+Sint32 gf3d_vqueues_get_graphics_queue_family()
+{
+    return gf3d_vqueues.graphics_queue_family;
+}
+
+Sint32 gf3d_vqueues_get_present_queue_family()
+{
+    return gf3d_vqueues.present_queue_family;
 }
 /*eol@eof*/

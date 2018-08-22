@@ -11,14 +11,9 @@
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
 #include "gf3d_vqueues.h"
+#include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "simple_logger.h"
-
-typedef struct
-{
-    VkImage image;
-    VkImageView view;
-}SwapChainBuffer;
 
 typedef struct
 {
@@ -49,22 +44,9 @@ typedef struct
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
 
-    // swap chain
-    VkSwapchainKHR              swap_chain;
-    SwapChainBuffer            *buffers;
-    VkImage                    *images;
-    size_t                      node_index;
-    
     VkDeviceQueueCreateInfo    *queueCreateInfo;
     VkPhysicalDeviceFeatures    deviceFeatures;
     
-    // function pointers
-    PFN_vkGetPhysicalDeviceSurfaceFormatsKHR        fpGetPhysicalDeviceSurfaceFormatsKHR;
-    PFN_vkGetPhysicalDeviceSurfacePresentModesKHR   fpGetPhysicalDeviceSurfacePresentModesKHR;
-    PFN_vkCreateSwapchainKHR                        fpCreateSwapchainKHR;
-    PFN_vkDestroySwapchainKHR                       fpDestroySwapchainKHR;
-    PFN_vkGetSwapchainImagesKHR                     fpGetSwapchainImagesKHR;
-    PFN_vkQueuePresentKHR                           fpQueuePresentKHR;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -136,7 +118,7 @@ void gf3d_vgraphics_init(
         for (i = 0; i < gf3d_vgraphics.sdl_extension_count;i++)
         {
             slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
-            gf3d_extensions_instance_enable(gf3d_vgraphics.sdl_extension_names[i]);
+            gf3d_extensions_enable(ET_Instance, gf3d_vgraphics.sdl_extension_names[i]);
         }
     }
     else
@@ -166,7 +148,7 @@ void gf3d_vgraphics_init(
         gf3d_validation_init();
         gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_validation_layer_count();
         gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
-        gf3d_extensions_instance_enable("VK_EXT_debug_utils");
+        gf3d_extensions_enable(ET_Instance,"VK_EXT_debug_utils");
     }
     else
     {
@@ -215,6 +197,10 @@ void gf3d_vgraphics_init(
     // setup queues
     gf3d_vqueues_init(gf3d_vgraphics.gpu,gf3d_vgraphics.surface);
     
+    //setup device extensions
+    gf3d_extensions_device_init(gf3d_vgraphics.gpu);
+    gf3d_extensions_enable(ET_Device,"VK_KHR_swapchain");
+
     createInfo = gf3d_vgraphics_get_device_info(enableValidation);
     
     if (vkCreateDevice(gf3d_vgraphics.gpu, &createInfo, NULL, &gf3d_vgraphics.device) != VK_SUCCESS)
@@ -226,8 +212,10 @@ void gf3d_vgraphics_init(
     gf3d_vgraphics.logicalDeviceCreated = true;
     
     gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
-    gf3d_extensions_device_init(gf3d_vgraphics.gpu);
 
+    // swap chain!!!
+    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
+    
     atexit(gf3d_vgraphics_close);
 }
 
@@ -245,7 +233,10 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
 
     createInfo.pEnabledFeatures = &gf3d_vgraphics.deviceFeatures;
     
-    createInfo.enabledExtensionCount = 0;
+    
+    createInfo.ppEnabledExtensionNames = gf3d_extensions_get_device_enabled_names(&count);
+    createInfo.enabledExtensionCount = count;
+    
 
     if (enableValidationLayers)
     {
@@ -262,6 +253,7 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
 
 void gf3d_vgraphics_close()
 {
+    gf3d_swapchain_close();
     gf3d_vgraphics_debug_close();
     if (gf3d_vgraphics.logicalDeviceCreated)
     {
@@ -287,6 +279,7 @@ void gf3d_vgraphics_close()
     {
         SDL_DestroyWindow(gf3d_vgraphics.main_window);
     }
+    memset(&gf3d_vgraphics,0,sizeof(vGraphics));
 }
 
 void gf3d_vgraphics_clear()

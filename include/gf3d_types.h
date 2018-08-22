@@ -62,4 +62,12 @@ typedef short unsigned int Bool;
 
 #define gf3d_rect_set(r,a,b,c,d) (r.x=(a), r.y=(b), r.w=(c), r.h=(d))
 
+/**
+ * @brief helper function to allocate and initialize arrays.  The array returned needs to be free'd
+ * @param typeSize the size of the type for the array
+ * @param count the number of elements in the array
+ * @returns NULL on error (check logs), an array allocated and initialized to zero otherwise
+ */
+void *gf3d_allocate_array(size_t typeSize,size_t count);
+
 #endif

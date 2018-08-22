@@ -54,7 +54,7 @@ void gf3d_extensions_device_close()
     {
         free(gf3d_device_extensions.enabled_extension_names);
     }
-
+    memset(&gf3d_device_extensions,0,sizeof(vExtensions));
 }
 
 void gf3d_extensions_instance_init()
@@ -90,15 +90,18 @@ void gf3d_extensions_instance_close()
     {
         free(gf3d_instance_extensions.enabled_extension_names);
     }
-
+    memset(&gf3d_instance_extensions,0,sizeof(vExtensions));
 }
 
-Bool gf3d_extensions_instance_check_available(const char *extensionName)
+Bool gf3d_extensions_check_available(vExtensions *extensions,const char *extensionName)
 {
     int i;
-    for (i = 0; i < gf3d_instance_extensions.available_extension_count;i++)
+    
+    if (!extensions)return false;
+    
+    for (i = 0; i < extensions->available_extension_count;i++)
     {
-        if (strcmp(gf3d_instance_extensions.available_extensions[i].extensionName,extensionName) == 0)
+        if (strcmp(extensions->available_extensions[i].extensionName,extensionName) == 0)
         {
             return true;
         }
@@ -107,25 +110,38 @@ Bool gf3d_extensions_instance_check_available(const char *extensionName)
     return false;
 }
 
-Bool gf3d_extensions_instance_enable(const char *extensionName)
+Bool gf3d_extensions_enable(ExtensionType extType, const char *extensionName)
 {
+    vExtensions *extensions;
     int i;
-    for (i = 0; i < gf3d_instance_extensions.enabled_extension_count;i++)
+    switch(extType)
     {
-        if (strcmp(gf3d_instance_extensions.enabled_extension_names[i],extensionName) == 0)
+        case ET_Instance:
+            extensions = &gf3d_instance_extensions;
+        break;
+        case ET_Device:
+            extensions = &gf3d_device_extensions;
+        break;
+        default:
+            slog("unknown extension type");
+            return false;
+    }
+    for (i = 0; i < extensions->enabled_extension_count;i++)
+    {
+        if (strcmp(extensions->enabled_extension_names[i],extensionName) == 0)
         {
             slog("Extension '%s' already enabled",extensionName);
             return false;
         }
     }
-    if (!gf3d_extensions_instance_check_available(extensionName))return false;
-    if (gf3d_instance_extensions.enabled_extension_count >= gf3d_instance_extensions.available_extension_count)
+    if (!gf3d_extensions_check_available(extensions,extensionName))return false;
+    if (extensions->enabled_extension_count >= extensions->available_extension_count)
     {
         slog("cannot enable extension '%s' no more space",extensionName);
         return false;
     }
     
-    gf3d_instance_extensions.enabled_extension_names[gf3d_instance_extensions.enabled_extension_count++] = extensionName;
+    extensions->enabled_extension_names[extensions->enabled_extension_count++] = extensionName;
     return true;
 }
 
@@ -135,5 +151,10 @@ const char* const* gf3d_extensions_get_instance_enabled_names(Uint32 *count)
     return gf3d_instance_extensions.enabled_extension_names;
 }
 
+const char* const* gf3d_extensions_get_device_enabled_names(Uint32 *count)
+{
+    if (count != NULL)*count = gf3d_device_extensions.enabled_extension_count;
+    return gf3d_device_extensions.enabled_extension_names;
+}
 
 /*eol@eof*/
