@@ -119,7 +119,12 @@ void gf3d_matrix_perspective(
     out[1][1] = 1 / (halftanfov);
     out[2][2] = - ((far + near) / (far - near));
     out[2][3] = -1;
-    out[3][2] = - (2 * far * near)? -(2 * far * near) / (far - near):0;
+    if ((far - near) == 0)
+    {
+        out[3][2] = 0;
+    }
+    else
+    out[3][2] = -(2 * far * near) / (far - near);
     return;
 }
 

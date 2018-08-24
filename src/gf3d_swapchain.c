@@ -5,7 +5,6 @@
 
 typedef struct
 {
-    VkSwapchainKHR              swapChain;
     VkDevice                    device;
     VkSurfaceCapabilitiesKHR    capabilities;
     Uint32                      formatCount;
@@ -16,6 +15,10 @@ typedef struct
     int                         chosenPresentMode;
     VkExtent2D                  extent;                 // resolution of the swap buffers
     Uint32                      swapChainCount;
+    VkSwapchainKHR              swapChain;
+    VkImage                    *swapImages;
+    Uint32                      swapImageCount;
+    VkImageView                *imageViews;
 }vSwapChain;
 
 static vSwapChain gf3d_swapchain = {0};
@@ -25,6 +28,7 @@ void gf3d_swapchain_close();
 int gf3d_swapchain_get_format();
 int gf3d_swapchain_get_presentation_mode();
 VkExtent2D gf3d_swapchain_get_extent(Uint32 width,Uint32 height);
+VkImageView gf3d_swapchain_create_imageview(VkDevice device,VkImage image);
 
 void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfaceKHR surface,Uint32 width,Uint32 height)
 {
@@ -76,6 +80,7 @@ void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfac
 
 void gf2d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
 {
+    int i;
     Sint32 graphicsFamily;
     Sint32 presentFamily;
     VkSwapchainCreateInfoKHR createInfo = {0};
@@ -124,7 +129,55 @@ void gf2d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     if (vkCreateSwapchainKHR(device, &createInfo, NULL, &gf3d_swapchain.swapChain) != VK_SUCCESS)
     {
         slog("failed to create swap chain!");
+        gf3d_swapchain_close();
+        return;
     }
+    slog("created a swap chain with length %i",gf3d_swapchain.swapChainCount);
+    
+    vkGetSwapchainImagesKHR(device, gf3d_swapchain.swapChain, &gf3d_swapchain.swapImageCount, NULL);
+    if (gf3d_swapchain.swapImageCount == 0)
+    {
+        slog("failed to create any swap images!");
+        gf3d_swapchain_close();
+        return;
+    }
+    gf3d_swapchain.swapImages = (VkImage *)gf3d_allocate_array(sizeof(VkImage),gf3d_swapchain.swapImageCount);
+    vkGetSwapchainImagesKHR(device, gf3d_swapchain.swapChain, &gf3d_swapchain.swapImageCount,gf3d_swapchain.swapImages );
+    slog("created swap chain with %i images",gf3d_swapchain.swapImageCount);
+    
+    gf3d_swapchain.imageViews = (VkImageView *)gf3d_allocate_array(sizeof(VkImageView),gf3d_swapchain.swapImageCount);
+    for (i = 0 ; i < gf3d_swapchain.swapImageCount; i++)
+    {
+        gf3d_swapchain.imageViews[i] = gf3d_swapchain_create_imageview(device,gf3d_swapchain.swapImages[i]);
+    }
+    slog("create image views");
+}
+
+VkImageView gf3d_swapchain_create_imageview(VkDevice device,VkImage image)
+{
+    VkImageView imageView;
+    VkImageViewCreateInfo createInfo = {0};
+    
+    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    createInfo.image = image;
+    createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    createInfo.format = gf3d_swapchain.formats[gf3d_swapchain.chosenFormat].format;
+    createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    createInfo.subresourceRange.baseMipLevel = 0;
+    createInfo.subresourceRange.levelCount = 1;
+    createInfo.subresourceRange.baseArrayLayer = 0;
+    createInfo.subresourceRange.layerCount = 1;
+    
+    if (vkCreateImageView(device, &createInfo, NULL, &imageView) != VK_SUCCESS)
+    {
+        slog("failed to create image view");
+        return NULL;
+    }
+    return imageView;
 }
 
 VkExtent2D gf3d_swapchain_get_extent(Uint32 width,Uint32 height)
@@ -168,7 +221,20 @@ int gf3d_swapchain_get_format()
 
 void gf3d_swapchain_close()
 {
+    int i;
     vkDestroySwapchainKHR(gf3d_swapchain.device, gf3d_swapchain.swapChain, NULL);
+    if (gf3d_swapchain.imageViews)
+    {
+        for (i = 0;i < gf3d_swapchain.swapImageCount;i++)
+        {
+            vkDestroyImageView(gf3d_swapchain.device,gf3d_swapchain.imageViews[i],NULL);
+        }
+        free(gf3d_swapchain.imageViews);
+    }
+    if (gf3d_swapchain.swapImages)
+    {
+        free(gf3d_swapchain.swapImages);
+    }
     if (gf3d_swapchain.formats)
     {
         free(gf3d_swapchain.formats);

@@ -3,6 +3,7 @@
 
 #include "simple_logger.h"
 #include "gf3d_vgraphics.h"
+#include "gf3d_pipeline.h"
 #include "gf3d_model.h"
 #include "gf3d_matrix.h"
 #include "gf3d_camera.h"
@@ -22,6 +23,7 @@ int main(int argc,char *argv[])
         0,                      //fullscreen
         1                       //validation
     );
+    gf3d_pipeline_init(2);
     
     // main game loop
     while(!done)
