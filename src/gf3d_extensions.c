@@ -46,6 +46,7 @@ void gf3d_extensions_device_init(VkPhysicalDevice device)
 
 void gf3d_extensions_device_close()
 {
+    slog("cleaning up device extensions");
     if (gf3d_device_extensions.available_extensions)
     {
         free(gf3d_device_extensions.available_extensions);
@@ -82,6 +83,7 @@ void gf3d_extensions_instance_init()
 
 void gf3d_extensions_instance_close()
 {
+    slog("cleaning up instance extentions");
     if (gf3d_instance_extensions.available_extensions)
     {
         free(gf3d_instance_extensions.available_extensions);

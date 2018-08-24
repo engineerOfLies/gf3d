@@ -5,7 +5,23 @@
 #include "simple_logger.h"
 
 
-char *gf3d_shaders_load_data(char * filename)
+VkShaderModule gf3d_shaders_create_module(char *shader,size_t size,VkDevice device)
+{
+    VkShaderModule module = {0};
+    VkShaderModuleCreateInfo createInfo = {0};
+    
+    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    createInfo.codeSize = size;
+    createInfo.pCode = (const uint32_t*)shader;
+    
+    if (vkCreateShaderModule(device, &createInfo, NULL, &module) != VK_SUCCESS)
+    {
+        slog("failed to create shader module");
+    }
+    return module;
+}
+
+char *gf3d_shaders_load_data(char * filename,size_t *rsize)
 {
     char *buffer = NULL;
     FILE *file;
@@ -34,6 +50,7 @@ char *gf3d_shaders_load_data(char * filename)
     }
     fread(buffer,size,1,file);
     fclose(file);
+    if (rsize)*rsize = size;
     return buffer;
 }
     

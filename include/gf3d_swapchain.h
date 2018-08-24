@@ -3,6 +3,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include "gf3d_pipeline.h"
 #include "gf3d_types.h"
 
 /**
@@ -20,6 +21,18 @@ void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice, VkSurfa
  * @returns false if not, true if it will work for rendering
  */
 Bool gf3d_swapchain_validation_check();
+
+/**
+ * @brief get the current extent configured for the swap chain
+ * @returns the width and height of the swap chain images
+ */
+VkExtent2D gf3d_swapchain_get_extent();
+
+/**
+ * @brief get the swap image surface format
+ * @returns the format chosen or 0 if none specified
+ */
+VkFormat gf3d_swapchain_get_format();
 
 /**
  * @brief called at exit to clean up the swap chains

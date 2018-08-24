@@ -1,6 +1,8 @@
 #ifndef __GF3D_VGRAPHICS_H__
 #define __GF3D_VGRAPHICS_H__
 
+#include <vulkan/vulkan.h>
+
 #include "gf3d_vector.h"
 
 void gf3d_vgraphics_init(
@@ -11,6 +13,9 @@ void gf3d_vgraphics_init(
     Bool fullscreen,
     Bool enableValidation
 );
+
+VkDevice gf3d_vgraphics_get_default_logical_device();
+VkExtent2D gf3d_vgraphics_get_view_extent();
 
 void gf3d_vgraphics_clear();
 

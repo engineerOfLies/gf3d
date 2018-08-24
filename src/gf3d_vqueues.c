@@ -148,6 +148,7 @@ void gf3d_vqueues_setup_device_queues(VkDevice device)
 
 void gf3d_vqueues_close()
 {
+    slog("cleaning up vulkan queues");
     if (gf3d_vqueues.queue_create_info)
     {
         free(gf3d_vqueues.queue_create_info);

@@ -12,6 +12,8 @@ int main(int argc,char *argv[])
 {
     int done = 0;
     const Uint8 * keys;
+    Pipeline *pipe;
+    VkDevice device;
     
     init_logger("gf3d.log");
     slog("gf3d begin");
@@ -23,7 +25,11 @@ int main(int argc,char *argv[])
         0,                      //fullscreen
         1                       //validation
     );
+    device = gf3d_vgraphics_get_default_logical_device();
+    
     gf3d_pipeline_init(2);
+    
+    pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
     
     // main game loop
     while(!done)

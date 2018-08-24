@@ -174,6 +174,7 @@ void gf3d_vgraphics_init(
     {
         gf3d_vgraphics_setup_debug();
     }
+    atexit(gf3d_vgraphics_close);
     
     //get a gpu to do work with
     vkEnumeratePhysicalDevices(gf3d_vgraphics.vk_instance, &gf3d_vgraphics.device_count, NULL);
@@ -215,9 +216,49 @@ void gf3d_vgraphics_init(
 
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
-    
-    atexit(gf3d_vgraphics_close);
 }
+
+void gf3d_vgraphics_close()
+{
+    slog("cleaning up vulkan graphics");
+    gf3d_vgraphics_debug_close();
+    if (gf3d_vgraphics.logicalDeviceCreated)
+    {
+        vkDestroyDevice(gf3d_vgraphics.device, NULL);
+    }
+    if (gf3d_vgraphics.devices)
+    {
+        free(gf3d_vgraphics.devices);
+    }
+    if (gf3d_vgraphics.sdl_extension_names)
+    {
+        free(gf3d_vgraphics.sdl_extension_names);
+    }
+    if(gf3d_vgraphics.surface)
+    {
+        vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
+    }
+    if (gf3d_vgraphics.vk_instance)
+    {
+        vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
+    }
+    if (gf3d_vgraphics.main_window)
+    {
+        SDL_DestroyWindow(gf3d_vgraphics.main_window);
+    }
+    memset(&gf3d_vgraphics,0,sizeof(vGraphics));
+}
+
+VkDevice gf3d_vgraphics_get_default_logical_device()
+{
+    return gf3d_vgraphics.device;
+}
+
+VkExtent2D gf3d_vgraphics_get_view_extent()
+{
+    return gf3d_swapchain_get_extent();
+}
+
 
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
 {
@@ -249,37 +290,6 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
     }
     
     return createInfo;
-}
-
-void gf3d_vgraphics_close()
-{
-    gf3d_swapchain_close();
-    gf3d_vgraphics_debug_close();
-    if (gf3d_vgraphics.logicalDeviceCreated)
-    {
-        vkDestroyDevice(gf3d_vgraphics.device, NULL);
-    }
-    if (gf3d_vgraphics.devices)
-    {
-        free(gf3d_vgraphics.devices);
-    }
-    if (gf3d_vgraphics.sdl_extension_names)
-    {
-        free(gf3d_vgraphics.sdl_extension_names);
-    }
-    if(gf3d_vgraphics.surface)
-    {
-        vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
-    }
-    if (gf3d_vgraphics.vk_instance)
-    {
-        vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
-    }
-    if (gf3d_vgraphics.main_window)
-    {
-        SDL_DestroyWindow(gf3d_vgraphics.main_window);
-    }
-    memset(&gf3d_vgraphics,0,sizeof(vGraphics));
 }
 
 void gf3d_vgraphics_clear()
