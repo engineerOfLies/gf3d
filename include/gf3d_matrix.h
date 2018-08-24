@@ -1,11 +1,9 @@
 #ifndef __GF3D_MATRIX_H__
 #define __GF3D_MATRIX_H__
 
-#include <GL/glew.h>
-#include <SDL.h>
 #include "gf3d_vector.h"
 
-typedef GLfloat Matrix4[4][4];
+typedef double Matrix4[4][4];
 
 
 /**

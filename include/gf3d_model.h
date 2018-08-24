@@ -22,61 +22,10 @@
     SOFTWARE.
 */
 
-#include "gf3d_graphics.h"
 #include "gf3d_types.h"
 #include "gf3d_vector.h"
 #include "gf3d_matrix.h"
 #include "gf3d_text.h"
 
-typedef struct
-{
-    Uint32 ref_count;
-    TextLine filepath;
-    
-    GLuint vertex_buffer;
-    GLuint normal_buffer;
-    GLuint texel_buffer;
-    GLuint textures[2];
-    Uint32 vertex_count;
-    Uint32 normal_count;
-}Model;
-
-/**
- * @brief initialize the 3d model manager
- * @param max the limit on the number of models that can be held in memory at once
- */
-void gf3d_model_manager_init(Uint32 max);
-
-/**
- * @brief unloads all models from memory, but keeps model system initialized
- */
-void gf3d_model_clear_all();
-
-/**
- * @brief load 3d model data from a json file
- * @param filename the path to the file to load
- * @returns NULL on error or a pointer to a setup model
- */
-Model *gf3d_model_load_from_json_file(char *filename);
-
-/**
- * @brief make a model object that contains only a triange
- * @return NULL if error, or a handle to a triangle model otherwise
- */
-Model *gf3d_model_new_triangle();
-
-/**
- * @brief render a model this frame
- * @param model the model to render
- * @param mat the model matrix, containing the translation, rotation, and scaling of the model, if NULL identity matrix is used
- * @param program the shader program to use
- */
-void gf3d_model_render(Model *model,Matrix4 mat,GLuint program);
-
-/**
- * @brief free a previously loaded model
- * @param model pointer to the model data to free
- */
-void gf3d_model_free(Model *model);
 
 #endif

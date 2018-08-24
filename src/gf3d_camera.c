@@ -1,6 +1,4 @@
-#include <SDL.h>
-#include <GL/glew.h>
-#include "gf3d_graphics.h"
+#include "gf3d_matrix.h"
 
 Matrix4 gf3d_camera = {0};
 
