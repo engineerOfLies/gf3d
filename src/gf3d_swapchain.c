@@ -20,6 +20,7 @@ typedef struct
     Uint32                      swapImageCount;
     VkImageView                *imageViews;
     VkFramebuffer              *frameBuffers;
+    Uint32                      framebufferCount;
 }vSwapChain;
 
 static vSwapChain gf3d_swapchain = {0};
@@ -83,14 +84,11 @@ void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfac
 void gf3d_swapchain_create_frame_buffer(VkFramebuffer *buffer,VkImageView *imageView,Pipeline *pipe)
 {
     VkFramebufferCreateInfo framebufferInfo = {0};
-    VkImageView attachments[] = {
-        *imageView
-    };
 
     framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     framebufferInfo.renderPass = pipe->renderPass;
     framebufferInfo.attachmentCount = 1;
-    framebufferInfo.pAttachments = attachments;
+    framebufferInfo.pAttachments = imageView;
     framebufferInfo.width = gf3d_swapchain.extent.width;
     framebufferInfo.height = gf3d_swapchain.extent.height;
     framebufferInfo.layers = 1;
@@ -98,6 +96,10 @@ void gf3d_swapchain_create_frame_buffer(VkFramebuffer *buffer,VkImageView *image
     if (vkCreateFramebuffer(gf3d_swapchain.device, &framebufferInfo, NULL, buffer) != VK_SUCCESS)
     {
         slog("failed to create framebuffer!");
+    }
+    else
+    {
+        slog("created framebuffer");
     }
 }
 
@@ -109,6 +111,7 @@ void gf3d_swapchain_setup_frame_buffers(Pipeline *pipe)
     {
         gf3d_swapchain_create_frame_buffer(&gf3d_swapchain.frameBuffers[i],&gf3d_swapchain.imageViews[i],pipe);
     }
+    gf3d_swapchain.framebufferCount = gf3d_swapchain.swapImageCount;
 }
 
 VkFormat gf3d_swapchain_get_format()
@@ -269,7 +272,7 @@ void gf3d_swapchain_close()
     slog("cleaning up swapchain");
     if (gf3d_swapchain.frameBuffers)
     {
-        for (i = 0;i < gf3d_swapchain.swapImageCount;i++)
+        for (i = 0;i < gf3d_swapchain.framebufferCount; i++)
         {
             vkDestroyFramebuffer(gf3d_swapchain.device, gf3d_swapchain.frameBuffers[i], NULL);
         }
@@ -313,4 +316,10 @@ Bool gf3d_swapchain_validation_check()
     }
     return true;
 }
+
+Uint32 gf3d_swapchain_get_frame_buffer_count()
+{
+    return gf3d_swapchain.framebufferCount;
+}
+
 /*eol@eof*/

@@ -13,6 +13,8 @@
 #include "gf3d_vqueues.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
+#include "gf3d_pipeline.h"
+#include "gf3d_commands.h"
 #include "simple_logger.h"
 
 typedef struct
@@ -59,8 +61,48 @@ VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
 void gf3d_vgraphics_debug_close();
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
+void gf3d_vgraphics_setup(
+    char *windowName,
+    int renderWidth,
+    int renderHeight,
+    Vector4D bgcolor,
+    Bool fullscreen,
+    Bool enableValidation
+);
 
 void gf3d_vgraphics_init(
+    char *windowName,
+    int renderWidth,
+    int renderHeight,
+    Vector4D bgcolor,
+    Bool fullscreen,
+    Bool enableValidation
+)
+{
+    Pipeline *pipe;
+    VkDevice device;
+
+    gf3d_vgraphics_setup(
+        windowName,
+        renderWidth,
+        renderHeight,
+        bgcolor,
+        fullscreen,
+        enableValidation);
+    
+    device = gf3d_vgraphics_get_default_logical_device();
+    
+    gf3d_pipeline_init(2);
+    
+    pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
+
+    gf3d_swapchain_setup_frame_buffers(pipe);
+
+    gf3d_command_pool_setup(device,gf3d_swapchain_get_frame_buffer_count());
+}
+
+
+void gf3d_vgraphics_setup(
     char *windowName,
     int renderWidth,
     int renderHeight,

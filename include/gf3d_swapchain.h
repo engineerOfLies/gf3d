@@ -35,8 +35,16 @@ VkExtent2D gf3d_swapchain_get_extent();
 VkFormat gf3d_swapchain_get_format();
 
 /**
+ * @brief create frame buffers
+ * @param pipe the pipeline to create the frame buffers for
+ */
+void gf3d_swapchain_setup_frame_buffers(Pipeline *pipe);
+
+/**
  * @brief called at exit to clean up the swap chains
  */
 void gf3d_swapchain_close();
+
+Uint32 gf3d_swapchain_get_frame_buffer_count();
 
 #endif
