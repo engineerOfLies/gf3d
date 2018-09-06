@@ -68,7 +68,7 @@ VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
 void gf3d_vgraphics_debug_close();
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
-void gf3d_vgraphics_setup(
+int gf3d_vgraphics_setup(
     char *windowName,
     int renderWidth,
     int renderHeight,
@@ -77,7 +77,7 @@ void gf3d_vgraphics_setup(
     Bool enableValidation
 );
 
-void gf3d_vgraphics_init(
+int gf3d_vgraphics_init(
     char *windowName,
     int renderWidth,
     int renderHeight,
@@ -88,13 +88,16 @@ void gf3d_vgraphics_init(
 {
     VkDevice device;
 
-    gf3d_vgraphics_setup(
+    if( gf3d_vgraphics_setup(
         windowName,
         renderWidth,
         renderHeight,
         bgcolor,
         fullscreen,
-        enableValidation);
+        enableValidation) != 0){
+            slog("Graphics was unable to setup");
+            return -1;
+        }
     
     device = gf3d_vgraphics_get_default_logical_device();
     
@@ -107,10 +110,12 @@ void gf3d_vgraphics_init(
     gf3d_command_pool_setup(device,gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
     
     gf3d_vgraphics_semaphores_create();
+    
+    return 0;
 }
 
 
-void gf3d_vgraphics_setup(
+int gf3d_vgraphics_setup(
     char *windowName,
     int renderWidth,
     int renderHeight,
@@ -127,7 +132,7 @@ void gf3d_vgraphics_setup(
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         slog("Unable to initilaize SDL system: %s",SDL_GetError());
-        return;
+        return -1;
     }
     atexit(SDL_Quit);
     if (fullscreen)
@@ -152,7 +157,7 @@ void gf3d_vgraphics_setup(
         slog("failed to create main window: %s",SDL_GetError());
         gf3d_vgraphics_close();
         exit(0);
-        return;
+        return -1;
     }
 
     // instance extension configuration
@@ -176,7 +181,7 @@ void gf3d_vgraphics_setup(
         slog("SDL / Vulkan not supported");
         gf3d_vgraphics_close();
         exit(0);
-        return;
+        return -1;
     }
 
     // setup app info
@@ -217,7 +222,7 @@ void gf3d_vgraphics_setup(
     {
         slog("failed to create a vulkan instance");
         gf3d_vgraphics_close();
-        return;
+        return -1;
     }
     
     if (enableValidation)
@@ -233,7 +238,7 @@ void gf3d_vgraphics_setup(
     {
         slog("failed to create a vulkan instance with a usable device");
         gf3d_vgraphics_close();
-        return;
+        return -1;
     }
 
     gf3d_vgraphics.devices = (VkPhysicalDevice *)malloc(sizeof(VkPhysicalDevice)*gf3d_vgraphics.device_count);
@@ -243,7 +248,7 @@ void gf3d_vgraphics_setup(
     if(!gf3d_vgraphics.gpu){
         slog("Failed to select graphics card. If using integrated graphics, change variable in h file.");
         gf3d_vgraphics_close();
-        return;
+        return -1;
     }
     
     // create a surface for the window
@@ -263,7 +268,7 @@ void gf3d_vgraphics_setup(
     {
         slog("failed to create logical device");
         gf3d_vgraphics_close();
-        return;
+        return -1;
     }
     gf3d_vgraphics.logicalDeviceCreated = true;
     
@@ -271,6 +276,8 @@ void gf3d_vgraphics_setup(
 
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
+
+    return 0;
 }
 
 void gf3d_vgraphics_close()
@@ -295,7 +302,7 @@ void gf3d_vgraphics_close()
     }
     if (gf3d_vgraphics.vk_instance)
     {
-        vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
+        //vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
     }
     if (gf3d_vgraphics.main_window)
     {
