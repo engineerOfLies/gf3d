@@ -240,6 +240,11 @@ void gf3d_vgraphics_setup(
     vkEnumeratePhysicalDevices(gf3d_vgraphics.vk_instance, &gf3d_vgraphics.device_count, gf3d_vgraphics.devices);
     
     gf3d_vgraphics.gpu = gf3d_vgraphics_select_device();
+    if(!gf3d_vgraphics.gpu){
+        slog("Failed to select graphics card. If using integrated graphics, change variable in h file.");
+        gf3d_vgraphics_close();
+        return;
+    }
     
     // create a surface for the window
     SDL_Vulkan_CreateSurface(gf3d_vgraphics.main_window, gf3d_vgraphics.vk_instance, &gf3d_vgraphics.surface);
@@ -284,7 +289,7 @@ void gf3d_vgraphics_close()
     {
         free(gf3d_vgraphics.sdl_extension_names);
     }
-    if(gf3d_vgraphics.surface)
+    if(gf3d_vgraphics.surface && gf3d_vgraphics.vk_instance)
     {
         vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
     }
@@ -412,13 +417,13 @@ Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)
     
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
     vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    
+
     slog("Device Name: %s",deviceProperties.deviceName);
     slog("Dedicated GPU: %i",(deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)?1:0);
     slog("apiVersion: %i",deviceProperties.apiVersion);
     slog("driverVersion: %i",deviceProperties.driverVersion);
     slog("supports Geometry Shader: %i",deviceFeatures.geometryShader);
-    return (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)&&(deviceFeatures.geometryShader);
+    return (deviceProperties.deviceType == GF3D_VGRAPHICS_DISCRETE)&&(deviceFeatures.geometryShader);
 }
 
 VkPhysicalDevice gf3d_vgraphics_select_device()
@@ -432,6 +437,7 @@ VkPhysicalDevice gf3d_vgraphics_select_device()
             chosen = gf3d_vgraphics.devices[i];
         }
     }
+
     return chosen;
 }
 
