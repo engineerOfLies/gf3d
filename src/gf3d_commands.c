@@ -14,6 +14,7 @@ typedef struct
 static Commands gf3d_commands = {0};
 
 void gf3d_command_pool_close();
+void gf3d_command_buffer_begin(Pipeline *pipe);
 
 void gf3d_command_pool_setup(VkDevice device,Uint32 count,Pipeline *pipe)
 {
@@ -52,6 +53,7 @@ void gf3d_command_pool_setup(VkDevice device,Uint32 count,Pipeline *pipe)
         return;
     }
     
+    gf3d_command_buffer_begin(pipe);
     
     slog("created command buffers");
     atexit(gf3d_command_pool_close);
@@ -104,6 +106,10 @@ void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPas
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {
         slog("failed to record command buffer!");
+    }
+    else
+    {
+        slog("created renderpass command");
     }
 }
 
