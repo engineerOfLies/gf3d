@@ -322,4 +322,19 @@ Uint32 gf3d_swapchain_get_frame_buffer_count()
     return gf3d_swapchain.framebufferCount;
 }
 
+VkSwapchainKHR gf3d_swapchain_get()
+{
+    return gf3d_swapchain.swapChain;
+}
+
+VkFramebuffer gf3d_swapchain_get_frame_buffer_by_index(Uint32 index)
+{
+    if (index >= gf3d_swapchain.framebufferCount)
+    {
+        slog("FATAL: index for framebuffer out of range");
+        return 0;
+    }
+    return gf3d_swapchain.frameBuffers[index];
+}
+
 /*eol@eof*/

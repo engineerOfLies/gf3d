@@ -37,4 +37,16 @@ Sint32 gf3d_vqueues_get_present_queue_family();
  */
 Sint32 gf3d_vqueues_get_graphics_queue_family();
 
+/**
+ * @brief get the queue to be used for graphics calls
+ * @returns the queue in question
+ */
+VkQueue gf3d_vqueues_get_graphics_queue();
+
+/**
+ * @brief get the queue to be used for presentation calls
+ * @returns the queue in question
+ */
+VkQueue gf3d_vqueues_get_present_queue();
+
 #endif

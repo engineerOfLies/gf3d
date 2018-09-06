@@ -174,4 +174,14 @@ Sint32 gf3d_vqueues_get_present_queue_family()
 {
     return gf3d_vqueues.present_queue_family;
 }
+
+VkQueue gf3d_vqueues_get_graphics_queue()
+{
+    return gf3d_vqueues.graphics_queue;
+}
+
+VkQueue gf3d_vqueues_get_present_queue()
+{
+    return gf3d_vqueues.present_queue;
+}
 /*eol@eof*/

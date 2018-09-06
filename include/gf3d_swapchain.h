@@ -47,4 +47,17 @@ void gf3d_swapchain_close();
 
 Uint32 gf3d_swapchain_get_frame_buffer_count();
 
+/**
+ * @brief get the swapchain to use for rendering
+ */
+VkSwapchainKHR gf3d_swapchain_get();
+
+/**
+ * @brief get the frame buffer by the index
+ * @param index the frame buffer to get
+ * @return the framebuffer in question
+ */
+VkFramebuffer gf3d_swapchain_get_frame_buffer_by_index(Uint32 index);
+
+
 #endif

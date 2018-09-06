@@ -65,6 +65,14 @@ void gf3d_pipeline_render_pass_setup(Pipeline *pipe)
     VkAttachmentReference colorAttachmentRef = {0};
     VkSubpassDescription subpass = {0};
     VkRenderPassCreateInfo renderPassInfo = {0};
+    VkSubpassDependency dependency = {0};
+    
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
     colorAttachment.format = gf3d_swapchain_get_format();
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -87,7 +95,9 @@ void gf3d_pipeline_render_pass_setup(Pipeline *pipe)
     renderPassInfo.pAttachments = &colorAttachment;
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpass;
-    
+    renderPassInfo.dependencyCount = 1;
+    renderPassInfo.pDependencies = &dependency;
+
     if (vkCreateRenderPass(pipe->device, &renderPassInfo, NULL, &pipe->renderPass) != VK_SUCCESS)
     {
         slog("failed to create render pass!");

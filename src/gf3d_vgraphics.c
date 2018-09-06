@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_vulkan.h>
 #include <vulkan/vulkan.h>
+#include <limits.h>
 
 #include "gf3d_vector.h"
 #include "gf3d_types.h"
@@ -15,6 +16,7 @@
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
+
 #include "simple_logger.h"
 
 typedef struct
@@ -49,6 +51,10 @@ typedef struct
     VkDeviceQueueCreateInfo    *queueCreateInfo;
     VkPhysicalDeviceFeatures    deviceFeatures;
     
+    VkSemaphore                 imageAvailableSemaphore;
+    VkSemaphore                 renderFinishedSemaphore;
+    
+    Pipeline                   *pipe;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -57,6 +63,7 @@ void gf3d_vgraphics_close();
 void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
+void gf3d_vgraphics_semaphores_create();
 VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
 void gf3d_vgraphics_debug_close();
@@ -79,7 +86,6 @@ void gf3d_vgraphics_init(
     Bool enableValidation
 )
 {
-    Pipeline *pipe;
     VkDevice device;
 
     gf3d_vgraphics_setup(
@@ -94,11 +100,13 @@ void gf3d_vgraphics_init(
     
     gf3d_pipeline_init(2);
     
-    pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
+    gf3d_vgraphics.pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
 
-    gf3d_swapchain_setup_frame_buffers(pipe);
+    gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.pipe);
 
-    gf3d_command_pool_setup(device,gf3d_swapchain_get_frame_buffer_count());
+    gf3d_command_pool_setup(device,gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
+    
+    gf3d_vgraphics_semaphores_create();
 }
 
 
@@ -341,7 +349,56 @@ void gf3d_vgraphics_clear()
 
 void gf3d_vgraphics_render()
 {
+    Uint32 imageIndex;
+    VkPresentInfoKHR presentInfo = {0};
+    VkSubmitInfo submitInfo = {0};
+    VkSemaphore waitSemaphores[] = {gf3d_vgraphics.imageAvailableSemaphore};
+    VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
+    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSwapchainKHR swapChains[1] = {0};
+
+    /*
+    Acquire an image from the swap chain
+    Execute the command buffer with that image as attachment in the framebuffer
+    Return the image to the swap chain for presentation
+    */
+    swapChains[0] = gf3d_swapchain_get();
     
+    vkAcquireNextImageKHR(
+        gf3d_vgraphics.device,
+        swapChains[0],
+        UINT_MAX,
+        gf3d_vgraphics.imageAvailableSemaphore,
+        VK_NULL_HANDLE,
+        &imageIndex);
+    
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = gf3d_command_buffer_get_by_index(imageIndex);
+    
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = signalSemaphores;
+    
+    if (vkQueueSubmit(gf3d_vqueues_get_graphics_queue(), 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+    {
+        slog("failed to submit draw command buffer!");
+    }
+    
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = signalSemaphores;
+    
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = swapChains;
+    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pResults = NULL; // Optional
+    
+    vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
 }
 
 /**
@@ -445,5 +502,25 @@ void gf3d_vgraphics_setup_debug()
     CreateDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, &createInfo, NULL, &gf3d_vgraphics.debug_callback);
 }
 
+void gf3d_vgraphics_semaphores_close()
+{
+    vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.renderFinishedSemaphore, NULL);
+    vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.imageAvailableSemaphore, NULL);
+    
+}
+
+void gf3d_vgraphics_semaphores_create()
+{
+    VkSemaphoreCreateInfo semaphoreInfo = {0};
+    
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    
+    if ((vkCreateSemaphore(gf3d_vgraphics.device, &semaphoreInfo, NULL, &gf3d_vgraphics.imageAvailableSemaphore) != VK_SUCCESS) ||
+        (vkCreateSemaphore(gf3d_vgraphics.device, &semaphoreInfo, NULL, &gf3d_vgraphics.renderFinishedSemaphore) != VK_SUCCESS))
+    {
+        slog("failed to create semaphores!");
+    }
+    atexit(gf3d_vgraphics_semaphores_close);
+}
 /*eol@eof*/
 

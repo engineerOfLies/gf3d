@@ -37,6 +37,7 @@ int main(int argc,char *argv[])
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
     }    
     
+    vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup
     slog("gf3d program end");
     slog_sync();
