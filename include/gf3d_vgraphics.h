@@ -5,8 +5,6 @@
 
 #include "gf3d_vector.h"
 
-#define GF3D_VGRAPHICS_DISCRETE 2   //Choosing whether to use integrated [1], discrete [2], virtual [3], cpu [4]
-
 int gf3d_vgraphics_init(
     char *windowName,
     int renderWidth,
