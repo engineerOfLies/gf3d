@@ -3,6 +3,8 @@
 #include "gf3d_swapchain.h"
 #include "simple_logger.h"
 
+#include <string.h>
+
 typedef struct
 {
     VkCommandPool       commandPool;

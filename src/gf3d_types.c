@@ -1,5 +1,8 @@
 #include "gf3d_types.h"
 
+#include <string.h>
+#include <stdio.h>
+
 #include "simple_logger.h"
 
 void *gf3d_allocate_array(size_t typeSize,size_t count)

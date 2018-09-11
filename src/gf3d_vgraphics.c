@@ -6,6 +6,8 @@
 #include <SDL_vulkan.h>
 #include <vulkan/vulkan.h>
 #include <limits.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "gf3d_vector.h"
 #include "gf3d_types.h"

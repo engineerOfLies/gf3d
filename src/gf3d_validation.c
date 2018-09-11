@@ -4,6 +4,9 @@
 #include "gf3d_types.h"
 #include "gf3d_vector.h"
 
+#include <string.h>
+#include <stdio.h>
+
 #include "simple_logger.h"
 
 // validation layers
