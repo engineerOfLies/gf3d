@@ -1,4 +1,6 @@
 #include <math.h>
+#include <stdio.h>
+#include <string.h>
 #include "gf3d_matrix.h"
 #include "simple_logger.h"
 
@@ -55,8 +57,8 @@ void gf3d_matrix_multiply_vector4d(
   Vector4D   vec
 )
 {
-  GLdouble x,y,z,w;
-  GLdouble ox,oy,oz,ow;
+  double x,y,z,w;
+  double ox,oy,oz,ow;
   if (!out)return;
   x=vec.x;
   y=vec.y;

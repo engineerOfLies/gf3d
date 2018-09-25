@@ -1,5 +1,7 @@
 #include "gf3d_matrix.h"
 
+#include <string.h>
+
 Matrix4 gf3d_camera = {0};
 
 void gf3d_camera_get_view(Matrix4 *view)

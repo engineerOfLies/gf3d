@@ -1,5 +1,4 @@
 #include <SDL.h>            
-#include <GL/glew.h>
 
 #include "simple_logger.h"
 #include "gf3d_vgraphics.h"

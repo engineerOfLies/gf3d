@@ -2,6 +2,9 @@
 #include "gf3d_vector.h"
 #include "simple_logger.h"
 
+#include <stdio.h>
+#include <string.h>
+
 typedef struct
 {
     VkDeviceQueueCreateInfo     queue_info;
@@ -27,7 +30,7 @@ VkDeviceQueueCreateInfo gf3d_vqueues_get_present_queue_info();
 
 void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
 {
-    int i;
+    Uint32 i;
     VkBool32 supported;
 
     gf3d_vqueues.graphics_queue_family = -1;

@@ -1,6 +1,9 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_vqueues.h"
 
+#include <string.h>
+#include <stdio.h>
+
 #include "simple_logger.h"
 
 typedef struct

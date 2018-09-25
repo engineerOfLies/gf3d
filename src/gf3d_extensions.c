@@ -3,6 +3,8 @@
 
 #include "simple_logger.h"
 
+#include <string.h>
+#include <stdio.h>
 #include <vulkan/vulkan.h>
 
 typedef struct
@@ -22,7 +24,7 @@ void gf3d_extensions_device_close();
 
 void gf3d_extensions_device_init(VkPhysicalDevice device)
 {
-    int i;
+    Uint32 i;
     
     vkEnumerateDeviceExtensionProperties(device,NULL, &gf3d_device_extensions.available_extension_count, NULL);
     slog("Total available device extensions: %i",gf3d_device_extensions.available_extension_count);
@@ -115,7 +117,7 @@ Bool gf3d_extensions_check_available(vExtensions *extensions,const char *extensi
 Bool gf3d_extensions_enable(ExtensionType extType, const char *extensionName)
 {
     vExtensions *extensions;
-    int i;
+    Uint32 i;
     switch(extType)
     {
         case ET_Instance:

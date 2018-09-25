@@ -2,6 +2,8 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_shaders.h"
 
+#include <string.h>
+#include <stdio.h>
 #include "simple_logger.h"
 
 typedef struct
