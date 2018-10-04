@@ -4,21 +4,21 @@
 #include "gf3d_vector.h"
 #include "simple_logger.h"
 
-Vector2D vector2d(double x, double y)
+Vector2D vector2d(float x, float y)
 {
   Vector2D vec;
   vector2d_set(vec,x, y);
   return vec;
 }
 
-Vector3D vector3d(double x, double y, double z)
+Vector3D vector3d(float x, float y, float z)
 {
   Vector3D vec;
   vector3d_set(vec,x, y, z);
   return vec;
 }
 
-Vector4D vector4d(double x, double y, double z, double w)
+Vector4D vector4d(float x, float y, float z, float w)
 {
   Vector4D vec;
   vector4d_set(vec,x, y, z, w);

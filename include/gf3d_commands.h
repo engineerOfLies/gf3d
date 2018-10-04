@@ -6,13 +6,28 @@
 #include "gf3d_types.h"
 #include "gf3d_pipeline.h"
 
+typedef struct
+{
+    Uint8               _inuse;
+    VkCommandPool       commandPool;
+    VkCommandBuffer    *commandBuffers;
+    Uint32              commandBufferCount;
+}Command;
+
+/**
+ * @brief initialize the command pool subsystem
+ * @param max_commands how many different command pools you want to support
+ * @param device the default logical device to create the command pool for
+ */
+void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice);
+
 /**
  * @brief setup up the command pools
- * @param device the logical device to use for this
  * @param count the swap chain count
  * @param pipe the pointer to the graphics pipeline to use
+ * @return NULL on error or a pointer to a setup command pool
  */
-void gf3d_command_pool_setup(VkDevice device,Uint32 count,Pipeline *pipe);
+Command * gf3d_command_pool_setup(Uint32 count,Pipeline *pipe);
 
 /**
  * @brief execute a render pass
@@ -21,8 +36,11 @@ void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPas
 
 /**
  * @brief get a command buffer by index
+ * @param com the command pool to get the buffer from
+ * @param index the index to retrieve
  * @returns NULL on error, or a pointer to the command buffer requested
  */
-VkCommandBuffer *gf3d_command_buffer_get_by_index(Uint32 index);
+VkCommandBuffer * gf3d_command_buffer_get_by_index(Command *com,Uint32 index);
 
 #endif
+

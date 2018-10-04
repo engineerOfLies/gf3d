@@ -57,8 +57,8 @@ void gf3d_matrix_multiply_vector4d(
   Vector4D   vec
 )
 {
-  double x,y,z,w;
-  double ox,oy,oz,ow;
+  float x,y,z,w;
+  float ox,oy,oz,ow;
   if (!out)return;
   x=vec.x;
   y=vec.y;
@@ -91,13 +91,13 @@ void gf3d_matrix_identity(Matrix4 one)
 
 void gf3d_matrix_perspective(
     Matrix4     out,
-    double      fov,
-    double      aspect,
-    double      near,
-    double      far
+    float      fov,
+    float      aspect,
+    float      near,
+    float      far
 )
 {
-    double halftanfov = tan(fov * 0.5);
+    float halftanfov = tan(fov * 0.5);
     gf3d_matrix_zero(out);
 
     if (aspect == 0)

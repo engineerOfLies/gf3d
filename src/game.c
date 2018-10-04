@@ -3,9 +3,12 @@
 #include "simple_logger.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
-#include "gf3d_model.h"
+#include "gf3d_mesh.h"
 #include "gf3d_matrix.h"
 #include "gf3d_camera.h"
+#include "gf3d_vector.h"
+
+Mesh *testMesh = NULL;
 
 int main(int argc,char *argv[])
 {
@@ -26,7 +29,6 @@ int main(int argc,char *argv[])
     // main game loop
     while(!done)
     {
-        gf3d_vgraphics_clear();
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         //update game things here

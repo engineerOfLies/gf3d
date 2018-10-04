@@ -16,10 +16,19 @@
 #include "gf3d_vqueues.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
+#include "gf3d_mesh.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
+#include "gf3d_matrix.h"
 
 #include "simple_logger.h"
+
+typedef struct
+{
+    Matrix4 model;
+    Matrix4 view;
+    Matrix4 proj;
+}UniformBufferObject;
 
 typedef struct
 {
@@ -56,20 +65,31 @@ typedef struct
     VkSemaphore                 imageAvailableSemaphore;
     VkSemaphore                 renderFinishedSemaphore;
     
+    VkDescriptorSetLayout       descriptorSetLayout;
     Pipeline                   *pipe;
+    
+    VkBuffer                   *uniformBuffers;
+    VkDeviceMemory             *uniformBuffersMemory;
+    Command                 *   graphicsCommandPool; 
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
+
+extern Mesh *testMesh;
 
 void gf3d_vgraphics_close();
 void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
 void gf3d_vgraphics_semaphores_create();
+void gf3d_vgraphics_create_descriptor_set_layout();
+
 VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
+
 void gf3d_vgraphics_debug_close();
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
+
 void gf3d_vgraphics_setup(
     char *windowName,
     int renderWidth,
@@ -89,6 +109,22 @@ void gf3d_vgraphics_init(
 )
 {
     VkDevice device;
+    static Vertex vertices[] = 
+    {
+        {
+            {0,-0.1,0},
+            {1,0,0}
+        },
+        {
+            {0.5,0.5,0},
+            {0,1,0}
+            
+        },
+        {
+            {-0.5,0.5,0},
+            {0,0,1}
+        }
+    };
 
     gf3d_vgraphics_setup(
         windowName,
@@ -100,13 +136,20 @@ void gf3d_vgraphics_init(
     
     device = gf3d_vgraphics_get_default_logical_device();
     
+    gf3d_mesh_init(1024);//TODO: pull this from a parameter
+
+    testMesh = gf3d_mesh_create_vertex_buffer_from_vertices(vertices,3);
+    gf3d_word_cpy(testMesh->filename,"testMesh");
+
+    gf3d_vgraphics_create_descriptor_set_layout();
     gf3d_pipeline_init(2);
     
     gf3d_vgraphics.pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
 
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.pipe);
 
-    gf3d_command_pool_setup(device,gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
+    gf3d_command_system_init(8,device);
+    gf3d_vgraphics.graphicsCommandPool = gf3d_command_pool_setup(gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
     
     gf3d_vgraphics_semaphores_create();
 }
@@ -275,10 +318,29 @@ void gf3d_vgraphics_setup(
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
 }
 
+void gf3d_vgraphics_create_uniform_buffer()
+{
+    int i;
+    Uint32 buffercount = gf3d_swapchain_get_frame_buffer_count();
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+    gf3d_vgraphics.uniformBuffers = (VkBuffer*)gf3d_allocate_array(sizeof(VkBuffer),buffercount);
+    gf3d_vgraphics.uniformBuffersMemory = (VkDeviceMemory*)gf3d_allocate_array(sizeof(VkDeviceMemory),buffercount);
+
+    for (i = 0; i < buffercount; i++)
+    {
+        gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &gf3d_vgraphics.uniformBuffers[i], &gf3d_vgraphics.uniformBuffersMemory[i]);
+    }
+}
+
 void gf3d_vgraphics_close()
 {
     slog("cleaning up vulkan graphics");
     gf3d_vgraphics_debug_close();
+    if (gf3d_vgraphics.descriptorSetLayout)
+    {
+        vkDestroyDescriptorSetLayout(gf3d_vgraphics.device, gf3d_vgraphics.descriptorSetLayout, NULL);
+    }
     if (gf3d_vgraphics.logicalDeviceCreated)
     {
         vkDestroyDevice(gf3d_vgraphics.device, NULL);
@@ -309,6 +371,11 @@ void gf3d_vgraphics_close()
 VkDevice gf3d_vgraphics_get_default_logical_device()
 {
     return gf3d_vgraphics.device;
+}
+
+VkPhysicalDevice gf3d_vgraphics_get_default_physical_device()
+{
+    return gf3d_vgraphics.gpu;
 }
 
 VkExtent2D gf3d_vgraphics_get_view_extent()
@@ -349,11 +416,6 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
     return createInfo;
 }
 
-void gf3d_vgraphics_clear()
-{
-    
-}
-
 void gf3d_vgraphics_render()
 {
     Uint32 imageIndex;
@@ -385,7 +447,7 @@ void gf3d_vgraphics_render()
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = gf3d_command_buffer_get_by_index(imageIndex);
+    submitInfo.pCommandBuffers = gf3d_command_buffer_get_by_index(gf3d_vgraphics.graphicsCommandPool,imageIndex);
     
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
@@ -530,5 +592,96 @@ void gf3d_vgraphics_semaphores_create()
     }
     atexit(gf3d_vgraphics_semaphores_close);
 }
+
+void gf3d_vgraphics_create_descriptor_set_layout()
+{
+    VkDescriptorSetLayoutCreateInfo layoutInfo = {0};
+    VkDescriptorSetLayoutBinding uboLayoutBinding = {0};
+    
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = NULL; // Optional
+    
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 1;
+    layoutInfo.pBindings = &uboLayoutBinding;
+
+    if (vkCreateDescriptorSetLayout(gf3d_vgraphics.device, &layoutInfo, NULL, &gf3d_vgraphics.descriptorSetLayout) != VK_SUCCESS)
+    {
+        slog("failed to create descriptor set layout!");
+    }
+}
+
+VkDescriptorSetLayout * gf3d_vgraphics_get_descriptor_set_layout()
+{
+    return &gf3d_vgraphics.descriptorSetLayout;
+}
+
+void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+    VkCommandBufferAllocateInfo allocInfo = {0};
+    VkCommandBuffer commandBuffer;
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+//    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    vkAllocateCommandBuffers(gf3d_vgraphics.device, &allocInfo, &commandBuffer);
+}
+
+int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory)
+{
+    VkBufferCreateInfo bufferInfo = {0};
+    VkMemoryRequirements memRequirements;
+    VkMemoryAllocateInfo allocInfo = {0};
+
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    if (vkCreateBuffer(gf3d_vgraphics.device, &bufferInfo, NULL, buffer) != VK_SUCCESS)
+    {
+        slog("failed to create buffer!");
+        return 0;
+    }
+
+    vkGetBufferMemoryRequirements(gf3d_vgraphics.device, *buffer, &memRequirements);
+
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = gf3d_vgraphics_find_memory_type(memRequirements.memoryTypeBits, properties);
+
+    
+    if (vkAllocateMemory(gf3d_vgraphics.device, &allocInfo, NULL, bufferMemory) != VK_SUCCESS)
+    {
+        slog("failed to allocate buffer memory!");
+        return 0;
+    }
+
+    vkBindBufferMemory(gf3d_vgraphics.device, *buffer, *bufferMemory, 0);
+    return 1;
+}
+
+uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+    VkPhysicalDeviceMemoryProperties memProperties;
+    
+    vkGetPhysicalDeviceMemoryProperties(gf3d_vgraphics_get_default_physical_device(), &memProperties);
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) && ((memProperties.memoryTypes[i].propertyFlags & properties) == properties))
+        {
+            return i;
+        }
+    }
+
+    slog("failed to find suitable memory type!");
+    return 0;
+}
+
 /*eol@eof*/
 

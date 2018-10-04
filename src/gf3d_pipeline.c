@@ -1,7 +1,8 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_swapchain.h"
+#include "gf3d_vgraphics.h"
 #include "gf3d_shaders.h"
-
+#include "gf3d_mesh.h"
 #include <string.h>
 #include <stdio.h>
 #include "simple_logger.h"
@@ -151,10 +152,9 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,char *vertFile,char *fragF
     shaderStages[1] = fragShaderStageInfo;
     
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = NULL; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = NULL; // Optional    return pipe;
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = gf3d_mesh_get_bind_description();; // Optional
+    vertexInputInfo.pVertexAttributeDescriptions = gf3d_mesh_get_attribute_descriptions(&vertexInputInfo.vertexAttributeDescriptionCount); // Optional    
 
     // TODO: pull all this information from config file
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -218,8 +218,8 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,char *vertFile,char *fragF
     colorBlending.blendConstants[3] = 0.0f; // Optional
 
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0; // Optional
-    pipelineLayoutInfo.pSetLayouts = NULL; // Optional
+    pipelineLayoutInfo.setLayoutCount = 1; // Optional
+    pipelineLayoutInfo.pSetLayouts = gf3d_vgraphics_get_descriptor_set_layout(); // Optional
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = NULL; // Optional
 

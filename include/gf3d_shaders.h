@@ -8,7 +8,7 @@
 /**
  * @brief load a SPIR-V shader program from file
  * @param filename the name of the file to load
- * @param rsize saves the size, in bytes, of the buffer loaded
+ * @param rsize [output] saves the size, in bytes, of the buffer loaded
  * @returns NULL on error (check logs) or a pointer to the buffer containing the shader.
  * @note: The buffer returned must be freed, it is not managed internally
  */

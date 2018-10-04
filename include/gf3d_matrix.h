@@ -3,7 +3,7 @@
 
 #include "gf3d_vector.h"
 
-typedef double Matrix4[4][4];
+typedef float Matrix4[4][4];
 
 
 /**
@@ -66,10 +66,10 @@ void gf3d_matrix_slog(Matrix4 mat);
  */
 void gf3d_matrix_perspective(
     Matrix4     out,
-    double      fov,
-    double      aspect,
-    double      near,
-    double      far
+    float      fov,
+    float      aspect,
+    float      near,
+    float      far
 );
 
 

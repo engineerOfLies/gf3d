@@ -8,17 +8,17 @@
 
 typedef struct
 {
-    Bool                inUse;
-    VkPipeline          graphicsPipeline;
-    VkRenderPass        renderPass;
-    VkPipelineLayout    pipelineLayout;
-    size_t              vertSize;
-    char               *vertShader;
-    VkShaderModule      vertModule;
-    size_t              fragSize;
-    char               *fragShader;
-    VkShaderModule      fragModule;
-    VkDevice            device;
+    Bool                    inUse;
+    VkPipeline              graphicsPipeline;
+    VkRenderPass            renderPass;
+    VkPipelineLayout        pipelineLayout;
+    size_t                  vertSize;
+    char                   *vertShader;
+    VkShaderModule          vertModule;
+    size_t                  fragSize;
+    char                   *fragShader;
+    VkShaderModule          fragModule;
+    VkDevice                device;
 }Pipeline;
 
 /**
