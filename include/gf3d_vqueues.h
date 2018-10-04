@@ -38,6 +38,12 @@ Sint32 gf3d_vqueues_get_present_queue_family();
 Sint32 gf3d_vqueues_get_graphics_queue_family();
 
 /**
+ * @brief get the queue family index for the graphics queue
+ * @return the index of the graphics queue family
+ */
+Sint32 gf3d_vqueues_get_transfer_queue_family();
+
+/**
  * @brief get the queue to be used for graphics calls
  * @returns the queue in question
  */
@@ -48,5 +54,11 @@ VkQueue gf3d_vqueues_get_graphics_queue();
  * @returns the queue in question
  */
 VkQueue gf3d_vqueues_get_present_queue();
+
+/**
+ * @brief get the queue to be used for transfer calls
+ * @returns the queue in question
+ */
+VkQueue gf3d_vqueues_get_transfer_queue();
 
 #endif

@@ -78,7 +78,57 @@ void gf3d_command_free(Command *com)
     memset(com,0,sizeof(Command));
 }
 
-Command * gf3d_command_pool_setup(Uint32 count,Pipeline *pipe)
+Command * gf3d_command_transfer_pool_setup(Uint32 count,Pipeline *pipe)
+{
+    Command *com;
+    VkCommandPoolCreateInfo poolInfo = {0};
+    VkCommandBufferAllocateInfo allocInfo = {0};
+    
+    com = gf3d_command_new();
+    
+    if (!com)
+    {
+        return NULL;
+    }
+    
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = gf3d_vqueues_get_transfer_queue_family();
+    poolInfo.flags = 0; // Optional    
+    
+    if (vkCreateCommandPool(gf3d_commands.device, &poolInfo, NULL, &com->commandPool) != VK_SUCCESS)
+    {
+        slog("failed to create command pool!");
+        return NULL;
+    }
+    
+    com->commandBuffers = (VkCommandBuffer*)gf3d_allocate_array(sizeof(VkCommandBuffer),count);
+    if (!com->commandBuffers)
+    {
+        slog("failed to allocate command buffer array");
+        gf3d_command_free(com);
+        return NULL;
+    }
+    
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = com->commandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = count;
+    com->commandBufferCount = count;
+
+    if (vkAllocateCommandBuffers(gf3d_commands.device, &allocInfo, com->commandBuffers) != VK_SUCCESS)
+    {
+        slog("failed to allocate command buffers!");
+        gf3d_command_free(com);
+        return NULL;
+    }
+    
+    gf3d_command_buffer_begin(com,pipe);
+    
+    slog("created command buffer");
+    return com;
+}
+
+Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe)
 {
     Command *com;
     VkCommandPoolCreateInfo poolInfo = {0};

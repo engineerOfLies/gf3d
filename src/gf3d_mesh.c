@@ -129,6 +129,16 @@ void gf3d_mesh_close()
 void gf3d_mesh_delete(Mesh *mesh)
 {
     if (!mesh)return;
+    if (mesh->faceBuffer != VK_NULL_HANDLE)
+    {
+        vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->faceBuffer, NULL);
+        slog("mesh %s buffer freed",mesh->filename);
+    }
+    if (mesh->faceBufferMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->faceBufferMemory, NULL);
+        slog("mesh %s buffer memory freed",mesh->filename);
+    }
     if (mesh->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->buffer, NULL);
@@ -162,18 +172,45 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer)
     }
     
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
-
-    vkCmdDraw(commandBuffer, mesh->vertexCount, 1, 0, 0);
     
+    vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+    vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
+
     slog("rendering mesh %s",mesh->filename);
 }
 
-Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 count)
+void gf3d_mesh_setup_face_buffers(Mesh *mesh,Face *faces,Uint32 fcount)
+{
+    void* data;
+    VkDevice device = gf3d_vgraphics_get_default_logical_device();
+    VkDeviceSize bufferSize = sizeof(Face) * fcount;
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    
+    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, faces, (size_t) bufferSize);
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->faceBuffer, &mesh->faceBufferMemory);
+
+    gf3d_vgraphics_copy_buffer(stagingBuffer, mesh->faceBuffer, bufferSize);
+
+    mesh->faceCount = fcount;
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
+}
+
+Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount)
 {
     Mesh *mesh = NULL;
     void *data = NULL;
     VkDevice device = gf3d_vgraphics_get_default_logical_device();
     size_t bufferSize;
+    
     
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -185,7 +222,7 @@ Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 count
         return NULL;
     }
 
-    bufferSize = sizeof(Vertex) * count;
+    bufferSize = sizeof(Vertex) * vcount;
     
     gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     
@@ -195,10 +232,14 @@ Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 count
 
     gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &mesh->buffer, &mesh->bufferMemory);
 
+    gf3d_vgraphics_copy_buffer(stagingBuffer, mesh->buffer, bufferSize);
     
-    mesh->vertexCount = count;
+    mesh->vertexCount = vcount;
     mesh->bufferMemory = mesh->bufferMemory;
-    slog("created a mesh with %i vertices",count);
+    
+    gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
+    
+    slog("created a mesh with %i vertices and %i face",vcount,fcount);
     return mesh;
 }
 

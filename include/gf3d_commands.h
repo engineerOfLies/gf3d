@@ -22,12 +22,21 @@ typedef struct
 void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice);
 
 /**
- * @brief setup up the command pools
- * @param count the swap chain count
+ * @brief setup up the command pool for graphics commands
+ * @param count the number of command buffers to create
  * @param pipe the pointer to the graphics pipeline to use
  * @return NULL on error or a pointer to a setup command pool
  */
-Command * gf3d_command_pool_setup(Uint32 count,Pipeline *pipe);
+Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe);
+
+/**
+ * @brief setup up the command pool for memory transfer commands
+ * @param count the number of command buffers to create
+ * @param pipe the pointer to the command pipeline to use
+ * @return NULL on error or a pointer to a setup command pool
+ */
+Command * gf3d_command_transfer_pool_setup(Uint32 count,Pipeline *pipe);
+
 
 /**
  * @brief execute a render pass

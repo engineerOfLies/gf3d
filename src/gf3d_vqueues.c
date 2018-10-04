@@ -13,13 +13,17 @@ typedef struct
     VkQueue                     device_queue;
     Sint32                      graphics_queue_family;
     Sint32                      present_queue_family;
+    Sint32                      transfer_queue_family;
     float                       graphics_queue_priority;
     float                       present_queue_priority;
+    float                       transfer_queue_priority;
     Uint32                      work_queue_count;
     VkQueue                     graphics_queue;
     VkQueue                     present_queue;
+    VkQueue                     transfer_queue;
     VkDeviceQueueCreateInfo    *presentation_queue_info;
     VkDeviceQueueCreateInfo    *queue_create_info;
+    VkDeviceQueueCreateInfo    *transfer_queue_info;
 }vQueues;
 
 static vQueues gf3d_vqueues = {0};
@@ -27,6 +31,7 @@ static vQueues gf3d_vqueues = {0};
 void gf3d_vqueues_close();
 VkDeviceQueueCreateInfo gf3d_vqueues_get_graphics_queue_info();
 VkDeviceQueueCreateInfo gf3d_vqueues_get_present_queue_info();
+VkDeviceQueueCreateInfo gf3d_vqueues_get_transfer_queue_info();
 
 void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
 {
@@ -35,6 +40,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
 
     gf3d_vqueues.graphics_queue_family = -1;
     gf3d_vqueues.present_queue_family = -1;
+    gf3d_vqueues.transfer_queue_family = -1;
     
     vkGetPhysicalDeviceQueueFamilyProperties(
         device,
@@ -77,6 +83,12 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
             gf3d_vqueues.graphics_queue_priority = 1.0f;
             slog("Queue handles graphics calls");
         }
+        if (gf3d_vqueues.queue_properties[i].queueFlags & VK_QUEUE_TRANSFER_BIT)
+        {
+            gf3d_vqueues.transfer_queue_family = i;
+            gf3d_vqueues.transfer_queue_priority = 1.0f;
+            slog("Queue handles transfer calls");
+        }
         if (supported)
         {
             gf3d_vqueues.present_queue_family = i;
@@ -86,6 +98,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     }
     slog("using queue family %i for graphics commands",gf3d_vqueues.graphics_queue_family);
     slog("using queue family %i for rendering pipeline",gf3d_vqueues.present_queue_family);
+    slog("using queue family %i for transfer pipeline",gf3d_vqueues.transfer_queue_family);
     
     if (gf3d_vqueues.graphics_queue_family != -1)gf3d_vqueues.work_queue_count++;
     if ((gf3d_vqueues.present_queue_family != -1) && (gf3d_vqueues.present_queue_family != gf3d_vqueues.graphics_queue_family))gf3d_vqueues.work_queue_count++;
@@ -137,6 +150,16 @@ VkDeviceQueueCreateInfo gf3d_vqueues_get_present_queue_info()
     return queueCreateInfo;
 }
 
+VkDeviceQueueCreateInfo gf3d_vqueues_get_transfer_queue_info()
+{
+    VkDeviceQueueCreateInfo queueCreateInfo = {0};
+    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueCreateInfo.queueFamilyIndex = gf3d_vqueues.transfer_queue_family;
+    queueCreateInfo.queueCount = 1;
+    queueCreateInfo.pQueuePriorities = &gf3d_vqueues.transfer_queue_priority;
+    return queueCreateInfo;
+}
+
 void gf3d_vqueues_setup_device_queues(VkDevice device)
 {
     if (gf3d_vqueues.graphics_queue_family != -1)
@@ -146,6 +169,10 @@ void gf3d_vqueues_setup_device_queues(VkDevice device)
     if (gf3d_vqueues.present_queue_family != -1)
     {
         vkGetDeviceQueue(device, gf3d_vqueues.present_queue_family, 0, &gf3d_vqueues.present_queue);
+    }
+    if (gf3d_vqueues.transfer_queue_family != -1)
+    {
+        vkGetDeviceQueue(device, gf3d_vqueues.transfer_queue_family, 0, &gf3d_vqueues.transfer_queue);
     }
 }
 
@@ -178,6 +205,11 @@ Sint32 gf3d_vqueues_get_present_queue_family()
     return gf3d_vqueues.present_queue_family;
 }
 
+Sint32 gf3d_vqueues_get_transfer_queue_family()
+{
+    return gf3d_vqueues.transfer_queue_family;
+}
+
 VkQueue gf3d_vqueues_get_graphics_queue()
 {
     return gf3d_vqueues.graphics_queue;
@@ -186,5 +218,10 @@ VkQueue gf3d_vqueues_get_graphics_queue()
 VkQueue gf3d_vqueues_get_present_queue()
 {
     return gf3d_vqueues.present_queue;
+}
+
+VkQueue gf3d_vqueues_get_transfer_queue()
+{
+    return gf3d_vqueues.transfer_queue;
 }
 /*eol@eof*/

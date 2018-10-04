@@ -71,6 +71,7 @@ typedef struct
     VkBuffer                   *uniformBuffers;
     VkDeviceMemory             *uniformBuffersMemory;
     Command                 *   graphicsCommandPool; 
+    Command                 *   transferCommandPool;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -112,18 +113,28 @@ void gf3d_vgraphics_init(
     static Vertex vertices[] = 
     {
         {
-            {0,-0.1,0},
+            {-1,-1,0},
             {1,0,0}
         },
         {
-            {0.5,0.5,0},
+            {1,-1,0},
             {0,1,0}
             
         },
         {
-            {-0.5,0.5,0},
+            {1,1,0},
             {0,0,1}
+        },
+        {
+            {-1,1,0},
+            {0.5,0,0.5}
         }
+    };
+    
+    static Face faces[] = 
+    {
+        {{0,1,2}},
+        {{2,3,0}}
     };
 
     gf3d_vgraphics_setup(
@@ -138,18 +149,21 @@ void gf3d_vgraphics_init(
     
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
 
-    testMesh = gf3d_mesh_create_vertex_buffer_from_vertices(vertices,3);
-    gf3d_word_cpy(testMesh->filename,"testMesh");
 
     gf3d_vgraphics_create_descriptor_set_layout();
-    gf3d_pipeline_init(2);
     
+    gf3d_pipeline_init(2);
     gf3d_vgraphics.pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
 
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.pipe);
 
     gf3d_command_system_init(8,device);
-    gf3d_vgraphics.graphicsCommandPool = gf3d_command_pool_setup(gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
+    gf3d_vgraphics.transferCommandPool = gf3d_command_transfer_pool_setup(3,gf3d_vgraphics.pipe);
+
+        testMesh = gf3d_mesh_create_vertex_buffer_from_vertices(vertices,4,faces,2);
+        gf3d_word_cpy(testMesh->filename,"testMesh");
+
+    gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
     
     gf3d_vgraphics_semaphores_create();
 }
@@ -619,16 +633,40 @@ VkDescriptorSetLayout * gf3d_vgraphics_get_descriptor_set_layout()
     return &gf3d_vgraphics.descriptorSetLayout;
 }
 
-void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
     VkCommandBufferAllocateInfo allocInfo = {0};
+    VkCommandBufferBeginInfo beginInfo = {0};
     VkCommandBuffer commandBuffer;
+    VkBufferCopy copyRegion = {0};
+    VkSubmitInfo submitInfo = {0};
+    VkQueue transferQueue = gf3d_vqueues_get_transfer_queue();
+
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-//    allocInfo.commandPool = commandPool;
+    allocInfo.commandPool = gf3d_vgraphics.transferCommandPool->commandPool;
     allocInfo.commandBufferCount = 1;
 
     vkAllocateCommandBuffers(gf3d_vgraphics.device, &allocInfo, &commandBuffer);
+
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+        copyRegion.size = size;
+        vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+    vkEndCommandBuffer(commandBuffer);
+
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(transferQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(transferQueue);
+
+    vkFreeCommandBuffers(gf3d_vgraphics.device, gf3d_vgraphics.transferCommandPool->commandPool, 1, &commandBuffer);
 }
 
 int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory)
@@ -640,7 +678,7 @@ int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, Vk
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;
     bufferInfo.usage = usage;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
 
     if (vkCreateBuffer(gf3d_vgraphics.device, &bufferInfo, NULL, buffer) != VK_SUCCESS)
     {

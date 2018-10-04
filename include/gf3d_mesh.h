@@ -14,12 +14,20 @@ typedef struct
 
 typedef struct
 {
+    Uint32  verts[3];
+}Face;
+
+typedef struct
+{
     TextLine        filename;
     Uint32          _refCount;
     Uint8           _inuse;
     Uint32          vertexCount;
     VkBuffer        buffer;
     VkDeviceMemory  bufferMemory;
+    Uint32          faceCount;
+    VkBuffer        faceBuffer;
+    VkDeviceMemory  faceBufferMemory;
 }Mesh;
 
 /**
@@ -57,9 +65,11 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer);
 /**
  * @brief create a mesh's internal buffers based on vertices
  * @param vertices an array of vertices to make the mesh with
- * @param count how many vertices are int he array
+ * @param vcount how many vertices are in the array
+ * @param faces an array of faces to make the mesh with
+ * @param fcount how many faces are in the array
  * @return NULL on error or a mesh that can be rendered
  */
-Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 count);
+Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount);
 
 #endif
