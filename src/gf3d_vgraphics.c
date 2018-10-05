@@ -66,12 +66,18 @@ typedef struct
     VkSemaphore                 renderFinishedSemaphore;
     
     VkDescriptorSetLayout       descriptorSetLayout;
+    VkDescriptorPool            descriptorPool;
+    VkDescriptorSet         *   descriptorSets;
+    Uint32                      descriptorSetCount;
+    
     Pipeline                   *pipe;
     
     VkBuffer                   *uniformBuffers;
     VkDeviceMemory             *uniformBuffersMemory;
+    Uint32                      uniformBufferCount;
     Command                 *   graphicsCommandPool; 
     Command                 *   transferCommandPool;
+    UniformBufferObject         ubo;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -83,12 +89,17 @@ void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
 void gf3d_vgraphics_semaphores_create();
+
 void gf3d_vgraphics_create_descriptor_set_layout();
+void gf3d_vgraphics_create_descriptor_pool(Uint32 count);
+void gf3d_vgraphics_create_descriptor_sets(Uint32 count);
 
 VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
 
+void gf3d_vgraphics_create_uniform_buffer();
 void gf3d_vgraphics_debug_close();
+void gf3d_vgraphics_update_uniform_buffer(uint32_t currentImage);
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
 
 void gf3d_vgraphics_setup(
@@ -136,6 +147,25 @@ void gf3d_vgraphics_init(
         {{0,1,2}},
         {{2,3,0}}
     };
+    
+    gf3d_matrix_identity(gf3d_vgraphics.ubo.model);
+    gf3d_matrix_identity(gf3d_vgraphics.ubo.view);
+    gf3d_matrix_identity(gf3d_vgraphics.ubo.proj);
+    gf3d_matrix_view(
+        gf3d_vgraphics.ubo.view,
+        vector3d(2,2,2),
+        vector3d(0,0,0),
+        vector3d(0,0,1)
+    );
+    gf3d_matrix_perspective(
+        gf3d_vgraphics.ubo.proj,
+        45 * GF3D_DEGTORAD,
+        renderWidth/(float)renderHeight,
+        0.1f,
+        10
+    );
+    
+    gf3d_vgraphics.ubo.proj[1][1] *= -1;
 
     gf3d_vgraphics_setup(
         windowName,
@@ -146,16 +176,25 @@ void gf3d_vgraphics_init(
         enableValidation);
     
     device = gf3d_vgraphics_get_default_logical_device();
+
+    gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
+
+    // swap chain!!!
+    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
     
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
 
-
     gf3d_vgraphics_create_descriptor_set_layout();
     
-    gf3d_pipeline_init(2);
+    gf3d_pipeline_init(4);
     gf3d_vgraphics.pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
 
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.pipe);
+
+    gf3d_vgraphics_create_uniform_buffer();
+    
+    gf3d_vgraphics_create_descriptor_pool(gf3d_swapchain_get_frame_buffer_count());
+    gf3d_vgraphics_create_descriptor_sets(gf3d_swapchain_get_frame_buffer_count());
 
     gf3d_command_system_init(8,device);
     gf3d_vgraphics.transferCommandPool = gf3d_command_transfer_pool_setup(3,gf3d_vgraphics.pipe);
@@ -326,10 +365,6 @@ void gf3d_vgraphics_setup(
     }
     gf3d_vgraphics.logicalDeviceCreated = true;
     
-    gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
-
-    // swap chain!!!
-    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
 }
 
 void gf3d_vgraphics_create_uniform_buffer()
@@ -340,6 +375,7 @@ void gf3d_vgraphics_create_uniform_buffer()
 
     gf3d_vgraphics.uniformBuffers = (VkBuffer*)gf3d_allocate_array(sizeof(VkBuffer),buffercount);
     gf3d_vgraphics.uniformBuffersMemory = (VkDeviceMemory*)gf3d_allocate_array(sizeof(VkDeviceMemory),buffercount);
+    gf3d_vgraphics.uniformBufferCount = buffercount;
 
     for (i = 0; i < buffercount; i++)
     {
@@ -349,12 +385,25 @@ void gf3d_vgraphics_create_uniform_buffer()
 
 void gf3d_vgraphics_close()
 {
+    int i;
     slog("cleaning up vulkan graphics");
-    gf3d_vgraphics_debug_close();
+
+    if (gf3d_vgraphics.descriptorPool)
+    {
+        vkDestroyDescriptorPool(gf3d_vgraphics.device, gf3d_vgraphics.descriptorPool, NULL);
+    }
     if (gf3d_vgraphics.descriptorSetLayout)
     {
         vkDestroyDescriptorSetLayout(gf3d_vgraphics.device, gf3d_vgraphics.descriptorSetLayout, NULL);
     }
+    
+    for (i = 0; i < gf3d_vgraphics.uniformBufferCount; i++)
+    {
+        vkDestroyBuffer(gf3d_vgraphics.device, gf3d_vgraphics.uniformBuffers[i], NULL);
+        vkFreeMemory(gf3d_vgraphics.device, gf3d_vgraphics.uniformBuffersMemory[i], NULL);
+    }
+    
+    
     if (gf3d_vgraphics.logicalDeviceCreated)
     {
         vkDestroyDevice(gf3d_vgraphics.device, NULL);
@@ -367,6 +416,9 @@ void gf3d_vgraphics_close()
     {
         free(gf3d_vgraphics.sdl_extension_names);
     }
+
+    gf3d_vgraphics_debug_close();
+        
     if(gf3d_vgraphics.surface && gf3d_vgraphics.vk_instance)
     {
         vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
@@ -455,6 +507,8 @@ void gf3d_vgraphics_render()
         VK_NULL_HANDLE,
         &imageIndex);
     
+    gf3d_vgraphics_update_uniform_buffer(imageIndex);
+
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
     submitInfo.waitSemaphoreCount = 1;
@@ -607,6 +661,85 @@ void gf3d_vgraphics_semaphores_create()
     atexit(gf3d_vgraphics_semaphores_close);
 }
 
+VkDescriptorSet * gf3d_vgraphics_get_descriptor_set_by_index(Uint32 index)
+{
+    if (index >= gf3d_vgraphics.descriptorSetCount)
+    {
+        slog("no descriptor set with index %i",index);
+        return NULL;
+    }
+    return &gf3d_vgraphics.descriptorSets[index];
+}
+
+void gf3d_vgraphics_create_descriptor_sets(Uint32 count)
+{
+    int i;
+    VkDescriptorSetLayout *layouts = NULL;
+    VkDescriptorSetAllocateInfo allocInfo = {0};
+    VkDescriptorBufferInfo bufferInfo = {0};
+    VkWriteDescriptorSet descriptorWrite = {0};
+
+    layouts = (VkDescriptorSetLayout *)gf3d_allocate_array(sizeof(VkDescriptorSetLayout),count);
+    for (i = 0; i < count; i++)
+    {
+        memcpy(&layouts[i],gf3d_vgraphics_get_descriptor_set_layout(),sizeof(VkDescriptorSetLayout));
+    }
+    
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = gf3d_vgraphics.descriptorPool;
+    allocInfo.descriptorSetCount = count;
+    allocInfo.pSetLayouts = layouts;
+    
+    gf3d_vgraphics.descriptorSets = (VkDescriptorSet *)gf3d_allocate_array(sizeof(VkDescriptorSet),count);
+    if (vkAllocateDescriptorSets(gf3d_vgraphics.device, &allocInfo, gf3d_vgraphics.descriptorSets) != VK_SUCCESS)
+    {
+        slog("failed to allocate descriptor sets!");
+        return;
+    }
+    gf3d_vgraphics.descriptorSetCount = count;
+    for (i = 0; i < count; i++)
+    {
+        memset(&bufferInfo,0,sizeof(VkDescriptorBufferInfo));
+        bufferInfo.buffer = gf3d_vgraphics.uniformBuffers[i];
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(UniformBufferObject);        
+        
+        memset(&descriptorWrite,0,sizeof(VkWriteDescriptorSet));
+        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrite.dstSet = gf3d_vgraphics.descriptorSets[i];
+        descriptorWrite.dstBinding = 0;
+        descriptorWrite.dstArrayElement = 0;
+        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptorWrite.descriptorCount = 1;
+        
+        descriptorWrite.pBufferInfo = &bufferInfo;
+        descriptorWrite.pImageInfo = NULL; // Optional
+        descriptorWrite.pTexelBufferView = NULL; // Optional
+        
+        vkUpdateDescriptorSets(gf3d_vgraphics.device, 1, &descriptorWrite, 0, NULL);
+    }
+}
+
+void gf3d_vgraphics_create_descriptor_pool(Uint32 count)
+{
+    VkDescriptorPoolSize poolSize = {0};
+    VkDescriptorPoolCreateInfo poolInfo = {0};
+    slog("attempting to make a descriptor pool of size %i",count);
+    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSize.descriptorCount = count;
+    
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.poolSizeCount = 1;
+    poolInfo.pPoolSizes = &poolSize;
+    poolInfo.maxSets = count;
+    
+    if (vkCreateDescriptorPool(gf3d_vgraphics.device, &poolInfo, NULL, &gf3d_vgraphics.descriptorPool) != VK_SUCCESS)
+    {
+        slog("failed to create descriptor pool!");
+        return;
+    }
+}
+
 void gf3d_vgraphics_create_descriptor_set_layout()
 {
     VkDescriptorSetLayoutCreateInfo layoutInfo = {0};
@@ -678,7 +811,7 @@ int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, Vk
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;
     bufferInfo.usage = usage;
-    bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateBuffer(gf3d_vgraphics.device, &bufferInfo, NULL, buffer) != VK_SUCCESS)
     {
@@ -721,5 +854,24 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
+void gf3d_vgraphics_update_uniform_buffer(uint32_t currentImage)
+{
+    void* data;
+    vkMapMemory(gf3d_vgraphics.device, gf3d_vgraphics.uniformBuffersMemory[currentImage], 0, sizeof(UniformBufferObject), 0, &data);
+    
+        memcpy(data, &gf3d_vgraphics.ubo, sizeof(UniformBufferObject));
+
+    vkUnmapMemory(gf3d_vgraphics.device, gf3d_vgraphics.uniformBuffersMemory[currentImage]);
+}
+
+void gf3d_vgraphics_rotate_camera(float degrees)
+{
+    gf3d_matrix_rotate(
+        gf3d_vgraphics.ubo.model,
+        gf3d_vgraphics.ubo.model,
+        degrees,
+        vector3d(0,0,1));
+
+}
 /*eol@eof*/
 

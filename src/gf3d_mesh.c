@@ -128,7 +128,7 @@ void gf3d_mesh_close()
 
 void gf3d_mesh_delete(Mesh *mesh)
 {
-    if (!mesh)return;
+    if ((!mesh)||(!mesh->_inuse))return;
     if (mesh->faceBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->faceBuffer, NULL);
@@ -174,7 +174,6 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer)
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
-
     vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
 
     slog("rendering mesh %s",mesh->filename);
@@ -230,7 +229,7 @@ Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 vcoun
     memcpy(data, vertices, (size_t) bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
-    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &mesh->buffer, &mesh->bufferMemory);
+    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->buffer, &mesh->bufferMemory);
 
     gf3d_vgraphics_copy_buffer(stagingBuffer, mesh->buffer, bufferSize);
     

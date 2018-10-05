@@ -30,11 +30,16 @@ void gf3d_vgraphics_render();
 
 VkDescriptorSetLayout * gf3d_vgraphics_get_descriptor_set_layout();
 
+VkDescriptorSet * gf3d_vgraphics_get_descriptor_set_by_index(Uint32 index);
+
+
 int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory);
 
 void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
+
+void gf3d_vgraphics_rotate_camera(float degrees);
 
 #endif

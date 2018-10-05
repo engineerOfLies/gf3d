@@ -1,4 +1,5 @@
 #include "gf3d_commands.h"
+#include "gf3d_vgraphics.h"
 #include "gf3d_vqueues.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_mesh.h"
@@ -21,6 +22,7 @@ extern Mesh *testMesh;
 static CommandManager gf3d_commands = {0};
 
 void gf3d_command_pool_close();
+void gf3d_command_free(Command *com);
 void gf3d_command_buffer_begin(Command *com,Pipeline *pipe);
 
 void gf3d_command_system_close()
@@ -30,7 +32,7 @@ void gf3d_command_system_close()
     {
         for (i = 0; i < gf3d_commands.max_commands; i++)
         {
-            // FREE the command pool
+            gf3d_command_free(&gf3d_commands.command_list[i]);
         }
         free(gf3d_commands.command_list);
     }
@@ -69,7 +71,7 @@ Command *gf3d_command_new()
 
 void gf3d_command_free(Command *com)
 {
-    if (!com)return;
+    if ((!com)||(!com->_inuse))return;
     if (com->commandBuffers)
     {
         free(com->commandBuffers);
@@ -179,7 +181,7 @@ Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe)
 }
 
 
-void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline)
+void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout, VkDescriptorSet *descriptorSet)
 {
     VkClearValue clearColor = {0};
     VkRenderPassBeginInfo renderPassInfo = {0};
@@ -207,10 +209,8 @@ void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPas
     
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-    //vertexCount: Even though we don't have a vertex buffer, we technically still have 3 vertices to draw.
-    //instanceCount: Used for instanced rendering, use 1 if you're not doing that.
-    //firstVertex: Used as an offset into the vertex buffer, defines the lowest value of gl_VertexIndex.
-    //firstInstance: Used as an offset for instanced rendering, defines the lowest value of gl_InstanceIndex.
+
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, descriptorSet, 0, NULL);
     gf3d_mesh_render(testMesh,commandBuffer);
     slog("doing render pass");
     vkCmdEndRenderPass(commandBuffer);
@@ -234,7 +234,9 @@ void gf3d_command_buffer_begin(Command *com,Pipeline *pipe)
             com->commandBuffers[i], 
             pipe->renderPass,
             gf3d_swapchain_get_frame_buffer_by_index(i),
-            pipe->graphicsPipeline);
+            pipe->graphicsPipeline,
+            pipe->pipelineLayout,
+            gf3d_vgraphics_get_descriptor_set_by_index(i));
     }
 }
 

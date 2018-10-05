@@ -127,8 +127,9 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     int i;
     Sint32 graphicsFamily;
     Sint32 presentFamily;
+    Sint32 transferFamily;
     VkSwapchainCreateInfoKHR createInfo = {0};
-    Uint32 queueFamilyIndices[2];
+    Uint32 queueFamilyIndices[3];
     
     slog("minimum images needed for swap chain: %i",gf3d_swapchain.capabilities.minImageCount);
     slog("Maximum images needed for swap chain: %i",gf3d_swapchain.capabilities.maxImageCount);
@@ -147,20 +148,20 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     
     graphicsFamily = gf3d_vqueues_get_graphics_queue_family();
     presentFamily = gf3d_vqueues_get_present_queue_family();
+    transferFamily = gf3d_vqueues_get_transfer_queue_family();
     queueFamilyIndices[0] = graphicsFamily;
     queueFamilyIndices[1] = presentFamily;
+    queueFamilyIndices[2] = transferFamily;
     
     if (graphicsFamily != presentFamily)
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-        createInfo.queueFamilyIndexCount = 2;
+        createInfo.queueFamilyIndexCount = 3;
         createInfo.pQueueFamilyIndices = queueFamilyIndices;
     }
     else
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        createInfo.queueFamilyIndexCount = 0; // Optional
-        createInfo.pQueueFamilyIndices = NULL; // Optional
     }
     createInfo.preTransform = gf3d_swapchain.capabilities.currentTransform;
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;  // our window is opaque, but it doesn't have to be

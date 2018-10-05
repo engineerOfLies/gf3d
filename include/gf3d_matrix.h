@@ -98,4 +98,18 @@ void gf3d_matrix_multiply_vector4d(
     Vector4D   vec
 );
 
+/**
+ * @brief multiply a matrix by the rotation matrix
+ * @param out the output matrix
+ * @param in  the input matrix
+ * @param degree the amount, in radians, to rotate by
+ * @param axis the axis about which to rotate
+ */
+void gf3d_matrix_rotate(
+    Matrix4     out,
+    Matrix4     in,
+    float       degree,
+    Vector3D    axis
+);
+
 #endif

@@ -41,7 +41,7 @@ Command * gf3d_command_transfer_pool_setup(Uint32 count,Pipeline *pipe);
 /**
  * @brief execute a render pass
  */
-void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline);
+void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout, VkDescriptorSet *descriptorSet);
 
 /**
  * @brief get a command buffer by index

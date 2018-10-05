@@ -27,12 +27,14 @@ int main(int argc,char *argv[])
     );
     
     // main game loop
+    slog("gf3d main loop begin");
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         //update game things here
         
+        gf3d_vgraphics_rotate_camera(0.001);
         
         gf3d_vgraphics_render();
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
