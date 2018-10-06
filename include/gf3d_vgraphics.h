@@ -4,6 +4,8 @@
 #include <vulkan/vulkan.h>
 
 #include "gf3d_vector.h"
+#include "gf3d_pipeline.h"
+#include "gf3d_commands.h"
 
 #define GF3D_VGRAPHICS_DISCRETE 1   //Choosing whether to use discrete [1] or integrated graphics [0]
 
@@ -41,5 +43,11 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
 
 
 void gf3d_vgraphics_rotate_camera(float degrees);
+
+Pipeline *gf3d_vgraphics_get_graphics_pipeline();
+Command *gf3d_vgraphics_get_graphics_command_pool();
+
+VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format);
+
 
 #endif

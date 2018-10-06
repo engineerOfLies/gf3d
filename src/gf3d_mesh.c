@@ -116,6 +116,7 @@ void gf3d_mesh_free_all()
 
 void gf3d_mesh_close()
 {
+    slog("cleaning up mesh data");
     if (gf3d_mesh.mesh_list)
     {
         gf3d_mesh_free_all();
@@ -132,22 +133,22 @@ void gf3d_mesh_delete(Mesh *mesh)
     if (mesh->faceBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->faceBuffer, NULL);
-        slog("mesh %s buffer freed",mesh->filename);
+        slog("mesh %s face buffer freed",mesh->filename);
     }
     if (mesh->faceBufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->faceBufferMemory, NULL);
-        slog("mesh %s buffer memory freed",mesh->filename);
+        slog("mesh %s face buffer memory freed",mesh->filename);
     }
     if (mesh->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->buffer, NULL);
-        slog("mesh %s buffer freed",mesh->filename);
+        slog("mesh %s vert buffer freed",mesh->filename);
     }
     if (mesh->bufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->bufferMemory, NULL);
-        slog("mesh %s buffer memory freed",mesh->filename);
+        slog("mesh %s vert buffer memory freed",mesh->filename);
     }
     memset(mesh,0,sizeof(Mesh));
 }
@@ -232,12 +233,17 @@ Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 vcoun
     gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->buffer, &mesh->bufferMemory);
 
     gf3d_vgraphics_copy_buffer(stagingBuffer, mesh->buffer, bufferSize);
+
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
     
     mesh->vertexCount = vcount;
     mesh->bufferMemory = mesh->bufferMemory;
     
     gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
     
+    gf3d_command_buffer_begin(gf3d_vgraphics_get_graphics_command_pool(),gf3d_vgraphics_get_graphics_pipeline());
+
     slog("created a mesh with %i vertices and %i face",vcount,fcount);
     return mesh;
 }

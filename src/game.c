@@ -7,6 +7,7 @@
 #include "gf3d_matrix.h"
 #include "gf3d_camera.h"
 #include "gf3d_vector.h"
+#include "gf3d_texture.h"
 
 Mesh *testMesh = NULL;
 
@@ -14,7 +15,7 @@ int main(int argc,char *argv[])
 {
     int done = 0;
     const Uint8 * keys;
-    
+    Texture *texture;
     init_logger("gf3d.log");
     slog("gf3d begin");
     gf3d_vgraphics_init(
@@ -26,6 +27,7 @@ int main(int argc,char *argv[])
         1                       //validation
     );
     
+    texture = gf3d_texture_load("images/bg_flat.png");
     // main game loop
     slog("gf3d main loop begin");
     while(!done)

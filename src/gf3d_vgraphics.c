@@ -19,6 +19,7 @@
 #include "gf3d_mesh.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
+#include "gf3d_texture.h"
 #include "gf3d_matrix.h"
 
 #include "simple_logger.h"
@@ -768,38 +769,15 @@ VkDescriptorSetLayout * gf3d_vgraphics_get_descriptor_set_layout()
 
 void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
-    VkCommandBufferAllocateInfo allocInfo = {0};
-    VkCommandBufferBeginInfo beginInfo = {0};
-    VkCommandBuffer commandBuffer;
     VkBufferCopy copyRegion = {0};
-    VkSubmitInfo submitInfo = {0};
-    VkQueue transferQueue = gf3d_vqueues_get_transfer_queue();
 
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = gf3d_vgraphics.transferCommandPool->commandPool;
-    allocInfo.commandBufferCount = 1;
-
-    vkAllocateCommandBuffers(gf3d_vgraphics.device, &allocInfo, &commandBuffer);
-
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
+    VkCommandBuffer commandBuffer = gf3d_command_begin_single_time(gf3d_vgraphics.transferCommandPool->commandPool);
+    
         copyRegion.size = size;
         vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-    vkEndCommandBuffer(commandBuffer);
-
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-
-    vkQueueSubmit(transferQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(transferQueue);
-
-    vkFreeCommandBuffers(gf3d_vgraphics.device, gf3d_vgraphics.transferCommandPool->commandPool, 1, &commandBuffer);
+    gf3d_command_end_single_time(gf3d_vgraphics.transferCommandPool->commandPool, commandBuffer);
+    
 }
 
 int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory)
@@ -873,5 +851,40 @@ void gf3d_vgraphics_rotate_camera(float degrees)
         vector3d(0,0,1));
 
 }
+
+Pipeline *gf3d_vgraphics_get_graphics_pipeline()
+{
+    return gf3d_vgraphics.pipe;
+}
+
+Command *gf3d_vgraphics_get_graphics_command_pool()
+{
+    return gf3d_vgraphics.graphicsCommandPool;
+}
+
+VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
+{
+    VkImageView imageView;
+    VkImageViewCreateInfo viewInfo = {0};
+
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = format;
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    if (vkCreateImageView(gf3d_vgraphics.device, &viewInfo, NULL, &imageView) != VK_SUCCESS)
+    {
+        slog("failed to create texture image view!");
+        return VK_NULL_HANDLE;
+    }
+
+    return imageView;
+}
+
 /*eol@eof*/
 

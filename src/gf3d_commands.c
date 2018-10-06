@@ -76,7 +76,10 @@ void gf3d_command_free(Command *com)
     {
         free(com->commandBuffers);
     }
-    vkDestroyCommandPool(gf3d_commands.device, com->commandPool, NULL);
+    if (com->commandPool != VK_NULL_HANDLE)
+    {
+        vkDestroyCommandPool(gf3d_commands.device, com->commandPool, NULL);
+    }
     memset(com,0,sizeof(Command));
 }
 
@@ -234,7 +237,7 @@ void gf3d_command_buffer_begin(Command *com,Pipeline *pipe)
             com->commandBuffers[i], 
             pipe->renderPass,
             gf3d_swapchain_get_frame_buffer_by_index(i),
-            pipe->graphicsPipeline,
+            pipe->pipeline,
             pipe->pipelineLayout,
             gf3d_vgraphics_get_descriptor_set_by_index(i));
     }
@@ -249,5 +252,42 @@ VkCommandBuffer * gf3d_command_buffer_get_by_index(Command *com,Uint32 index)
         return NULL;
     }
     return &com->commandBuffers[index];
+}
+
+VkCommandBuffer gf3d_command_begin_single_time(VkCommandPool commandPool)
+{
+    VkCommandBufferAllocateInfo allocInfo = {0};
+    VkCommandBufferBeginInfo beginInfo = {0};
+    VkCommandBuffer commandBuffer;
+    
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    vkAllocateCommandBuffers(gf3d_commands.device, &allocInfo, &commandBuffer);
+
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+void gf3d_command_end_single_time(VkCommandPool commandPool, VkCommandBuffer commandBuffer)
+{
+    VkSubmitInfo submitInfo = {0};
+    
+    vkEndCommandBuffer(commandBuffer);
+
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(gf3d_vqueues_get_graphics_queue(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(gf3d_vqueues_get_graphics_queue());
+
+    vkFreeCommandBuffers(gf3d_commands.device, commandPool, 1, &commandBuffer);
 }
 /*eol@eof*/

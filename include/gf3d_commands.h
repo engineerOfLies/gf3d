@@ -38,6 +38,13 @@ Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe);
 Command * gf3d_command_transfer_pool_setup(Uint32 count,Pipeline *pipe);
 
 
+void gf3d_command_buffer_begin(Command *com,Pipeline *pipe);
+
+
+VkCommandBuffer gf3d_command_begin_single_time(VkCommandPool commandPool);
+
+void gf3d_command_end_single_time(VkCommandPool commandPool, VkCommandBuffer commandBuffer);
+
 /**
  * @brief execute a render pass
  */

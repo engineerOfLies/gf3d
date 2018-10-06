@@ -9,7 +9,7 @@
 typedef struct
 {
     Bool                    inUse;
-    VkPipeline              graphicsPipeline;
+    VkPipeline              pipeline;
     VkRenderPass            renderPass;
     VkPipelineLayout        pipelineLayout;
     size_t                  vertSize;

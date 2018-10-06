@@ -252,7 +252,7 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,char *vertFile,char *fragF
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
     
-    if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipe->graphicsPipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipe->pipeline) != VK_SUCCESS)
     {   
         slog("failed to create graphics pipeline!");
         gf3d_pipeline_free(pipe);
@@ -265,11 +265,11 @@ void gf3d_pipeline_free(Pipeline *pipe)
 {
     if (!pipe)return;
     if (!pipe->inUse)return;
-    if (pipe->graphicsPipeline)
+    if (pipe->pipeline != VK_NULL_HANDLE)
     {
-        vkDestroyPipeline(pipe->device, pipe->graphicsPipeline, NULL);
+        vkDestroyPipeline(pipe->device, pipe->pipeline, NULL);
     }
-    if (pipe->pipelineLayout)
+    if (pipe->pipelineLayout != VK_NULL_HANDLE)
     {
         vkDestroyPipelineLayout(pipe->device, pipe->pipelineLayout, NULL);
     }

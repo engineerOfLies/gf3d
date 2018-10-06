@@ -1,5 +1,6 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_vqueues.h"
+#include "gf3d_vgraphics.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -33,7 +34,6 @@ void gf3d_swapchain_close();
 int gf3d_swapchain_choose_format();
 int gf3d_swapchain_get_presentation_mode();
 VkExtent2D gf3d_swapchain_configure_extent(Uint32 width,Uint32 height);
-VkImageView gf3d_swapchain_create_imageview(VkDevice device,VkImage image);
 
 void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfaceKHR surface,Uint32 width,Uint32 height)
 {
@@ -193,36 +193,9 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     gf3d_swapchain.imageViews = (VkImageView *)gf3d_allocate_array(sizeof(VkImageView),gf3d_swapchain.swapImageCount);
     for (i = 0 ; i < gf3d_swapchain.swapImageCount; i++)
     {
-        gf3d_swapchain.imageViews[i] = gf3d_swapchain_create_imageview(device,gf3d_swapchain.swapImages[i]);
+        gf3d_swapchain.imageViews[i] = gf3d_vgraphics_create_image_view(gf3d_swapchain.swapImages[i],gf3d_swapchain.formats[gf3d_swapchain.chosenFormat].format);
     }
     slog("create image views");
-}
-
-VkImageView gf3d_swapchain_create_imageview(VkDevice device,VkImage image)
-{
-    VkImageView imageView;
-    VkImageViewCreateInfo createInfo = {0};
-    
-    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    createInfo.image = image;
-    createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    createInfo.format = gf3d_swapchain.formats[gf3d_swapchain.chosenFormat].format;
-    createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-    createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-    createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-    createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-    createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    createInfo.subresourceRange.baseMipLevel = 0;
-    createInfo.subresourceRange.levelCount = 1;
-    createInfo.subresourceRange.baseArrayLayer = 0;
-    createInfo.subresourceRange.layerCount = 1;
-    
-    if (vkCreateImageView(device, &createInfo, NULL, &imageView) != VK_SUCCESS)
-    {
-        slog("failed to create image view");
-        return NULL;
-    }
-    return imageView;
 }
 
 VkExtent2D gf3d_swapchain_configure_extent(Uint32 width,Uint32 height)
@@ -279,6 +252,7 @@ void gf3d_swapchain_close()
         for (i = 0;i < gf3d_swapchain.framebufferCount; i++)
         {
             vkDestroyFramebuffer(gf3d_swapchain.device, gf3d_swapchain.frameBuffers[i], NULL);
+            slog("framebuffer destroyed");
         }
         free (gf3d_swapchain.frameBuffers);
     }
@@ -288,6 +262,7 @@ void gf3d_swapchain_close()
         for (i = 0;i < gf3d_swapchain.swapImageCount;i++)
         {
             vkDestroyImageView(gf3d_swapchain.device,gf3d_swapchain.imageViews[i],NULL);
+            slog("imageview destroyed");
         }
         free(gf3d_swapchain.imageViews);
     }
