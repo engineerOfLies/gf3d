@@ -28,7 +28,7 @@ VkExtent2D gf3d_vgraphics_get_view_extent();
 
 void gf3d_vgraphics_clear();
 
-void gf3d_vgraphics_render();
+Uint32 gf3d_vgraphics_render();
 
 VkDescriptorSetLayout * gf3d_vgraphics_get_descriptor_set_layout();
 

@@ -1,6 +1,7 @@
 #include "gf3d_vgraphics.h"
 #include "gf3d_mesh.h"
 #include "simple_logger.h"
+#include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
 
 #include <stddef.h>
@@ -158,25 +159,49 @@ void gf3d_mesh_scene_add(Mesh *mesh)
     if (!mesh)return;
 }
 
-void gf3d_mesh_scene_render()
+/*
+VkCommandBuffer gf3d_mesh_configure_render_command(Mesh *mesh)
 {
-    
-}
+    Command *command;
+    if (!mesh)
+    {
+        slog("cannot render a NULL mesh");
+        return;
+    }
+    command = gf3d_command_get_graphics_buffer();
+    return command->command;
+}*/
 
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer)
+void gf3d_mesh_render(Mesh *mesh,Command* com,Pipeline *pipe, Uint32 index,VkCommandBuffer commandBuffer)
 {
     VkDeviceSize offsets[] = {0};
+//    VkCommandBuffer commandBuffer;
     if (!mesh)
     {
         slog("cannot render a NULL mesh");
         return;
     }
     
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
-    
-    vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
-    vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
+/*    commandBuffer = gf3d_command_begin_single_time(com);
 
+        gf3d_command_configure_render_pass(
+            commandBuffer,
+            pipe->renderPass,
+            gf3d_swapchain_get_frame_buffer_by_index(index),
+            pipe->pipeline,
+            pipe->pipelineLayout,
+            gf3d_vgraphics_get_descriptor_set_by_index(index));
+  */      
+                vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
+                
+                vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
+
+/*
+        gf3d_command_configure_render_pass_end(commandBuffer);
+    
+    gf3d_command_end_single_time(com, commandBuffer);
+*/
     slog("rendering mesh %s",mesh->filename);
 }
 
@@ -242,8 +267,6 @@ Mesh *gf3d_mesh_create_vertex_buffer_from_vertices(Vertex *vertices,Uint32 vcoun
     
     gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
     
-    gf3d_command_buffer_begin(gf3d_vgraphics_get_graphics_command_pool(),gf3d_vgraphics_get_graphics_pipeline());
-
     slog("created a mesh with %i vertices and %i face",vcount,fcount);
     return mesh;
 }

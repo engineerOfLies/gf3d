@@ -77,7 +77,6 @@ typedef struct
     VkDeviceMemory             *uniformBuffersMemory;
     Uint32                      uniformBufferCount;
     Command                 *   graphicsCommandPool; 
-    Command                 *   transferCommandPool;
     UniformBufferObject         ubo;
 }vGraphics;
 
@@ -122,32 +121,6 @@ void gf3d_vgraphics_init(
 )
 {
     VkDevice device;
-    static Vertex vertices[] = 
-    {
-        {
-            {-1,-1,0},
-            {1,0,0}
-        },
-        {
-            {1,-1,0},
-            {0,1,0}
-            
-        },
-        {
-            {1,1,0},
-            {0,0,1}
-        },
-        {
-            {-1,1,0},
-            {0.5,0,0.5}
-        }
-    };
-    
-    static Face faces[] = 
-    {
-        {{0,1,2}},
-        {{2,3,0}}
-    };
     
     gf3d_matrix_identity(gf3d_vgraphics.ubo.model);
     gf3d_matrix_identity(gf3d_vgraphics.ubo.view);
@@ -188,6 +161,7 @@ void gf3d_vgraphics_init(
     gf3d_vgraphics_create_descriptor_set_layout();
     
     gf3d_pipeline_init(4);
+
     gf3d_vgraphics.pipe = gf3d_pipeline_graphics_load(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent());
 
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.pipe);
@@ -198,10 +172,6 @@ void gf3d_vgraphics_init(
     gf3d_vgraphics_create_descriptor_sets(gf3d_swapchain_get_frame_buffer_count());
 
     gf3d_command_system_init(8,device);
-    gf3d_vgraphics.transferCommandPool = gf3d_command_transfer_pool_setup(3,gf3d_vgraphics.pipe);
-
-        testMesh = gf3d_mesh_create_vertex_buffer_from_vertices(vertices,4,faces,2);
-        gf3d_word_cpy(testMesh->filename,"testMesh");
 
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
     
@@ -483,7 +453,7 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
     return createInfo;
 }
 
-void gf3d_vgraphics_render()
+Uint32 gf3d_vgraphics_render()
 {
     Uint32 imageIndex;
     VkPresentInfoKHR presentInfo = {0};
@@ -515,8 +485,11 @@ void gf3d_vgraphics_render()
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = gf3d_command_buffer_get_by_index(gf3d_vgraphics.graphicsCommandPool,imageIndex);
+    //get count of configured command buffers
+    //get the list of command buffers
+    
+    submitInfo.commandBufferCount = gf3d_command_pool_get_used_buffer_count(gf3d_vgraphics.graphicsCommandPool);
+    submitInfo.pCommandBuffers = gf3d_command_pool_get_used_buffers(gf3d_vgraphics.graphicsCommandPool);
     
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
@@ -537,6 +510,7 @@ void gf3d_vgraphics_render()
     presentInfo.pResults = NULL; // Optional
     
     vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
+    return imageIndex;
 }
 
 /**
@@ -771,12 +745,12 @@ void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevice
 {
     VkBufferCopy copyRegion = {0};
 
-    VkCommandBuffer commandBuffer = gf3d_command_begin_single_time(gf3d_vgraphics.transferCommandPool->commandPool);
+    VkCommandBuffer commandBuffer = gf3d_command_begin_single_time(gf3d_vgraphics.graphicsCommandPool);
     
         copyRegion.size = size;
         vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-    gf3d_command_end_single_time(gf3d_vgraphics.transferCommandPool->commandPool, commandBuffer);
+    gf3d_command_end_single_time(gf3d_vgraphics.graphicsCommandPool, commandBuffer);
     
 }
 

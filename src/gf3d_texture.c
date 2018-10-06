@@ -130,7 +130,7 @@ void gf3d_texture_copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t 
     VkBufferImageCopy region = {0};
 
     commandPool = gf3d_vgraphics_get_graphics_command_pool();
-    commandBuffer = gf3d_command_begin_single_time(commandPool->commandPool);
+    commandBuffer = gf3d_command_begin_single_time(commandPool);
     
     
     region.bufferOffset = 0;
@@ -159,7 +159,7 @@ void gf3d_texture_copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t 
         &region
     );
 
-    gf3d_command_end_single_time(commandPool->commandPool, commandBuffer);
+    gf3d_command_end_single_time(commandPool, commandBuffer);
 }
 
 void gf3d_texture_transition_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
@@ -207,7 +207,7 @@ void gf3d_texture_transition_image_layout(VkImage image, VkFormat format, VkImag
     }
 
     commandPool = gf3d_vgraphics_get_graphics_command_pool();
-    commandBuffer = gf3d_command_begin_single_time(commandPool->commandPool);
+    commandBuffer = gf3d_command_begin_single_time(commandPool);
 
     vkCmdPipelineBarrier(
         commandBuffer,
@@ -217,7 +217,7 @@ void gf3d_texture_transition_image_layout(VkImage image, VkFormat format, VkImag
         0, NULL,
         1, &barrier);
     
-    gf3d_command_end_single_time(commandPool->commandPool, commandBuffer);
+    gf3d_command_end_single_time(commandPool, commandBuffer);
 }
 
 void gf3d_texture_create_sampler(Texture *tex)

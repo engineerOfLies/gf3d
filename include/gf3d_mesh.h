@@ -58,9 +58,9 @@ void gf3d_mesh_delete(Mesh *mesh);
  * @brief adds a mesh to the render pass
  * @note: must be called within the render pass
  * @param mesh the mesh to render
- * @param commandBuffer the command buffer we are rendering with
+ * @param com the command pool to use to handle the request we are rendering with
  */
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer);
+void gf3d_mesh_render(Mesh *mesh,Command* com,Pipeline *pipe, Uint32 index,VkCommandBuffer commandBuffer);
 
 /**
  * @brief create a mesh's internal buffers based on vertices

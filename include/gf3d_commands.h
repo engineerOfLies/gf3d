@@ -12,6 +12,7 @@ typedef struct
     VkCommandPool       commandPool;
     VkCommandBuffer    *commandBuffers;
     Uint32              commandBufferCount;
+    Uint32              commandBufferNext;
 }Command;
 
 /**
@@ -29,34 +30,25 @@ void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice);
  */
 Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe);
 
-/**
- * @brief setup up the command pool for memory transfer commands
- * @param count the number of command buffers to create
- * @param pipe the pointer to the command pipeline to use
- * @return NULL on error or a pointer to a setup command pool
- */
-Command * gf3d_command_transfer_pool_setup(Uint32 count,Pipeline *pipe);
+VkCommandBuffer gf3d_command_begin_single_time(Command *com);
 
+void gf3d_command_end_single_time(Command *com, VkCommandBuffer commandBuffer);
 
-void gf3d_command_buffer_begin(Command *com,Pipeline *pipe);
+Uint32 gf3d_command_pool_get_used_buffer_count(Command *com);
 
-
-VkCommandBuffer gf3d_command_begin_single_time(VkCommandPool commandPool);
-
-void gf3d_command_end_single_time(VkCommandPool commandPool, VkCommandBuffer commandBuffer);
+VkCommandBuffer * gf3d_command_pool_get_used_buffers(Command *com);
 
 /**
- * @brief execute a render pass
+ * @brief begin recording a command that will take rendering pass information.  Submit all draw commands between this and gf3d_command_rendering_end
+ * @param index the rendering frame to use
+ * @return the command buffer used for this drawing pass.
  */
-void gf3d_command_execute_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout, VkDescriptorSet *descriptorSet);
+VkCommandBuffer gf3d_command_rendering_begin(Uint32 index);
 
-/**
- * @brief get a command buffer by index
- * @param com the command pool to get the buffer from
- * @param index the index to retrieve
- * @returns NULL on error, or a pointer to the command buffer requested
- */
-VkCommandBuffer * gf3d_command_buffer_get_by_index(Command *com,Uint32 index);
+void gf3d_command_rendering_end(VkCommandBuffer commandBuffer);
+
+void gf3d_command_configure_render_pass_end(VkCommandBuffer commandBuffer);
+
 
 #endif
 
