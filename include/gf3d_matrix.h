@@ -5,6 +5,12 @@
 
 typedef float Matrix4[4][4];
 
+typedef struct
+{
+    Matrix4 model;
+    Matrix4 view;
+    Matrix4 proj;
+}UniformBufferObject;
 
 /**
  * @brief copy the contents of one matrix into another

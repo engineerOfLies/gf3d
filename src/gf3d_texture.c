@@ -78,6 +78,10 @@ void gf3d_texture_delete(Texture *tex)
 {
     if ((!tex)||(!tex->_inuse))return;
     
+    if (tex->textureSampler != VK_NULL_HANDLE)
+    {
+        vkDestroySampler(gf3d_texture.device, tex->textureSampler, NULL);
+    }
     if (tex->textureImageView != VK_NULL_HANDLE)
     {
         vkDestroyImageView(gf3d_texture.device, tex->textureImageView, NULL);
@@ -232,8 +236,21 @@ void gf3d_texture_create_sampler(Texture *tex)
     samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.anisotropyEnable = VK_TRUE;
+    samplerInfo.maxAnisotropy = 16;
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 0.0f;
     
-    
+    if (vkCreateSampler(gf3d_texture.device, &samplerInfo, NULL, &tex->textureSampler) != VK_SUCCESS)
+    {
+        slog("failed to create texture sampler!");
+    }
 }
 
 Texture *gf3d_texture_load(char *filename)
@@ -323,6 +340,8 @@ Texture *gf3d_texture_load(char *filename)
     gf3d_texture_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     tex->textureImageView = gf3d_vgraphics_create_image_view(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM);
+    
+    gf3d_texture_create_sampler(tex);
     
     vkDestroyBuffer(gf3d_texture.device, stagingBuffer, NULL);
     vkFreeMemory(gf3d_texture.device, stagingBufferMemory, NULL);

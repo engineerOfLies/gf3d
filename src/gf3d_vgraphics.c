@@ -16,20 +16,13 @@
 #include "gf3d_vqueues.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
-#include "gf3d_mesh.h"
+#include "gf3d_model.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
 #include "gf3d_matrix.h"
 
 #include "simple_logger.h"
-
-typedef struct
-{
-    Matrix4 model;
-    Matrix4 view;
-    Matrix4 proj;
-}UniformBufferObject;
 
 typedef struct
 {
@@ -65,12 +58,7 @@ typedef struct
     
     VkSemaphore                 imageAvailableSemaphore;
     VkSemaphore                 renderFinishedSemaphore;
-    
-    VkDescriptorSetLayout       descriptorSetLayout;
-    VkDescriptorPool            descriptorPool;
-    VkDescriptorSet         *   descriptorSets;
-    Uint32                      descriptorSetCount;
-    
+        
     Pipeline                   *pipe;
     
     VkBuffer                   *uniformBuffers;
@@ -89,10 +77,6 @@ void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
 void gf3d_vgraphics_semaphores_create();
-
-void gf3d_vgraphics_create_descriptor_set_layout();
-void gf3d_vgraphics_create_descriptor_pool(Uint32 count);
-void gf3d_vgraphics_create_descriptor_sets(Uint32 count);
 
 VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
@@ -157,8 +141,8 @@ void gf3d_vgraphics_init(
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
     
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
-
-    gf3d_vgraphics_create_descriptor_set_layout();
+    gf3d_texture_init(1024);
+    gf3d_model_manager_init(1024,gf3d_swapchain_get_frame_buffer_count(),device);
     
     gf3d_pipeline_init(4);
 
@@ -168,14 +152,12 @@ void gf3d_vgraphics_init(
 
     gf3d_vgraphics_create_uniform_buffer();
     
-    gf3d_vgraphics_create_descriptor_pool(gf3d_swapchain_get_frame_buffer_count());
-    gf3d_vgraphics_create_descriptor_sets(gf3d_swapchain_get_frame_buffer_count());
-
     gf3d_command_system_init(8,device);
 
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_frame_buffer_count(),gf3d_vgraphics.pipe);
     
     gf3d_vgraphics_semaphores_create();
+    
 }
 
 
@@ -338,6 +320,16 @@ void gf3d_vgraphics_setup(
     
 }
 
+VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index)
+{
+    if (index >= gf3d_vgraphics.uniformBufferCount)
+    {
+        slog("request for uniform buffer index %i is out of range",index);
+        return VK_NULL_HANDLE;
+    }
+    return gf3d_vgraphics.uniformBuffers[index];
+}
+
 void gf3d_vgraphics_create_uniform_buffer()
 {
     int i;
@@ -358,15 +350,6 @@ void gf3d_vgraphics_close()
 {
     int i;
     slog("cleaning up vulkan graphics");
-
-    if (gf3d_vgraphics.descriptorPool)
-    {
-        vkDestroyDescriptorPool(gf3d_vgraphics.device, gf3d_vgraphics.descriptorPool, NULL);
-    }
-    if (gf3d_vgraphics.descriptorSetLayout)
-    {
-        vkDestroyDescriptorSetLayout(gf3d_vgraphics.device, gf3d_vgraphics.descriptorSetLayout, NULL);
-    }
     
     for (i = 0; i < gf3d_vgraphics.uniformBufferCount; i++)
     {
@@ -636,110 +619,6 @@ void gf3d_vgraphics_semaphores_create()
     atexit(gf3d_vgraphics_semaphores_close);
 }
 
-VkDescriptorSet * gf3d_vgraphics_get_descriptor_set_by_index(Uint32 index)
-{
-    if (index >= gf3d_vgraphics.descriptorSetCount)
-    {
-        slog("no descriptor set with index %i",index);
-        return NULL;
-    }
-    return &gf3d_vgraphics.descriptorSets[index];
-}
-
-void gf3d_vgraphics_create_descriptor_sets(Uint32 count)
-{
-    int i;
-    VkDescriptorSetLayout *layouts = NULL;
-    VkDescriptorSetAllocateInfo allocInfo = {0};
-    VkDescriptorBufferInfo bufferInfo = {0};
-    VkWriteDescriptorSet descriptorWrite = {0};
-
-    layouts = (VkDescriptorSetLayout *)gf3d_allocate_array(sizeof(VkDescriptorSetLayout),count);
-    for (i = 0; i < count; i++)
-    {
-        memcpy(&layouts[i],gf3d_vgraphics_get_descriptor_set_layout(),sizeof(VkDescriptorSetLayout));
-    }
-    
-    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    allocInfo.descriptorPool = gf3d_vgraphics.descriptorPool;
-    allocInfo.descriptorSetCount = count;
-    allocInfo.pSetLayouts = layouts;
-    
-    gf3d_vgraphics.descriptorSets = (VkDescriptorSet *)gf3d_allocate_array(sizeof(VkDescriptorSet),count);
-    if (vkAllocateDescriptorSets(gf3d_vgraphics.device, &allocInfo, gf3d_vgraphics.descriptorSets) != VK_SUCCESS)
-    {
-        slog("failed to allocate descriptor sets!");
-        return;
-    }
-    gf3d_vgraphics.descriptorSetCount = count;
-    for (i = 0; i < count; i++)
-    {
-        memset(&bufferInfo,0,sizeof(VkDescriptorBufferInfo));
-        bufferInfo.buffer = gf3d_vgraphics.uniformBuffers[i];
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(UniformBufferObject);        
-        
-        memset(&descriptorWrite,0,sizeof(VkWriteDescriptorSet));
-        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrite.dstSet = gf3d_vgraphics.descriptorSets[i];
-        descriptorWrite.dstBinding = 0;
-        descriptorWrite.dstArrayElement = 0;
-        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrite.descriptorCount = 1;
-        
-        descriptorWrite.pBufferInfo = &bufferInfo;
-        descriptorWrite.pImageInfo = NULL; // Optional
-        descriptorWrite.pTexelBufferView = NULL; // Optional
-        
-        vkUpdateDescriptorSets(gf3d_vgraphics.device, 1, &descriptorWrite, 0, NULL);
-    }
-}
-
-void gf3d_vgraphics_create_descriptor_pool(Uint32 count)
-{
-    VkDescriptorPoolSize poolSize = {0};
-    VkDescriptorPoolCreateInfo poolInfo = {0};
-    slog("attempting to make a descriptor pool of size %i",count);
-    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSize.descriptorCount = count;
-    
-    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = 1;
-    poolInfo.pPoolSizes = &poolSize;
-    poolInfo.maxSets = count;
-    
-    if (vkCreateDescriptorPool(gf3d_vgraphics.device, &poolInfo, NULL, &gf3d_vgraphics.descriptorPool) != VK_SUCCESS)
-    {
-        slog("failed to create descriptor pool!");
-        return;
-    }
-}
-
-void gf3d_vgraphics_create_descriptor_set_layout()
-{
-    VkDescriptorSetLayoutCreateInfo layoutInfo = {0};
-    VkDescriptorSetLayoutBinding uboLayoutBinding = {0};
-    
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    uboLayoutBinding.descriptorCount = 1;
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    uboLayoutBinding.pImmutableSamplers = NULL; // Optional
-    
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = 1;
-    layoutInfo.pBindings = &uboLayoutBinding;
-
-    if (vkCreateDescriptorSetLayout(gf3d_vgraphics.device, &layoutInfo, NULL, &gf3d_vgraphics.descriptorSetLayout) != VK_SUCCESS)
-    {
-        slog("failed to create descriptor set layout!");
-    }
-}
-
-VkDescriptorSetLayout * gf3d_vgraphics_get_descriptor_set_layout()
-{
-    return &gf3d_vgraphics.descriptorSetLayout;
-}
 
 void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {

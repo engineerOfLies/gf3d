@@ -26,6 +26,29 @@
 #include "gf3d_vector.h"
 #include "gf3d_matrix.h"
 #include "gf3d_text.h"
+#include "gf3d_texture.h"
+#include "gf3d_mesh.h"
+
+typedef struct
+{
+    Uint8                       _inuse;
+    Uint32                      _refcount;
+    TextLine                    filename;
+    Mesh                    *   mesh;
+    Texture                 *   texture;
+    VkDescriptorPool            descriptorPool;
+    VkDescriptorSet         *   descriptorSets;
+    Uint32                      descriptorSetCount;
+
+}Model;
+
+
+void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
+VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
+
+Model * gf3d_model_load(char * filename);
+Model * gf3d_model_new();
+void gf3d_model_free(Model *model);
 
 
 #endif

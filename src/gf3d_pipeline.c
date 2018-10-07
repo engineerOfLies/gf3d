@@ -2,7 +2,7 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_shaders.h"
-#include "gf3d_mesh.h"
+#include "gf3d_model.h"
 #include <string.h>
 #include <stdio.h>
 #include "simple_logger.h"
@@ -222,7 +222,7 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,char *vertFile,char *fragF
 
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1; // Optional
-    pipelineLayoutInfo.pSetLayouts = gf3d_vgraphics_get_descriptor_set_layout(); // Optional
+    pipelineLayoutInfo.pSetLayouts = gf3d_model_get_descriptor_set_layout(); // Optional
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = NULL; // Optional
 

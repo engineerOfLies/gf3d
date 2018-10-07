@@ -167,7 +167,7 @@ void gf3d_command_configure_render_pass_end(VkCommandBuffer commandBuffer)
     vkCmdEndRenderPass(commandBuffer);
 }
 
-VkCommandBuffer gf3d_command_rendering_begin(Uint32 index)
+VkCommandBuffer gf3d_command_rendering_begin(Uint32 index,VkDescriptorSet *descriptorSet)
 {
     VkCommandBuffer commandBuffer;
     Pipeline *pipe;
@@ -181,7 +181,7 @@ VkCommandBuffer gf3d_command_rendering_begin(Uint32 index)
             gf3d_swapchain_get_frame_buffer_by_index(index),
             pipe->pipeline,
             pipe->pipelineLayout,
-            gf3d_vgraphics_get_descriptor_set_by_index(index));
+            descriptorSet);
     
     return commandBuffer;
 }
