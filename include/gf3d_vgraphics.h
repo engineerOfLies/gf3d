@@ -33,7 +33,8 @@ VkExtent2D gf3d_vgraphics_get_view_extent();
 
 void gf3d_vgraphics_clear();
 
-Uint32 gf3d_vgraphics_render();
+Uint32 gf3d_vgraphics_render_begin();
+void gf3d_vgraphics_render_end(Uint32 imageIndex);
 
 int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory);
 

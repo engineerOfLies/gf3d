@@ -24,7 +24,7 @@ static CommandManager gf3d_commands = {0};
 void gf3d_command_pool_close();
 void gf3d_command_free(Command *com);
 void gf3d_command_buffer_begin(Command *com,Pipeline *pipe);
-void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout, VkDescriptorSet *descriptorSet);
+void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout);
 
 void gf3d_command_system_close()
 {
@@ -167,7 +167,7 @@ void gf3d_command_configure_render_pass_end(VkCommandBuffer commandBuffer)
     vkCmdEndRenderPass(commandBuffer);
 }
 
-VkCommandBuffer gf3d_command_rendering_begin(Uint32 index,VkDescriptorSet *descriptorSet)
+VkCommandBuffer gf3d_command_rendering_begin(Uint32 index)
 {
     VkCommandBuffer commandBuffer;
     Pipeline *pipe;
@@ -180,8 +180,7 @@ VkCommandBuffer gf3d_command_rendering_begin(Uint32 index,VkDescriptorSet *descr
             pipe->renderPass,
             gf3d_swapchain_get_frame_buffer_by_index(index),
             pipe->pipeline,
-            pipe->pipelineLayout,
-            descriptorSet);
+            pipe->pipelineLayout);
     
     return commandBuffer;
 }
@@ -192,7 +191,7 @@ void gf3d_command_rendering_end(VkCommandBuffer commandBuffer)
     gf3d_command_end_single_time(gf3d_vgraphics_get_graphics_command_pool(), commandBuffer);
 }
 
-void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout, VkDescriptorSet *descriptorSet)
+void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout)
 {
     VkClearValue clearColor = {0};
     VkRenderPassBeginInfo renderPassInfo = {0};
@@ -209,8 +208,6 @@ void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderP
     
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, descriptorSet, 0, NULL);
 }
 
 VkCommandBuffer gf3d_command_begin_single_time(Command* com)

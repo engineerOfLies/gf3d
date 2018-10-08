@@ -14,8 +14,7 @@ int main(int argc,char *argv[])
 {
     int done = 0;
     const Uint8 * keys;
-    Sint32 bufferFrame = -1;
-    VkCommandBuffer commandBuffer;
+    Uint32 bufferFrame = 0;
     Model *model;
     
     init_logger("gf3d.log");    
@@ -42,20 +41,12 @@ int main(int argc,char *argv[])
         
         // configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool
-/*        if (bufferFrame != -1)
-        {
-            
-            commandBuffer = gf3d_command_rendering_begin(bufferFrame);
-            // TODO loop through desired meshes to render
-                gf3d_mesh_render(testMesh,gf3d_vgraphics_get_graphics_command_pool(),gf3d_vgraphics_get_graphics_pipeline(),bufferFrame,commandBuffer);
-                gf3d_mesh_render(mesh,gf3d_vgraphics_get_graphics_command_pool(),gf3d_vgraphics_get_graphics_pipeline(),bufferFrame,commandBuffer);
-                
-            gf3d_command_rendering_end(commandBuffer);
-            
-        }
-        bufferFrame = gf3d_vgraphics_render();
-        */
+        bufferFrame = gf3d_vgraphics_render_begin();
         
+            gf3d_model_draw(model,bufferFrame);
+            
+        gf3d_vgraphics_render_end(bufferFrame);
+
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
     }    
     

@@ -111,7 +111,7 @@ void gf3d_vgraphics_init(
     gf3d_matrix_identity(gf3d_vgraphics.ubo.proj);
     gf3d_matrix_view(
         gf3d_vgraphics.ubo.view,
-        vector3d(2,2,2),
+        vector3d(2,20,2),
         vector3d(0,0,0),
         vector3d(0,0,1)
     );
@@ -120,7 +120,7 @@ void gf3d_vgraphics_init(
         45 * GF3D_DEGTORAD,
         renderWidth/(float)renderHeight,
         0.1f,
-        10
+        100
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
@@ -142,7 +142,7 @@ void gf3d_vgraphics_init(
     
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
-    gf3d_model_manager_init(1024,gf3d_swapchain_get_frame_buffer_count(),device);
+    gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);
     
     gf3d_pipeline_init(4);
 
@@ -416,6 +416,8 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
     createInfo.pQueueCreateInfos = gf3d_vgraphics.queueCreateInfo;
     createInfo.queueCreateInfoCount = count;
 
+    gf3d_vgraphics.deviceFeatures.samplerAnisotropy = VK_TRUE;
+
     createInfo.pEnabledFeatures = &gf3d_vgraphics.deviceFeatures;
     
     
@@ -436,14 +438,9 @@ VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
     return createInfo;
 }
 
-Uint32 gf3d_vgraphics_render()
+Uint32 gf3d_vgraphics_render_begin()
 {
     Uint32 imageIndex;
-    VkPresentInfoKHR presentInfo = {0};
-    VkSubmitInfo submitInfo = {0};
-    VkSemaphore waitSemaphores[] = {gf3d_vgraphics.imageAvailableSemaphore};
-    VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
-    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     VkSwapchainKHR swapChains[1] = {0};
 
     /*
@@ -461,6 +458,19 @@ Uint32 gf3d_vgraphics_render()
         VK_NULL_HANDLE,
         &imageIndex);
     
+    return imageIndex;
+}
+
+void gf3d_vgraphics_render_end(Uint32 imageIndex)
+{
+    VkPresentInfoKHR presentInfo = {0};
+    VkSubmitInfo submitInfo = {0};
+    VkSwapchainKHR swapChains[1] = {0};
+    VkSemaphore waitSemaphores[] = {gf3d_vgraphics.imageAvailableSemaphore};
+    VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
+    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    swapChains[0] = gf3d_swapchain_get();
+
     gf3d_vgraphics_update_uniform_buffer(imageIndex);
 
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -493,7 +503,6 @@ Uint32 gf3d_vgraphics_render()
     presentInfo.pResults = NULL; // Optional
     
     vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
-    return imageIndex;
 }
 
 /**
@@ -504,6 +513,7 @@ Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)
 {
     VkPhysicalDeviceProperties deviceProperties;
     VkPhysicalDeviceFeatures deviceFeatures;
+    
     
     vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
     vkGetPhysicalDeviceProperties(device, &deviceProperties);

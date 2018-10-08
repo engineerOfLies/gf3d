@@ -48,6 +48,7 @@ VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
 
 Model * gf3d_model_load(char * filename);
 Model * gf3d_model_new();
+void gf3d_model_draw(Model *model,Uint32 bufferFrame);
 void gf3d_model_free(Model *model);
 
 

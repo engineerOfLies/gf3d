@@ -46,6 +46,7 @@ void gf3d_swapchain_setup_frame_buffers(Pipeline *pipe);
 void gf3d_swapchain_close();
 
 Uint32 gf3d_swapchain_get_frame_buffer_count();
+Uint32 gf3d_swapchain_get_swap_image_count();
 
 /**
  * @brief get the swapchain to use for rendering

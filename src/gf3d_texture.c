@@ -250,7 +250,9 @@ void gf3d_texture_create_sampler(Texture *tex)
     if (vkCreateSampler(gf3d_texture.device, &samplerInfo, NULL, &tex->textureSampler) != VK_SUCCESS)
     {
         slog("failed to create texture sampler!");
+        return;
     }
+    slog("created texture sampler");
 }
 
 Texture *gf3d_texture_load(char *filename)
@@ -346,6 +348,7 @@ Texture *gf3d_texture_load(char *filename)
     vkDestroyBuffer(gf3d_texture.device, stagingBuffer, NULL);
     vkFreeMemory(gf3d_texture.device, stagingBufferMemory, NULL);
     SDL_FreeSurface(surface);
+    slog("created texture for image: %s",filename);
     return tex;
 }
 

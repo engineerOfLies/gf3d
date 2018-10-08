@@ -9,14 +9,12 @@ typedef struct
 {
     Vector3D vertex;
     Vector3D normal;
-//    Vector2D texel;
+    Vector2D texel;
 }Vertex;
 
 typedef struct
 {
     Uint32  verts[3];
-//    Uint32  normals[3];
-//    Uint32  texels[3];
 }Face;
 
 typedef struct
@@ -70,7 +68,7 @@ void gf3d_mesh_free(Mesh *mesh);
  * @param mesh the mesh to render
  * @param com the command pool to use to handle the request we are rendering with
  */
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer);
+void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 
 /**
  * @brief create a mesh's internal buffers based on vertices

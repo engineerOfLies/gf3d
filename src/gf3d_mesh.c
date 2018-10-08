@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 
-#define ATTRIBUTE_COUNT 2
+#define ATTRIBUTE_COUNT 3
 
 
 typedef struct
@@ -48,6 +48,11 @@ void gf3d_mesh_init(Uint32 mesh_max)
     gf3d_mesh.attributeDescriptions[1].location = 1;
     gf3d_mesh.attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
     gf3d_mesh.attributeDescriptions[1].offset = offsetof(Vertex, normal);
+    
+    gf3d_mesh.attributeDescriptions[2].binding = 0;
+    gf3d_mesh.attributeDescriptions[2].location = 2;
+    gf3d_mesh.attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    gf3d_mesh.attributeDescriptions[2].offset = offsetof(Vertex, texel);
 
     gf3d_mesh.mesh_list = gf3d_allocate_array(sizeof(Mesh),mesh_max);
     slog("mesh system initialized");
@@ -162,17 +167,22 @@ void gf3d_mesh_scene_add(Mesh *mesh)
     if (!mesh)return;
 }
 
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer)
+void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
     VkDeviceSize offsets[] = {0};
+    Pipeline *pipe;
     if (!mesh)
     {
         slog("cannot render a NULL mesh");
         return;
     }
+    pipe = gf3d_vgraphics_get_graphics_pipeline();
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
+    
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
+    
     vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
 }
 
@@ -251,7 +261,7 @@ Mesh *gf3d_mesh_load(char *filename)
     {
         return NULL;
     }
-    gf3d_mesh_create_vertex_buffer_from_vertices(mesh,obj->vertices,obj->vertex_count,obj->faces,obj->face_count);
+    gf3d_mesh_create_vertex_buffer_from_vertices(mesh,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
     gf3d_obj_free(obj);
     gf3d_line_cpy(mesh->filename,filename);
     return mesh;

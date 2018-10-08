@@ -296,6 +296,11 @@ Bool gf3d_swapchain_validation_check()
     return true;
 }
 
+Uint32 gf3d_swapchain_get_swap_image_count()
+{
+    return gf3d_swapchain.swapImageCount;
+}
+
 Uint32 gf3d_swapchain_get_frame_buffer_count()
 {
     return gf3d_swapchain.framebufferCount;

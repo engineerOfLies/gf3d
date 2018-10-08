@@ -1,5 +1,5 @@
-
 #include "gf3d_model.h"
+#include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
 #include "simple_logger.h"
 #include "gf3d_obj_load.h"
@@ -38,6 +38,7 @@ void gf3d_model_manager_close()
         vkDestroyDescriptorSetLayout(gf3d_model.device, gf3d_model.descriptorSetLayout, NULL);
     }
     memset(&gf3d_model,0,sizeof(ModelManager));
+    slog("model manager closed");
 }
 
 void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device)
@@ -47,11 +48,12 @@ void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice devi
         slog("cannot intilizat model manager for 0 models");
         return;
     }
+    gf3d_model.chain_length = chain_length;
     gf3d_model.model_list = (Model *)gf3d_allocate_array(sizeof(Model),max_models);
     gf3d_model.max_models = max_models;
-    gf3d_model.chain_length = chain_length;
     gf3d_model.device = device;
     gf3d_model_create_descriptor_set_layout();
+    slog("model manager initiliazed");
     atexit(gf3d_model_manager_close);
 }
 
@@ -118,7 +120,7 @@ Model * gf3d_model_load(char * filename)
     model->texture = gf3d_texture_load(assetname);
     
     gf3d_model_setup(model);
-    return NULL;
+    return model;
 }
 
 void gf3d_model_free(Model *model)
@@ -139,6 +141,22 @@ void gf3d_model_delete(Model *model)
         vkDestroyDescriptorPool(gf3d_model.device, model->descriptorPool, NULL);
     }
 
+}
+
+void gf3d_model_draw(Model *model,Uint32 bufferFrame)
+{
+    VkCommandBuffer commandBuffer;
+    if (!model)
+    {
+        slog("cannot render a NULL model");
+        return;
+    }
+    
+    commandBuffer = gf3d_command_rendering_begin(bufferFrame);
+
+    gf3d_mesh_render(model->mesh,commandBuffer,&model->descriptorSets[bufferFrame]);
+
+    gf3d_command_rendering_end(commandBuffer);
 }
 
 void gf3d_model_create_descriptor_sets(Model *model)
@@ -170,6 +188,7 @@ void gf3d_model_create_descriptor_sets(Model *model)
     model->descriptorSetCount = gf3d_model.chain_length;
     for (i = 0; i < gf3d_model.chain_length; i++)
     {
+        slog("updating descriptor sets");
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.imageView = model->texture->textureImageView;
         imageInfo.sampler = model->texture->textureSampler;
