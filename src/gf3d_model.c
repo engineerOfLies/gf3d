@@ -143,20 +143,14 @@ void gf3d_model_delete(Model *model)
 
 }
 
-void gf3d_model_draw(Model *model,Uint32 bufferFrame)
+void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuffer)
 {
-    VkCommandBuffer commandBuffer;
     if (!model)
     {
         slog("cannot render a NULL model");
         return;
     }
-    
-    commandBuffer = gf3d_command_rendering_begin(bufferFrame);
-
     gf3d_mesh_render(model->mesh,commandBuffer,&model->descriptorSets[bufferFrame]);
-
-    gf3d_command_rendering_end(commandBuffer);
 }
 
 void gf3d_model_create_descriptor_sets(Model *model)

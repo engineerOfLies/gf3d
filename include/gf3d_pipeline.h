@@ -41,4 +41,6 @@ void gf3d_pipeline_free(Pipeline *pipe);
  */
 Pipeline *gf3d_pipeline_graphics_load(VkDevice device,char *vertFile,char *fragFile,VkExtent2D extent);
 
+VkFormat gf3d_pipeline_find_depth_format();
+
 #endif

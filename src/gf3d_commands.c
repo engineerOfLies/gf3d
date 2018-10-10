@@ -193,9 +193,11 @@ void gf3d_command_rendering_end(VkCommandBuffer commandBuffer)
 
 void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderPass renderPass,VkFramebuffer framebuffer,VkPipeline graphicsPipeline,VkPipelineLayout pipelineLayout)
 {
-    VkClearValue clearColor = {0};
+    VkClearValue clearValues[2] = {0};
     VkRenderPassBeginInfo renderPassInfo = {0};
-    clearColor.color.float32[3] = 1.0;
+    
+    clearValues[0].color.float32[3] = 1.0;
+    clearValues[1].depthStencil.depth = 1.0f;
     
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = renderPass;
@@ -203,8 +205,8 @@ void gf3d_command_configure_render_pass(VkCommandBuffer commandBuffer, VkRenderP
     renderPassInfo.renderArea.offset.x = 0;
     renderPassInfo.renderArea.offset.y = 0;
     renderPassInfo.renderArea.extent = gf3d_swapchain_get_extent();
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearColor;
+    renderPassInfo.clearValueCount = 2;
+    renderPassInfo.pClearValues = clearValues;
     
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
@@ -215,6 +217,11 @@ VkCommandBuffer gf3d_command_begin_single_time(Command* com)
     VkCommandBufferAllocateInfo allocInfo = {0};
     VkCommandBufferBeginInfo beginInfo = {0};
     VkCommandBuffer commandBuffer;
+    
+    if (!com)
+    {
+        slog("com is NULL");
+    }
     
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;

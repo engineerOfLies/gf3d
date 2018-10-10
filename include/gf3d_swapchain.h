@@ -61,4 +61,11 @@ VkSwapchainKHR gf3d_swapchain_get();
 VkFramebuffer gf3d_swapchain_get_frame_buffer_by_index(Uint32 index);
 
 
+void gf3d_swapchain_create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage* image, VkDeviceMemory* imageMemory);
+
+void gf3d_swapchain_transition_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
+void gf3d_swapchain_create_depth_image();
+
+
 #endif

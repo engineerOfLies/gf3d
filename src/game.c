@@ -15,7 +15,9 @@ int main(int argc,char *argv[])
     int done = 0;
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
+    VkCommandBuffer commandBuffer;
     Model *model;
+    Model *model2;
     
     init_logger("gf3d.log");    
     slog("gf3d begin");
@@ -29,8 +31,9 @@ int main(int argc,char *argv[])
     );
     
     // main game loop
-    slog("gf3d main loop begin");    
+    slog("gf3d main loop begin");
     model = gf3d_model_load("agumon");
+    model2 = gf3d_model_load("cube");
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
@@ -42,9 +45,12 @@ int main(int argc,char *argv[])
         // configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool
         bufferFrame = gf3d_vgraphics_render_begin();
-        
-            gf3d_model_draw(model,bufferFrame);
+        commandBuffer = gf3d_command_rendering_begin(bufferFrame);
+
+            gf3d_model_draw(model,bufferFrame,commandBuffer);
+            gf3d_model_draw(model2,bufferFrame,commandBuffer);
             
+        gf3d_command_rendering_end(commandBuffer);
         gf3d_vgraphics_render_end(bufferFrame);
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
