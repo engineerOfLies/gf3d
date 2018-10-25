@@ -99,9 +99,26 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     slog("using queue family %i for graphics commands",gf3d_vqueues.graphics_queue_family);
     slog("using queue family %i for rendering pipeline",gf3d_vqueues.present_queue_family);
     slog("using queue family %i for transfer pipeline",gf3d_vqueues.transfer_queue_family);
-    
-    if (gf3d_vqueues.graphics_queue_family != -1)gf3d_vqueues.work_queue_count++;
-    if ((gf3d_vqueues.present_queue_family != -1) && (gf3d_vqueues.present_queue_family != gf3d_vqueues.graphics_queue_family))gf3d_vqueues.work_queue_count++;
+
+    /*
+     * When creating a logical device a VkDeviceQueueCreateInfo can only be included (at most) once per queue_family.
+     * This is a hacky way of preventing us from including a work queue VkDeviceQueueCreateInfo more than once per family.
+     */
+    Bool presentation_queue_unique = (Bool) (gf3d_vqueues.present_queue_family != gf3d_vqueues.graphics_queue_family);
+    Bool transfer_queue_unique = (Bool) ((gf3d_vqueues.transfer_queue_family != gf3d_vqueues.graphics_queue_family) &&
+                                 (gf3d_vqueues.transfer_queue_family != gf3d_vqueues.work_queue_count));
+
+    if (gf3d_vqueues.graphics_queue_family != -1) {
+        gf3d_vqueues.work_queue_count++;
+    }
+
+    if ((gf3d_vqueues.present_queue_family != -1) && presentation_queue_unique) {
+        gf3d_vqueues.work_queue_count++;
+    }
+
+    if (gf3d_vqueues.transfer_queue_family != -1 && transfer_queue_unique) {
+        gf3d_vqueues.work_queue_count++;
+    }
 
     if (!gf3d_vqueues.work_queue_count)
     {
@@ -115,9 +132,13 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
         {
             gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_graphics_queue_info();
         }
-        if (gf3d_vqueues.present_queue_family != -1)
+        if (gf3d_vqueues.present_queue_family != -1 && presentation_queue_unique)
         {
             gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_present_queue_info();
+        }
+        if (gf3d_vqueues.transfer_queue_family != -1 && transfer_queue_unique)
+        {
+            gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_transfer_queue_info();
         }
     }
     
