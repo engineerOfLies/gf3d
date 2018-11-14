@@ -50,7 +50,7 @@ void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice)
     }
     gf3d_commands.device = defaultDevice;
     gf3d_commands.max_commands = max_commands;
-    gf3d_commands.command_list = gf3d_allocate_array(sizeof(CommandManager),max_commands);
+    gf3d_commands.command_list = (Command*)gf3d_allocate_array(sizeof(Command),max_commands);
     
     atexit(gf3d_command_system_close);
 }

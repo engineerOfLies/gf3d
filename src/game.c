@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
         commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 
             gf3d_model_draw(model,bufferFrame,commandBuffer);
-            gf3d_model_draw(model2,bufferFrame,commandBuffer);
+//            gf3d_model_draw(model2,bufferFrame,commandBuffer);
             
         gf3d_command_rendering_end(commandBuffer);
         gf3d_vgraphics_render_end(bufferFrame);

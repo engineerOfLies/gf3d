@@ -378,13 +378,13 @@ void gf3d_vgraphics_close()
     {
         vkDestroySurfaceKHR(gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface, NULL);
     }
-    if (gf3d_vgraphics.vk_instance)
-    {
-        vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
-    }
     if (gf3d_vgraphics.main_window)
     {
         SDL_DestroyWindow(gf3d_vgraphics.main_window);
+    }
+    if (gf3d_vgraphics.vk_instance)
+    {
+        vkDestroyInstance(gf3d_vgraphics.vk_instance, NULL);
     }
     memset(&gf3d_vgraphics,0,sizeof(vGraphics));
 }
