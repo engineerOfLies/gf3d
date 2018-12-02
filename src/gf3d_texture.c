@@ -200,7 +200,7 @@ void gf3d_texture_create_sampler(Texture *tex)
 
 Texture *gf3d_texture_load(char *filename)
 {
-    SDL_Surface * surface;
+    SDL_Surface * surface, *surfaceRaw;
     void* data;
     Texture *tex;
     VkDeviceSize imageSize;
@@ -216,12 +216,19 @@ Texture *gf3d_texture_load(char *filename)
         tex->_refcount++;
         return tex;
     }
-    surface = IMG_Load(filename);
-    if (!surface)
+    surfaceRaw = IMG_Load(filename);
+    if (!surfaceRaw)
     {
         slog("failed to load texture file %s",filename);
         return NULL;
     }
+    surface = SDL_ConvertSurfaceFormat(surfaceRaw, SDL_PIXELFORMAT_ABGR8888, 0);
+    if (!surface)
+    {
+        slog("failed to convert texture format of file %s",filename);
+        return NULL;
+    }
+
     tex = gf3d_texture_new();
     if (!tex)
     {
@@ -291,6 +298,7 @@ Texture *gf3d_texture_load(char *filename)
     vkDestroyBuffer(gf3d_texture.device, stagingBuffer, NULL);
     vkFreeMemory(gf3d_texture.device, stagingBufferMemory, NULL);
     SDL_FreeSurface(surface);
+    SDL_FreeSurface(surfaceRaw);
     slog("created texture for image: %s",filename);
     return tex;
 }
