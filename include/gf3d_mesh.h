@@ -2,8 +2,8 @@
 #define __GF3D_MESH_H__
 
 #include <vulkan/vulkan.h>
-#include "gf3d_vector.h"
-#include "gf3d_text.h"
+#include "gfc_vector.h"
+#include "gfc_text.h"
 
 typedef struct
 {

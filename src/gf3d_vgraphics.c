@@ -9,8 +9,11 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "gf3d_vector.h"
-#include "gf3d_types.h"
+#include "simple_logger.h"
+#include "gfc_types.h"
+#include "gfc_vector.h"
+#include "gfc_matrix.h"
+
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
 #include "gf3d_vqueues.h"
@@ -20,9 +23,7 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
-#include "gf3d_matrix.h"
 
-#include "simple_logger.h"
 
 typedef struct
 {
@@ -106,18 +107,18 @@ void gf3d_vgraphics_init(
 {
     VkDevice device;
     
-    gf3d_matrix_identity(gf3d_vgraphics.ubo.model);
-    gf3d_matrix_identity(gf3d_vgraphics.ubo.view);
-    gf3d_matrix_identity(gf3d_vgraphics.ubo.proj);
-    gf3d_matrix_view(
+    gfc_matrix_identity(gf3d_vgraphics.ubo.model);
+    gfc_matrix_identity(gf3d_vgraphics.ubo.view);
+    gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
+    gfc_matrix_view(
         gf3d_vgraphics.ubo.view,
         vector3d(2,20,2),
         vector3d(0,0,0),
         vector3d(0,0,1)
     );
-    gf3d_matrix_perspective(
+    gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
-        45 * GF3D_DEGTORAD,
+        45 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
         0.1f,
         100
@@ -214,7 +215,7 @@ void gf3d_vgraphics_setup(
     SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), NULL);
     if (gf3d_vgraphics.sdl_extension_count > 0)
     {
-        gf3d_vgraphics.sdl_extension_names = gf3d_allocate_array(sizeof(const char *),gf3d_vgraphics.sdl_extension_count);
+        gf3d_vgraphics.sdl_extension_names = gfc_allocate_array(sizeof(const char *),gf3d_vgraphics.sdl_extension_count);
         
         SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), gf3d_vgraphics.sdl_extension_names);
         for (i = 0; i < gf3d_vgraphics.sdl_extension_count;i++)
@@ -337,8 +338,8 @@ void gf3d_vgraphics_create_uniform_buffer()
     Uint32 buffercount = gf3d_swapchain_get_swap_image_count();
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-    gf3d_vgraphics.uniformBuffers = (VkBuffer*)gf3d_allocate_array(sizeof(VkBuffer),buffercount);
-    gf3d_vgraphics.uniformBuffersMemory = (VkDeviceMemory*)gf3d_allocate_array(sizeof(VkDeviceMemory),buffercount);
+    gf3d_vgraphics.uniformBuffers = (VkBuffer*)gfc_allocate_array(sizeof(VkBuffer),buffercount);
+    gf3d_vgraphics.uniformBuffersMemory = (VkDeviceMemory*)gfc_allocate_array(sizeof(VkDeviceMemory),buffercount);
     gf3d_vgraphics.uniformBufferCount = buffercount;
 
     for (i = 0; i < buffercount; i++)
@@ -708,7 +709,7 @@ void gf3d_vgraphics_update_uniform_buffer(uint32_t currentImage)
 
 void gf3d_vgraphics_rotate_camera(float degrees)
 {
-    gf3d_matrix_rotate(
+    gfc_matrix_rotate(
         gf3d_vgraphics.ubo.model,
         gf3d_vgraphics.ubo.model,
         degrees,

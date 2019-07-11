@@ -1,11 +1,13 @@
+#include <stddef.h>
+
+#include "simple_logger.h"
+
 #include "gf3d_vgraphics.h"
 #include "gf3d_mesh.h"
 #include "gf3d_obj_load.h"
-#include "simple_logger.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
 
-#include <stddef.h>
 
 #define ATTRIBUTE_COUNT 3
 
@@ -54,7 +56,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     gf3d_mesh.attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
     gf3d_mesh.attributeDescriptions[2].offset = offsetof(Vertex, texel);
 
-    gf3d_mesh.mesh_list = gf3d_allocate_array(sizeof(Mesh),mesh_max);
+    gf3d_mesh.mesh_list = gfc_allocate_array(sizeof(Mesh),mesh_max);
     slog("mesh system initialized");
 }
 
@@ -100,7 +102,7 @@ Mesh *gf3d_mesh_get_by_filename(char *filename)
     for (i = 0; i < gf3d_mesh.mesh_max; i++)
     {
         if (!gf3d_mesh.mesh_list[i]._inuse)continue;
-        if (gf3d_line_cmp(gf3d_mesh.mesh_list[i].filename,filename) == 0)
+        if (gfc_line_cmp(gf3d_mesh.mesh_list[i].filename,filename) == 0)
         {
             return &gf3d_mesh.mesh_list[i];
         }
@@ -263,7 +265,7 @@ Mesh *gf3d_mesh_load(char *filename)
     }
     gf3d_mesh_create_vertex_buffer_from_vertices(mesh,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
     gf3d_obj_free(obj);
-    gf3d_line_cpy(mesh->filename,filename);
+    gfc_line_cpy(mesh->filename,filename);
     return mesh;
 }
 

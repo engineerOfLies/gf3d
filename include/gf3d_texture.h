@@ -2,8 +2,8 @@
 #define __GF3D_TEXTURE_H__
 
 #include <vulkan/vulkan.h>
-#include "gf3d_types.h"
-#include "gf3d_text.h"
+#include "gfc_types.h"
+#include "gfc_text.h"
 
 typedef struct
 {

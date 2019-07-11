@@ -1,7 +1,8 @@
+#include "simple_logger.h"
+
 #include "gf3d_model.h"
 #include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
-#include "simple_logger.h"
 #include "gf3d_obj_load.h"
 
 typedef struct
@@ -49,7 +50,7 @@ void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice devi
         return;
     }
     gf3d_model.chain_length = chain_length;
-    gf3d_model.model_list = (Model *)gf3d_allocate_array(sizeof(Model),max_models);
+    gf3d_model.model_list = (Model *)gfc_allocate_array(sizeof(Model),max_models);
     gf3d_model.max_models = max_models;
     gf3d_model.device = device;
     gf3d_model_create_descriptor_set_layout();
@@ -90,7 +91,7 @@ Model *gf3d_model_get_by_filename(char *filename)
     for (i = 0; i < gf3d_model.max_models;i++)
     {
         if (!gf3d_model.model_list[i]._inuse)continue;
-        if (gf3d_line_cmp(filename,gf3d_model.model_list[i].filename)==0)
+        if (gfc_line_cmp(filename,gf3d_model.model_list[i].filename)==0)
         {
             gf3d_model.model_list[i]._refcount++;
             return &gf3d_model.model_list[i];
@@ -113,10 +114,10 @@ Model * gf3d_model_load(char * filename)
     if (model)return model;
     model = gf3d_model_new();
     if (!model)return NULL;
-    snprintf(assetname,GF3DLINELEN,"models/%s.obj",filename);
+    snprintf(assetname,GFCLINELEN,"models/%s.obj",filename);
     model->mesh = gf3d_mesh_load(assetname);
 
-    snprintf(assetname,GF3DLINELEN,"images/%s.png",filename);
+    snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
     model->texture = gf3d_texture_load(assetname);
     
     gf3d_model_setup(model);
@@ -162,7 +163,7 @@ void gf3d_model_create_descriptor_sets(Model *model)
     VkWriteDescriptorSet descriptorWrite[2] = {0};
     VkDescriptorImageInfo imageInfo = {0};
 
-    layouts = (VkDescriptorSetLayout *)gf3d_allocate_array(sizeof(VkDescriptorSetLayout),gf3d_model.chain_length);
+    layouts = (VkDescriptorSetLayout *)gfc_allocate_array(sizeof(VkDescriptorSetLayout),gf3d_model.chain_length);
     for (i = 0; i < gf3d_model.chain_length; i++)
     {
         memcpy(&layouts[i],gf3d_model_get_descriptor_set_layout(model),sizeof(VkDescriptorSetLayout));
@@ -173,7 +174,7 @@ void gf3d_model_create_descriptor_sets(Model *model)
     allocInfo.descriptorSetCount = gf3d_model.chain_length;
     allocInfo.pSetLayouts = layouts;
     
-    model->descriptorSets = (VkDescriptorSet *)gf3d_allocate_array(sizeof(VkDescriptorSet),gf3d_model.chain_length);
+    model->descriptorSets = (VkDescriptorSet *)gfc_allocate_array(sizeof(VkDescriptorSet),gf3d_model.chain_length);
     if (vkAllocateDescriptorSets(gf3d_model.device, &allocInfo, model->descriptorSets) != VK_SUCCESS)
     {
         slog("failed to allocate descriptor sets!");

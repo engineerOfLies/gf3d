@@ -2,8 +2,7 @@
 #define __GF3D_EXTENSIONS_H__
 
 #include <vulkan/vulkan.h>
-
-#include "gf3d_types.h"
+#include "gfc_types.h"
 
 typedef enum
 {

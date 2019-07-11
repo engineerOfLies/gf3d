@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "simple_logger.h"
 
 #include "gf3d_shaders.h"
-#include "simple_logger.h"
 
 
 VkShaderModule gf3d_shaders_create_module(char *shader,size_t size,VkDevice device)
@@ -41,7 +41,7 @@ char *gf3d_shaders_load_data(char * filename,size_t *rsize)
         return NULL;
     }
     rewind(file);
-    buffer = gf3d_allocate_array(sizeof(char),size);
+    buffer = gfc_allocate_array(sizeof(char),size);
     if (!buffer)
     {
         slog("failed to allocate memory for shader file %s",filename);

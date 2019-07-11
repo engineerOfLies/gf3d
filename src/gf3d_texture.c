@@ -1,15 +1,14 @@
+#include <SDL_image.h>
+#include "simple_logger.h"
+
 #include "gf3d_texture.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_swapchain.h"
-#include "simple_logger.h"
-
-#include <SDL_image.h>
-
 
 typedef struct
 {
     Uint32          max_textures;
-    Texture     *   texture_list;
+    Texture       * texture_list;
     VkDevice        device;
 }TextureManager;
 
@@ -27,7 +26,7 @@ void gf3d_texture_init(Uint32 max_textures)
         slog("cannot initialize texture system for 0 textures");
         return;
     }
-    gf3d_texture.texture_list = gf3d_allocate_array(sizeof(Texture),max_textures);
+    gf3d_texture.texture_list = gfc_allocate_array(sizeof(Texture),max_textures);
     if (!gf3d_texture.texture_list)
     {
         slog("failed to initialize texture system: not enough memory");
@@ -120,7 +119,7 @@ Texture *gf3d_texture_get_by_filename(char * filename)
     for (i = 0; i < gf3d_texture.max_textures; i++)
     {
         if (!gf3d_texture.texture_list[i]._inuse)continue;
-        if (gf3d_line_cmp(gf3d_texture.texture_list[i].filename,filename)==0)
+        if (gfc_line_cmp(gf3d_texture.texture_list[i].filename,filename)==0)
         {
             return &gf3d_texture.texture_list[i];
         }
@@ -228,7 +227,7 @@ Texture *gf3d_texture_load(char *filename)
         SDL_FreeSurface(surface);
         return NULL;
     }
-    gf3d_line_cpy(tex->filename,filename);
+    gfc_line_cpy(tex->filename,filename);
 
     imageSize = surface->w * surface->h * 4;
     

@@ -2,9 +2,9 @@
 #define __GF3D_SWAPCHAIN_H__
 
 #include <vulkan/vulkan.h>
+#include "gfc_types.h"
 
 #include "gf3d_pipeline.h"
-#include "gf3d_types.h"
 
 /**
  * @brief validate and setup swap chain

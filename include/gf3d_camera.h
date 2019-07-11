@@ -1,7 +1,8 @@
 #ifndef __GF3D_CAMERA_H__
 #define __GF3D_CAMERA_H__
 
-#include "gf3d_matrix.h"
+#include "gfc_matrix.h"
+
 /**
  * @brief get the current camera view
  * @param view output, the matrix provided will be populated with the current camera information

@@ -1,13 +1,14 @@
 #include <SDL.h>            
 
 #include "simple_logger.h"
+#include "gfc_vector.h"
+#include "gfc_matrix.h"
+
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_model.h"
-#include "gf3d_matrix.h"
 #include "gf3d_camera.h"
-#include "gf3d_vector.h"
 #include "gf3d_texture.h"
 
 int main(int argc,char *argv[])
@@ -17,7 +18,6 @@ int main(int argc,char *argv[])
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
     Model *model;
-    Model *model2;
     
     init_logger("gf3d.log");    
     slog("gf3d begin");
@@ -33,7 +33,6 @@ int main(int argc,char *argv[])
     // main game loop
     slog("gf3d main loop begin");
     model = gf3d_model_load("agumon");
-    model2 = gf3d_model_load("cube");
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures

@@ -1,11 +1,12 @@
+
+#include <string.h>
+#include "simple_logger.h"
+
 #include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_vqueues.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_mesh.h"
-#include "simple_logger.h"
-
-#include <string.h>
 
 
  // TODO: Make a command buffer resource manager
@@ -50,7 +51,7 @@ void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice)
     }
     gf3d_commands.device = defaultDevice;
     gf3d_commands.max_commands = max_commands;
-    gf3d_commands.command_list = (Command*)gf3d_allocate_array(sizeof(Command),max_commands);
+    gf3d_commands.command_list = (Command*)gfc_allocate_array(sizeof(Command),max_commands);
     
     atexit(gf3d_command_system_close);
 }
@@ -108,7 +109,7 @@ Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe)
         return NULL;
     }
     
-    com->commandBuffers = (VkCommandBuffer*)gf3d_allocate_array(sizeof(VkCommandBuffer),count);
+    com->commandBuffers = (VkCommandBuffer*)gfc_allocate_array(sizeof(VkCommandBuffer),count);
     if (!com->commandBuffers)
     {
         slog("failed to allocate command buffer array");

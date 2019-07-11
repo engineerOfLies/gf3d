@@ -1,5 +1,6 @@
-#include "gf3d_obj_load.h"
 #include "simple_logger.h"
+
+#include "gf3d_obj_load.h"
 
 void gf3d_obj_get_counts_from_file(ObjData *obj, FILE* file);
 void gf3d_obj_load_get_data_from_file(ObjData *obj, FILE* file);
@@ -56,8 +57,8 @@ void gf3d_obj_load_reorg(ObjData *obj)
     if (!obj)return;
     
     obj->face_vert_count = obj->face_count*3;
-    obj->faceVertices = (Vertex *)gf3d_allocate_array(sizeof(Vertex),obj->face_vert_count);
-    obj->outFace = (Face *)gf3d_allocate_array(sizeof(Face),obj->face_count);
+    obj->faceVertices = (Vertex *)gfc_allocate_array(sizeof(Vertex),obj->face_vert_count);
+    obj->outFace = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     
     for (i = 0; i < obj->face_count;i++)
     {
@@ -86,18 +87,18 @@ ObjData *gf3d_obj_load_from_file(char *filename)
         slog("failed to open obj file %s",filename);
         return NULL;
     }
-    obj = (ObjData*)gf3d_allocate_array(sizeof(ObjData),1);
+    obj = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
     if (!obj)return NULL;
     
     gf3d_obj_get_counts_from_file(obj, file);
     
-    obj->vertices = (Vector3D *)gf3d_allocate_array(sizeof(Vector3D),obj->vertex_count);
-    obj->normals = (Vector3D *)gf3d_allocate_array(sizeof(Vector3D),obj->normal_count);
-    obj->texels = (Vector2D *)gf3d_allocate_array(sizeof(Vector2D),obj->texel_count);
+    obj->vertices = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->vertex_count);
+    obj->normals = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->normal_count);
+    obj->texels = (Vector2D *)gfc_allocate_array(sizeof(Vector2D),obj->texel_count);
     
-    obj->faceVerts = (Face *)gf3d_allocate_array(sizeof(Face),obj->face_count);
-    obj->faceNormals = (Face *)gf3d_allocate_array(sizeof(Face),obj->face_count);
-    obj->faceTexels = (Face *)gf3d_allocate_array(sizeof(Face),obj->face_count);
+    obj->faceVerts = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
+    obj->faceNormals = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
+    obj->faceTexels = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     
     gf3d_obj_load_get_data_from_file(obj, file);
     fclose(file);

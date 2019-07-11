@@ -1,11 +1,11 @@
-#include "gf3d_extensions.h"
-#include "gf3d_vector.h"
-
-#include "simple_logger.h"
-
 #include <string.h>
 #include <stdio.h>
 #include <vulkan/vulkan.h>
+
+#include "simple_logger.h"
+#include "gfc_vector.h"
+
+#include "gf3d_extensions.h"
 
 typedef struct
 {
@@ -30,11 +30,11 @@ void gf3d_extensions_device_init(VkPhysicalDevice device)
     slog("Total available device extensions: %i",gf3d_device_extensions.available_extension_count);
     if (!gf3d_device_extensions.available_extension_count)return;
 
-    gf3d_device_extensions.available_extensions = (VkExtensionProperties*)gf3d_allocate_array(sizeof (VkExtensionProperties),gf3d_device_extensions.available_extension_count);    
+    gf3d_device_extensions.available_extensions = (VkExtensionProperties*)gfc_allocate_array(sizeof (VkExtensionProperties),gf3d_device_extensions.available_extension_count);    
 
     if (!gf3d_device_extensions.available_extensions)return;
 
-    gf3d_device_extensions.enabled_extension_names = gf3d_allocate_array(sizeof(const char *),gf3d_device_extensions.available_extension_count);
+    gf3d_device_extensions.enabled_extension_names = gfc_allocate_array(sizeof(const char *),gf3d_device_extensions.available_extension_count);
     if (!gf3d_device_extensions.enabled_extension_names)return;
 
     vkEnumerateDeviceExtensionProperties(device,NULL, &gf3d_device_extensions.available_extension_count, gf3d_device_extensions.available_extensions);
@@ -68,10 +68,10 @@ void gf3d_extensions_instance_init()
     slog("Total available instance extensions: %i",gf3d_instance_extensions.available_extension_count);
     if (!gf3d_instance_extensions.available_extension_count)return;
 
-    gf3d_instance_extensions.available_extensions = (VkExtensionProperties*)gf3d_allocate_array(sizeof (VkExtensionProperties),gf3d_instance_extensions.available_extension_count);    
+    gf3d_instance_extensions.available_extensions = (VkExtensionProperties*)gfc_allocate_array(sizeof (VkExtensionProperties),gf3d_instance_extensions.available_extension_count);    
     if (!gf3d_instance_extensions.available_extensions)return;
 
-    gf3d_instance_extensions.enabled_extension_names = gf3d_allocate_array(sizeof(const char *),gf3d_instance_extensions.available_extension_count);
+    gf3d_instance_extensions.enabled_extension_names = gfc_allocate_array(sizeof(const char *),gf3d_instance_extensions.available_extension_count);
     if (!gf3d_instance_extensions.enabled_extension_names)return;
 
     vkEnumerateInstanceExtensionProperties(NULL, &gf3d_instance_extensions.available_extension_count, gf3d_instance_extensions.available_extensions);

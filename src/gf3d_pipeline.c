@@ -1,11 +1,12 @@
+#include <string.h>
+#include <stdio.h>
+#include "simple_logger.h"
+
 #include "gf3d_pipeline.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_shaders.h"
 #include "gf3d_model.h"
-#include <string.h>
-#include <stdio.h>
-#include "simple_logger.h"
 
 typedef struct
 {
@@ -24,7 +25,7 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
         slog("cannot initialize zero pipelines");
         return;
     }
-    gf3d_pipeline.pipelineList = (Pipeline *)gf3d_allocate_array(sizeof(Pipeline),max_pipelines);
+    gf3d_pipeline.pipelineList = (Pipeline *)gfc_allocate_array(sizeof(Pipeline),max_pipelines);
     if (!gf3d_pipeline.pipelineList)
     {
         slog("failed to allocate pipeline manager");

@@ -2,9 +2,9 @@
 #define __GF3D_VGRAPHICS_H__
 
 #include <vulkan/vulkan.h>
+#include "gfc_vector.h"
+#include "gfc_matrix.h"
 
-#include "gf3d_vector.h"
-#include "gf3d_matrix.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 

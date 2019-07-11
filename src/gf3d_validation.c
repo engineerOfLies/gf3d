@@ -1,13 +1,13 @@
-#include <vulkan/vulkan.h>
-
-#include "gf3d_validation.h"
-#include "gf3d_types.h"
-#include "gf3d_vector.h"
-
 #include <string.h>
 #include <stdio.h>
+#include <vulkan/vulkan.h>
 
 #include "simple_logger.h"
+#include "gfc_types.h"
+#include "gfc_vector.h"
+#include "gf3d_validation.h"
+
+
 
 // validation layers
 typedef struct
@@ -27,10 +27,10 @@ void gf3d_validation_query_layer_properties()
     
     if (!gf3d_validation.layerCount)return;
     
-    gf3d_validation.availableLayers = (VkLayerProperties *)gf3d_allocate_array(sizeof(VkLayerProperties),gf3d_validation.layerCount);
+    gf3d_validation.availableLayers = (VkLayerProperties *)gfc_allocate_array(sizeof(VkLayerProperties),gf3d_validation.layerCount);
     vkEnumerateInstanceLayerProperties(&gf3d_validation.layerCount, gf3d_validation.availableLayers);
     
-    gf3d_validation.layerNames = (const char* * )gf3d_allocate_array(sizeof(const char *),gf3d_validation.layerCount);
+    gf3d_validation.layerNames = (const char* * )gfc_allocate_array(sizeof(const char *),gf3d_validation.layerCount);
     for (i = 0; i < gf3d_validation.layerCount;i++)
     {
         gf3d_validation.layerNames[i] = (const char *)gf3d_validation.availableLayers[i].layerName;

@@ -1,9 +1,11 @@
-#include "gf3d_vqueues.h"
-#include "gf3d_vector.h"
-#include "simple_logger.h"
-
 #include <stdio.h>
 #include <string.h>
+
+#include "simple_logger.h"
+#include "gfc_vector.h"
+
+#include "gf3d_vqueues.h"
+
 
 typedef struct
 {
@@ -54,7 +56,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
         return;
     }
     
-    gf3d_vqueues.queue_properties = (VkQueueFamilyProperties*)gf3d_allocate_array(sizeof(VkQueueFamilyProperties),gf3d_vqueues.queue_family_count);
+    gf3d_vqueues.queue_properties = (VkQueueFamilyProperties*)gfc_allocate_array(sizeof(VkQueueFamilyProperties),gf3d_vqueues.queue_family_count);
     
     vkGetPhysicalDeviceQueueFamilyProperties(
         device,
@@ -109,7 +111,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     }
     else
     {
-        gf3d_vqueues.queue_create_info = (VkDeviceQueueCreateInfo*)gf3d_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.work_queue_count);
+        gf3d_vqueues.queue_create_info = (VkDeviceQueueCreateInfo*)gfc_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.work_queue_count);
         i = 0;
         if (gf3d_vqueues.graphics_queue_family != -1)
         {
@@ -192,7 +194,7 @@ void gf3d_vqueues_close()
 
 void gf3d_vqueues_create_presentation_queues()
 {
-    gf3d_vqueues.presentation_queue_info = (VkDeviceQueueCreateInfo*)gf3d_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.queue_family_count);
+    gf3d_vqueues.presentation_queue_info = (VkDeviceQueueCreateInfo*)gfc_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.queue_family_count);
 }
 
 Sint32 gf3d_vqueues_get_graphics_queue_family()

@@ -3,7 +3,7 @@
 
 #include <vulkan/vulkan.h>
 
-#include "gf3d_types.h"
+#include "gfc_types.h"
 
 /**
  * @brief load a SPIR-V shader program from file

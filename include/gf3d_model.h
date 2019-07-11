@@ -22,10 +22,11 @@
     SOFTWARE.
 */
 
-#include "gf3d_types.h"
-#include "gf3d_vector.h"
-#include "gf3d_matrix.h"
-#include "gf3d_text.h"
+#include "gfc_types.h"
+#include "gfc_vector.h"
+#include "gfc_matrix.h"
+#include "gfc_text.h"
+
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
 

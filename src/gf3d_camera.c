@@ -1,4 +1,4 @@
-#include "gf3d_matrix.h"
+#include "gfc_matrix.h"
 
 #include <string.h>
 
@@ -22,7 +22,7 @@ void gf3d_camera_look_at(
     Vector3D up
 )
 {
-    gf3d_matrix_view(
+    gfc_matrix_view(
         gf3d_camera,
         position,
         target,

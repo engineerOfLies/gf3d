@@ -2,8 +2,8 @@
 #define __GF3D_COMMANDS_H__
 
 #include <vulkan/vulkan.h>
+#include "gfc_types.h"
 
-#include "gf3d_types.h"
 #include "gf3d_pipeline.h"
 
 typedef struct

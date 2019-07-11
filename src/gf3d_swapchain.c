@@ -1,11 +1,12 @@
-#include "gf3d_swapchain.h"
-#include "gf3d_vqueues.h"
-#include "gf3d_vgraphics.h"
-
 #include <string.h>
 #include <stdio.h>
 
 #include "simple_logger.h"
+
+#include "gf3d_swapchain.h"
+#include "gf3d_vqueues.h"
+#include "gf3d_vgraphics.h"
+
 
 typedef struct
 {
@@ -51,7 +52,7 @@ void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfac
     slog("device supports %i surface formats",gf3d_swapchain.formatCount);
     if (gf3d_swapchain.formatCount != 0)
     {
-        gf3d_swapchain.formats = (VkSurfaceFormatKHR*)gf3d_allocate_array(sizeof(VkSurfaceFormatKHR),gf3d_swapchain.formatCount);
+        gf3d_swapchain.formats = (VkSurfaceFormatKHR*)gfc_allocate_array(sizeof(VkSurfaceFormatKHR),gf3d_swapchain.formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &gf3d_swapchain.formatCount, gf3d_swapchain.formats);
         for (i = 0; i < gf3d_swapchain.formatCount; i++)
         {
@@ -66,7 +67,7 @@ void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfac
     slog("device supports %i presentation modes",gf3d_swapchain.presentModeCount);
     if (gf3d_swapchain.presentModeCount != 0)
     {
-        gf3d_swapchain.presentModes = (VkPresentModeKHR*)gf3d_allocate_array(sizeof(VkPresentModeKHR),gf3d_swapchain.presentModeCount);
+        gf3d_swapchain.presentModes = (VkPresentModeKHR*)gfc_allocate_array(sizeof(VkPresentModeKHR),gf3d_swapchain.presentModeCount);
         vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &gf3d_swapchain.presentModeCount, gf3d_swapchain.presentModes);
         for (i = 0; i < gf3d_swapchain.presentModeCount; i++)
         {
@@ -118,7 +119,7 @@ void gf3d_swapchain_create_frame_buffer(VkFramebuffer *buffer,VkImageView *image
 void gf3d_swapchain_setup_frame_buffers(Pipeline *pipe)
 {
     int i;
-    gf3d_swapchain.frameBuffers = (VkFramebuffer *)gf3d_allocate_array(sizeof(VkFramebuffer),gf3d_swapchain.swapImageCount);
+    gf3d_swapchain.frameBuffers = (VkFramebuffer *)gfc_allocate_array(sizeof(VkFramebuffer),gf3d_swapchain.swapImageCount);
     for (i = 0; i < gf3d_swapchain.swapImageCount;i++)
     {
         gf3d_swapchain_create_frame_buffer(&gf3d_swapchain.frameBuffers[i],&gf3d_swapchain.imageViews[i],pipe);
@@ -195,11 +196,11 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
         gf3d_swapchain_close();
         return;
     }
-    gf3d_swapchain.swapImages = (VkImage *)gf3d_allocate_array(sizeof(VkImage),gf3d_swapchain.swapImageCount);
+    gf3d_swapchain.swapImages = (VkImage *)gfc_allocate_array(sizeof(VkImage),gf3d_swapchain.swapImageCount);
     vkGetSwapchainImagesKHR(device, gf3d_swapchain.swapChain, &gf3d_swapchain.swapImageCount,gf3d_swapchain.swapImages );
     slog("created swap chain with %i images",gf3d_swapchain.swapImageCount);
     
-    gf3d_swapchain.imageViews = (VkImageView *)gf3d_allocate_array(sizeof(VkImageView),gf3d_swapchain.swapImageCount);
+    gf3d_swapchain.imageViews = (VkImageView *)gfc_allocate_array(sizeof(VkImageView),gf3d_swapchain.swapImageCount);
     for (i = 0 ; i < gf3d_swapchain.swapImageCount; i++)
     {
         gf3d_swapchain.imageViews[i] = gf3d_vgraphics_create_image_view(gf3d_swapchain.swapImages[i],gf3d_swapchain.formats[gf3d_swapchain.chosenFormat].format);
