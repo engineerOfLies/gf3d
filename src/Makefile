@@ -16,7 +16,7 @@ CC      = gcc
 
 LIB_PATH = ../libs
 STATIC_LIBS = libsj.a
-VULKAN_LIB = /home/djkehoe/git/vulkan1.1.82.0/x86_64
+VULKAN_LIB = ../../vulkan1.1.82.0/x86_64
 LDFLAGS = -L$(VULKAN_LIB)/lib -L$(LIB_PATH) $(foreach d, $(STATIC_LIBS),$(LIB_PATH)/$d)
 
 OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c))
