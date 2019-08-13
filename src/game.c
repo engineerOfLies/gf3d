@@ -14,10 +14,20 @@
 int main(int argc,char *argv[])
 {
     int done = 0;
+    int a;
+    Uint8 validate = 1;
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
     Model *model;
+    
+    for (a = 1; a < argc;a++)
+    {
+        if (strcmp(argv[a],"-disable_validate") == 0)
+        {
+            validate = 0;
+        }
+    }
     
     init_logger("gf3d.log");    
     slog("gf3d begin");
@@ -27,7 +37,7 @@ int main(int argc,char *argv[])
         700,                    //screen height
         vector4d(0.51,0.75,1,1),//background color
         0,                      //fullscreen
-        1                       //validation
+        validate                //validation
     );
     
     // main game loop
@@ -47,7 +57,6 @@ int main(int argc,char *argv[])
         commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 
             gf3d_model_draw(model,bufferFrame,commandBuffer);
-//            gf3d_model_draw(model2,bufferFrame,commandBuffer);
             
         gf3d_command_rendering_end(commandBuffer);
         gf3d_vgraphics_render_end(bufferFrame);

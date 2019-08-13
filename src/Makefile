@@ -16,8 +16,7 @@ CC      = gcc
 
 
 LIB_LIST = ../gfc/libs/libgfc.a ../gfc/simple_json/libs/libsj.a ../gfc/simple_logger/libs/libsl.a 
-#LIB_LIST = ../gfc/libs/libgfc.a
-
+DLIB_LIST = -L../../vulkan/1.1.108.0/x86_64/lib
 OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c))
 
 INC_PATHS = ../include ../gfc/include ../gfc/simple_logger/include ../gfc/simple_json/include
@@ -72,5 +71,3 @@ include makefile.dep
 
 .c.o:
 	$(CC) $(CFLAGS) $(SDL_CFLAGS) -c $<
-
-
