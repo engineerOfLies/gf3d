@@ -8,7 +8,7 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 
-#define GF3D_VGRAPHICS_DISCRETE 1   //Choosing whether to use discrete [1] or integrated graphics [0]
+#define GF3D_VGRAPHICS_DISCRETE VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU   //Choosing whether to use discrete [1] or integrated graphics [0]
 
 /**
  * @brief init Vulkan / SDL, setup device and initialize infrastructure for 3d graphics

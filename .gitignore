@@ -53,3 +53,8 @@ dkms.conf
 makefile.dep
 gf3d
 *.log
+
+# CMake and CLion related ignores
+build/
+.idea/
+cmake-build-debug/
