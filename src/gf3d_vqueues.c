@@ -102,9 +102,15 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     slog("using queue family %i for rendering pipeline",gf3d_vqueues.present_queue_family);
     slog("using queue family %i for transfer pipeline",gf3d_vqueues.transfer_queue_family);
     
-    if (gf3d_vqueues.graphics_queue_family != -1)gf3d_vqueues.work_queue_count++;
-    if ((gf3d_vqueues.present_queue_family != -1) && (gf3d_vqueues.present_queue_family != gf3d_vqueues.graphics_queue_family))gf3d_vqueues.work_queue_count++;
-
+    if (gf3d_vqueues.graphics_queue_family != -1)
+    {
+        gf3d_vqueues.work_queue_count++;
+    }
+    if ((gf3d_vqueues.present_queue_family != -1) && (gf3d_vqueues.present_queue_family != gf3d_vqueues.graphics_queue_family))
+    {
+        gf3d_vqueues.work_queue_count++;
+    }
+    
     if (!gf3d_vqueues.work_queue_count)
     {
         slog("No suitable queues for graphics calls or presentation");
@@ -112,12 +118,13 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     else
     {
         gf3d_vqueues.queue_create_info = (VkDeviceQueueCreateInfo*)gfc_allocate_array(sizeof(VkDeviceQueueCreateInfo),gf3d_vqueues.work_queue_count);
+        slog("work queue count: %i",gf3d_vqueues.work_queue_count);
         i = 0;
         if (gf3d_vqueues.graphics_queue_family != -1)
         {
             gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_graphics_queue_info();
         }
-        if (gf3d_vqueues.present_queue_family != -1)
+        if ((gf3d_vqueues.present_queue_family != -1) && (i < gf3d_vqueues.work_queue_count))
         {
             gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_present_queue_info();
         }
@@ -183,11 +190,15 @@ void gf3d_vqueues_close()
     slog("cleaning up vulkan queues");
     if (gf3d_vqueues.queue_create_info)
     {
-//        free(gf3d_vqueues.queue_create_info);
+        free(gf3d_vqueues.queue_create_info);
     }
     if (gf3d_vqueues.queue_properties)
     {
-//        free(gf3d_vqueues.queue_properties);
+        free(gf3d_vqueues.queue_properties);
+    }
+    if (gf3d_vqueues.presentation_queue_info)
+    {
+        free(gf3d_vqueues.presentation_queue_info);
     }
     memset(&gf3d_vqueues,0,sizeof(vQueues));
 }
