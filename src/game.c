@@ -54,11 +54,13 @@ int main(int argc,char *argv[])
         // configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool
         bufferFrame = gf3d_vgraphics_render_begin();
-        commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 
-            gf3d_model_draw(model,bufferFrame,commandBuffer);
+            commandBuffer = gf3d_command_rendering_begin(bufferFrame);
+
+                gf3d_model_draw(model,bufferFrame,commandBuffer);
+                
+            gf3d_command_rendering_end(commandBuffer);
             
-        gf3d_command_rendering_end(commandBuffer);
         gf3d_vgraphics_render_end(bufferFrame);
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
