@@ -124,7 +124,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
         {
             gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_graphics_queue_info();
         }
-        if ((gf3d_vqueues.present_queue_family != -1) && (i < gf3d_vqueues.work_queue_count))
+        if ((gf3d_vqueues.present_queue_family != -1) && (gf3d_vqueues.present_queue_family != gf3d_vqueues.graphics_queue_family))
         {
             gf3d_vqueues.queue_create_info[i++] = gf3d_vqueues_get_present_queue_info();
         }
