@@ -42,7 +42,7 @@ int main(int argc,char *argv[])
     
     // main game loop
     slog("gf3d main loop begin");
-    model = gf3d_model_load("agumon");
+    model = gf3d_model_load("dino");
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
@@ -54,7 +54,7 @@ int main(int argc,char *argv[])
         // configure render command for graphics command pool
         // for each mesh, get a command and configure it from the pool
         bufferFrame = gf3d_vgraphics_render_begin();
-
+        gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),bufferFrame);
             commandBuffer = gf3d_command_rendering_begin(bufferFrame);
 
                 gf3d_model_draw(model,bufferFrame,commandBuffer);

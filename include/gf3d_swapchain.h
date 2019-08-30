@@ -47,6 +47,7 @@ void gf3d_swapchain_close();
 
 Uint32 gf3d_swapchain_get_frame_buffer_count();
 Uint32 gf3d_swapchain_get_swap_image_count();
+Uint32 gf3d_swapchain_get_chain_length();
 
 /**
  * @brief get the swapchain to use for rendering

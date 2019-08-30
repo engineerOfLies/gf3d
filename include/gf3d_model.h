@@ -37,20 +37,27 @@ typedef struct
     TextLine                    filename;
     Mesh                    *   mesh;
     Texture                 *   texture;
-    VkDescriptorPool            descriptorPool;
-    VkDescriptorSet         *   descriptorSets;
-    Uint32                      descriptorSetCount;
-
+    VkDescriptorSet         *   descriptorSet;
 }Model;
 
 
 void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
-VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
 
 Model * gf3d_model_load(char * filename);
 Model * gf3d_model_new();
+/**
+ * TODO: take a model matrix for rendering
+ */
 void gf3d_model_draw(Model *model,Uint32 bufferFrame,VkCommandBuffer commandBuffer);
 void gf3d_model_free(Model *model);
+
+/**
+ * @brief update the descriptorSet with the model data needed to submit the draw command for the model provided
+ * @param model the model data to populate the descriptor set with
+ * @param descriptSet the descriptorSet to populate
+ * @param chainIndex the swap chain frame to do this for
+ */
+void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex);
 
 
 #endif
