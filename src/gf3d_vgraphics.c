@@ -112,7 +112,7 @@ void gf3d_vgraphics_init(
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
     gfc_matrix_view(
         gf3d_vgraphics.ubo.view,
-        vector3d(2,20,2),
+        vector3d(2,40,2),
         vector3d(0,0,0),
         vector3d(0,0,1)
     );
@@ -710,8 +710,8 @@ void gf3d_vgraphics_update_uniform_buffer(uint32_t currentImage)
 void gf3d_vgraphics_rotate_camera(float degrees)
 {
     gfc_matrix_rotate(
-        gf3d_vgraphics.ubo.model,
-        gf3d_vgraphics.ubo.model,
+        gf3d_vgraphics.ubo.view,
+        gf3d_vgraphics.ubo.view,
         degrees,
         vector3d(0,0,1));
 
@@ -725,6 +725,11 @@ Pipeline *gf3d_vgraphics_get_graphics_pipeline()
 Command *gf3d_vgraphics_get_graphics_command_pool()
 {
     return gf3d_vgraphics.graphicsCommandPool;
+}
+
+UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object()
+{
+    return gf3d_vgraphics.ubo;
 }
 
 VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
