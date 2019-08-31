@@ -146,8 +146,6 @@ void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet d
         return;
     }
 
-    slog("updating descriptor sets");
-
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = model->texture->textureImageView;
     imageInfo.sampler = model->texture->textureSampler;
