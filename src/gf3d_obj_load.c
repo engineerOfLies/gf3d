@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "simple_logger.h"
 
 #include "gf3d_obj_load.h"

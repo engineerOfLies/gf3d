@@ -41,9 +41,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\djkehoe\git\gf3d\include;C:\Users\djkehoe\git\libs\VulkanSDK\1.1.82.1\Include;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\include;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\include;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\include;C:\Users\djkehoe\git\libs\SDL2-2.0.8\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\djkehoe\git\gf3d\gfc\simple_logger\include;C:\Users\djkehoe\git\gf3d\gfc\simple_json\include;C:\Users\djkehoe\git\gf3d\gfc\include;C:\Users\djkehoe\git\gf3d\include;C:\Users\djkehoe\git\libs\VulkanSDK\1.1.82.1\Include;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\include;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\include;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\include;C:\Users\djkehoe\git\libs\SDL2-2.0.8\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\djkehoe\git\libs\VulkanSDK\1.1.82.1\Lib32;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\lib\x86;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\lib\x86;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\lib\x86;C:\Users\djkehoe\git\libs\SDL2-2.0.8\lib\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>..</OutDir>
+    <OutDir>..\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -84,38 +84,66 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\game.c" />
-    <ClCompile Include="..\src\gf3d_camera.c" />
-    <ClCompile Include="..\src\gf3d_commands.c" />
-    <ClCompile Include="..\src\gf3d_extensions.c" />
-    <ClCompile Include="..\src\gf3d_matrix.c" />
-    <ClCompile Include="..\src\gf3d_model.c" />
-    <ClCompile Include="..\src\gf3d_pipeline.c" />
-    <ClCompile Include="..\src\gf3d_shaders.c" />
-    <ClCompile Include="..\src\gf3d_swapchain.c" />
-    <ClCompile Include="..\src\gf3d_types.c" />
-    <ClCompile Include="..\src\gf3d_validation.c" />
-    <ClCompile Include="..\src\gf3d_vector.c" />
-    <ClCompile Include="..\src\gf3d_vgraphics.c" />
-    <ClCompile Include="..\src\gf3d_vqueues.c" />
-    <ClCompile Include="..\src\simple_logger.c" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="..\gfc\include\gfc_audio.h" />
+    <ClInclude Include="..\gfc\include\gfc_callbacks.h" />
+    <ClInclude Include="..\gfc\include\gfc_color.h" />
+    <ClInclude Include="..\gfc\include\gfc_input.h" />
+    <ClInclude Include="..\gfc\include\gfc_list.h" />
+    <ClInclude Include="..\gfc\include\gfc_matrix.h" />
+    <ClInclude Include="..\gfc\include\gfc_text.h" />
+    <ClInclude Include="..\gfc\include\gfc_types.h" />
+    <ClInclude Include="..\gfc\include\gfc_vector.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_list.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_object.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_parse.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
+    <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
     <ClInclude Include="..\include\gf3d_camera.h" />
     <ClInclude Include="..\include\gf3d_commands.h" />
     <ClInclude Include="..\include\gf3d_extensions.h" />
-    <ClInclude Include="..\include\gf3d_matrix.h" />
     <ClInclude Include="..\include\gf3d_model.h" />
     <ClInclude Include="..\include\gf3d_pipeline.h" />
     <ClInclude Include="..\include\gf3d_shaders.h" />
     <ClInclude Include="..\include\gf3d_swapchain.h" />
-    <ClInclude Include="..\include\gf3d_text.h" />
-    <ClInclude Include="..\include\gf3d_types.h" />
     <ClInclude Include="..\include\gf3d_validation.h" />
-    <ClInclude Include="..\include\gf3d_vector.h" />
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
     <ClInclude Include="..\include\gf3d_vqueues.h" />
-    <ClInclude Include="..\include\simple_logger.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_array.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_error.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_list.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_object.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_parse.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_string.c" />
+    <ClCompile Include="..\gfc\simple_logger\src\simple_logger.c" />
+    <ClCompile Include="..\gfc\src\gfc_audio.c" />
+    <ClCompile Include="..\gfc\src\gfc_callbacks.c" />
+    <ClCompile Include="..\gfc\src\gfc_input.c" />
+    <ClCompile Include="..\gfc\src\gfc_list.c" />
+    <ClCompile Include="..\gfc\src\gfc_matrix.c" />
+    <ClCompile Include="..\gfc\src\gfc_text.c" />
+    <ClCompile Include="..\gfc\src\gfc_types.c" />
+    <ClCompile Include="..\gfc\src\gfc_vector.c" />
+    <ClCompile Include="..\src\game.c" />
+    <ClCompile Include="..\src\gf3d_camera.c" />
+    <ClCompile Include="..\src\gf3d_commands.c" />
+    <ClCompile Include="..\src\gf3d_extensions.c" />
+    <ClCompile Include="..\src\gf3d_mesh.c" />
+    <ClCompile Include="..\src\gf3d_model.c" />
+    <ClCompile Include="..\src\gf3d_obj_load.c" />
+    <ClCompile Include="..\src\gf3d_pipeline.c" />
+    <ClCompile Include="..\src\gf3d_shaders.c" />
+    <ClCompile Include="..\src\gf3d_swapchain.c" />
+    <ClCompile Include="..\src\gf3d_texture.c" />
+    <ClCompile Include="..\src\gf3d_validation.c" />
+    <ClCompile Include="..\src\gf3d_vgraphics.c" />
+    <ClCompile Include="..\src\gf3d_vqueues.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
