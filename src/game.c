@@ -15,7 +15,7 @@ int main(int argc,char *argv[])
 {
     int done = 0;
     int a;
-    Uint8 validate = 1;
+    Uint8 validate = 0;
     const Uint8 * keys;
     Uint32 bufferFrame = 0;
     VkCommandBuffer commandBuffer;
@@ -42,12 +42,14 @@ int main(int argc,char *argv[])
         0,                      //fullscreen
         validate                //validation
     );
-    
+	slog_sync();
+
     // main game loop
     slog("gf3d main loop begin");
-    model = gf3d_model_load("dino");
-    gfc_matrix_identity(modelMat);
-    model2 = gf3d_model_load("dino");
+	slog_sync();
+	model = gf3d_model_load("dino");
+	gfc_matrix_identity(modelMat);
+	model2 = gf3d_model_load("dino");
     gfc_matrix_identity(modelMat2);
     gfc_matrix_make_translation(
             modelMat2,

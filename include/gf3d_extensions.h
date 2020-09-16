@@ -44,4 +44,6 @@ const char* const* gf3d_extensions_get_device_enabled_names(Uint32 *count);
 void gf3d_extensions_device_init(VkPhysicalDevice device);
 
 
+const char* const* gf3d_extensions_get_instance_available_names(Uint32 *count);
+
 #endif
