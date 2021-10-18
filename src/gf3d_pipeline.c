@@ -475,7 +475,6 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
             return;
         }
     }
-    pipe->descriptorSetCount = gf3d_pipeline.chainLength;
 }
 
 void gf3d_pipeline_create_basic_model_descriptor_set_layout(Pipeline *pipe)

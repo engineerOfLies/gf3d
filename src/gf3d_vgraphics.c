@@ -105,18 +105,12 @@ void gf3d_vgraphics_init(
     gfc_matrix_identity(gf3d_vgraphics.ubo.model);
     gfc_matrix_identity(gf3d_vgraphics.ubo.view);
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
-    gfc_matrix_view(
-        gf3d_vgraphics.ubo.view,
-        vector3d(2,40,2),
-        vector3d(0,0,0),
-        vector3d(0,0,1)
-    );
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
         45 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
         0.1f,
-        100
+        10000
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
@@ -494,7 +488,12 @@ VkPhysicalDevice gf3d_vgraphics_select_device()
         if (gf3d_vgraphics_device_validate(gf3d_vgraphics.devices[i]))
         {
             valid[i] = gf3d_vgraphics.devices[i];
-			if (valid[i] != VK_NULL_HANDLE)chosen = valid[i];
+			if (valid[i] != VK_NULL_HANDLE)
+            {
+                slog("gf3d_vgraphics_select_device: device %i is valid");
+                chosen = valid[i];
+                break;
+            }
         }
     }
 	if (chosen == VK_NULL_HANDLE)chosen = gf3d_vgraphics.devices[0];
@@ -655,6 +654,11 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
 
     slog("failed to find suitable memory type!");
     return 0;
+}
+
+Matrix4 *gf3d_vgraphics_get_view_matrix()
+{
+    return &gf3d_vgraphics.ubo.view;
 }
 
 void gf3d_vgraphics_rotate_camera(float degrees)

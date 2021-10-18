@@ -41,8 +41,8 @@ typedef struct
     Mesh                    *   mesh;
     Texture                 *   texture;
     VkDescriptorSet         *   descriptorSet;
-    VkBuffer                   *uniformBuffers;
-    VkDeviceMemory             *uniformBuffersMemory;
+    VkBuffer                *   uniformBuffers;
+    VkDeviceMemory          *   uniformBuffersMemory;
     Uint32                      uniformBufferCount;
 }Model;
 
