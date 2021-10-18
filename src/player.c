@@ -33,8 +33,8 @@ void player_think(Entity *self)
     const Uint8 * keys;
     keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
-    if (keys[SDL_SCANCODE_W])self->position.y -= 0.10;
-    if (keys[SDL_SCANCODE_S])self->position.y += 0.10;
+    if (keys[SDL_SCANCODE_W])self->position.y += 0.10;
+    if (keys[SDL_SCANCODE_S])self->position.y -= 0.10;
     if (keys[SDL_SCANCODE_A])self->position.x -= 0.10;
     if (keys[SDL_SCANCODE_D])self->position.x += 0.10;
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 0.10;
