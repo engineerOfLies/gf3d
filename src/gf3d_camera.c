@@ -46,9 +46,9 @@ void gf3d_camera_update_view()
     position.z = gf3d_camera.position.y;
     gfc_matrix_identity(gf3d_camera.cameraMat);
 
-    vector3d_set(xaxis, cosYaw, 0, -sinYaw);
-    vector3d_set(yaxis, sinYaw * sinPitch, cosPitch, cosYaw * sinPitch);
-    vector3d_set(zaxis, sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw );
+    vector3d_set(xaxis, cosYaw,                     0,  -sinYaw);
+    vector3d_set(yaxis, sinYaw * sinPitch,   cosPitch,   cosYaw * sinPitch);
+    vector3d_set(zaxis, sinYaw * cosPitch,  -sinPitch,   cosPitch * cosYaw);
     
     gf3d_camera.cameraMat[0][0] = xaxis.x;
     gf3d_camera.cameraMat[0][1] = yaxis.x;
@@ -58,9 +58,9 @@ void gf3d_camera_update_view()
     gf3d_camera.cameraMat[1][1] = yaxis.z;
     gf3d_camera.cameraMat[1][2] = zaxis.z;
 
-    gf3d_camera.cameraMat[2][0] = xaxis.y;
-    gf3d_camera.cameraMat[2][1] = yaxis.y;
-    gf3d_camera.cameraMat[2][2] = zaxis.y;
+    gf3d_camera.cameraMat[2][0] = -xaxis.y;
+    gf3d_camera.cameraMat[2][1] = -yaxis.y;
+    gf3d_camera.cameraMat[2][2] = -zaxis.y;
 
     gf3d_camera.cameraMat[3][0] = vector3d_dot_product(xaxis, position);
     gf3d_camera.cameraMat[3][1] = vector3d_dot_product(yaxis, position);
