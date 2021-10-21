@@ -23,6 +23,31 @@ void gf3d_vgraphics_init(
 );
 
 /**
+ * @brief kick off a rendering call for the next buffer frame.
+ */
+void gf3d_vgraphics_render_start();
+
+/**
+ * @brief finish a render command and send all commands to the GPU
+ */
+void gf3d_vgraphics_render_end();
+
+/**
+ * @brief get the buffer frame for the current rendering context
+ * @note: THIS SHOULD ONLY BE CALLED BETWEEN CALLS TO gf3d_vgraphics_render_start() and gf3d_vgraphics_render_end()
+ * @param the active buffer frame (swap chain link number)
+ */
+Uint32  gf3d_vgraphics_get_current_buffer_frame();
+
+/**
+ * @brief get the handle to the active command buffer for the current rendering context
+ * @note: THIS SHOULD ONLY BE CALLED BETWEEN CALLS TO gf3d_vgraphics_render_start() and gf3d_vgraphics_render_end()
+ * @return the handle to the command buffer.
+ */
+VkCommandBuffer gf3d_vgraphics_get_current_command_buffer();
+
+
+/**
  * @brief After initialization 
  */
 VkDevice gf3d_vgraphics_get_default_logical_device();
@@ -33,8 +58,6 @@ VkExtent2D gf3d_vgraphics_get_view_extent();
 
 void gf3d_vgraphics_clear();
 
-Uint32 gf3d_vgraphics_render_begin();
-void gf3d_vgraphics_render_end(Uint32 imageIndex);
 
 int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory);
 

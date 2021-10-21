@@ -113,13 +113,17 @@ void gf3d_model_delete(Model *model)
     memset(model,0,sizeof(Model));
 }
 
-void gf3d_model_draw(Model *model,Uint32 bufferFrame, VkCommandBuffer commandBuffer,Matrix4 modelMat)
+void gf3d_model_draw(Model *model,Matrix4 modelMat)
 {
     VkDescriptorSet *descriptorSet = NULL;
+    VkCommandBuffer commandBuffer;
+    Uint32 bufferFrame;
     if (!model)
     {
         return;
     }
+    commandBuffer = gf3d_vgraphics_get_current_command_buffer();
+    bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
     if (descriptorSet == NULL)
     {

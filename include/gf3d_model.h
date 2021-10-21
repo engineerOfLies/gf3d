@@ -54,11 +54,9 @@ Model * gf3d_model_new();
 /**
  * @brief queue up a model for rendering
  * @param model the model to render
- * @param bufferFrame the swap chain frame to render for
- * @param commandBuffer the command used to send this render request
  * @param modelMat the model matrix (MVP)
  */
-void gf3d_model_draw(Model *model,Uint32 bufferFrame,VkCommandBuffer commandBuffer,Matrix4 modelMat);
+void gf3d_model_draw(Model *model,Matrix4 modelMat);
 void gf3d_model_free(Model *model);
 
 /**

@@ -35,6 +35,10 @@ void gf3d_camera_look_at(
 
 void gf3d_camera_update_view()
 {
+    /**
+     * Adapted from tutorial:
+     * https://www.3dgep.com/understanding-the-view-matrix/
+     */
     Vector3D xaxis,yaxis,zaxis,position;
     float cosPitch = cos(gf3d_camera.rotation.x);
     float sinPitch = sin(gf3d_camera.rotation.x);
@@ -77,8 +81,8 @@ void gf3d_camera_set_position(Vector3D position)
 
 void gf3d_camera_set_rotation(Vector3D rotation)
 {
-    gf3d_camera.rotation.x = rotation.x;
-    gf3d_camera.rotation.y = rotation.y;
+    gf3d_camera.rotation.x = -rotation.x;
+    gf3d_camera.rotation.y = -rotation.y;
     gf3d_camera.rotation.z = -rotation.z;
 }
 

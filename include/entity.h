@@ -54,17 +54,13 @@ void entity_free(Entity *self);
 /**
  * @brief Draw an entity in the current frame
  * @param self the entity in question
- * @param bufferFrame the current rending frame index
- * @param commandBuffer the current command buffer to populate with the draw call
  */
-void entity_draw(Entity *self,Uint32 bufferFrame,VkCommandBuffer commandBuffer);
+void entity_draw(Entity *self);
 
 /**
  * @brief draw ALL active entities
- * @param bufferFrame the current rending frame index
- * @param commandBuffer the current command buffer to populate with the draw call
  */
-void entity_draw_all(Uint32 bufferFrame,VkCommandBuffer commandBuffer);
+void entity_draw_all();
 
 /**
  * @brief Call an entity's think function if it exists

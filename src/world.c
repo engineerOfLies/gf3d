@@ -62,11 +62,11 @@ World *world_load(char *filename)
     return w;
 }
 
-void world_draw(World *world,Uint32 bufferFrame,VkCommandBuffer commandBuffer)
+void world_draw(World *world)
 {
     if (!world)return;
     if (!world->worldModel)return;// no model to draw, do nothing
-    gf3d_model_draw(world->worldModel,bufferFrame,commandBuffer,world->modelMat);
+    gf3d_model_draw(world->worldModel,world->modelMat);
 }
 
 void world_delete(World *world)

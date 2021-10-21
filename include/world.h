@@ -19,7 +19,7 @@ typedef struct
 
 World *world_load(char *filename);
 
-void world_draw(World *world,Uint32 bufferFrame,VkCommandBuffer commandBuffer);
+void world_draw(World *world);
 
 void world_delete(World *world);
 

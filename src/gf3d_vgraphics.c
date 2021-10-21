@@ -64,6 +64,10 @@ typedef struct
     
     Command                 *   graphicsCommandPool; 
     UniformBufferObject         ubo;
+    
+    //render frame and command buffer for the current render pass
+    Uint32                      bufferFrame;
+    VkCommandBuffer             commandBuffer;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -415,7 +419,29 @@ Uint32 gf3d_vgraphics_render_begin()
     return imageIndex;
 }
 
-void gf3d_vgraphics_render_end(Uint32 imageIndex)
+/**
+ * Rendering wrapper
+ * 
+ */
+
+void gf3d_vgraphics_render_start()
+{
+        gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
+        gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_pipeline(),gf3d_vgraphics.bufferFrame);
+        gf3d_vgraphics.commandBuffer = gf3d_command_rendering_begin(gf3d_vgraphics.bufferFrame);
+}
+
+Uint32  gf3d_vgraphics_get_current_buffer_frame()
+{
+    return gf3d_vgraphics.bufferFrame;
+}
+
+VkCommandBuffer gf3d_vgraphics_get_current_command_buffer()
+{
+    return gf3d_vgraphics.commandBuffer;
+}
+
+void gf3d_vgraphics_render_end()
 {
     VkPresentInfoKHR presentInfo = {0};
     VkSubmitInfo submitInfo = {0};
@@ -423,6 +449,11 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
     VkSemaphore waitSemaphores[] = {gf3d_vgraphics.imageAvailableSemaphore};
     VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    
+    
+    gf3d_command_rendering_end(gf3d_vgraphics.commandBuffer);
+
+    
     swapChains[0] = gf3d_swapchain_get();
 
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -451,14 +482,15 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
     
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
-    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pImageIndices = &gf3d_vgraphics.bufferFrame;
     presentInfo.pResults = NULL; // Optional
     
     vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
 }
 
+
 /**
- * VULKAN DEVEICE SUPPORT
+ * VULKAN DEVICE SUPPORT
  */
 
 Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)

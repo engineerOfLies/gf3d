@@ -67,13 +67,13 @@ void entity_free(Entity *self)
 }
 
 
-void entity_draw(Entity *self,Uint32 bufferFrame,VkCommandBuffer commandBuffer)
+void entity_draw(Entity *self)
 {
     if (!self)return;
-    gf3d_model_draw(self->model,bufferFrame,commandBuffer,self->modelMat);
+    gf3d_model_draw(self->model,self->modelMat);
 }
 
-void entity_draw_all(Uint32 bufferFrame,VkCommandBuffer commandBuffer)
+void entity_draw_all()
 {
     int i;
     for (i = 0; i < entity_manager.entity_count; i++)
@@ -82,7 +82,7 @@ void entity_draw_all(Uint32 bufferFrame,VkCommandBuffer commandBuffer)
         {
             continue;// skip this iteration of the loop
         }
-        entity_draw(&entity_manager.entity_list[i],bufferFrame,commandBuffer);
+        entity_draw(&entity_manager.entity_list[i]);
     }
 }
 
