@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
     entity_system_init(1024);
     
     w = world_load("config/testworld.json");
-
+    
     for (a = 0; a < 10;a++)
     {
         agumon_new(vector3d(a * 10 -50,0,0));
