@@ -10,6 +10,7 @@
 #include "gf3d_model.h"
 #include "gf3d_camera.h"
 #include "gf3d_texture.h"
+#include "gf3d_sprite.h"
 
 #include "entity.h"
 #include "agumon.h"
@@ -23,6 +24,9 @@ int main(int argc,char *argv[])
     Uint8 validate = 0;
     const Uint8 * keys;
     
+    Sprite *mouse = NULL;
+    int mousex,mousey;
+    float mouseFrame = 0;
     World *w;
     
     for (a = 1; a < argc;a++)
@@ -47,22 +51,29 @@ int main(int argc,char *argv[])
     
     entity_system_init(1024);
     
+    mouse = gf3d_sprite_load("images/pointer.png",32,32, 16);
+    
     w = world_load("config/testworld.json");
     
     for (a = 0; a < 10;a++)
     {
         agumon_new(vector3d(a * 10 -50,0,0));
     }
-    // main game loop
-	slog_sync();
-    gf3d_camera_set_scale(vector3d(1,1,1));
     
-    slog("gf3d main loop begin");
+    slog_sync();
+    gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(0,0,20));
+    
+    // main game loop
+    slog("gf3d main loop begin");
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+        SDL_GetMouseState(&mousex,&mousey);
+        
+        mouseFrame += 0.01;
+        if (mouseFrame >= 16)mouseFrame = 0;
         entity_think_all();
         entity_update_all();
         gf3d_camera_update_view();
@@ -72,9 +83,11 @@ int main(int argc,char *argv[])
         // for each mesh, get a command and configure it from the pool
         gf3d_vgraphics_render_start();
 
+            //3D draws
                 world_draw(w);
                 entity_draw_all();
-            
+            //2D draws
+                gf3d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(1,1),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
