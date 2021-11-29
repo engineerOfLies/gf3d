@@ -87,7 +87,7 @@ int main(int argc,char *argv[])
                 world_draw(w);
                 entity_draw_all();
             //2D draws
-                gf3d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(1,1),(Uint32)mouseFrame);
+                gf3d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
