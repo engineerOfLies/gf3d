@@ -534,7 +534,7 @@ Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)
     slog("apiVersion: %i",deviceProperties.apiVersion);
     slog("driverVersion: %i",deviceProperties.driverVersion);
     slog("supports Geometry Shader: %i",deviceFeatures.geometryShader);
-    return (deviceProperties.deviceType == GF3D_VGRAPHICS_DISCRETE)&&(deviceFeatures.geometryShader);
+    return (deviceProperties.deviceType == GF3D_VGRAPHICS_DISCRETE);
 }
 
 VkPhysicalDevice gf3d_vgraphics_select_device()
