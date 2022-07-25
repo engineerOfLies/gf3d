@@ -228,7 +228,8 @@ Texture *gf3d_texture_load(char *filename)
         return NULL;
     }
     gfc_line_cpy(tex->filename,filename);
-
+    tex->width = surface->w;
+    tex->height = surface->h;
     imageSize = surface->w * surface->h * 4;
     
     gf3d_vgraphics_create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);

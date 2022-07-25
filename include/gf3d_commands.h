@@ -25,10 +25,9 @@ void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice);
 /**
  * @brief setup up the command pool for graphics commands
  * @param count the number of command buffers to create
- * @param pipe the pointer to the graphics pipeline to use
  * @return NULL on error or a pointer to a setup command pool
  */
-Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe);
+Command * gf3d_command_graphics_pool_setup(Uint32 count);
 
 VkCommandBuffer gf3d_command_begin_single_time(Command *com);
 
@@ -41,9 +40,10 @@ VkCommandBuffer * gf3d_command_pool_get_used_buffers(Command *com);
 /**
  * @brief begin recording a command that will take rendering pass information.  Submit all draw commands between this and gf3d_command_rendering_end
  * @param index the rendering frame to use
+ * @param pipe the pipeline to send the command to
  * @return the command buffer used for this drawing pass.
  */
-VkCommandBuffer gf3d_command_rendering_begin(Uint32 index);
+VkCommandBuffer gf3d_command_rendering_begin(Uint32 index,Pipeline *pipe);
 
 void gf3d_command_rendering_end(VkCommandBuffer commandBuffer);
 

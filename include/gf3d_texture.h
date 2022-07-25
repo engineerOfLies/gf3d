@@ -9,6 +9,7 @@ typedef struct
 {
     Uint8               _inuse;
     Uint32              _refcount;
+    Uint32              width,height;
     TextLine            filename;
     VkImage             textureImage;
     VkDeviceMemory      textureImageMemory;

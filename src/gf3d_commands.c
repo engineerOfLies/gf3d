@@ -86,7 +86,7 @@ void gf3d_command_free(Command *com)
 }
 
 
-Command * gf3d_command_graphics_pool_setup(Uint32 count,Pipeline *pipe)
+Command * gf3d_command_graphics_pool_setup(Uint32 count)
 {
     Command *com;
     VkCommandPoolCreateInfo poolInfo = {0};
@@ -168,11 +168,9 @@ void gf3d_command_configure_render_pass_end(VkCommandBuffer commandBuffer)
     vkCmdEndRenderPass(commandBuffer);
 }
 
-VkCommandBuffer gf3d_command_rendering_begin(Uint32 index)
+VkCommandBuffer gf3d_command_rendering_begin(Uint32 index,Pipeline *pipe)
 {
     VkCommandBuffer commandBuffer;
-    Pipeline *pipe;
-    pipe = gf3d_vgraphics_get_graphics_pipeline();
     
     commandBuffer = gf3d_command_begin_single_time(gf3d_vgraphics_get_graphics_command_pool());
     

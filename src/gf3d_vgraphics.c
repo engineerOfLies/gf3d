@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include "simple_logger.h"
+
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
@@ -23,6 +24,7 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
+#include "gf3d_sprite.h"
 
 
 typedef struct
@@ -60,10 +62,16 @@ typedef struct
     VkSemaphore                 imageAvailableSemaphore;
     VkSemaphore                 renderFinishedSemaphore;
         
-    Pipeline                   *pipe;
-    
+    Pipeline                   *model_pipe;     /**<for rendering 3d*/
+    Pipeline                   *overlay_pipe;   /**<for rendering 2d*/
+
     Command                 *   graphicsCommandPool; 
     UniformBufferObject         ubo;
+    
+    //render frame and command buffer for the current render pass
+    Uint32                      bufferFrame;
+    VkCommandBuffer             commandModelBuffer;
+    VkCommandBuffer             commandOverlayBuffer;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -105,18 +113,13 @@ void gf3d_vgraphics_init(
     gfc_matrix_identity(gf3d_vgraphics.ubo.model);
     gfc_matrix_identity(gf3d_vgraphics.ubo.view);
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
-    gfc_matrix_view(
-        gf3d_vgraphics.ubo.view,
-        vector3d(2,40,2),
-        vector3d(0,0,0),
-        vector3d(0,0,1)
-    );
+    
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
         45 * GFC_DEGTORAD,
         renderWidth/(float)renderHeight,
         0.1f,
-        100
+        10000
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
@@ -137,14 +140,18 @@ void gf3d_vgraphics_init(
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
     gf3d_pipeline_init(4);// how many different rendering pipelines we need
-    gf3d_vgraphics.pipe = gf3d_pipeline_basic_model_create(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
-    gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);
-	gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), device);
+    gf3d_vgraphics.model_pipe = gf3d_pipeline_basic_model_create(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
+    gf3d_vgraphics.overlay_pipe = gf3d_pipeline_basic_sprite_create(device,"shaders/sprite_vert.spv","shaders/sprite_frag.spv",gf3d_vgraphics_get_view_extent(),1024);
+     
+    
+    gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), device);
+    gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
-    gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count(),gf3d_vgraphics.pipe);
+    gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);    
+    gf3d_sprite_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);
 
     gf3d_swapchain_create_depth_image();
-    gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.pipe);
+    gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.model_pipe);
     gf3d_vgraphics_semaphores_create();
 }
 
@@ -169,6 +176,7 @@ void gf3d_vgraphics_setup(
         return;
     }
     atexit(SDL_Quit);
+    SDL_ShowCursor(SDL_DISABLE);
     if (fullscreen)
     {
         if (renderWidth == 0)
@@ -196,7 +204,9 @@ void gf3d_vgraphics_setup(
     }
 	slog_sync();
     // instance extension configuration
+    
     gf3d_extensions_instance_init();
+    
 	slog_sync();
     // get the extensions that are needed for rendering to an SDL Window
     SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), NULL);
@@ -421,7 +431,43 @@ Uint32 gf3d_vgraphics_render_begin()
     return imageIndex;
 }
 
-void gf3d_vgraphics_render_end(Uint32 imageIndex)
+/**
+ * Rendering wrapper
+ * 
+ */
+
+void gf3d_vgraphics_render_start()
+{
+    gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
+    
+    gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_model_pipeline(),gf3d_vgraphics.bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(),gf3d_vgraphics.bufferFrame);
+    
+    gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
+        gf3d_vgraphics.bufferFrame,
+        gf3d_vgraphics_get_graphics_model_pipeline());
+    
+    gf3d_vgraphics.commandOverlayBuffer = gf3d_command_rendering_begin(
+        gf3d_vgraphics.bufferFrame,
+        gf3d_vgraphics_get_graphics_overlay_pipeline());
+}
+
+Uint32  gf3d_vgraphics_get_current_buffer_frame()
+{
+    return gf3d_vgraphics.bufferFrame;
+}
+
+VkCommandBuffer gf3d_vgraphics_get_current_command_model_buffer()
+{
+    return gf3d_vgraphics.commandModelBuffer;
+}
+
+VkCommandBuffer gf3d_vgraphics_get_current_command_overlay_buffer()
+{
+    return gf3d_vgraphics.commandOverlayBuffer;
+}
+
+void gf3d_vgraphics_render_end()
 {
     VkPresentInfoKHR presentInfo = {0};
     VkSubmitInfo submitInfo = {0};
@@ -429,6 +475,12 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
     VkSemaphore waitSemaphores[] = {gf3d_vgraphics.imageAvailableSemaphore};
     VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    
+    
+    gf3d_command_rendering_end(gf3d_vgraphics.commandModelBuffer);
+    gf3d_command_rendering_end(gf3d_vgraphics.commandOverlayBuffer);
+
+    
     swapChains[0] = gf3d_swapchain_get();
 
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -457,14 +509,15 @@ void gf3d_vgraphics_render_end(Uint32 imageIndex)
     
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
-    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pImageIndices = &gf3d_vgraphics.bufferFrame;
     presentInfo.pResults = NULL; // Optional
     
     vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
 }
 
+
 /**
- * VULKAN DEVEICE SUPPORT
+ * VULKAN DEVICE SUPPORT
  */
 
 Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)
@@ -494,7 +547,12 @@ VkPhysicalDevice gf3d_vgraphics_select_device()
         if (gf3d_vgraphics_device_validate(gf3d_vgraphics.devices[i]))
         {
             valid[i] = gf3d_vgraphics.devices[i];
-			if (valid[i] != VK_NULL_HANDLE)chosen = valid[i];
+			if (valid[i] != VK_NULL_HANDLE)
+            {
+                slog("gf3d_vgraphics_select_device: device %i is valid");
+                chosen = valid[i];
+                break;
+            }
         }
     }
 	if (chosen == VK_NULL_HANDLE)chosen = gf3d_vgraphics.devices[0];
@@ -657,6 +715,11 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
+Matrix4 *gf3d_vgraphics_get_view_matrix()
+{
+    return &gf3d_vgraphics.ubo.view;
+}
+
 void gf3d_vgraphics_rotate_camera(float degrees)
 {
     gfc_matrix_rotate(
@@ -667,9 +730,14 @@ void gf3d_vgraphics_rotate_camera(float degrees)
 
 }
 
-Pipeline *gf3d_vgraphics_get_graphics_pipeline()
+Pipeline *gf3d_vgraphics_get_graphics_model_pipeline()
 {
-    return gf3d_vgraphics.pipe;
+    return gf3d_vgraphics.model_pipe;
+}
+
+Pipeline *gf3d_vgraphics_get_graphics_overlay_pipeline()
+{
+    return gf3d_vgraphics.overlay_pipe;
 }
 
 Command *gf3d_vgraphics_get_graphics_command_pool()
