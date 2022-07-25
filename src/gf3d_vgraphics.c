@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include "simple_logger.h"
+
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
@@ -112,6 +113,7 @@ void gf3d_vgraphics_init(
     gfc_matrix_identity(gf3d_vgraphics.ubo.model);
     gfc_matrix_identity(gf3d_vgraphics.ubo.view);
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
+    
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
         45 * GFC_DEGTORAD,
@@ -202,7 +204,9 @@ void gf3d_vgraphics_setup(
     }
 	slog_sync();
     // instance extension configuration
+    
     gf3d_extensions_instance_init();
+    
 	slog_sync();
     // get the extensions that are needed for rendering to an SDL Window
     SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), NULL);

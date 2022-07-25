@@ -1,6 +1,7 @@
 #include <SDL.h>            
 
 #include "simple_logger.h"
+#include "gfc_input.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
 
@@ -22,7 +23,6 @@ int main(int argc,char *argv[])
     int done = 0;
     int a;
     Uint8 validate = 0;
-    const Uint8 * keys;
     
     Sprite *mouse = NULL;
     int mousex,mousey;
@@ -38,6 +38,7 @@ int main(int argc,char *argv[])
     }
     
     init_logger("gf3d.log");    
+    gfc_input_init("config/input.cfg");
     slog("gf3d begin");
     gf3d_vgraphics_init(
         "gf3d",                 //program name
@@ -68,8 +69,7 @@ int main(int argc,char *argv[])
     slog("gf3d main loop begin");
     while(!done)
     {
-        SDL_PumpEvents();   // update SDL's internal event structures
-        keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+        gfc_input_update();
         SDL_GetMouseState(&mousex,&mousey);
         
         mouseFrame += 0.01;
@@ -90,7 +90,7 @@ int main(int argc,char *argv[])
                 gf3d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
-        if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
+        if (gfc_input_command_down("exit"))done = 1; // exit condition
     }    
     
     world_delete(w);
