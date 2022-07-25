@@ -18,6 +18,8 @@
 #include "player.h"
 #include "world.h"
 
+extern int __DEBUG;
+
 int main(int argc,char *argv[])
 {
     int done = 0;
@@ -31,9 +33,13 @@ int main(int argc,char *argv[])
     
     for (a = 1; a < argc;a++)
     {
-        if (strcmp(argv[a],"-disable_validate") == 0)
+        if (strcmp(argv[a],"--disable_validate") == 0)
         {
             validate = 0;
+        }
+        if (strcmp(argv[a],"--debug") == 0)
+        {
+            __DEBUG = 1;
         }
     }
     
@@ -46,7 +52,8 @@ int main(int argc,char *argv[])
         700,                    //screen height
         vector4d(0.51,0.75,1,1),//background color
         0,                      //fullscreen
-        validate                //validation
+        validate,                //validation
+        "config/setup.cfg"
     );
 	slog_sync();
     

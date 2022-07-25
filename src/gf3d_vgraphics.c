@@ -15,16 +15,17 @@
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
 
+#include "gf3d_device.h"
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
 #include "gf3d_vqueues.h"
 #include "gf3d_swapchain.h"
-#include "gf3d_vgraphics.h"
 #include "gf3d_model.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
 #include "gf3d_sprite.h"
+#include "gf3d_vgraphics.h"
 
 
 typedef struct
@@ -76,6 +77,7 @@ typedef struct
 
 static vGraphics gf3d_vgraphics = {0};
 
+int __DEBUG = 0;
 extern Mesh *testMesh;
 
 void gf3d_vgraphics_close();
@@ -84,7 +86,6 @@ void gf3d_vgraphics_extension_init();
 void gf3d_vgraphics_setup_debug();
 void gf3d_vgraphics_semaphores_create();
 
-VkPhysicalDevice gf3d_vgraphics_select_device();
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
 
 void gf3d_vgraphics_debug_close();
@@ -96,7 +97,8 @@ void gf3d_vgraphics_setup(
     int renderHeight,
     Vector4D bgcolor,
     Bool fullscreen,
-    Bool enableValidation
+    Bool enableValidation,
+    const char *config
 );
 
 void gf3d_vgraphics_init(
@@ -105,7 +107,8 @@ void gf3d_vgraphics_init(
     int renderHeight,
     Vector4D bgcolor,
     Bool fullscreen,
-    Bool enableValidation
+    Bool enableValidation,
+    const char *config
 )
 {
     VkDevice device;
@@ -130,7 +133,8 @@ void gf3d_vgraphics_init(
         renderHeight,
         bgcolor,
         fullscreen,
-        enableValidation);
+        enableValidation,
+        config);
     
     device = gf3d_vgraphics_get_default_logical_device();
 
@@ -162,7 +166,8 @@ void gf3d_vgraphics_setup(
     int renderHeight,
     Vector4D bgcolor,
     Bool fullscreen,
-    Bool enableValidation
+    Bool enableValidation,
+    const char *config
 )
 {
     Uint32 flags = SDL_WINDOW_VULKAN;
@@ -277,23 +282,12 @@ void gf3d_vgraphics_setup(
     }
     atexit(gf3d_vgraphics_close);
     
-    //get a gpu to do work with
-    vkEnumeratePhysicalDevices(gf3d_vgraphics.vk_instance, &gf3d_vgraphics.device_count, NULL);
-    slog("vulkan discovered %i device(s) with this instance",gf3d_vgraphics.device_count);
-    if (!gf3d_vgraphics.device_count)
-    {
-        slog("failed to create a vulkan instance with a usable device");
-        gf3d_vgraphics_close();
-        return;
-    }
-	slog_sync();
-
-    gf3d_vgraphics.devices = (VkPhysicalDevice *)malloc(sizeof(VkPhysicalDevice)*gf3d_vgraphics.device_count);
-    vkEnumeratePhysicalDevices(gf3d_vgraphics.vk_instance, &gf3d_vgraphics.device_count, gf3d_vgraphics.devices);
     
-    gf3d_vgraphics.gpu = gf3d_vgraphics_select_device();
+    gf3d_device_manager_init(config, gf3d_vgraphics.vk_instance);
+
+    gf3d_vgraphics.gpu = gf3d_devices_get_best_device();
     if(!gf3d_vgraphics.gpu){
-        slog("Failed to select graphics card. If using integrated graphics, change variable in h file.");
+        slog("Failed to select graphics card.");
         gf3d_vgraphics_close();
         return;
     }
@@ -516,48 +510,6 @@ void gf3d_vgraphics_render_end()
 }
 
 
-/**
- * VULKAN DEVICE SUPPORT
- */
-
-Bool gf3d_vgraphics_device_validate(VkPhysicalDevice device)
-{
-    VkPhysicalDeviceProperties deviceProperties;
-    VkPhysicalDeviceFeatures deviceFeatures;
-    
-    
-    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-    vkGetPhysicalDeviceProperties(device, &deviceProperties);
-
-    slog("Device Name: %s",deviceProperties.deviceName);
-    slog("Dedicated GPU: %i",(deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)?1:0);
-    slog("apiVersion: %i",deviceProperties.apiVersion);
-    slog("driverVersion: %i",deviceProperties.driverVersion);
-    slog("supports Geometry Shader: %i",deviceFeatures.geometryShader);
-    return (deviceProperties.deviceType == GF3D_VGRAPHICS_DISCRETE);
-}
-
-VkPhysicalDevice gf3d_vgraphics_select_device()
-{
-    unsigned int i;
-    VkPhysicalDevice chosen = VK_NULL_HANDLE;
-	VkPhysicalDevice *valid = (VkPhysicalDevice*)gfc_allocate_array(sizeof(VkPhysicalDevice), gf3d_vgraphics.device_count);
-	for (i = 0; i < gf3d_vgraphics.device_count; i++)
-    {
-        if (gf3d_vgraphics_device_validate(gf3d_vgraphics.devices[i]))
-        {
-            valid[i] = gf3d_vgraphics.devices[i];
-			if (valid[i] != VK_NULL_HANDLE)
-            {
-                slog("gf3d_vgraphics_select_device: device %i is valid");
-                chosen = valid[i];
-                break;
-            }
-        }
-    }
-	if (chosen == VK_NULL_HANDLE)chosen = gf3d_vgraphics.devices[0];
-    return chosen;
-}
 
 
 /**
