@@ -215,38 +215,4 @@ VkPhysicalDevice gf3d_devices_get_best_device()
     return gf3d_device_manager.devices[gf3d_device_manager.bestDevice];
 }
 
-VkDeviceCreateInfo gf3d_device_get_device_info(Bool enableValidationLayers)
-{
-    VkDeviceCreateInfo createInfo = {0};
-    Uint32 count;
-    
-    gf3d_vgraphics.queueCreateInfo = (VkDeviceQueueCreateInfo *)gf3d_vqueues_get_queue_create_info(&count);
 
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    
-    createInfo.pQueueCreateInfos = gf3d_vgraphics.queueCreateInfo;
-    createInfo.queueCreateInfoCount = count;
-
-    gf3d_vgraphics.deviceFeatures.samplerAnisotropy = VK_TRUE;
-
-    createInfo.pEnabledFeatures = &gf3d_vgraphics.deviceFeatures;
-    
-    
-    createInfo.ppEnabledExtensionNames = gf3d_extensions_get_device_enabled_names(&count);
-    createInfo.enabledExtensionCount = count;
-    
-
-    if (enableValidationLayers)
-    {
-        createInfo.enabledLayerCount = gf3d_validation_get_validation_layer_count();
-        createInfo.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
-    }
-    else
-    {
-        createInfo.enabledLayerCount = 0;
-    }
-    
-    return createInfo;
-}
-
-/*eol@eof*/
