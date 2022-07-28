@@ -5,8 +5,9 @@
 #include <SDL.h>
 /**
  * @brief Setup Vulkan Validation Layers
+ * @param config a config file containing validation layer config data
  */
-void gf3d_validation_init();
+void gf3d_validation_init(const char *config);
 
 /**
  * @brief get the array address for the validation layers
@@ -19,12 +20,18 @@ VkLayerProperties *gf3d_validation_get_validation_layer_data();
  * @brief get the number of validation layers that are available
  * @return 0 if there are none, or validation has not been initialized.  The polled count otherwises
  */
-Uint32 gf3d_validation_get_validation_layer_count();
+Uint32 gf3d_validation_get_available_layer_count();
+
+/**
+ * @brief get the number of validation layers that are enabled
+ * @return 0 if there are none, or validation has not been initialized.  The polled count otherwises
+ */
+Uint32 gf3d_validation_get_enabled_layer_count();
 
 /**
  * @brief get an array of pointers to the validation layer names
  * @return NULL on error,no layers, or if init has not been called yet
  */
-const char* const* gf3d_validation_get_validation_layer_names();
+const char* const* gf3d_validation_get_enabled_layer_names();
 
 #endif

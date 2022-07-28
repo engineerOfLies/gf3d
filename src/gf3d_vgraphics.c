@@ -10,10 +10,12 @@
 #include <stdio.h>
 
 #include "simple_logger.h"
+#include "simple_json.h"
 
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_config.h"
 
 #include "gf3d_device.h"
 #include "gf3d_validation.h"
@@ -45,8 +47,6 @@ typedef struct
     unsigned int                enabled_layer_count;
 
     //devices
-    Uint32                      device_count;
-    VkPhysicalDevice           *devices;
     VkPhysicalDevice            gpu;
     Bool                        logicalDeviceCreated;
     
@@ -54,10 +54,9 @@ typedef struct
     VkSurfaceKHR                surface;
 
     // color space
+    Color                       bgcolor;
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
-
-    VkDeviceQueueCreateInfo    *queueCreateInfo;
     
     VkSemaphore                 imageAvailableSemaphore;
     VkSemaphore                 renderFinishedSemaphore;
@@ -91,27 +90,56 @@ void gf3d_vgraphics_debug_close();
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
 
 void gf3d_vgraphics_setup(
-    char *windowName,
+    const char *windowName,
     int renderWidth,
     int renderHeight,
-    Vector4D bgcolor,
     Bool fullscreen,
     Bool enableValidation,
+    Bool enableDebug,
     const char *config
 );
 
-void gf3d_vgraphics_init(
-    char *windowName,
-    int renderWidth,
-    int renderHeight,
-    Vector4D bgcolor,
-    Bool fullscreen,
-    Bool enableValidation,
-    const char *config
-)
+void gf3d_vgraphics_init(const char *config)
 {
-    VkDevice device;
+    SJson *json,*setup;
+    const char *windowName = NULL;
+    Vector2D resolution = {1024,768};
+    short int fullscreen = 0;
+    short int enableValidation = 0;
+    short int enableDebug = 0;
+   
+    json = sj_load(config);
+    if (!json)
+    {
+        slog("graphics config file load failed, exiting");
+        exit(0);
+        return;
+    }
+    setup = sj_object_get_value(json,"setup");
     
+    if (!setup)
+    {
+        slog("graphics config file missing setup data, exiting");
+        sj_free(json);
+        exit(0);
+        return;
+    }
+    
+    windowName = sj_object_get_value_as_string(setup,"application_name");
+    sj_value_as_vector2d(sj_object_get_value(setup,"resolution"),&resolution);
+    gf3d_vgraphics.bgcolor = sj_value_as_color(sj_object_get_value(setup,"background"));
+    sj_get_bool_value(sj_object_get_value(setup,"fullscreen"),&fullscreen);
+    sj_get_bool_value(sj_object_get_value(json,"enable_debug"),&enableDebug);
+    sj_get_bool_value(sj_object_get_value(json,"enable_validation"),&enableValidation);
+    
+    if (resolution.y == 0)
+    {
+        slog("invalid resolution (%f,%f), closing",resolution.x,resolution.y);
+        sj_free(json);
+        exit(0);
+        return;
+    }
+
     gfc_matrix_identity(gf3d_vgraphics.ubo.model);
     gfc_matrix_identity(gf3d_vgraphics.ubo.view);
     gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
@@ -119,7 +147,7 @@ void gf3d_vgraphics_init(
     gfc_matrix_perspective(
         gf3d_vgraphics.ubo.proj,
         45 * GFC_DEGTORAD,
-        renderWidth/(float)renderHeight,
+        resolution.x/resolution.y,
         0.1f,
         10000
     );
@@ -128,31 +156,31 @@ void gf3d_vgraphics_init(
 
     gf3d_vgraphics_setup(
         windowName,
-        renderWidth,
-        renderHeight,
-        bgcolor,
+        resolution.x,
+        resolution.y,
         fullscreen,
         enableValidation,
+        enableDebug,
         config
         );
     
-    device = gf3d_vgraphics_get_default_logical_device();
+    gf3d_vgraphics.device = gf3d_vgraphics_get_default_logical_device();
 
     gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
     // swap chain!!!
-    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,renderWidth,renderHeight);
+    gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
     gf3d_pipeline_init(4);// how many different rendering pipelines we need
-    gf3d_vgraphics.model_pipe = gf3d_pipeline_basic_model_create(device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
-    gf3d_vgraphics.overlay_pipe = gf3d_pipeline_basic_sprite_create(device,"shaders/sprite_vert.spv","shaders/sprite_frag.spv",gf3d_vgraphics_get_view_extent(),1024);
+    gf3d_vgraphics.model_pipe = gf3d_pipeline_basic_model_create(gf3d_vgraphics.device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
+    gf3d_vgraphics.overlay_pipe = gf3d_pipeline_basic_sprite_create(gf3d_vgraphics.device,"shaders/sprite_vert.spv","shaders/sprite_frag.spv",gf3d_vgraphics_get_view_extent(),1024);
      
     
-    gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), device);
+    gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
-    gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);    
-    gf3d_sprite_manager_init(1024,gf3d_swapchain_get_swap_image_count(),device);
+    gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),gf3d_vgraphics.device);    
+    gf3d_sprite_manager_init(1024,gf3d_swapchain_get_swap_image_count(),gf3d_vgraphics.device);
 
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(gf3d_vgraphics.model_pipe);
@@ -161,12 +189,12 @@ void gf3d_vgraphics_init(
 
 
 void gf3d_vgraphics_setup(
-    char *windowName,
+    const char *windowName,
     int renderWidth,
     int renderHeight,
-    Vector4D bgcolor,
     Bool fullscreen,
     Bool enableValidation,
+    Bool enableDebug,
     const char *config
 )
 {
@@ -248,10 +276,9 @@ void gf3d_vgraphics_setup(
     
     if (enableValidation)
     {
-        gf3d_vgraphics.enableValidationLayers = true;
-        gf3d_validation_init();
-        gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_validation_layer_count();
-        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+        gf3d_validation_init(config);
+        gf3d_vgraphics.vk_instance_info.enabledLayerCount = gf3d_validation_get_enabled_layer_count();
+        gf3d_vgraphics.vk_instance_info.ppEnabledLayerNames = gf3d_validation_get_enabled_layer_names();
         gf3d_extensions_enable(ET_Instance,"VK_EXT_debug_utils");
     }
     else
@@ -275,7 +302,7 @@ void gf3d_vgraphics_setup(
         return;
     }
 	slog_sync();
-    if (enableValidation)
+    if (enableDebug)
     {
         gf3d_vgraphics_setup_debug();
     }
@@ -313,14 +340,6 @@ void gf3d_vgraphics_close()
 {
     slog("cleaning up vulkan graphics");
     
-    if (gf3d_vgraphics.logicalDeviceCreated)
-    {
-        vkDestroyDevice(gf3d_vgraphics.device, NULL);
-    }
-    if (gf3d_vgraphics.devices)
-    {
-        free(gf3d_vgraphics.devices);
-    }
     if (gf3d_vgraphics.sdl_extension_names)
     {
         free(gf3d_vgraphics.sdl_extension_names);
@@ -514,7 +533,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 void gf3d_vgraphics_debug_close()
 {
-    if (gf3d_vgraphics.enableValidationLayers)
+    if (gf3d_vgraphics.debug_callback)
     {
         DestroyDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, gf3d_vgraphics.debug_callback, NULL);
     }

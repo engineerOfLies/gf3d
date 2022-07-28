@@ -13,16 +13,9 @@
 
 /**
  * @brief init Vulkan / SDL, setup device and initialize infrastructure for 3d graphics
+ * @param config json file containing setup information
  */
-void gf3d_vgraphics_init(
-    char *windowName,
-    int renderWidth,
-    int renderHeight,
-    Vector4D bgcolor,
-    Bool fullscreen,
-    Bool enableValidation,
-    const char *config
-);
+void gf3d_vgraphics_init(const char *config);
 
 /**
  * @brief kick off a rendering call for the next buffer frame.

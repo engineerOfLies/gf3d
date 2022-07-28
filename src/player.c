@@ -60,10 +60,10 @@ void player_think(Entity *self)
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 0.10;
     if (keys[SDL_SCANCODE_Z])self->position.z -= 0.10;
     
-    if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0010;
-    if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0010;
-    if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.0010;
-    if (keys[SDL_SCANCODE_LEFT])self->rotation.z += 0.0010;
+    if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
+    if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
+    if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.0050;
+    if (keys[SDL_SCANCODE_LEFT])self->rotation.z += 0.0050;
 
 }
 

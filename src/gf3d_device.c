@@ -34,6 +34,10 @@ VkDeviceCreateInfo gf3d_device_get_logical_device_info(Bool enableValidationLaye
 
 void gf3d_device_manager_close()
 {
+    if (gf3d_device_manager.device != VK_NULL_HANDLE)
+    {
+        vkDestroyDevice(gf3d_device_manager.device, NULL);
+    }
     sj_free(gf3d_device_manager.config);
     if (gf3d_device_manager.device_list)
     {
@@ -308,8 +312,8 @@ VkDeviceCreateInfo gf3d_device_get_logical_device_info(Bool enableValidationLaye
 
     if (enableValidationLayers)
     {
-        createInfo.enabledLayerCount = gf3d_validation_get_validation_layer_count();
-        createInfo.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+        createInfo.enabledLayerCount = gf3d_validation_get_enabled_layer_count();
+        createInfo.ppEnabledLayerNames = gf3d_validation_get_enabled_layer_names();
     }
     else
     {
