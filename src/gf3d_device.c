@@ -4,25 +4,23 @@
 #include "gfc_types.h"
 #include "gfc_list.h"
 
+#include "gf3d_vqueues.h"
+#include "gf3d_validation.h"
+#include "gf3d_extensions.h"
 #include "gf3d_device.h"
 
 extern int __DEBUG;
 
 typedef struct
 {
-    VkPhysicalDevice device;                        /**vulkan device handle*/
-    VkPhysicalDeviceProperties  deviceProperties;   /**<properties of the device*/
-    VkPhysicalDeviceFeatures    deviceFeatures;     /**<features of the device*/
-    int score;                                      /**<how many device features match ideal*/
-}GF3D_Device;
-
-typedef struct
-{
-    SJson *config;
-    VkInstance instance;
-    List *device_list;
-    VkPhysicalDevice *devices;
-    int bestDevice;
+    SJson *config;                  /**<loaded config*/
+    VkInstance instance;            /**<active vulkan instance*/
+    List *device_list;              /**<list of GF3D_Device's*/
+    VkPhysicalDevice *devices;      /**<array of physical device handles*/
+    VkDevice          device;       /**<logical device handle*/
+    int bestDevice;                 /**<index of the chosen physical device*/
+    GF3D_Device *chosen_gpu;        /**< physical device to use for logical device*/
+    VkSurfaceKHR renderSurface;     /**<vulkan surface target for the screen/window  owned by graphics*/
 }GF3D_DeviceManager;
 
 static GF3D_DeviceManager gf3d_device_manager = {0};
@@ -30,6 +28,8 @@ static GF3D_DeviceManager gf3d_device_manager = {0};
 int gf3d_devices_enumerate();
 void gf3d_device_manager_determine_best();
 GF3D_Device *gf3d_device_get_info(VkPhysicalDevice device);
+VkDevice gf3d_device_create_logic_device(Bool enableValidationLayers);
+VkDeviceCreateInfo gf3d_device_get_logical_device_info(Bool enableValidationLayers);
 
 
 void gf3d_device_manager_close()
@@ -48,8 +48,10 @@ void gf3d_device_manager_close()
     if (__DEBUG)slog("gf2d_devices manager closed");
 }
 
-void gf3d_device_manager_init(const char *config, VkInstance instance)
+void gf3d_device_manager_init(const char *config, VkInstance instance, VkSurfaceKHR renderSurface)
 {
+    SJson *deviceConfig;
+    short int enable_validation = false;
     if (!instance)
     {
         slog("no vulkan instance provided, failed to init device manager");
@@ -74,8 +76,29 @@ void gf3d_device_manager_init(const char *config, VkInstance instance)
         sj_free(gf3d_device_manager.config);
         return;
     }
+    gf3d_device_manager.renderSurface = renderSurface;
     gf3d_device_manager.bestDevice = -1;
     gf3d_device_manager_determine_best();
+    
+    if (!gf3d_device_manager.chosen_gpu)
+    {
+        return;
+    }
+    
+    deviceConfig = sj_object_get_value(gf3d_device_manager.config,"devices");
+    if (deviceConfig)
+    {
+        sj_get_bool_value(sj_object_get_value(gf3d_device_manager.config,"enable_validation"),&enable_validation);
+    }
+    
+    gf3d_vqueues_init(gf3d_device_manager.chosen_gpu->device,gf3d_device_manager.renderSurface);
+    
+    //setup device extensions
+    gf3d_extensions_device_init(gf3d_device_manager.chosen_gpu->device);
+    gf3d_extensions_enable(ET_Device,"VK_KHR_swapchain");//TODO: from CONFIG
+
+    gf3d_device_create_logic_device(enable_validation);
+    
     atexit(gf3d_device_manager_close);
     if (__DEBUG)slog("gf3d_devices manager initialized");
 }
@@ -183,9 +206,16 @@ void gf3d_device_manager_determine_best()
             slog("failed to determine a best device!");
         }
     }
+    gf3d_device_manager.chosen_gpu = device_best;
 }
 
-VkPhysicalDevice gf3d_devices_get_best_device_by_name(const char *name)
+GF3D_Device *gf3d_device_get_chosen_gpu_info()
+{
+    return gf3d_device_manager.chosen_gpu;
+}
+
+
+VkPhysicalDevice gf3d_devices_get_device_by_name(const char *name)
 {
     int i,c;
     GF3D_Device *device_info;
@@ -215,4 +245,78 @@ VkPhysicalDevice gf3d_devices_get_best_device()
     return gf3d_device_manager.devices[gf3d_device_manager.bestDevice];
 }
 
+VkDevice gf3d_device_get()
+{
+    return gf3d_device_manager.device;
+}
 
+VkDevice gf3d_device_create_logic_device(Bool enableValidationLayers)
+{
+    VkPhysicalDevice gpu;
+    VkDeviceCreateInfo createInfo = gf3d_device_get_logical_device_info(enableValidationLayers);
+    
+    if (createInfo.sType != VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO)
+    {
+        slog("failed to setup creation info for logical device");
+        return VK_NULL_HANDLE;
+    }
+    gpu = gf3d_devices_get_best_device();
+    if (gpu == VK_NULL_HANDLE)
+    {
+        slog("cannot create logical device, no physical device set");
+        return VK_NULL_HANDLE;
+    }
+    if (vkCreateDevice(gpu, &createInfo, NULL, &gf3d_device_manager.device) != VK_SUCCESS)
+    {
+        slog("failed to create logical device");
+        return VK_NULL_HANDLE;
+    }
+    return gf3d_device_manager.device;
+}
+
+VkDeviceCreateInfo gf3d_device_get_logical_device_info(Bool enableValidationLayers)
+{
+    VkDeviceCreateInfo createInfo = {0};
+    Uint32 count;
+    VkDeviceQueueCreateInfo *queueCreateInfo;
+
+    
+    if (!gf3d_device_manager.chosen_gpu)
+    {
+        slog("cannot create logical device info, no GPU chosen");
+        return createInfo;
+    }
+    
+    queueCreateInfo = (VkDeviceQueueCreateInfo *)gf3d_vqueues_get_queue_create_info(&count);
+    if (!queueCreateInfo)
+    {
+        slog("cannot create logical device info, queueCreateInfo");
+        return createInfo;
+    }
+
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    
+    createInfo.pQueueCreateInfos = queueCreateInfo;
+    createInfo.queueCreateInfoCount = count;
+
+    createInfo.pEnabledFeatures = &gf3d_device_manager.chosen_gpu->deviceFeatures;
+    
+    
+    createInfo.ppEnabledExtensionNames = gf3d_extensions_get_device_enabled_names(&count);
+    createInfo.enabledExtensionCount = count;
+    
+
+    if (enableValidationLayers)
+    {
+        createInfo.enabledLayerCount = gf3d_validation_get_validation_layer_count();
+        createInfo.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
+    }
+    else
+    {
+        createInfo.enabledLayerCount = 0;
+    }
+    
+    return createInfo;
+}
+
+/*eol@eof*/

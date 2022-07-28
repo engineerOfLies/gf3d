@@ -58,7 +58,6 @@ typedef struct
     VkColorSpaceKHR             color_space;
 
     VkDeviceQueueCreateInfo    *queueCreateInfo;
-    VkPhysicalDeviceFeatures    deviceFeatures;
     
     VkSemaphore                 imageAvailableSemaphore;
     VkSemaphore                 renderFinishedSemaphore;
@@ -134,7 +133,8 @@ void gf3d_vgraphics_init(
         bgcolor,
         fullscreen,
         enableValidation,
-        config);
+        config
+        );
     
     device = gf3d_vgraphics_get_default_logical_device();
 
@@ -173,7 +173,6 @@ void gf3d_vgraphics_setup(
     Uint32 flags = SDL_WINDOW_VULKAN;
     Uint32 i;
     Uint32 enabledExtensionCount = 0;
-    VkDeviceCreateInfo createInfo = {0};
     
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -282,8 +281,18 @@ void gf3d_vgraphics_setup(
     }
     atexit(gf3d_vgraphics_close);
     
+    // create a surface for the window
+    SDL_Vulkan_CreateSurface(gf3d_vgraphics.main_window, gf3d_vgraphics.vk_instance, &gf3d_vgraphics.surface);
     
-    gf3d_device_manager_init(config, gf3d_vgraphics.vk_instance);
+    if (gf3d_vgraphics.surface == VK_NULL_HANDLE)
+    {
+        slog("failed to create render target surface");
+        gf3d_vgraphics_close();
+        return;
+    }
+    
+    gf3d_device_manager_init(config, gf3d_vgraphics.vk_instance,gf3d_vgraphics.surface);
+
 
     gf3d_vgraphics.gpu = gf3d_devices_get_best_device();
     if(!gf3d_vgraphics.gpu){
@@ -291,31 +300,13 @@ void gf3d_vgraphics_setup(
         gf3d_vgraphics_close();
         return;
     }
-	slog_sync();
-
-    // create a surface for the window
-    SDL_Vulkan_CreateSurface(gf3d_vgraphics.main_window, gf3d_vgraphics.vk_instance, &gf3d_vgraphics.surface);
-    // setup a queue for rendering calls
-	slog_sync();
-
-    // setup queues
-    gf3d_vqueues_init(gf3d_vgraphics.gpu,gf3d_vgraphics.surface);
     
-    //setup device extensions
-    gf3d_extensions_device_init(gf3d_vgraphics.gpu);
-    gf3d_extensions_enable(ET_Device,"VK_KHR_swapchain");
-
-    createInfo = gf3d_vgraphics_get_device_info(enableValidation);
-    
-    if (vkCreateDevice(gf3d_vgraphics.gpu, &createInfo, NULL, &gf3d_vgraphics.device) != VK_SUCCESS)
+    gf3d_vgraphics.device = gf3d_device_get();
+    if (gf3d_vgraphics.device != VK_NULL_HANDLE)
     {
-        slog("failed to create logical device");
-        gf3d_vgraphics_close();
-        return;
+        gf3d_vgraphics.logicalDeviceCreated = true;
     }
-    gf3d_vgraphics.logicalDeviceCreated = true;
-	slog_sync();
-
+    slog_sync();
 }
 
 void gf3d_vgraphics_close()
@@ -368,39 +359,6 @@ VkExtent2D gf3d_vgraphics_get_view_extent()
 }
 
 
-VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers)
-{
-    VkDeviceCreateInfo createInfo = {0};
-    Uint32 count;
-    
-    gf3d_vgraphics.queueCreateInfo = (VkDeviceQueueCreateInfo *)gf3d_vqueues_get_queue_create_info(&count);
-
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    
-    createInfo.pQueueCreateInfos = gf3d_vgraphics.queueCreateInfo;
-    createInfo.queueCreateInfoCount = count;
-
-    gf3d_vgraphics.deviceFeatures.samplerAnisotropy = VK_TRUE;
-
-    createInfo.pEnabledFeatures = &gf3d_vgraphics.deviceFeatures;
-    
-    
-    createInfo.ppEnabledExtensionNames = gf3d_extensions_get_device_enabled_names(&count);
-    createInfo.enabledExtensionCount = count;
-    
-
-    if (enableValidationLayers)
-    {
-        createInfo.enabledLayerCount = gf3d_validation_get_validation_layer_count();
-        createInfo.ppEnabledLayerNames = gf3d_validation_get_validation_layer_names();
-    }
-    else
-    {
-        createInfo.enabledLayerCount = 0;
-    }
-    
-    return createInfo;
-}
 
 Uint32 gf3d_vgraphics_render_begin()
 {
