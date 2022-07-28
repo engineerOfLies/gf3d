@@ -18,6 +18,7 @@
 #include "gfc_config.h"
 
 #include "gf3d_device.h"
+#include "gf3d_debug.h"
 #include "gf3d_validation.h"
 #include "gf3d_extensions.h"
 #include "gf3d_vqueues.h"
@@ -42,7 +43,6 @@ typedef struct
     Uint32                      sdl_extension_count;
     const char                **sdl_extension_names;
     Bool                        enableValidationLayers;
-    VkDebugUtilsMessengerEXT    debug_callback;    
     
     unsigned int                enabled_layer_count;
 
@@ -81,7 +81,6 @@ extern Mesh *testMesh;
 void gf3d_vgraphics_close();
 void gf3d_vgraphics_logical_device_close();
 void gf3d_vgraphics_extension_init();
-void gf3d_vgraphics_setup_debug();
 void gf3d_vgraphics_semaphores_create();
 
 VkDeviceCreateInfo gf3d_vgraphics_get_device_info(Bool enableValidationLayers);
@@ -304,7 +303,7 @@ void gf3d_vgraphics_setup(
 	slog_sync();
     if (enableDebug)
     {
-        gf3d_vgraphics_setup_debug();
+        gf3d_debug_setup(gf3d_vgraphics.vk_instance);
     }
     atexit(gf3d_vgraphics_close);
     
@@ -345,7 +344,7 @@ void gf3d_vgraphics_close()
         free(gf3d_vgraphics.sdl_extension_names);
     }
 
-    gf3d_vgraphics_debug_close();
+    gf3d_debug_close();
         
     if(gf3d_vgraphics.surface && gf3d_vgraphics.vk_instance)
     {
@@ -484,76 +483,6 @@ void gf3d_vgraphics_render_end()
     presentInfo.pResults = NULL; // Optional
     
     vkQueuePresentKHR(gf3d_vqueues_get_present_queue(), &presentInfo);
-}
-
-
-
-
-/**
- * VULKAN DEBUGGING CALLBACK SETUP
- */
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL gf3d_vgraphics_debug_parse(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* pUserData)
-{
-    //setting this up to always log the message, but this can be adjusted later
-    slog("VULKAN DEBUG [%i]:%s",messageSeverity,pCallbackData->pMessage);
-	slog_sync();
-    return VK_FALSE;
-}
-
-VkResult CreateDebugUtilsMessengerEXT(
-    VkInstance instance,
-    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-    const VkAllocationCallbacks* pAllocator,
-    VkDebugUtilsMessengerEXT* pCallback)
-{
-    auto PFN_vkCreateDebugUtilsMessengerEXT func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != NULL)
-    {
-        return func(instance, pCreateInfo, pAllocator, pCallback);
-    }
-    else
-    {
-        return VK_ERROR_EXTENSION_NOT_PRESENT;
-    }
-}
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator)
-{
-    auto PFN_vkDestroyDebugUtilsMessengerEXT func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != NULL)
-    {
-        func(instance, callback, pAllocator);
-    }
-}
-
-void gf3d_vgraphics_debug_close()
-{
-    if (gf3d_vgraphics.debug_callback)
-    {
-        DestroyDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, gf3d_vgraphics.debug_callback, NULL);
-    }
-}
-
-void gf3d_vgraphics_setup_debug()
-{
-    VkDebugUtilsMessengerCreateInfoEXT createInfo = {0};
-
-    
-    createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    
-    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    
-    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-    
-    createInfo.pfnUserCallback = gf3d_vgraphics_debug_parse;
-    createInfo.pUserData = NULL; // Optional
-    
-    CreateDebugUtilsMessengerEXT(gf3d_vgraphics.vk_instance, &createInfo, NULL, &gf3d_vgraphics.debug_callback);
 }
 
 void gf3d_vgraphics_semaphores_close()
