@@ -12,8 +12,9 @@ typedef enum
 
 /**
  * @brief initialize gf3d vulkan extension system
+ * @param config a json file containing a list instance_extensions to enable
  */
-void gf3d_extensions_instance_init();
+void gf3d_extensions_instance_init(const char *config);
 
 /**
  * @brief during setup phase, this will queue an extension to be enabled
@@ -40,8 +41,10 @@ const char* const* gf3d_extensions_get_device_enabled_names(Uint32 *count);
 
 /**
  * @brief after device creation, setup vulkan extension support
+ * @param device the physical device to setup extensions for
+ * @param config a json file containing a list device_extensions to enable
  */
-void gf3d_extensions_device_init(VkPhysicalDevice device);
+void gf3d_extensions_device_init(VkPhysicalDevice device,const char *config);
 
 
 const char* const* gf3d_extensions_get_instance_available_names(Uint32 *count);

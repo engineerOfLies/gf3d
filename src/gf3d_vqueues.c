@@ -123,6 +123,10 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     gf3d_vqueues.queue_list[VQ_Graphics].queue_family = -1;
     gf3d_vqueues.queue_list[VQ_Present].queue_family = -1;
     gf3d_vqueues.queue_list[VQ_Transfer].queue_family = -1;
+
+    gf3d_vqueues.queue_list[VQ_Graphics].queue_priority = 1/3.0;// EVEN priorities now, but this should be configurable
+    gf3d_vqueues.queue_list[VQ_Present].queue_priority = 1/3.0;
+    gf3d_vqueues.queue_list[VQ_Transfer].queue_priority = 1/3.0;
     
     gf3d_vqueues.physical_device = device;
     gf3d_vqueues.surface = surface;

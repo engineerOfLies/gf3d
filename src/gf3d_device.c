@@ -98,8 +98,7 @@ void gf3d_device_manager_init(const char *config, VkInstance instance, VkSurface
     gf3d_vqueues_init(gf3d_device_manager.chosen_gpu->device,gf3d_device_manager.renderSurface);
     
     //setup device extensions
-    gf3d_extensions_device_init(gf3d_device_manager.chosen_gpu->device);
-    gf3d_extensions_enable(ET_Device,"VK_KHR_swapchain");//TODO: from CONFIG
+    gf3d_extensions_device_init(gf3d_device_manager.chosen_gpu->device,config);
 
     gf3d_device_create_logic_device(enable_validation);
     

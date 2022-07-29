@@ -236,7 +236,7 @@ void gf3d_vgraphics_setup(
 	slog_sync();
     // instance extension configuration
     
-    gf3d_extensions_instance_init();
+    gf3d_extensions_instance_init(config);
     
 	slog_sync();
     // get the extensions that are needed for rendering to an SDL Window
@@ -331,6 +331,10 @@ void gf3d_vgraphics_setup(
     if (gf3d_vgraphics.device != VK_NULL_HANDLE)
     {
         gf3d_vgraphics.logicalDeviceCreated = true;
+    }
+    else
+    {
+        exit(0);
     }
     slog_sync();
 }
