@@ -5,6 +5,15 @@
 
 #include "gfc_types.h"
 
+typedef enum
+{
+    VQ_Graphics = 0,
+    VQ_Present,
+    VQ_Transfer,
+    VQ_MAX
+}VQ_Types;
+
+
 /**
  * @brief initialize the vulkan queues
  * @param device the device to use for setup
