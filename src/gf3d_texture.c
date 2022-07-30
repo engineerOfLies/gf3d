@@ -1,9 +1,10 @@
 #include <SDL_image.h>
 #include "simple_logger.h"
 
-#include "gf3d_texture.h"
 #include "gf3d_vgraphics.h"
+#include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
+#include "gf3d_texture.h"
 
 typedef struct
 {
@@ -232,7 +233,7 @@ Texture *gf3d_texture_load(char *filename)
     tex->height = surface->h;
     imageSize = surface->w * surface->h * 4;
     
-    gf3d_vgraphics_create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+    gf3d_buffer_create(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     
     SDL_LockSurface(surface);
         vkMapMemory(gf3d_texture.device, stagingBufferMemory, 0, imageSize, 0, &data);

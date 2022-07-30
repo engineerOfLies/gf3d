@@ -2,11 +2,12 @@
 
 #include "simple_logger.h"
 
+#include "gf3d_buffers.h"
 #include "gf3d_vgraphics.h"
-#include "gf3d_mesh.h"
 #include "gf3d_obj_load.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
+#include "gf3d_mesh.h"
 
 
 #define ATTRIBUTE_COUNT 3
@@ -197,15 +198,15 @@ void gf3d_mesh_setup_face_buffers(Mesh *mesh,Face *faces,Uint32 fcount)
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     
-    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, faces, (size_t) bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
-    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->faceBuffer, &mesh->faceBufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->faceBuffer, &mesh->faceBufferMemory);
 
-    gf3d_vgraphics_copy_buffer(stagingBuffer, mesh->faceBuffer, bufferSize);
+    gf3d_buffer_copy(stagingBuffer, mesh->faceBuffer, bufferSize);
 
     mesh->faceCount = fcount;
     vkDestroyBuffer(device, stagingBuffer, NULL);
@@ -223,15 +224,15 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
 
     bufferSize = sizeof(Vertex) * vcount;
     
-    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices, (size_t) bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
-    gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->buffer, &mesh->bufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->buffer, &mesh->bufferMemory);
 
-    gf3d_vgraphics_copy_buffer(stagingBuffer, mesh->buffer, bufferSize);
+    gf3d_buffer_copy(stagingBuffer, mesh->buffer, bufferSize);
 
     vkDestroyBuffer(device, stagingBuffer, NULL);
     vkFreeMemory(device, stagingBufferMemory, NULL);

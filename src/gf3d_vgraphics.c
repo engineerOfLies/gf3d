@@ -171,7 +171,14 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
     gf3d_pipeline_init(4);// how many different rendering pipelines we need
-    gf3d_vgraphics.model_pipe = gf3d_pipeline_basic_model_create(gf3d_vgraphics.device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
+    Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFile,VkExtent2D extent,Uint32 descriptorCount);
+
+    gf3d_vgraphics.model_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics.device,
+        "config/model_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        1024);//TODO: this from config as well
+//    gf3d_vgraphics.model_pipe = gf3d_pipeline_basic_model_create(gf3d_vgraphics.device,"shaders/vert.spv","shaders/frag.spv",gf3d_vgraphics_get_view_extent(),1024);
     gf3d_vgraphics.overlay_pipe = gf3d_pipeline_basic_sprite_create(gf3d_vgraphics.device,"shaders/sprite_vert.spv","shaders/sprite_frag.spv",gf3d_vgraphics_get_view_extent(),1024);
      
     
@@ -509,54 +516,6 @@ void gf3d_vgraphics_semaphores_create()
     }
 	else slog("created semaphores");
     atexit(gf3d_vgraphics_semaphores_close);
-}
-
-
-void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
-{
-    VkBufferCopy copyRegion = {0};
-
-    VkCommandBuffer commandBuffer = gf3d_command_begin_single_time(gf3d_vgraphics.graphicsCommandPool);
-    
-        copyRegion.size = size;
-        vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-
-    gf3d_command_end_single_time(gf3d_vgraphics.graphicsCommandPool, commandBuffer);
-    
-}
-
-int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory)
-{
-    VkBufferCreateInfo bufferInfo = {0};
-    VkMemoryRequirements memRequirements;
-    VkMemoryAllocateInfo allocInfo = {0};
-
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = size;
-    bufferInfo.usage = usage;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    if (vkCreateBuffer(gf3d_vgraphics.device, &bufferInfo, NULL, buffer) != VK_SUCCESS)
-    {
-        slog("failed to create buffer!");
-        return 0;
-    }
-
-    vkGetBufferMemoryRequirements(gf3d_vgraphics.device, *buffer, &memRequirements);
-
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = gf3d_vgraphics_find_memory_type(memRequirements.memoryTypeBits, properties);
-
-    
-    if (vkAllocateMemory(gf3d_vgraphics.device, &allocInfo, NULL, bufferMemory) != VK_SUCCESS)
-    {
-        slog("failed to allocate buffer memory!");
-        return 0;
-    }
-
-    vkBindBufferMemory(gf3d_vgraphics.device, *buffer, *bufferMemory, 0);
-    return 1;
 }
 
 uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)

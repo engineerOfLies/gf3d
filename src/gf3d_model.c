@@ -2,10 +2,11 @@
 
 #include "simple_logger.h"
 
-#include "gf3d_model.h"
+#include "gf3d_buffers.h"
 #include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_obj_load.h"
+#include "gf3d_model.h"
 
 typedef struct
 {
@@ -206,7 +207,7 @@ void gf3d_model_create_uniform_buffer(Model *model)
 
     for (i = 0; i < buffercount; i++)
     {
-        gf3d_vgraphics_create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &model->uniformBuffers[i], &model->uniformBuffersMemory[i]);
+        gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &model->uniformBuffers[i], &model->uniformBuffersMemory[i]);
     }
 }
 

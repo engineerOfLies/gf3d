@@ -1,13 +1,18 @@
 #include <string.h>
 #include <stdio.h>
-#include "simple_logger.h"
 
-#include "gf3d_pipeline.h"
+#include "simple_logger.h"
+#include "simple_json.h"
+
+#include "gf3d_config.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_shaders.h"
 #include "gf3d_model.h"
 #include "gf3d_sprite.h"
+#include "gf3d_pipeline.h"
+
+extern int __DEBUG;
 
 typedef struct
 {
@@ -22,6 +27,7 @@ void gf3d_pipeline_close();
 void gf3d_pipeline_create_basic_model_descriptor_pool(Pipeline *pipe);
 void gf3d_pipeline_create_basic_model_descriptor_set_layout(Pipeline *pipe);
 void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe);
+VkFormat gf3d_pipeline_find_depth_format();
 
 void gf3d_pipeline_init(Uint32 max_pipelines)
 {
@@ -101,6 +107,74 @@ VkFormat gf3d_pipeline_find_depth_format()
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
     );
+}
+
+int gf3d_pipeline_render_pass_create(VkDevice device,SJson *config,VkRenderPass *renderPass)
+{
+    SJson *item;
+    const char *str;
+    VkAttachmentDescription colorAttachment = {0};
+    VkAttachmentReference colorAttachmentRef = {0};
+    VkSubpassDescription subpass = {0};
+    VkRenderPassCreateInfo renderPassInfo = {0};
+    VkSubpassDependency dependency = {0};
+    VkAttachmentDescription depthAttachment = {0};
+    VkAttachmentReference depthAttachmentRef = {0};
+    VkAttachmentDescription attachments[2];
+
+    if (!config)return 0;
+    if (!renderPass)return 0;
+    
+
+    item = sj_object_get_value(config,"depthAttachment");
+    if (item)
+    {
+        depthAttachment = gf3d_config_attachment_description(item,gf3d_pipeline_find_depth_format());
+        depthAttachmentRef.attachment = 1;
+        depthAttachmentRef.layout = depthAttachment.finalLayout;
+    }
+    item = sj_object_get_value(config,"colorAttachment");
+    if (item)
+    {
+        colorAttachment = gf3d_config_attachment_description(item,gf3d_swapchain_get_format());
+        colorAttachmentRef.attachment = 0;
+        colorAttachmentRef.layout = colorAttachment.finalLayout;
+    }
+    
+    item = sj_object_get_value(config,"dependency");
+    if (item)
+    {
+        dependency = gf3d_config_subpass_dependency(item);
+    }
+    
+    item = sj_object_get_value(config,"subpass");
+    if (item)
+    {
+        str = sj_object_get_value_as_string(item,"pipelineBindPoint");
+        subpass.pipelineBindPoint = gf3d_config_pipeline_bindpoint_from_str(str);
+    }
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+    subpass.pDepthStencilAttachment = &depthAttachmentRef;
+        
+    memcpy(&attachments[0],&colorAttachment,sizeof(VkAttachmentDescription));
+    memcpy(&attachments[1],&depthAttachment,sizeof(VkAttachmentDescription));
+    
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = 2;
+    renderPassInfo.pAttachments = attachments;
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+    renderPassInfo.dependencyCount = 1;
+    renderPassInfo.pDependencies = &dependency;
+    
+    if (vkCreateRenderPass(device, &renderPassInfo, NULL, renderPass) != VK_SUCCESS)
+    {
+        slog("failed to create render pass!");
+        return 0;
+    }
+    if (__DEBUG)slog("created renderpass for pipeline");
+    return 1;
 }
 
 void gf3d_pipeline_render_pass_setup(Pipeline *pipe)
@@ -233,9 +307,12 @@ void gf3d_pipeline_sprite_render_pass_setup(Pipeline *pipe)
     }
 }
 
-Pipeline *gf3d_pipeline_basic_model_create(VkDevice device,char *vertFile,char *fragFile,VkExtent2D extent,Uint32 descriptorCount)
+Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFile,VkExtent2D extent,Uint32 descriptorCount)
 {
+    SJson *config,*file, *item;
     Pipeline *pipe;
+    const char *vertFile = NULL;
+    const char *fragFile = NULL;
     VkRect2D scissor = {0};
     VkViewport viewport = {0};
     VkGraphicsPipelineCreateInfo pipelineInfo = {0};
@@ -252,18 +329,70 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device,char *vertFile,char *
     VkPipelineColorBlendStateCreateInfo colorBlending = {0};
     VkPipelineDepthStencilStateCreateInfo depthStencil = {0};
     
-    pipe = gf3d_pipeline_new();
-    if (!pipe)return NULL;
-
-    pipe->vertShader = gf3d_shaders_load_data(vertFile,&pipe->vertSize);
-    pipe->fragShader = gf3d_shaders_load_data(fragFile,&pipe->fragSize);
+    if (!configFile)return NULL;
+    file = sj_load(configFile);
+    if (!file)
+    {
+        slog("failed to load config file for pipeline");
+        return NULL;
+    }
+    config = sj_object_get_value(file,"pipeline");
+    if (!config)
+    {
+        slog("failed to load config file for pipeline, missing pipeline object");
+        sj_free(file);
+        return NULL;
+    }
     
-    pipe->vertModule = gf3d_shaders_create_module(pipe->vertShader,pipe->vertSize,device);
-    pipe->fragModule = gf3d_shaders_create_module(pipe->fragShader,pipe->fragSize,device);
+    pipe = gf3d_pipeline_new();
+    if (!pipe)
+    {
+        slog("failed to get memory for a new pipeline");
+        sj_free(file);
+        return NULL;
+    }
+
+    vertFile = sj_object_get_value_as_string(config,"vertex_shader");
+    if (vertFile)
+    {
+        pipe->vertShader = (char *)gf3d_shaders_load_data(vertFile,&pipe->vertSize);
+        pipe->vertModule = gf3d_shaders_create_module(pipe->vertShader,pipe->vertSize,device);
+        vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+        vertShaderStageInfo.module = pipe->vertModule;
+        vertShaderStageInfo.pName = "main";
+        shaderStages[0] = vertShaderStageInfo;
+    }
+    else
+    {
+        slog("no vertex_shader provided");
+        sj_free(file);
+        gf3d_pipeline_free(pipe);
+        return NULL;
+    }
+    fragFile = sj_object_get_value_as_string(config,"fragment_shader");
+    if (fragFile)
+    {
+        pipe->fragShader = (char *)gf3d_shaders_load_data(fragFile,&pipe->fragSize);
+        pipe->fragModule = gf3d_shaders_create_module(pipe->fragShader,pipe->fragSize,device);
+        fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragShaderStageInfo.module = pipe->fragModule;
+        fragShaderStageInfo.pName = "main";
+        shaderStages[1] = fragShaderStageInfo;
+    }
+    else
+    {
+        slog("no vertex_shader provided");
+        sj_free(file);
+        gf3d_pipeline_free(pipe);
+        return NULL;
+    }
 
     pipe->device = device;
     pipe->descriptorSetCount = descriptorCount;
     
+    //TODO: from config:
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depthStencil.depthTestEnable = VK_TRUE;
     depthStencil.depthWriteEnable = VK_TRUE;
@@ -272,19 +401,6 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device,char *vertFile,char *
     depthStencil.minDepthBounds = 0.0f; // Optional
     depthStencil.maxDepthBounds = 1.0f; // Optional
     depthStencil.stencilTestEnable = VK_FALSE;
-
-    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = pipe->vertModule;
-    vertShaderStageInfo.pName = "main";
-    
-    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = pipe->fragModule;
-    fragShaderStageInfo.pName = "main";
-    
-    shaderStages[0] = vertShaderStageInfo;
-    shaderStages[1] = fragShaderStageInfo;
     
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
@@ -354,21 +470,38 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device,char *vertFile,char *
     colorBlending.blendConstants[2] = 0.0f; // Optional
     colorBlending.blendConstants[3] = 0.0f; // Optional
     
+    //NOTE: Really gonna have to look closer at these to see how they can be driven from config, or passed the
+    // the information needed to make this work generically
     gf3d_pipeline_create_basic_model_descriptor_pool(pipe);
     gf3d_pipeline_create_basic_model_descriptor_set_layout(pipe);
     gf3d_pipeline_create_descriptor_sets(pipe);
     
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1; // Optional
-    pipelineLayoutInfo.pSetLayouts = &pipe->descriptorSetLayout; // Optional
+    pipelineLayoutInfo.pSetLayouts = &pipe->descriptorSetLayout; // Optional 
     pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
     pipelineLayoutInfo.pPushConstantRanges = NULL; // Optional
 
-    gf3d_pipeline_render_pass_setup(pipe);
+    item = sj_object_get_value(config,"renderPass");
+    if (!item)
+    {
+        slog("failed to create pipeline layout!");
+        sj_free(file);
+        gf3d_pipeline_free(pipe);
+        return NULL;
+    }
+    if (!gf3d_pipeline_render_pass_create(device,item,&pipe->renderPass))
+    {
+        slog("failed to create pipeline layout!");
+        sj_free(file);
+        gf3d_pipeline_free(pipe);
+        return NULL;
+    }
     
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, NULL, &pipe->pipelineLayout) != VK_SUCCESS)
     {
         slog("failed to create pipeline layout!");
+        sj_free(file);
         gf3d_pipeline_free(pipe);
         return NULL;
     }
@@ -391,16 +524,19 @@ Pipeline *gf3d_pipeline_basic_model_create(VkDevice device,char *vertFile,char *
     pipelineInfo.basePipelineIndex = -1; // Optional
     pipelineInfo.pDepthStencilState = &depthStencil;
     
+    sj_free(file);
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipe->pipeline) != VK_SUCCESS)
     {   
-        slog("failed to create graphics pipeline!");
+        slog("failed to create pipeline!");
+        
         gf3d_pipeline_free(pipe);
         return NULL;
     }
+    if (__DEBUG)slog("pipeline created from file '%s'",configFile);
     return pipe;
 }
 
-Pipeline *gf3d_pipeline_basic_sprite_create(VkDevice device,char *vertFile,char *fragFile,VkExtent2D extent,Uint32 descriptorCount)
+Pipeline *gf3d_pipeline_basic_sprite_create(VkDevice device,const char *vertFile,const char *fragFile,VkExtent2D extent,Uint32 descriptorCount)
 {
     Pipeline *pipe;
     VkRect2D scissor = {0};

@@ -60,11 +60,12 @@ VkExtent2D gf3d_vgraphics_get_view_extent();
 
 void gf3d_vgraphics_clear();
 
-
-int gf3d_vgraphics_create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer * buffer, VkDeviceMemory * bufferMemory);
-
-void gf3d_vgraphics_copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
+/**
+ * @brief check if the device supports memory of the given types
+ * @param typefilter a search critera
+ * @param properties more search critera
+ * @return 0 if there is no matching memory type supported, the memory type index otherwise
+ */
 uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 void gf3d_vgraphics_rotate_camera(float degrees);

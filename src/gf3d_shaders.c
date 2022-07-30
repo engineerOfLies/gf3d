@@ -5,7 +5,7 @@
 #include "gf3d_shaders.h"
 
 
-VkShaderModule gf3d_shaders_create_module(char *shader,size_t size,VkDevice device)
+VkShaderModule gf3d_shaders_create_module(const char *shader,size_t size,VkDevice device)
 {
     VkShaderModule module = {0};
     VkShaderModuleCreateInfo createInfo = {0};
@@ -21,7 +21,7 @@ VkShaderModule gf3d_shaders_create_module(char *shader,size_t size,VkDevice devi
     return module;
 }
 
-char *gf3d_shaders_load_data(char * filename,size_t *rsize)
+char *gf3d_shaders_load_data(const char * filename,size_t *rsize)
 {
     char *buffer = NULL;
     FILE *file;
