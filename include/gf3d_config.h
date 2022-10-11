@@ -6,6 +6,13 @@
 
 
 /**
+ * @brief parse a VkDescriptorType from a str
+ * @param str the string to parse
+ * @return 0 on error or the VkDescriptorType, note zero is also a valid response
+ */
+VkDescriptorType gf3d_config_descriptor_type_from_str(const char *str);
+
+/**
  * @brief parse a VkPipelineBindPoint from a str
  * @param str the string to parse
  * @return 0 on error or the VkPipelineBindPoint

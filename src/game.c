@@ -57,7 +57,7 @@ int main(int argc,char *argv[])
     
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(0,0,20));
+    //player_new(vector3d(0,0,20));
     
     // main game loop
     slog("gf3d main loop begin");
@@ -70,7 +70,12 @@ int main(int argc,char *argv[])
         if (mouseFrame >= 16)mouseFrame = 0;
         entity_think_all();
         entity_update_all();
-        gf3d_camera_update_view();
+//        gf3d_camera_update_view();
+        gf3d_camera_look_at(
+            vector3d(0,100,100),
+            vector3d(0,0,0),
+            vector3d(0,0,1)
+        );
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
 
         // configure render command for graphics command pool

@@ -8,6 +8,82 @@
 extern int __DEBUG;
 
 
+VkDescriptorSetLayoutCreateInfo gf3d_config_descriptors_layout(SJson *config)
+{
+    VkDescriptorSetLayoutCreateInfo layoutInfo = {0};
+    VkDescriptorSetLayoutBinding uboLayoutBinding = {0};
+    VkDescriptorSetLayoutBinding samplerLayoutBinding = {0};
+    
+    VkDescriptorSetLayoutBinding bindings[2];//TODO figure this out
+    
+    samplerLayoutBinding.binding = 1;
+    samplerLayoutBinding.descriptorCount = 1;
+    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    samplerLayoutBinding.pImmutableSamplers = NULL;
+    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    
+    memcpy(&bindings[1],&samplerLayoutBinding,sizeof(VkDescriptorSetLayoutBinding));
+
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = NULL; // Optional
+
+    memcpy(&bindings[0],&uboLayoutBinding,sizeof(VkDescriptorSetLayoutBinding));
+
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 2;
+    layoutInfo.pBindings = bindings;
+
+}
+
+VkDescriptorType gf3d_config_descriptor_type_from_str(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_SAMPLER")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_SAMPLER;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_STORAGE_IMAGE")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_STORAGE_BUFFER")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    }
+    if (strcmp(str,"VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT")==0)
+    {
+        return VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+    }
+    return 0;
+}   
+
 VkPipelineBindPoint gf3d_config_pipeline_bindpoint_from_str(const char *str)
 {
     if (!str)return 0;
