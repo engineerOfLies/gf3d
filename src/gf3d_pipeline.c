@@ -307,9 +307,42 @@ void gf3d_pipeline_sprite_render_pass_setup(Pipeline *pipe)
     }
 }
 
+int gf3d_pipelin_depth_stencil_create_info_from_json(SJson *json,VkPipelineDepthStencilStateCreateInfo *depthStencil)
+{
+    short int b = VK_FALSE;
+    float f = 0;
+    if ((!json)|| (!depthStencil))return 0;
+    depthStencil->sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil->pNext = NULL;
+#if defined(VkPipelineDepthStencilStateCreateFlagBits)
+    depthStencil->flags = gf3d_config_depth_stencil_create_flags(sj_object_get_value(json,"flags"));
+#endif
+    b = VK_FALSE;
+    sj_get_bool_value(sj_object_get_value(json,"depthTestEnable"),&b);
+    depthStencil->depthTestEnable = b;
+    b = VK_FALSE;
+    sj_get_bool_value(sj_object_get_value(json,"depthWriteEnable"),&b);
+    depthStencil->depthWriteEnable = b;
+    depthStencil->depthCompareOp = gf3d_config_compar_op_flag_from_str(sj_object_get_value_as_string(json,"depthCompareOp"));
+    b = VK_FALSE;
+    sj_get_bool_value(sj_object_get_value(json,"depthBoundsTestEnable"),&b);
+    depthStencil->depthBoundsTestEnable = b;
+    b = VK_FALSE;
+    sj_get_bool_value(sj_object_get_value(json,"stencilTestEnable"),&b);
+    depthStencil->stencilTestEnable = b;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(json,"minDepthBounds"),&f);
+    depthStencil->minDepthBounds = f;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(json,"maxDepthBounds"),&f);
+    depthStencil->maxDepthBounds = f;
+    return 1;
+}
+
 Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFile,VkExtent2D extent,Uint32 descriptorCount)
 {
     SJson *config,*file, *item;
+    const char *str;
     Pipeline *pipe;
     const char *vertFile = NULL;
     const char *fragFile = NULL;
@@ -392,25 +425,18 @@ Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFil
     pipe->device = device;
     pipe->descriptorSetCount = descriptorCount;
     
-    //TODO: from config:
-    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depthStencil.depthTestEnable = VK_TRUE;
-    depthStencil.depthWriteEnable = VK_TRUE;
-    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;    
-    depthStencil.depthBoundsTestEnable = VK_FALSE;
-    depthStencil.minDepthBounds = 0.0f; // Optional
-    depthStencil.maxDepthBounds = 1.0f; // Optional
-    depthStencil.stencilTestEnable = VK_FALSE;
+    gf3d_pipelin_depth_stencil_create_info_from_json(sj_object_get_value(config,"depthStencil"),&depthStencil);
+    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    str = sj_get_string_value(sj_object_get_value(config,"topology"));
+    inputAssembly.topology = gf3d_config_primitive_topology_from_str(str);
+    inputAssembly.primitiveRestartEnable = VK_FALSE;
     
+    //TODO: from config:
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
     vertexInputInfo.pVertexBindingDescriptions = gf3d_mesh_get_bind_description(); // Optional
     vertexInputInfo.pVertexAttributeDescriptions = gf3d_mesh_get_attribute_descriptions(&vertexInputInfo.vertexAttributeDescriptionCount); // Optional    
 
-    // TODO: pull all this information from config file
-    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
     
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -429,6 +455,8 @@ Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFil
     viewportState.scissorCount = 1;
     viewportState.pScissors = &scissor;
     
+    rasterizer = gf3d_config_pipline_rasterization_state_create_info(sj_object_get_value(config,"rasterizer"));
+    /*
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
@@ -441,7 +469,7 @@ Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFil
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f; // Optional
     rasterizer.depthBiasClamp = 0.0f; // Optional
-    rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
+    rasterizer.depthBiasSlopeFactor = 0.0f; // Optional*/
 
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_FALSE;

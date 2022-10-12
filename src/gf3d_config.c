@@ -7,36 +7,79 @@
 
 extern int __DEBUG;
 
-
-VkDescriptorSetLayoutCreateInfo gf3d_config_descriptors_layout(SJson *config)
+VkCompareOp gf3d_config_compar_op_flag_from_str(const char *str)
 {
-    VkDescriptorSetLayoutCreateInfo layoutInfo = {0};
-    VkDescriptorSetLayoutBinding uboLayoutBinding = {0};
-    VkDescriptorSetLayoutBinding samplerLayoutBinding = {0};
-    
-    VkDescriptorSetLayoutBinding bindings[2];//TODO figure this out
-    
-    samplerLayoutBinding.binding = 1;
-    samplerLayoutBinding.descriptorCount = 1;
-    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerLayoutBinding.pImmutableSamplers = NULL;
-    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    
-    memcpy(&bindings[1],&samplerLayoutBinding,sizeof(VkDescriptorSetLayoutBinding));
-
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    uboLayoutBinding.descriptorCount = 1;
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    uboLayoutBinding.pImmutableSamplers = NULL; // Optional
-
-    memcpy(&bindings[0],&uboLayoutBinding,sizeof(VkDescriptorSetLayoutBinding));
-
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = 2;
-    layoutInfo.pBindings = bindings;
-
+    if (!str)return VK_COMPARE_OP_NEVER;
+    if (strcmp(str,"VK_COMPARE_OP_NEVER")==0)return VK_COMPARE_OP_NEVER;
+    if (strcmp(str,"VK_COMPARE_OP_LESS")==0)return VK_COMPARE_OP_LESS;
+    if (strcmp(str,"VK_COMPARE_OP_EQUAL")==0)return VK_COMPARE_OP_EQUAL;
+    if (strcmp(str,"VK_COMPARE_OP_LESS_OR_EQUAL")==0)return VK_COMPARE_OP_LESS_OR_EQUAL;
+    if (strcmp(str,"VK_COMPARE_OP_GREATER")==0)return VK_COMPARE_OP_GREATER;
+    if (strcmp(str,"VK_COMPARE_OP_NOT_EQUAL")==0)return VK_COMPARE_OP_NOT_EQUAL;
+    if (strcmp(str,"VK_COMPARE_OP_GREATER_OR_EQUAL")==0)return VK_COMPARE_OP_GREATER_OR_EQUAL;
+    if (strcmp(str,"VK_COMPARE_OP_ALWAYS")==0)return VK_COMPARE_OP_ALWAYS;
+    return VK_COMPARE_OP_NEVER;
 }
+
+
+VkPrimitiveTopology gf3d_config_primitive_topology_from_str(const char *str)
+{
+    if (!str)
+    {
+        slog("not topology data provided");
+        return 0;
+    }
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_POINT_LIST")==0)return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;        
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_LINE_LIST")==0)return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_LINE_STRIP")==0)return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST")==0)return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP")==0)return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN")==0)return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY")==0)return VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY")==0)return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY")==0)return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY")==0)return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
+    if (strcmp(str,"VK_PRIMITIVE_TOPOLOGY_PATCH_LIST")==0)return VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
+    return 0;
+}
+
+#if defined (VkPipelineDepthStencilStateCreateFlagBits)
+
+VkPipelineDepthStencilStateCreateFlagBits gf3d_config_depth_stencil_create_flags(SJson *flags)
+{
+    int i,c;
+    const char *flag;
+    VkPipelineDepthStencilStateCreateFlagBits bits = 0;
+    if (!flags)return 0;
+    c = sj_array_get_count(flags);
+    for (i = 0;i < c;i++)
+    {
+        flag = sj_array_get_nth_as_string(flags,i);
+        if (!flag)continue;
+        bits |= gf3d_config_depth_stencil_create_flag_from_str(flag);
+    }
+    return bits;
+}
+
+VkPipelineDepthStencilStateCreateFlagBits gf3d_config_depth_stencil_create_flag_from_str(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_EXT")==0)
+    {
+        return VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_EXT;
+    }
+    if (strcmp(str,"VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_STENCIL_ACCESS_BIT_EXT")==0)
+    {
+        return VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_STENCIL_ACCESS_BIT_EXT;
+    }
+    if (strcmp(str,"VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_ARM")==0)
+    {
+        return VK_PIPELINE_DEPTH_STENCIL_STATE_CREATE_RASTERIZATION_ORDER_ATTACHMENT_DEPTH_ACCESS_BIT_ARM;
+    }
+    return 0;
+}
+
+#endif
 
 VkDescriptorType gf3d_config_descriptor_type_from_str(const char *str)
 {
@@ -560,4 +603,87 @@ VkAttachmentDescription gf3d_config_attachment_description(SJson *config,VkForma
     return data;
 }
 
+VkPolygonMode gf3d_config_parse_polygon_mode(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_POLYGON_MODE_FILL")==0)return VK_POLYGON_MODE_FILL;
+    if (strcmp(str,"VK_POLYGON_MODE_LINE")==0)return VK_POLYGON_MODE_LINE;
+    if (strcmp(str,"VK_POLYGON_MODE_POINT")==0)return VK_POLYGON_MODE_POINT;
+#if defined(VK_POLYGON_MODE_FILL_RECTANGLE_NV)
+    if (strcmp(str,"VK_POLYGON_MODE_FILL_RECTANGLE_NV")==0)return VK_POLYGON_MODE_FILL_RECTANGLE_NV;
+#endif
+    return 0;
+}
+
+VkCullModeFlags gf3d_config_parse_cull_mode(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_CULL_MODE_NONE")==0)return VK_CULL_MODE_NONE;
+    if (strcmp(str,"VK_CULL_MODE_FRONT_BIT")==0)return VK_CULL_MODE_FRONT_BIT;
+    if (strcmp(str,"VK_CULL_MODE_BACK_BIT")==0)return VK_CULL_MODE_BACK_BIT;
+    if (strcmp(str,"VK_CULL_MODE_FRONT_AND_BACK")==0)return VK_CULL_MODE_FRONT_AND_BACK;
+    return 0;
+}
+
+VkFrontFace gf3d_config_parse_front_face(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_FRONT_FACE_COUNTER_CLOCKWISE")==0)return VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    if (strcmp(str,"VK_FRONT_FACE_CLOCKWISE")==0)return VK_FRONT_FACE_CLOCKWISE;
+    return 0;
+}
+
+VkPipelineRasterizationStateCreateInfo gf3d_config_pipline_rasterization_state_create_info(SJson *config)
+{
+    short int b;
+    float f;
+    VkPipelineRasterizationStateCreateInfo rasterizer = {0};
+    
+    if (!config)return rasterizer;
+    
+    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer.pNext = NULL;
+    //rasterizer.flags;  FUTURE USE
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"depthClampEnable"),&b);
+    rasterizer.depthClampEnable = b;
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"rasterizerDiscardEnable"),&b);
+    rasterizer.rasterizerDiscardEnable = b;
+    rasterizer.polygonMode = gf3d_config_parse_polygon_mode(sj_object_get_value_as_string(config,"polygonMode"));
+    rasterizer.cullMode = gf3d_config_parse_cull_mode(sj_object_get_value_as_string(config,"cullMode"));
+    rasterizer.frontFace = gf3d_config_parse_front_face(sj_object_get_value_as_string(config,"frontFace"));
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"depthBiasEnable"),&b);
+    rasterizer.depthBiasEnable = b;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(config,"depthBiasConstantFactor"),&f);
+    rasterizer.depthBiasConstantFactor = f;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(config,"depthBiasClamp"),&f);
+    rasterizer.depthBiasClamp = f;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(config,"depthBiasSlopeFactor"),&f);
+    rasterizer.depthBiasSlopeFactor = f;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(config,"lineWidth"),&f);
+    rasterizer.lineWidth = f;
+    
+/*
+    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer.depthClampEnable = VK_FALSE;
+    rasterizer.rasterizerDiscardEnable = VK_FALSE;
+    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.lineWidth = 1.0f;
+//    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+//    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rasterizer.depthBiasEnable = VK_FALSE;
+    rasterizer.depthBiasConstantFactor = 0.0f; // Optional
+    rasterizer.depthBiasClamp = 0.0f; // Optional
+    rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
+    */
+    return rasterizer;
+}
 /*eol@eof*/
