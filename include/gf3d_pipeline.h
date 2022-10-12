@@ -55,9 +55,19 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,const char *vertFile,const
  * @param configFile the filepath to the config file
  * @param extent the screen resolution this pipeline will be working towards
  * @param descriptorCount the number of concurrent descriptSets to be suppert per command, ie: how many models you want to support for a draw call  This should be based on maximum number of supported entities or graphic assets
+ * @param vertexInputDescription the vertex input description to use
+ * @param vertextInputAttributeDescriptions list of how the attributes are described
+ * @param vertexAttributeCount how many of the above are provided in the list
  * @returns NULL on error (see logs) or a pointer to a pipeline
 */
-Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFile,VkExtent2D extent,Uint32 descriptorCount);
+Pipeline *gf3d_pipeline_create_from_config(
+    VkDevice device,
+    const char *configFile,
+    VkExtent2D extent,
+    Uint32 descriptorCount,
+    const VkVertexInputBindingDescription* vertexInputDescription,
+    VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
+    Uint32 vertexAttributeCount);
 
 /**
  * @brief setup a pipeline for rendering a basic sprite

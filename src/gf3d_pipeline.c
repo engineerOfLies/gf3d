@@ -339,7 +339,14 @@ int gf3d_pipelin_depth_stencil_create_info_from_json(SJson *json,VkPipelineDepth
     return 1;
 }
 
-Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFile,VkExtent2D extent,Uint32 descriptorCount)
+Pipeline *gf3d_pipeline_create_from_config(
+    VkDevice device,
+    const char *configFile,
+    VkExtent2D extent,
+    Uint32 descriptorCount,
+    const VkVertexInputBindingDescription* vertexInputDescription,
+    VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
+    Uint32 vertexAttributeCount)
 {
     SJson *config,*file, *item;
     const char *str;
@@ -362,6 +369,11 @@ Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFil
     VkPipelineColorBlendStateCreateInfo colorBlending = {0};
     VkPipelineDepthStencilStateCreateInfo depthStencil = {0};
     
+    if (!vertexInputDescription)
+    {
+        slog("must provide vertexInputDescription to create the pipeline");
+        return NULL;
+    }
     if (!configFile)return NULL;
     file = sj_load(configFile);
     if (!file)
@@ -434,9 +446,9 @@ Pipeline *gf3d_pipeline_create_from_config(VkDevice device,const char *configFil
     //TODO: from config:
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.pVertexBindingDescriptions = gf3d_mesh_get_bind_description(); // Optional
-    vertexInputInfo.pVertexAttributeDescriptions = gf3d_mesh_get_attribute_descriptions(&vertexInputInfo.vertexAttributeDescriptionCount); // Optional    
-
+    vertexInputInfo.pVertexBindingDescriptions = vertexInputDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = vertextInputAttributeDescriptions;
+    vertexInputInfo.vertexAttributeDescriptionCount = vertexAttributeCount;
     
     viewport.x = 0.0f;
     viewport.y = 0.0f;
