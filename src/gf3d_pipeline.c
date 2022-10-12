@@ -345,7 +345,7 @@ Pipeline *gf3d_pipeline_create_from_config(
     VkExtent2D extent,
     Uint32 descriptorCount,
     const VkVertexInputBindingDescription* vertexInputDescription,
-    VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
+    const VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
     Uint32 vertexAttributeCount)
 {
     SJson *config,*file, *item;

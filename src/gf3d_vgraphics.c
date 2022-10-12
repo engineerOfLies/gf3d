@@ -106,7 +106,6 @@ void gf3d_vgraphics_init(const char *config)
     short int fullscreen = 0;
     short int enableValidation = 0;
     short int enableDebug = 0;
-    Uint32 count = 1;
    
     json = sj_load(config);
     if (!json)
@@ -171,17 +170,17 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
-    gf3d_pipeline_init(4);// how many different rendering pipelines we need
+    gf3d_pipeline_init(8);// how many different rendering pipelines we need
 
-    count = 1;
     gf3d_vgraphics.model_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics.device,
         "config/model_pipeline.cfg",
         gf3d_vgraphics_get_view_extent(),
         1024,
         gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(&count),
-        1);//TODO: this from config as well
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        1);
+    
     gf3d_vgraphics.overlay_pipe = gf3d_pipeline_basic_sprite_create(gf3d_vgraphics.device,"shaders/sprite_vert.spv","shaders/sprite_frag.spv",gf3d_vgraphics_get_view_extent(),1024);
      
     
