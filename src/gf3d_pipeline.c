@@ -443,12 +443,12 @@ Pipeline *gf3d_pipeline_create_from_config(
     inputAssembly.topology = gf3d_config_primitive_topology_from_str(str);
     inputAssembly.primitiveRestartEnable = VK_FALSE;
     
-    //TODO: from config:
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
     vertexInputInfo.pVertexBindingDescriptions = vertexInputDescription;
-    vertexInputInfo.pVertexAttributeDescriptions = vertextInputAttributeDescriptions;
     vertexInputInfo.vertexAttributeDescriptionCount = vertexAttributeCount;
+    vertexInputInfo.pVertexAttributeDescriptions = vertextInputAttributeDescriptions;
+
     
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -469,23 +469,10 @@ Pipeline *gf3d_pipeline_create_from_config(
     
     rasterizer = gf3d_config_pipline_rasterization_state_create_info(sj_object_get_value(config,"rasterizer"));
 
+    multisampling = gf3d_config_pipline_multisample_state_create_info(sj_object_get_value(config,"multisampling"));
 
-    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-    multisampling.minSampleShading = 1.0f; // Optional
-    multisampling.pSampleMask = NULL; // Optional
-    multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
-    multisampling.alphaToOneEnable = VK_FALSE; // Optional
+    colorBlendAttachment = gf3d_config_pipeline_color_blend_attachment(sj_object_get_value(config,"colorBlendAttachment"));
 
-    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    colorBlendAttachment.blendEnable = VK_TRUE;
-    colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-    colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
     
     colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     colorBlending.logicOpEnable = VK_FALSE;

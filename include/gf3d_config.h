@@ -115,5 +115,18 @@ VkPrimitiveTopology gf3d_config_primitive_topology_from_str(const char *str);
  */
 VkPipelineRasterizationStateCreateInfo gf3d_config_pipline_rasterization_state_create_info(SJson *config);
 
+/**
+ * @brief extract VkPipelineMultisampleStateCreateInfo info from a json config
+ * @param config the json containing description information
+ * @return an empty struct on error or configured otherwise
+ */
+VkPipelineMultisampleStateCreateInfo gf3d_config_pipline_multisample_state_create_info(SJson *config);
+
+/**
+ * @brief extract VkPipelineColorBlendAttachmentState info from a json config
+ * @param config the json containing description information
+ * @return an empty struct on error or configured otherwise
+ */
+VkPipelineColorBlendAttachmentState gf3d_config_pipeline_color_blend_attachment(SJson *config);
 
 #endif

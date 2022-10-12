@@ -463,6 +463,19 @@ VkImageLayout gf3d_config_image_layer_from_str(const char *str)
     return VK_IMAGE_LAYOUT_UNDEFINED;
 }
 
+VkSampleCountFlagBits gf3d_config_parse_sample_count_bits(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_SAMPLE_COUNT_1_BIT")==0)return VK_SAMPLE_COUNT_1_BIT;
+    if (strcmp(str,"VK_SAMPLE_COUNT_2_BIT")==0)return VK_SAMPLE_COUNT_2_BIT;
+    if (strcmp(str,"VK_SAMPLE_COUNT_4_BIT")==0)return VK_SAMPLE_COUNT_4_BIT;
+    if (strcmp(str,"VK_SAMPLE_COUNT_8_BIT")==0)return VK_SAMPLE_COUNT_8_BIT;
+    if (strcmp(str,"VK_SAMPLE_COUNT_16_BIT")==0)return VK_SAMPLE_COUNT_16_BIT;
+    if (strcmp(str,"VK_SAMPLE_COUNT_32_BIT")==0)return VK_SAMPLE_COUNT_32_BIT;
+    if (strcmp(str,"VK_SAMPLE_COUNT_64_BIT")==0)return VK_SAMPLE_COUNT_64_BIT;
+    return 0;
+}
+
 VkAttachmentDescription gf3d_config_attachment_description(SJson *config,VkFormat format)
 {
     int i,c;
@@ -498,34 +511,7 @@ VkAttachmentDescription gf3d_config_attachment_description(SJson *config,VkForma
     str = sj_object_get_value_as_string(config,"samples");
     if (str)
     {
-        if (strcmp(str,"VK_SAMPLE_COUNT_1_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_1_BIT;
-        }
-        else if (strcmp(str,"VK_SAMPLE_COUNT_2_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_2_BIT;
-        }
-        else if (strcmp(str,"VK_SAMPLE_COUNT_4_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_4_BIT;
-        }
-        else if (strcmp(str,"VK_SAMPLE_COUNT_8_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_8_BIT;
-        }
-        else if (strcmp(str,"VK_SAMPLE_COUNT_16_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_16_BIT;
-        }
-        else if (strcmp(str,"VK_SAMPLE_COUNT_32_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_32_BIT;
-        }
-        else if (strcmp(str,"VK_SAMPLE_COUNT_64_BIT")==0)
-        {
-            data.samples = VK_SAMPLE_COUNT_64_BIT;
-        }
+        data.samples = gf3d_config_parse_sample_count_bits(str);
         if (__DEBUG)slog("VkAttachmentDescription samples: %i",data.samples);
     }
     str = sj_object_get_value_as_string(config,"loadOp");
@@ -668,22 +654,109 @@ VkPipelineRasterizationStateCreateInfo gf3d_config_pipline_rasterization_state_c
     f = 0;
     sj_get_float_value(sj_object_get_value(config,"lineWidth"),&f);
     rasterizer.lineWidth = f;
-    
-/*
-    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_FALSE;
-    rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-    rasterizer.lineWidth = 1.0f;
-//    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-//    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    rasterizer.depthBiasEnable = VK_FALSE;
-    rasterizer.depthBiasConstantFactor = 0.0f; // Optional
-    rasterizer.depthBiasClamp = 0.0f; // Optional
-    rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
-    */
     return rasterizer;
+}
+
+VkPipelineMultisampleStateCreateInfo gf3d_config_pipline_multisample_state_create_info(SJson *config)
+{
+    VkPipelineMultisampleStateCreateInfo multisampling = {0};
+    short int b;
+    float f;
+    if (!config)return multisampling;
+    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+
+    multisampling.rasterizationSamples = gf3d_config_parse_sample_count_bits(sj_object_get_value_as_string(config,"rasterizationSamples"));
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"sampleShadingEnable"),&b);
+    multisampling.sampleShadingEnable = b;
+    f = 0;
+    sj_get_float_value(sj_object_get_value(config,"minSampleShading"),&f);
+    multisampling.minSampleShading = f;
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"alphaToCoverageEnable"),&b);
+    multisampling.alphaToCoverageEnable = b;
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"alphaToOneEnable"),&b);
+    multisampling.alphaToOneEnable = b;
+    return multisampling;
+}
+
+VkColorComponentFlagBits gf3d_config_parse_color_component_flag_bits(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_COLOR_COMPONENT_R_BIT")==0)return VK_COLOR_COMPONENT_R_BIT;
+    if (strcmp(str,"VK_COLOR_COMPONENT_G_BIT")==0)return VK_COLOR_COMPONENT_G_BIT;
+    if (strcmp(str,"VK_COLOR_COMPONENT_B_BIT")==0)return VK_COLOR_COMPONENT_B_BIT;
+    if (strcmp(str,"VK_COLOR_COMPONENT_A_BIT")==0)return VK_COLOR_COMPONENT_A_BIT;
+    return 0;
+}
+
+VkColorComponentFlagBits gf3d_config_color_component_flag_bits(SJson *array)
+{
+    const char *str;
+    int i,c;
+    VkColorComponentFlagBits bits = 0;
+    if (!array)return 0;
+    c = sj_array_get_count(array);
+    for (i =0; i < c;i++)
+    {
+        str = sj_get_string_value(sj_array_get_nth(array,i));
+        if (!str)continue;
+        bits |= gf3d_config_parse_color_component_flag_bits(str);
+    }
+    return bits;
+}
+
+VkBlendFactor gf3d_config_parse_blend_factor(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_BLEND_FACTOR_ZERO")==0)return VK_BLEND_FACTOR_ZERO;
+    if (strcmp(str,"VK_BLEND_FACTOR_SRC_COLOR")==0)return VK_BLEND_FACTOR_SRC_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR")==0)return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_DST_COLOR")==0)return VK_BLEND_FACTOR_DST_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR")==0)return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_SRC_ALPHA")==0)return VK_BLEND_FACTOR_SRC_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA")==0)return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_DST_ALPHA")==0)return VK_BLEND_FACTOR_DST_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA")==0)return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_CONSTANT_COLOR")==0)return VK_BLEND_FACTOR_CONSTANT_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR")==0)return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_CONSTANT_ALPHA")==0)return VK_BLEND_FACTOR_CONSTANT_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA")==0)return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_SRC_ALPHA_SATURATE")==0)return VK_BLEND_FACTOR_SRC_ALPHA_SATURATE;
+    if (strcmp(str,"VK_BLEND_FACTOR_SRC1_COLOR")==0)return VK_BLEND_FACTOR_SRC1_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR")==0)return VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR;
+    if (strcmp(str,"VK_BLEND_FACTOR_SRC1_ALPHA")==0)return VK_BLEND_FACTOR_SRC1_ALPHA;
+    if (strcmp(str,"VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA")==0)return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
+    return 0;
+}
+
+VkBlendOp gf3d_config_parse_blend_op(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_BLEND_OP_ADD")==0)return VK_BLEND_OP_ADD;
+    if (strcmp(str,"VK_BLEND_OP_SUBTRACT")==0)return VK_BLEND_OP_SUBTRACT;
+    if (strcmp(str,"VK_BLEND_OP_MIN")==0)return VK_BLEND_OP_MIN;
+    if (strcmp(str,"VK_BLEND_OP_MAX")==0)return VK_BLEND_OP_MAX;
+    //NOTE there are a TON more, but only through extentions
+    return 0;
+}
+
+VkPipelineColorBlendAttachmentState gf3d_config_pipeline_color_blend_attachment(SJson *config)
+{
+    short int b;
+    VkPipelineColorBlendAttachmentState colorBlendAttachment = {0};
+    if (!config)return colorBlendAttachment;
+    
+    colorBlendAttachment.colorWriteMask = gf3d_config_color_component_flag_bits(sj_object_get_value(config,"colorWriteMask"));
+    b = 0;
+    sj_get_bool_value(sj_object_get_value(config,"blendEnable"),&b);
+    colorBlendAttachment.blendEnable = b;
+    colorBlendAttachment.srcColorBlendFactor = gf3d_config_parse_blend_factor(sj_object_get_value_as_string(config,"srcColorBlendFactor"));
+    colorBlendAttachment.dstColorBlendFactor = gf3d_config_parse_blend_factor(sj_object_get_value_as_string(config,"dstColorBlendFactor"));
+    colorBlendAttachment.colorBlendOp = gf3d_config_parse_blend_op(sj_object_get_value_as_string(config,"colorBlendOp"));
+    colorBlendAttachment.srcAlphaBlendFactor = gf3d_config_parse_blend_factor(sj_object_get_value_as_string(config,"srcAlphaBlendFactor"));
+    colorBlendAttachment.dstAlphaBlendFactor =  gf3d_config_parse_blend_factor(sj_object_get_value_as_string(config,"dstAlphaBlendFactor"));
+    return colorBlendAttachment;
 }
 /*eol@eof*/
