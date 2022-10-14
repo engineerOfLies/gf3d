@@ -4,7 +4,7 @@
 #include "gf3d_camera.h"
 #include "player.h"
 
-
+static int thirdPersonMode = 0;
 void player_think(Entity *self);
 void player_update(Entity *self);
 
@@ -19,10 +19,12 @@ Entity *player_new(Vector3D position)
         return NULL;
     }
     
+    ent->model = gf3d_model_load("dino");
     ent->think = player_think;
     ent->update = player_update;
     vector3d_copy(ent->position,position);
     ent->rotation.x = -M_PI;
+    ent->hidden = 1;
     return ent;
 }
 
@@ -72,13 +74,35 @@ void player_think(Entity *self)
     if (mouse.x != 0)self->rotation.z += (mouse.x * 0.001);
     if (mouse.y != 0)self->rotation.x -= (mouse.y * 0.001);
 
+    if (keys[SDL_SCANCODE_F3])
+    {
+        thirdPersonMode = !thirdPersonMode;
+        self->hidden = !self->hidden;
+    }
 }
 
 void player_update(Entity *self)
 {
+    Vector3D forward = {0};
+    Vector3D position;
+    Vector3D rotation;
+    Vector2D w;
+    
     if (!self)return;
-    gf3d_camera_set_position(self->position);
-    gf3d_camera_set_rotation(self->rotation);
+    
+    vector3d_copy(position,self->position);
+    vector3d_copy(rotation,self->rotation);
+    if (thirdPersonMode)
+    {
+        position.z += 100;
+        rotation.x += M_PI*0.125;
+        w = vector2d_from_angle(self->rotation.z);
+        forward.x = w.x * 100;
+        forward.y = w.y * 100;
+        vector3d_add(position,position,-forward);
+    }
+    gf3d_camera_set_position(position);
+    gf3d_camera_set_rotation(rotation);
 }
 
 /*eol@eof*/

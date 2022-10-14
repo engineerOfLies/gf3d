@@ -70,6 +70,7 @@ void entity_free(Entity *self)
 void entity_draw(Entity *self)
 {
     if (!self)return;
+    if (self->hidden)return;
     gf3d_model_draw(self->model,self->modelMat);
 }
 
