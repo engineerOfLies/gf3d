@@ -73,6 +73,15 @@ void gf3d_mesh_free(Mesh *mesh);
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 
 /**
+ * @brief adds a mesh to the render pass rendered as an outline highlight
+ * @note: must be called within the render pass
+ * @param mesh the mesh to render
+ * @param com the command pool to use to handle the request we are rendering with
+ */
+void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+
+/**
  * @brief create a mesh's internal buffers based on vertices
  * @param mesh the mesh handle to populate
  * @param vertices an array of vertices to make the mesh with
@@ -87,5 +96,6 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
  * @return NULL on error or the pipeline in question
  */
 Pipeline *gf3d_mesh_get_pipeline();
+Pipeline *gf3d_mesh_get_highlight_pipeline();
 
 #endif

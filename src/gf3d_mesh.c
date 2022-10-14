@@ -18,6 +18,7 @@ typedef struct
 {
     Mesh *mesh_list;
     Pipeline *pipe;
+    Pipeline *highlight_pipe;
     Uint32 mesh_max;
     VkVertexInputAttributeDescription attributeDescriptions[ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription bindingDescription;
@@ -72,6 +73,15 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_attribute_descriptions(NULL),
         count);
 
+    gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/highlight_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count);
+
     slog("mesh system initialized");
 }
 
@@ -79,6 +89,12 @@ Pipeline *gf3d_mesh_get_pipeline()
 {
     return gf3d_mesh.pipe;
 }
+
+Pipeline *gf3d_mesh_get_highlight_pipeline()
+{
+    return gf3d_mesh.highlight_pipe;
+}
+
 
 VkVertexInputAttributeDescription * gf3d_mesh_get_attribute_descriptions(Uint32 *count)
 {
@@ -207,6 +223,26 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet 
     
     vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
 }
+
+void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
+{
+    VkDeviceSize offsets[] = {0};
+    Pipeline *pipe;
+    if (!mesh)
+    {
+        slog("cannot render a NULL mesh");
+        return;
+    }
+    pipe = gf3d_mesh.highlight_pipe;
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
+    
+    vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
+    
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
+    
+    vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
+}
+
 
 void gf3d_mesh_setup_face_buffers(Mesh *mesh,Face *faces,Uint32 fcount)
 {

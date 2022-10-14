@@ -135,6 +135,28 @@ void gf3d_model_draw(Model *model,Matrix4 modelMat)
     gf3d_mesh_render(model->mesh,commandBuffer,descriptorSet);
 }
 
+void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat)
+{
+    VkDescriptorSet *descriptorSet = NULL;
+    VkCommandBuffer commandBuffer;
+    Uint32 bufferFrame;
+    if (!model)
+    {
+        return;
+    }
+    commandBuffer = gf3d_vgraphics_get_current_command_model_highlight_buffer();
+    bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
+    descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_mesh_get_highlight_pipeline(), bufferFrame);
+    if (descriptorSet == NULL)
+    {
+        slog("failed to get a free descriptor Set for model rendering");
+        return;
+    }
+    gf3d_model_update_basic_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat);
+    gf3d_mesh_render_highlight(model->mesh,commandBuffer,descriptorSet);
+}
+
+
 void gf3d_model_update_basic_model_descriptor_set(Model *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4 modelMat)
 {
     VkDescriptorImageInfo imageInfo = {0};

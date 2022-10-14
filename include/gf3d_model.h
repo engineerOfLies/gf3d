@@ -57,6 +57,11 @@ Model * gf3d_model_new();
  * @param modelMat the model matrix (MVP)
  */
 void gf3d_model_draw(Model *model,Matrix4 modelMat);
+void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat);
+
+/**
+ * @brief free a model
+ */
 void gf3d_model_free(Model *model);
 
 /**

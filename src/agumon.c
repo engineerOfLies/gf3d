@@ -17,7 +17,7 @@ Entity *agumon_new(Vector3D position)
         slog("UGH OHHHH, no agumon for you!");
         return NULL;
     }
-    
+    ent->selected = 1;
     ent->model = gf3d_model_load("dino");
     ent->think = agumon_think;
     ent->update = agumon_update;

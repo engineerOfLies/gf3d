@@ -57,7 +57,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(0,0,20));
+    player_new(vector3d(0,-50,0));
     
     // main game loop
     slog("gf3d main loop begin");

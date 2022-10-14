@@ -41,6 +41,8 @@ Uint32  gf3d_vgraphics_get_current_buffer_frame();
  */
 VkCommandBuffer gf3d_vgraphics_get_current_command_model_buffer();
 
+VkCommandBuffer gf3d_vgraphics_get_current_command_model_highlight_buffer();
+
 /**
  * @brief get the handle to the active command buffer for the current 2d overlay rendering context
  * @note: THIS SHOULD ONLY BE CALLED BETWEEN CALLS TO gf3d_vgraphics_render_start() and gf3d_vgraphics_render_end()

@@ -71,6 +71,10 @@ void entity_draw(Entity *self)
 {
     if (!self)return;
     if (self->hidden)return;
+    if (self->selected)
+    {
+        gf3d_model_draw_highlight(self->model,self->modelMat);
+    }
     gf3d_model_draw(self->model,self->modelMat);
 }
 

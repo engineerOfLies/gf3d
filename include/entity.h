@@ -20,6 +20,7 @@ typedef struct Entity_S
     Matrix4     modelMat;   /**<orientation matrix for the model*/
     Model      *model;      /**<pointer to the entity model to draw  (optional)*/
     Uint8       hidden;     /**<if true, not drawn*/
+    Uint8       selected;
 
     void       (*think)(struct Entity_S *self); /**<pointer to the think function*/
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/

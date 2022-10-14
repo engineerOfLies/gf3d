@@ -69,6 +69,7 @@ typedef struct
     //render frame and command buffer for the current render pass
     Uint32                      bufferFrame;
     VkCommandBuffer             commandModelBuffer;
+    VkCommandBuffer             commandHighlightBuffer;
     VkCommandBuffer             commandOverlayBuffer;
 }vGraphics;
 
@@ -422,11 +423,16 @@ void gf3d_vgraphics_render_start()
     gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
     
     gf3d_pipeline_reset_frame(gf3d_mesh_get_pipeline(),gf3d_vgraphics.bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_mesh_get_highlight_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(),gf3d_vgraphics.bufferFrame);
     
     gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
         gf3d_mesh_get_pipeline());
+
+    gf3d_vgraphics.commandHighlightBuffer = gf3d_command_rendering_begin(
+        gf3d_vgraphics.bufferFrame,
+        gf3d_mesh_get_highlight_pipeline());
     
     gf3d_vgraphics.commandOverlayBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
@@ -436,6 +442,11 @@ void gf3d_vgraphics_render_start()
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
 {
     return gf3d_vgraphics.bufferFrame;
+}
+
+VkCommandBuffer gf3d_vgraphics_get_current_command_model_highlight_buffer()
+{
+    return gf3d_vgraphics.commandHighlightBuffer;
 }
 
 VkCommandBuffer gf3d_vgraphics_get_current_command_model_buffer()
@@ -459,6 +470,7 @@ void gf3d_vgraphics_render_end()
     
     
     gf3d_command_rendering_end(gf3d_vgraphics.commandModelBuffer);
+    gf3d_command_rendering_end(gf3d_vgraphics.commandHighlightBuffer);
     gf3d_command_rendering_end(gf3d_vgraphics.commandOverlayBuffer);
 
     
