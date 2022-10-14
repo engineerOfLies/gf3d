@@ -27,12 +27,15 @@ Entity *agumon_new(Vector3D position)
 
 void agumon_update(Entity *self)
 {
+    Vector3D scale = {0.01,0.01,0.01};
     if (!self)
     {
         slog("self pointer not provided");
         return;
     }
     vector3d_add(self->position,self->position,self->velocity);
+//    self->scale.x = 10;
+    self->rotation.z += 0.01;
 }
 
 void agumon_think(Entity *self)

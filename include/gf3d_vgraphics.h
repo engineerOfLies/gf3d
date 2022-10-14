@@ -81,12 +81,6 @@ VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
 
 /**
- * @brief get the pipeline that is used to render basic 3d models
- * @return NULL on error or the pipeline in question
- */
-Pipeline *gf3d_vgraphics_get_graphics_model_pipeline();
-
-/**
  * @brief get the pipeline that is used to render 2d images to the overlay
  * @return NULL on error or the pipeline in question
  */

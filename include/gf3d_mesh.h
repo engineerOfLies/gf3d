@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 #include "gfc_vector.h"
 #include "gfc_text.h"
+#include "gf3d_pipeline.h"
 
 typedef struct
 {
@@ -62,6 +63,7 @@ VkVertexInputBindingDescription * gf3d_mesh_get_bind_description();
  */
 void gf3d_mesh_free(Mesh *mesh);
 
+
 /**
  * @brief adds a mesh to the render pass
  * @note: must be called within the render pass
@@ -79,5 +81,11 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet 
  * @param fcount how many faces are in the array
  */
 void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount);
+
+/**
+ * @brief get the pipeline that is used to render basic 3d meshes
+ * @return NULL on error or the pipeline in question
+ */
+Pipeline *gf3d_mesh_get_pipeline();
 
 #endif

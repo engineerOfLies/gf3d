@@ -50,11 +50,11 @@ int main(int argc,char *argv[])
     
     w = world_load("config/testworld.json");
     
-    for (a = 0; a < 10;a++)
+//    for (a = 0; a < 10;a++)
     {
-        agumon_new(vector3d(a * 10 -50,0,0));
+        agumon_new(vector3d(0 ,0,0));
     }
-    
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(0,0,20));

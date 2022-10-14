@@ -115,12 +115,9 @@ void entity_update(Entity *self)
     vector3d_add(self->velocity,self->acceleration,self->velocity);
     
     gfc_matrix_identity(self->modelMat);
+    
     gfc_matrix_scale(self->modelMat,self->scale);
-    
-    gfc_matrix_rotate(self->modelMat,self->modelMat,self->rotation.z,vector3d(0,0,1));
-    gfc_matrix_rotate(self->modelMat,self->modelMat,self->rotation.y,vector3d(0,1,0));
-    gfc_matrix_rotate(self->modelMat,self->modelMat,self->rotation.x,vector3d(1,0,0));
-    
+    gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
     gfc_matrix_translate(self->modelMat,self->position);
     
     if (self->update)self->update(self);
