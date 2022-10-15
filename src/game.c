@@ -29,6 +29,7 @@ int main(int argc,char *argv[])
     int mousex,mousey;
     float mouseFrame = 0;
     World *w;
+    Entity *agu;
     
     for (a = 1; a < argc;a++)
     {
@@ -38,7 +39,7 @@ int main(int argc,char *argv[])
         }
     }
     
-    init_logger("gf3d.log");    
+    init_logger("gf3d.log",0);    
     gfc_input_init("config/input.cfg");
     slog("gf3d begin");
     gf3d_vgraphics_init("config/setup.cfg");
@@ -48,12 +49,16 @@ int main(int argc,char *argv[])
     
     mouse = gf3d_sprite_load("images/pointer.png",32,32, 16);
     
+    
+    agu = agumon_new(vector3d(-10 ,0,0));
+    if (agu)agu->selected = 1;
+
+    for (a = 0; a < 10;a++)
+    {
+        agumon_new(vector3d(a * 10 ,0,0));
+    }
     w = world_load("config/testworld.json");
     
-//    for (a = 0; a < 10;a++)
-    {
-        agumon_new(vector3d(0 ,0,0));
-    }
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));

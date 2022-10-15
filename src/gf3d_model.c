@@ -88,6 +88,8 @@ Model * gf3d_model_load(char * filename)
     Model *model;
     model = gf3d_model_new();
     if (!model)return NULL;
+    
+    gfc_line_cpy(model->filename,filename);
     snprintf(assetname,GFCLINELEN,"models/%s.obj",filename);
     model->mesh = gf3d_mesh_load(assetname);
 
@@ -230,7 +232,7 @@ void gf3d_model_update_uniform_buffer(
     gfc_matrix_copy(modelUBO.proj,ubo.proj);
     if (colorMod)vector4d_copy(modelUBO.color,(*colorMod));
     if (highlightColor)vector4d_copy(modelUBO.highlight,(*highlightColor));
-    
+        
     vkMapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage], 0, sizeof(MeshUBO), 0, &data);
     
         memcpy(data, &modelUBO, sizeof(MeshUBO));

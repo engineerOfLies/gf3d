@@ -59,6 +59,7 @@ World *world_load(char *filename)
         slog("world data (%s) has no model",filename);
     }
     sj_free(json);
+    w->color = gfc_color(1,1,1,1);
     return w;
 }
 
@@ -66,7 +67,8 @@ void world_draw(World *world)
 {
     if (!world)return;
     if (!world->worldModel)return;// no model to draw, do nothing
-    gf3d_model_draw(world->worldModel,world->modelMat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+    gf3d_model_draw(world->worldModel,world->modelMat,gfc_color_to_vector4f(world->color),gfc_color_to_vector4f(world->color));
+    gf3d_model_draw_highlight(world->worldModel,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,1));
 }
 
 void world_delete(World *world)
