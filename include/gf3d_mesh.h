@@ -4,7 +4,17 @@
 #include <vulkan/vulkan.h>
 #include "gfc_vector.h"
 #include "gfc_text.h"
+#include "gfc_matrix.h"
 #include "gf3d_pipeline.h"
+
+typedef struct
+{
+    Matrix4 model;
+    Matrix4 view;
+    Matrix4 proj;
+    Vector4D color; //color mod
+    Vector4D highlight;//color mod
+}MeshUBO;
 
 typedef struct
 {

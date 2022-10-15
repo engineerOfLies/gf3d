@@ -78,6 +78,12 @@ void gf3d_sprite_free(Sprite *sprite);
 void gf3d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Uint32 frame);
 
 /**
+ * @brief get the default pipeline for overlay rendering
+ * @return NULL on error or not yet initlialized, the pipeline otherwise
+ */
+Pipeline *gf3d_sprite_get_pipeline();
+
+/**
  * @brief get the binding description for a sprite
  */
 VkVertexInputBindingDescription * gf3d_sprite_get_bind_description();

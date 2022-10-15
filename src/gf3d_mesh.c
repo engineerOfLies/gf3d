@@ -13,7 +13,6 @@
 
 #define ATTRIBUTE_COUNT 3
 
-
 typedef struct
 {
     Mesh *mesh_list;

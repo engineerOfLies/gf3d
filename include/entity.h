@@ -2,6 +2,7 @@
 #define __ENTITY_H__
 
 #include "gfc_types.h"
+#include "gfc_color.h"
 
 #include "gf3d_model.h"
 
@@ -18,9 +19,11 @@ typedef struct Entity_S
 {
     Uint8       _inuse;     /**<keeps track of memory usage*/
     Matrix4     modelMat;   /**<orientation matrix for the model*/
+    Color       color;      /**<default color for the model*/
     Model      *model;      /**<pointer to the entity model to draw  (optional)*/
     Uint8       hidden;     /**<if true, not drawn*/
     Uint8       selected;
+    Color       selectedColor;      /**<Color for highlighting*/
 
     void       (*think)(struct Entity_S *self); /**<pointer to the think function*/
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/

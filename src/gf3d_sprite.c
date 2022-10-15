@@ -78,6 +78,7 @@ void gf3d_sprite_manager_close()
 void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice device)
 {
     void* data;
+    Uint32 count;
     SpriteFace faces[2];
     size_t bufferSize;    
     VkBuffer stagingBuffer;
@@ -92,7 +93,6 @@ void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice de
     gf3d_sprite.sprite_list = (Sprite *)gfc_allocate_array(sizeof(Sprite),max_sprites);
     gf3d_sprite.max_sprites = max_sprites;
     gf3d_sprite.device = device;
-    gf3d_sprite.pipe = gf3d_vgraphics_get_graphics_overlay_pipeline();
     
     // setup the face buffer, which will be used for ALL sprites
     faces[0].verts[0] = 2;
@@ -101,7 +101,6 @@ void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice de
     faces[1].verts[0] = 1;
     faces[1].verts[1] = 3;
     faces[1].verts[2] = 2;
-
 
     bufferSize = sizeof(SpriteFace) * 2;
     
@@ -118,6 +117,15 @@ void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice de
     vkDestroyBuffer(device, stagingBuffer, NULL);
     vkFreeMemory(device, stagingBufferMemory, NULL);
 
+    gf3d_sprite_get_attribute_descriptions(&count);
+    gf3d_sprite.pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/overlay_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        max_sprites,
+        gf3d_sprite_get_bind_description(),
+        gf3d_sprite_get_attribute_descriptions(NULL),
+        count);     
     
     slog("sprite manager initiliazed");
     atexit(gf3d_sprite_manager_close);
@@ -225,7 +233,7 @@ void gf3d_sprite_render(Sprite *sprite,VkCommandBuffer commandBuffer, VkDescript
         slog("cannot render a NULL sprite");
         return;
     }
-    pipe = gf3d_vgraphics_get_graphics_overlay_pipeline();
+    pipe = gf3d_sprite_get_pipeline();
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, &sprite->buffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, gf3d_sprite.faceBuffer, 0, VK_INDEX_TYPE_UINT32);
@@ -415,6 +423,11 @@ void gf3d_sprite_create_uniform_buffer(Sprite *sprite)
     {
         gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sprite->uniformBuffers[i], &sprite->uniformBuffersMemory[i]);
     }
+}
+
+Pipeline *gf3d_sprite_get_pipeline()
+{
+    return gf3d_sprite.pipe;
 }
 
 /*eol@eof*/

@@ -60,8 +60,6 @@ typedef struct
     
     VkSemaphore                 imageAvailableSemaphore;
     VkSemaphore                 renderFinishedSemaphore;
-        
-    Pipeline                   *overlay_pipe;   /**<for rendering 2d*/
 
     Command                 *   graphicsCommandPool; 
     UniformBufferObject         ubo;
@@ -106,7 +104,6 @@ void gf3d_vgraphics_init(const char *config)
     short int fullscreen = 0;
     short int enableValidation = 0;
     short int enableDebug = 0;
-    Uint32 count = 0;
     
     json = sj_load(config);
     if (!json)
@@ -172,17 +169,7 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_pipeline_init(8);// how many different rendering pipelines we need
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
-    
-    gf3d_sprite_get_attribute_descriptions(&count);
-    gf3d_vgraphics.overlay_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics.device,
-        "config/overlay_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        1024,
-        gf3d_sprite_get_bind_description(),
-        gf3d_sprite_get_attribute_descriptions(NULL),
-        count);     
-    
+        
     gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
@@ -424,7 +411,7 @@ void gf3d_vgraphics_render_start()
     
     gf3d_pipeline_reset_frame(gf3d_mesh_get_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh_get_highlight_pipeline(),gf3d_vgraphics.bufferFrame);
-    gf3d_pipeline_reset_frame(gf3d_vgraphics_get_graphics_overlay_pipeline(),gf3d_vgraphics.bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_sprite_get_pipeline(),gf3d_vgraphics.bufferFrame);
     
     gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
@@ -436,7 +423,7 @@ void gf3d_vgraphics_render_start()
     
     gf3d_vgraphics.commandOverlayBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
-        gf3d_vgraphics_get_graphics_overlay_pipeline());
+        gf3d_sprite_get_pipeline());
 }
 
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
@@ -563,10 +550,6 @@ void gf3d_vgraphics_rotate_camera(float degrees)
 
 }
 
-Pipeline *gf3d_vgraphics_get_graphics_overlay_pipeline()
-{
-    return gf3d_vgraphics.overlay_pipe;
-}
 
 Command *gf3d_vgraphics_get_graphics_command_pool()
 {
