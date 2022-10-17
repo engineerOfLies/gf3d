@@ -53,8 +53,28 @@ typedef struct
 
 void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
 
-Model * gf3d_model_load(char * filename);
+/**
+ * @brief get a blank model address
+ * @return NULL on full, or a pointer to a blank model
+ */
 Model * gf3d_model_new();
+
+/**
+ * @brief load a model and texture from file where both the model is in models/<filename>.obj and the
+ * texture is in images><filename>,png
+ * @param filename the common filename to load by
+ * @return NULL on error, or the loaded model data otherwise
+ */
+Model * gf3d_model_load(char * filename);
+
+/**
+ * @brief load a model by its model file path and texture file path
+ * @param modelFile where to find the model obj file
+ * @param textureFile where to find the image for the texture
+ * @return NULL on error or the model file otherwise.  
+ */
+Model * gf3d_model_load_full(char * modelFile,char *textureFile);
+
 /**
  * @brief queue up a model for rendering
  * @param model the model to render

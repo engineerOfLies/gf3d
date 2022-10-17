@@ -84,17 +84,25 @@ Model * gf3d_model_new()
 
 Model * gf3d_model_load(char * filename)
 {
-    TextLine assetname;
+    TextLine modelName,textureName;
+
+    snprintf(modelName,GFCLINELEN,"models/%s.obj",filename);
+    snprintf(textureName,GFCLINELEN,"images/%s.png",filename);
+    
+    return gf3d_model_load_full(modelName,textureName);
+}
+
+Model * gf3d_model_load_full(char * modelFile,char *textureFile)
+{
     Model *model;
     model = gf3d_model_new();
     if (!model)return NULL;
     
-    gfc_line_cpy(model->filename,filename);
-    snprintf(assetname,GFCLINELEN,"models/%s.obj",filename);
-    model->mesh = gf3d_mesh_load(assetname);
+    gfc_line_cpy(model->filename,modelFile);
 
-    snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
-    model->texture = gf3d_texture_load(assetname);
+    model->mesh = gf3d_mesh_load(modelFile);
+    model->texture = gf3d_texture_load(textureFile);
+
     if (!model->texture)
     {
         model->texture = gf3d_texture_load("images/default.png");
