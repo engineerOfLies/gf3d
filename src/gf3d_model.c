@@ -95,6 +95,10 @@ Model * gf3d_model_load(char * filename)
 
     snprintf(assetname,GFCLINELEN,"images/%s.png",filename);
     model->texture = gf3d_texture_load(assetname);
+    if (!model->texture)
+    {
+        model->texture = gf3d_texture_load("images/default.png");
+    }
     
     return model;
 }

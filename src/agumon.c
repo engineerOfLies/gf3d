@@ -34,7 +34,7 @@ void agumon_update(Entity *self)
         return;
     }
     vector3d_add(self->position,self->position,self->velocity);
-    self->rotation.x += 0.01;
+    self->rotation.z += 0.01;
 }
 
 void agumon_think(Entity *self)
