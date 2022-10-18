@@ -43,15 +43,17 @@ typedef struct
     Mesh                    *   mesh;
     Texture                 *   texture;
     VkDescriptorSet         *   descriptorSet;
-    VkBuffer                *   uniformBuffers;         //for calls to the mesh rendering
-    VkDeviceMemory          *   uniformBuffersMemory;
-    Uint32                      uniformBufferCount;
-    VkBuffer                *   uniformBuffersHighlight;//for calls to the highlight rendering
-    VkDeviceMemory          *   uniformBuffersMemoryHighlight;
 }Model;
 
 
 void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
+
+
+/**
+ * @brief to be called at the beginning of a render frame to clear out the last time the buffer frame was used.
+ * @param bufferFrame the frame to clear out
+ */
+void gf3d_model_manager_state_frame(Uint32 bufferFrame);
 
 /**
  * @brief get a blank model address

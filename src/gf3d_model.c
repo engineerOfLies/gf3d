@@ -6,6 +6,8 @@
 #include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_obj_load.h"
+#include "gf3d_uniform_buffers.h"
+
 #include "gf3d_model.h"
 
 typedef struct
@@ -15,18 +17,19 @@ typedef struct
     Uint32                  chain_length;   /**<length of swap chain*/
     VkDevice                device;
     Pipeline            *   pipe;           /**<the pipeline associated with model rendering*/
+    UniformBufferList   *   uboList;
 }ModelManager;
 
 static ModelManager gf3d_model = {0};
 
 void gf3d_model_delete(Model *model);
 
-void gf3d_model_create_uniform_buffer(Model *model);
 void gf3d_model_create_descriptor_pool(Model *model);
 void gf3d_model_create_descriptor_sets(Model *model);
 void gf3d_model_create_descriptor_set_layout();
 void gf3d_model_update_uniform_buffer(
     Model *model,
+    UniformBuffer *ubo,
     uint32_t currentImage,
     Matrix4 modelMat,
     Vector4D *colorMod,
@@ -44,6 +47,7 @@ void gf3d_model_manager_close()
     {
         free(gf3d_model.model_list);
     }
+    if (gf3d_model.uboList)gf3d_uniform_buffer_list_free(gf3d_model.uboList);
     memset(&gf3d_model,0,sizeof(ModelManager));
     slog("model manager closed");
 }
@@ -60,9 +64,16 @@ void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice devi
     gf3d_model.max_models = max_models;
     gf3d_model.device = device;
     gf3d_model.pipe = gf3d_mesh_get_pipeline();
+    gf3d_model.uboList = gf3d_uniform_buffer_list_new(device,sizeof(MeshUBO),max_models,chain_length);
     
     slog("model manager initiliazed");
     atexit(gf3d_model_manager_close);
+}
+
+void gf3d_model_manager_state_frame(Uint32 bufferFrame)
+{
+    if (!gf3d_model.uboList)return;
+    gf3d_uniform_buffer_list_clear(gf3d_model.uboList,bufferFrame);
 }
 
 Model * gf3d_model_new()
@@ -74,7 +85,6 @@ Model * gf3d_model_new()
         {
             gf3d_model_delete(&gf3d_model.model_list[i]);
             gf3d_model.model_list[i]._inuse = 1;
-            gf3d_model_create_uniform_buffer(&gf3d_model.model_list[i]);
             return &gf3d_model.model_list[i];
         }
     }
@@ -118,16 +128,9 @@ void gf3d_model_free(Model *model)
 
 void gf3d_model_delete(Model *model)
 {
-    int i;
     if (!model)return;
     if (!model->_inuse)return;// not in use, nothing to do
     
-    for (i = 0; i < model->uniformBufferCount; i++)
-    {
-        vkDestroyBuffer(gf3d_model.device, model->uniformBuffers[i], NULL);
-        vkFreeMemory(gf3d_model.device, model->uniformBuffersMemory[i], NULL);
-    }
-
     gf3d_mesh_free(model->mesh);
     gf3d_texture_free(model->texture);
     memset(model,0,sizeof(Model));
@@ -187,7 +190,8 @@ void gf3d_model_update_basic_model_descriptor_set(
     VkDescriptorImageInfo imageInfo = {0};
     VkWriteDescriptorSet descriptorWrite[2] = {0};
     VkDescriptorBufferInfo bufferInfo = {0};
-
+    UniformBuffer *ubo = NULL;
+    
     if (!model)
     {
         slog("no model provided for descriptor set update");
@@ -198,13 +202,19 @@ void gf3d_model_update_basic_model_descriptor_set(
         slog("null handle provided for descriptorSet");
         return;
     }
-
+    ubo = gf3d_uniform_buffer_list_get_buffer(gf3d_model.uboList, chainIndex);
+    if (!ubo)
+    {
+        slog("failed to get a free uniform buffer for draw call");
+        return;
+    }
+    
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = model->texture->textureImageView;
     imageInfo.sampler = model->texture->textureSampler;
 
-    gf3d_model_update_uniform_buffer(model,chainIndex,modelMat,colorMod,highlightColor);
-    bufferInfo.buffer = model->uniformBuffers[chainIndex];
+    gf3d_model_update_uniform_buffer(model,ubo,chainIndex,modelMat,colorMod,highlightColor);
+    bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(MeshUBO);        
     
@@ -230,43 +240,29 @@ void gf3d_model_update_basic_model_descriptor_set(
 
 void gf3d_model_update_uniform_buffer(
     Model *model,
+    UniformBuffer *ubo,
     uint32_t currentImage,
     Matrix4 modelMat,
     Vector4D *colorMod,
     Vector4D *highlightColor)
 {
     void* data;
-    UniformBufferObject ubo;
+    UniformBufferObject graphics_ubo;
     MeshUBO modelUBO;
-    ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    
     gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,ubo.view);
-    gfc_matrix_copy(modelUBO.proj,ubo.proj);
+    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
+    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    
     if (colorMod)vector4d_copy(modelUBO.color,(*colorMod));
     if (highlightColor)vector4d_copy(modelUBO.highlight,(*highlightColor));
         
-    vkMapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage], 0, sizeof(MeshUBO), 0, &data);
+    vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
     
         memcpy(data, &modelUBO, sizeof(MeshUBO));
 
-    vkUnmapMemory(gf3d_model.device, model->uniformBuffersMemory[currentImage]);
-}
-
-
-void gf3d_model_create_uniform_buffer(Model *model)
-{
-    int i;
-    Uint32 buffercount = gf3d_model.chain_length;
-    VkDeviceSize bufferSize = sizeof(MeshUBO);
-
-    model->uniformBuffers = (VkBuffer*)gfc_allocate_array(sizeof(VkBuffer),buffercount);
-    model->uniformBuffersMemory = (VkDeviceMemory*)gfc_allocate_array(sizeof(VkDeviceMemory),buffercount);
-    model->uniformBufferCount = buffercount;
-
-    for (i = 0; i < buffercount; i++)
-    {
-        gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &model->uniformBuffers[i], &model->uniformBuffersMemory[i]);
-    }
+    vkUnmapMemory(gf3d_model.device, ubo->uniformBufferMemory);
 }
 
 /*eol@eof*/

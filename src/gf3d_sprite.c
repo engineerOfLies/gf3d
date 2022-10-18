@@ -266,6 +266,8 @@ void gf3d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Uint32 fra
         slog("failed to get a free descriptor Set for sprite rendering");
         return;
     }
+    
+    gfc_matrix_identity(modelMat);
     gfc_matrix_scale(
         modelMat,
         vector3d(scale.x,scale.y,1));

@@ -18,7 +18,7 @@ Entity *agumon_new(Vector3D position)
         return NULL;
     }
     ent->selectedColor = gfc_color(0.1,1,0.1,1);
-    ent->color = gfc_color(1,1,1,1);
+    ent->color = gfc_color(0,0,0,0);
     ent->model = gf3d_model_load("dino");
     ent->think = agumon_think;
     ent->update = agumon_update;
