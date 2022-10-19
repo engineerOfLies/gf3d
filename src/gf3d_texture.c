@@ -113,7 +113,7 @@ void gf3d_texture_delete_all()
     }
 }
 
-Texture *gf3d_texture_get_by_filename(char * filename)
+Texture *gf3d_texture_get_by_filename(const char * filename)
 {
     int i;
     if (!filename)return NULL;
@@ -198,7 +198,7 @@ void gf3d_texture_create_sampler(Texture *tex)
     slog("created texture sampler");
 }
 
-Texture *gf3d_texture_load(char *filename)
+Texture *gf3d_texture_load(const char *filename)
 {
     SDL_Surface * surface;
     void* data;

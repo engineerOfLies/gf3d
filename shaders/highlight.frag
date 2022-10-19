@@ -11,9 +11,9 @@ layout(location = 0) out vec4 outColor;
 
 void main()
 {
-    vec3 lightVector = vec3(0,0,1);
-    float cosTheta = dot( fragNormal,lightVector );
-    vec4 newColor = inColor + (inColor * cosTheta);
+    vec3 lightVector = vec3(0,0,-1);
+    float cosTheta = dot( normalize(fragNormal),lightVector );
+    vec4 newColor = (inColor * 0.5) + (inColor * cosTheta * 0.5);
     newColor.w = inColor.w;
     outColor = newColor;
 }

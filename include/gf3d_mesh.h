@@ -13,7 +13,19 @@ typedef struct
     Matrix4 view;
     Matrix4 proj;
     Vector4D color; //color mod
+    Vector4D ambient;
 }MeshUBO;
+
+/**
+ * @purpose to send to calls to draw via the highlight pipeline
+ */
+typedef struct
+{
+    Matrix4 model;
+    Matrix4 view;
+    Matrix4 proj;
+    Vector4D color; 
+}HighlightUBO;
 
 typedef struct
 {
@@ -52,7 +64,7 @@ void gf3d_mesh_init(Uint32 mesh_max);
  * @param filename the name of the file to load
  * @return NULL on error or Mesh data
  */
-Mesh *gf3d_mesh_load(char *filename);
+Mesh *gf3d_mesh_load(const char *filename);
 
 /**
  * @brief get the input attribute descriptions for mesh based rendering

@@ -15,8 +15,10 @@
 typedef struct
 {
     Matrix4 modelMat;
+    Vector3D position;
     Vector3D rotation;
-    Model *worldModel;
+    Vector3D scale;
+    Model *model;
     Color color;
     List *spawnList;        //entities to spawn
     List *entityList;       //entities that exist in the world

@@ -28,7 +28,7 @@ static MeshSystem gf3d_mesh = {0};
 
 void gf3d_mesh_close();
 void gf3d_mesh_delete(Mesh *mesh);
-Mesh *gf3d_mesh_get_by_filename(char *filename);
+Mesh *gf3d_mesh_get_by_filename(const char *filename);
 
 void gf3d_mesh_init(Uint32 mesh_max)
 {
@@ -82,7 +82,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO)
+        sizeof(HighlightUBO)
     );
 
     slog("mesh system initialized");
@@ -135,7 +135,7 @@ Mesh *gf3d_mesh_new()
     return NULL;
 }
 
-Mesh *gf3d_mesh_get_by_filename(char *filename)
+Mesh *gf3d_mesh_get_by_filename(const char *filename)
 {
     int i;
     for (i = 0; i < gf3d_mesh.mesh_max; i++)
@@ -303,7 +303,7 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
     slog("created a mesh with %i vertices and %i face",vcount,fcount);
 }
 
-Mesh *gf3d_mesh_load(char *filename)
+Mesh *gf3d_mesh_load(const char *filename)
 {
     Mesh *mesh;
     ObjData *obj;

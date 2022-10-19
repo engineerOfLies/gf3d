@@ -78,7 +78,7 @@ void gf3d_obj_load_reorg(ObjData *obj)
     }
 }
 
-ObjData *gf3d_obj_load_from_file(char *filename)
+ObjData *gf3d_obj_load_from_file(const char *filename)
 {
     FILE *file;
     ObjData *obj;

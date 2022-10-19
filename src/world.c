@@ -1,6 +1,8 @@
 #include "simple_logger.h"
 #include "simple_json.h"
+
 #include "gfc_types.h"
+#include "gfc_config.h"
 
 #include "world.h"
 
@@ -41,24 +43,17 @@ World *world_load(char *filename)
         return NULL;
     }
     modelName = sj_get_string_value(sj_object_get_value(wjson,"model"));
-    if (modelName)
-    {
-        w->worldModel = gf3d_model_load((char *)modelName);
-        gfc_matrix_identity(w->modelMat);
-        gfc_matrix_scale(
-            w->modelMat,
-            vector3d(10,10,10)
-        );
-/*        gfc_matrix_translate(
-            w->modelMat,
-            vector3d(0,0,-10)
-        );*/
-    }
-    else
+    if (!modelName)
     {
         slog("world data (%s) has no model",filename);
+        sj_free(json);
+        return w;
     }
-    w->rotation.x = 0.001;
+    w->model = gf3d_model_load(modelName);
+
+    sj_value_as_vector3d(sj_object_get_value(wjson,"scale"),&w->scale);
+    sj_value_as_vector3d(sj_object_get_value(wjson,"position"),&w->position);
+    sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
     return w;
@@ -67,21 +62,26 @@ World *world_load(char *filename)
 void world_draw(World *world)
 {
     if (!world)return;
-    if (!world->worldModel)return;// no model to draw, do nothing
-    gf3d_model_draw(world->worldModel,world->modelMat,gfc_color_to_vector4f(world->color),gfc_color_to_vector4f(world->color));
-    gf3d_model_draw_highlight(world->worldModel,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,.5,.1,1));
+    if (!world->model)return;// no model to draw, do nothing
+    gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(2,2,2,2));
+    //gf3d_model_draw_highlight(world->worldModel,world->modelMat,vector4d(1,.5,.1,1));
 }
 
 void world_delete(World *world)
 {
     if (!world)return;
-    gf3d_model_free(world->worldModel);
+    gf3d_model_free(world->model);
     free(world);
 }
 
 void world_run_updates(World *self)
 {
+    self->rotation.z += 0.0001;
+    gfc_matrix_identity(self->modelMat);
+    
+    gfc_matrix_scale(self->modelMat,self->scale);
     gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
+    gfc_matrix_translate(self->modelMat,self->position);
 
 }
 

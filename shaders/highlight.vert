@@ -23,7 +23,7 @@ layout (location = 2) out vec4 outColor;
 void main()
 {
     vec4 tempNormal;
-    tempNormal = ubo.model * vec4(inNormal,1.0);
+    tempNormal = ubo.view * ubo.model * vec4(inNormal,1.0);
     fragNormal = tempNormal.xyz;
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
     fragTexCoord = inTexCoord;

@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/antioch/antioch.obj",
+        "texture":"models/antioch/antioch.png"
+    }
+}
