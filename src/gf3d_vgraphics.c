@@ -412,9 +412,7 @@ void gf3d_vgraphics_render_start()
     gf3d_pipeline_reset_frame(gf3d_mesh_get_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh_get_highlight_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_sprite_get_pipeline(),gf3d_vgraphics.bufferFrame);
-    
-    gf3d_model_manager_state_frame(gf3d_vgraphics.bufferFrame);
-    
+        
     gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
         gf3d_mesh_get_pipeline());

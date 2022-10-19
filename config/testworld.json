@@ -1,6 +1,6 @@
 {
     "world":
     {
-        "model":"station_core"
+        "model":"station_ring"
     }
 }

@@ -45,15 +45,13 @@ typedef struct
     VkDescriptorSet         *   descriptorSet;
 }Model;
 
-
-void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
-
-
 /**
- * @brief to be called at the beginning of a render frame to clear out the last time the buffer frame was used.
- * @param bufferFrame the frame to clear out
+ * @brief setup the model manager
+ * @param max_models the maximum number of models that can be held in memory
+ * @param chain_length how many swap chains are supported
+ * @param device the logical device to use
  */
-void gf3d_model_manager_state_frame(Uint32 bufferFrame);
+void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
 
 /**
  * @brief get a blank model address

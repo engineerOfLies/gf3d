@@ -14,5 +14,6 @@ void main()
     vec3 lightVector = vec3(0,0,1);
     float cosTheta = dot( fragNormal,lightVector );
     vec4 newColor = inColor + (inColor * cosTheta);
+    newColor.w = inColor.w;
     outColor = newColor;
 }

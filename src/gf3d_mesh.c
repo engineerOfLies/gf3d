@@ -70,7 +70,9 @@ void gf3d_mesh_init(Uint32 mesh_max)
         mesh_max,
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
-        count);
+        count,
+        sizeof(MeshUBO)
+    );
 
     gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
@@ -79,7 +81,9 @@ void gf3d_mesh_init(Uint32 mesh_max)
         mesh_max,
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
-        count);
+        count,
+        sizeof(MeshUBO)
+    );
 
     slog("mesh system initialized");
 }

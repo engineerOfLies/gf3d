@@ -49,15 +49,16 @@ World *world_load(char *filename)
             w->modelMat,
             vector3d(10,10,10)
         );
-        gfc_matrix_translate(
+/*        gfc_matrix_translate(
             w->modelMat,
-            vector3d(0,0,-20)
-        );
+            vector3d(0,0,-10)
+        );*/
     }
     else
     {
         slog("world data (%s) has no model",filename);
     }
+    w->rotation.x = 0.001;
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
     return w;
@@ -78,7 +79,11 @@ void world_delete(World *world)
     free(world);
 }
 
-void world_run_updates(World *world);
+void world_run_updates(World *self)
+{
+    gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
+
+}
 
 void world_add_entity(World *world,Entity *entity);
 

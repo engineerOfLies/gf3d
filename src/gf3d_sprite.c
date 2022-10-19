@@ -125,7 +125,9 @@ void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice de
         max_sprites,
         gf3d_sprite_get_bind_description(),
         gf3d_sprite_get_attribute_descriptions(NULL),
-        count);     
+        count,
+        sizeof(SpriteUBO)
+    );     
     
     slog("sprite manager initiliazed");
     atexit(gf3d_sprite_manager_close);
@@ -321,18 +323,18 @@ void gf3d_sprite_create_vertex_buffer(Sprite *sprite)
     vkFreeMemory(device, stagingBufferMemory, NULL);    
 }
 
-void gf3d_sprite_update_uniform_buffer(Sprite *sprite,uint32_t currentImage,Matrix4 modelMat,Uint32 frame)
+void gf3d_sprite_update_uniform_buffer(Sprite *sprite,UniformBuffer *ubo,Matrix4 modelMat,Uint32 frame)
 {
     void* data;
-    SpriteUBO ubo;
-    gfc_matrix_copy(ubo.model,modelMat);
-    ubo.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
-    ubo.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
-    vkMapMemory(gf3d_sprite.device, sprite->uniformBuffersMemory[currentImage], 0, sizeof(SpriteUBO), 0, &data);
+    SpriteUBO spriteUBO;
+    gfc_matrix_copy(spriteUBO.model,modelMat);
+    spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
+    spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
+    vkMapMemory(gf3d_sprite.device, ubo->uniformBufferMemory, 0, sizeof(SpriteUBO), 0, &data);
     
-        memcpy(data, &ubo, sizeof(SpriteUBO));
+        memcpy(data, &spriteUBO, sizeof(SpriteUBO));
 
-    vkUnmapMemory(gf3d_sprite.device, sprite->uniformBuffersMemory[currentImage]);
+    vkUnmapMemory(gf3d_sprite.device, ubo->uniformBufferMemory);
 }
 
 void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4 modelMat,Uint32 frame)
@@ -340,6 +342,7 @@ void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite,VkDescriptorSet desc
     VkDescriptorImageInfo imageInfo = {0};
     VkWriteDescriptorSet descriptorWrite[2] = {0};
     VkDescriptorBufferInfo bufferInfo = {0};
+    UniformBuffer *ubo;
 
     if (!sprite)
     {
@@ -356,7 +359,8 @@ void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite,VkDescriptorSet desc
     imageInfo.imageView = sprite->texture->textureImageView;
     imageInfo.sampler = sprite->texture->textureSampler;
 
-    gf3d_sprite_update_uniform_buffer(sprite,chainIndex,modelMat,frame);
+    ubo = gf3d_uniform_buffer_list_get_buffer(gf3d_sprite.pipe->uboList, chainIndex);
+    gf3d_sprite_update_uniform_buffer(sprite,ubo,modelMat,frame);
     bufferInfo.buffer = sprite->uniformBuffers[chainIndex];
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(SpriteUBO);        
