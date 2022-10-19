@@ -5,7 +5,6 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-    vec4 color;
     vec4 highlight;
 } ubo;
 
@@ -24,9 +23,9 @@ layout (location = 2) out vec4 outColor;
 void main()
 {
     vec4 tempNormal;
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
     tempNormal = ubo.model * vec4(inNormal,1.0);
     fragNormal = tempNormal.xyz;
+    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
     fragTexCoord = inTexCoord;
     outColor = ubo.highlight;
 }

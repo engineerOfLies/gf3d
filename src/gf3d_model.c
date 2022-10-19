@@ -30,13 +30,11 @@ void gf3d_model_update_uniform_buffer(
     Model *model,
     UniformBuffer *ubo,
     Matrix4 modelMat,
-    Vector4D *colorMod,
-    Vector4D *highlightColor);
+    Vector4D *colorMod);
 void gf3d_model_update_highlight_uniform_buffer(
     Model *model,
     UniformBuffer *ubo,
     Matrix4 modelMat,
-    Vector4D *colorMod,
     Vector4D *highlightColor);
 
 void gf3d_model_update_highlight_model_descriptor_set(
@@ -217,7 +215,7 @@ void gf3d_model_update_basic_model_descriptor_set(
     imageInfo.imageView = model->texture->textureImageView;
     imageInfo.sampler = model->texture->textureSampler;
 
-    gf3d_model_update_uniform_buffer(model,ubo,modelMat,colorMod,highlightColor);
+    gf3d_model_update_uniform_buffer(model,ubo,modelMat,colorMod);
     bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(MeshUBO);        
@@ -278,7 +276,7 @@ void gf3d_model_update_highlight_model_descriptor_set(
     imageInfo.imageView = model->texture->textureImageView;
     imageInfo.sampler = model->texture->textureSampler;
 
-    gf3d_model_update_uniform_buffer(model,ubo,modelMat,colorMod,highlightColor);
+    gf3d_model_update_uniform_buffer(model,ubo,modelMat,highlightColor);
     bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(MeshUBO);        
@@ -307,8 +305,7 @@ void gf3d_model_update_uniform_buffer(
     Model *model,
     UniformBuffer *ubo,
     Matrix4 modelMat,
-    Vector4D *colorMod,
-    Vector4D *highlightColor)
+    Vector4D *colorMod)
 {
     void* data;
     UniformBufferObject graphics_ubo;
@@ -320,7 +317,6 @@ void gf3d_model_update_uniform_buffer(
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     
     if (colorMod)vector4d_copy(modelUBO.color,(*colorMod));
-    if (highlightColor)vector4d_copy(modelUBO.highlight,(*highlightColor));
         
     vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
     
@@ -333,7 +329,6 @@ void gf3d_model_update_highlight_uniform_buffer(
     Model *model,
     UniformBuffer *ubo,
     Matrix4 modelMat,
-    Vector4D *colorMod,
     Vector4D *highlightColor)
 {
     void* data;
@@ -345,8 +340,7 @@ void gf3d_model_update_highlight_uniform_buffer(
     gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     
-    if (colorMod)vector4d_copy(modelUBO.color,(*colorMod));
-    if (highlightColor)vector4d_copy(modelUBO.highlight,(*highlightColor));
+    if (highlightColor)vector4d_copy(modelUBO.color,(*highlightColor));
         
     vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
     
