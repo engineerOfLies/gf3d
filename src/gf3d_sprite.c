@@ -3,6 +3,7 @@
 #include "gfc_types.h"
 
 #include "gf3d_buffers.h"
+#include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
@@ -38,11 +39,9 @@ typedef struct
     VkDeviceMemory  faceBufferMemory; /**<memory habdle for tge face memory*/
     VkVertexInputAttributeDescription   attributeDescriptions[SPRITE_ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription     bindingDescription;
-    Command                            *stagingCommandBuffer;
 }SpriteManager;
 
 void gf3d_sprite_update_basic_descriptor_set(Sprite *model,VkDescriptorSet descriptorSet,Uint32 chainIndex,Matrix4 modelMat,Uint32 frame);
-void gf3d_sprite_create_uniform_buffer(Sprite *sprite);
 void gf3d_sprite_create_vertex_buffer(Sprite *sprite);
 void gf3d_sprite_delete(Sprite *sprite);
 
@@ -75,7 +74,7 @@ void gf3d_sprite_manager_close()
     slog("sprite manager closed");
 }
 
-void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice device)
+void gf3d_sprite_manager_init(Uint32 max_sprites)
 {
     void* data;
     Uint32 count;
@@ -89,10 +88,10 @@ void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice de
         slog("cannot intilizat sprite manager for 0 sprites");
         return;
     }
-    gf3d_sprite.chain_length = chain_length;
+    gf3d_sprite.chain_length = gf3d_swapchain_get_chain_length();
     gf3d_sprite.sprite_list = (Sprite *)gfc_allocate_array(sizeof(Sprite),max_sprites);
     gf3d_sprite.max_sprites = max_sprites;
-    gf3d_sprite.device = device;
+    gf3d_sprite.device = gf3d_vgraphics_get_default_logical_device();
     
     // setup the face buffer, which will be used for ALL sprites
     faces[0].verts[0] = 2;
@@ -106,16 +105,16 @@ void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice de
     
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    vkMapMemory(gf3d_sprite.device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, faces, (size_t) bufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
+    vkUnmapMemory(gf3d_sprite.device, stagingBufferMemory);
 
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &gf3d_sprite.faceBuffer, &gf3d_sprite.faceBufferMemory);
 
     gf3d_buffer_copy(stagingBuffer, gf3d_sprite.faceBuffer, bufferSize);
 
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
+    vkDestroyBuffer(gf3d_sprite.device, stagingBuffer, NULL);
+    vkFreeMemory(gf3d_sprite.device, stagingBufferMemory, NULL);
 
     gf3d_sprite_get_attribute_descriptions(&count);
     gf3d_sprite.pipe = gf3d_pipeline_create_from_config(
@@ -154,7 +153,6 @@ Sprite *gf3d_sprite_new()
     {
         if (gf3d_sprite.sprite_list[i]._inuse)continue;
         gf3d_sprite.sprite_list[i]._inuse = 1;
-        gf3d_sprite_create_uniform_buffer(&gf3d_sprite.sprite_list[i]);
         return &gf3d_sprite.sprite_list[i];
     }
     slog("gf3d_sprite_new: no free slots for new sprites");
@@ -202,14 +200,8 @@ void gf3d_sprite_free(Sprite *sprite)
 
 void gf3d_sprite_delete(Sprite *sprite)
 {
-    int i;
     if (!sprite)return;
     
-    for (i = 0; i < sprite->uniformBufferCount; i++)
-    {
-        vkDestroyBuffer(gf3d_sprite.device, sprite->uniformBuffers[i], NULL);
-        vkFreeMemory(gf3d_sprite.device, sprite->uniformBuffersMemory[i], NULL);
-    }
     if (sprite->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_sprite.device, sprite->buffer, NULL);
@@ -326,7 +318,7 @@ void gf3d_sprite_create_vertex_buffer(Sprite *sprite)
 void gf3d_sprite_update_uniform_buffer(Sprite *sprite,UniformBuffer *ubo,Matrix4 modelMat,Uint32 frame)
 {
     void* data;
-    SpriteUBO spriteUBO;
+    SpriteUBO spriteUBO = {0};
     gfc_matrix_copy(spriteUBO.model,modelMat);
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
@@ -361,7 +353,7 @@ void gf3d_sprite_update_basic_descriptor_set(Sprite *sprite,VkDescriptorSet desc
 
     ubo = gf3d_uniform_buffer_list_get_buffer(gf3d_sprite.pipe->uboList, chainIndex);
     gf3d_sprite_update_uniform_buffer(sprite,ubo,modelMat,frame);
-    bufferInfo.buffer = sprite->uniformBuffers[chainIndex];
+    bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(SpriteUBO);        
     
@@ -407,28 +399,6 @@ VkVertexInputAttributeDescription * gf3d_sprite_get_attribute_descriptions(Uint3
     gf3d_sprite.attributeDescriptions[1].offset = offsetof(SpriteVertex, texel);
     if (count)*count = SPRITE_ATTRIBUTE_COUNT;
     return gf3d_sprite.attributeDescriptions;
-}
-
-
-void gf3d_sprite_create_uniform_buffer(Sprite *sprite)
-{
-    int i;
-    Uint32 buffercount = gf3d_sprite.chain_length;
-    VkDeviceSize bufferSize = sizeof(SpriteUBO);
-
-    if (!sprite)
-    {
-        slog("Failed to provide valid sprite pointer");
-        return;
-    }
-    sprite->uniformBuffers = (VkBuffer*)gfc_allocate_array(sizeof(VkBuffer),buffercount);
-    sprite->uniformBuffersMemory = (VkDeviceMemory*)gfc_allocate_array(sizeof(VkDeviceMemory),buffercount);
-    sprite->uniformBufferCount = buffercount;
-
-    for (i = 0; i < buffercount; i++)
-    {
-        gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sprite->uniformBuffers[i], &sprite->uniformBuffersMemory[i]);
-    }
 }
 
 Pipeline *gf3d_sprite_get_pipeline()

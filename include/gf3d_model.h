@@ -51,7 +51,7 @@ typedef struct
  * @param chain_length how many swap chains are supported
  * @param device the logical device to use
  */
-void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device);
+void gf3d_model_manager_init(Uint32 max_models);
 
 /**
  * @brief get a blank model address

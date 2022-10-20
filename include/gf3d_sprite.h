@@ -40,18 +40,13 @@ typedef struct
     VkBuffer                    buffer;                 /**<vertex buffer for the sprite (always 4 vertices)*/
     VkDeviceMemory              bufferMemory;           /**<memory handle for the vertex buffer*/
     VkDescriptorSet            *descriptorSet;          /**<descriptor sets used for this sprite to render*/
-    VkBuffer                   *uniformBuffers;         /**<handles for the UBO*/
-    VkDeviceMemory             *uniformBuffersMemory;   /**<memory handle for the UBO memory*/
-    Uint32                      uniformBufferCount;     /**<how many UBOs for the sprite*/
 }Sprite;
 
 /**
  * @brief initialize the internal management system for sprites, auto-cleaned up on program exit
  * @param max_sprites how many concurrent sprites to support
- * @param chain_length how many images are available in the swap chain
- * @param device the logical vulkan device to be rendering to
  */
-void gf3d_sprite_manager_init(Uint32 max_sprites,Uint32 chain_length,VkDevice device);
+void gf3d_sprite_manager_init(Uint32 max_sprites);
 
 /**
  * @brief loads a sprite sheet into memory

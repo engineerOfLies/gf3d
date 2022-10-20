@@ -13,7 +13,11 @@ UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize buf
         return NULL;
     }
     bufferList = gfc_allocate_array(sizeof(UniformBufferList),1);
-    if (!bufferList)return NULL;
+    if (!bufferList)
+    {
+        slog("failed to allocate unform buffers list");
+        return NULL;
+    }
     
     bufferList->device = device;
     
@@ -22,6 +26,7 @@ UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize buf
     if (!bufferList->buffers)
     {
         gf3d_uniform_buffer_list_free(bufferList);
+        slog("failed to allocate unform buffers list");
         return NULL;
     }
     
@@ -31,6 +36,7 @@ UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize buf
         if (!bufferList->buffers[j])
         {
             gf3d_uniform_buffer_list_free(bufferList);
+            slog("failed to allocate unform buffers");
             return NULL;
         }
         for (i = 0; i < bufferCount; i++)
@@ -85,6 +91,7 @@ UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferList *list, Uint
         list->buffers[bufferFrame][i]._inuse = 1;
         return &list->buffers[bufferFrame][i];
     }
+    slog("out of uniform buffers");
     return NULL;
 }
 

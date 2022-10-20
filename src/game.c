@@ -12,6 +12,7 @@
 #include "gf3d_camera.h"
 #include "gf3d_texture.h"
 #include "gf3d_sprite.h"
+#include "gf3d_particle.h"
 
 #include "entity.h"
 #include "agumon.h"
@@ -27,10 +28,12 @@ int main(int argc,char *argv[])
     
     Sprite *mouse = NULL;
     int mousex,mousey;
+    Uint32 then;
     float mouseFrame = 0;
     World *w;
     Entity *agu;
-    
+    Particle particle[100];
+
     for (a = 1; a < argc;a++)
     {
         if (strcmp(argv[a],"--debug") == 0)
@@ -59,10 +62,19 @@ int main(int argc,char *argv[])
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(-50,0,0));
     
+    
+    for (a = 0; a < 100; a++)
+    {
+        particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
+        particle[a].color = gfc_color(gfc_random(),gfc_random(),gfc_random(),1);
+        particle[a].size = 10;
+    }
+    a = 0;
     // main game loop
     slog("gf3d main loop begin");
     while(!done)
     {
+        then = SDL_GetTicks();
         gfc_input_update();
         SDL_GetMouseState(&mousex,&mousey);
         
@@ -86,11 +98,17 @@ int main(int argc,char *argv[])
             //3D draws
                 world_draw(w);
                 entity_draw_all();
+                
+                for (a = 0; a < 100; a++)
+                {
+                    gf3d_particle_draw(&particle[a]);
+                }
             //2D draws
                 gf3d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
+        slog("time to handle one game loop: %i",SDL_GetTicks() - then);
     }    
     
     world_delete(w);

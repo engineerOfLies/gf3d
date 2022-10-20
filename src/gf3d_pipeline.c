@@ -447,7 +447,6 @@ void gf3d_pipeline_free(Pipeline *pipe)
         {
             if (pipe->descriptorPool[i] != VK_NULL_HANDLE)
             {
-                slog("cleaning up pipeline descriptor pool");
                 vkDestroyDescriptorPool(pipe->device, pipe->descriptorPool[i], NULL);
             }
         }

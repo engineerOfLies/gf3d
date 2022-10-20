@@ -28,6 +28,8 @@
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
 #include "gf3d_sprite.h"
+#include "gf3d_particle.h"
+
 #include "gf3d_vgraphics.h"
 
 
@@ -69,6 +71,7 @@ typedef struct
     VkCommandBuffer             commandModelBuffer;
     VkCommandBuffer             commandHighlightBuffer;
     VkCommandBuffer             commandOverlayBuffer;
+    VkCommandBuffer             commandParticleBuffer;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -166,15 +169,16 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
-    gf3d_pipeline_init(8);// how many different rendering pipelines we need
+    gf3d_pipeline_init(16);// how many different rendering pipelines we need
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
     gf3d_texture_init(1024);
-        
-    gf3d_command_system_init(8 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
+
+    gf3d_command_system_init(16 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
-    gf3d_model_manager_init(1024,gf3d_swapchain_get_swap_image_count(),gf3d_vgraphics.device);    
-    gf3d_sprite_manager_init(1024,gf3d_swapchain_get_swap_image_count(),gf3d_vgraphics.device);
+    gf3d_model_manager_init(1024);
+    gf3d_sprite_manager_init(1024);
+    gf3d_particle_manager_init(4096);
 
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(gf3d_mesh_get_pipeline());
@@ -375,6 +379,12 @@ VkExtent2D gf3d_vgraphics_get_view_extent()
     return gf3d_swapchain_get_extent();
 }
 
+Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
+{
+    VkExtent2D extent;
+    extent = gf3d_swapchain_get_extent();
+    return vector2d(extent.width,extent.height);
+}
 
 
 Uint32 gf3d_vgraphics_render_begin()
@@ -411,6 +421,7 @@ void gf3d_vgraphics_render_start()
     
     gf3d_pipeline_reset_frame(gf3d_mesh_get_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh_get_highlight_pipeline(),gf3d_vgraphics.bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_particle_get_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_sprite_get_pipeline(),gf3d_vgraphics.bufferFrame);
         
     gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
@@ -424,6 +435,10 @@ void gf3d_vgraphics_render_start()
     gf3d_vgraphics.commandOverlayBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
         gf3d_sprite_get_pipeline());
+
+    gf3d_vgraphics.commandParticleBuffer = gf3d_command_rendering_begin(
+        gf3d_vgraphics.bufferFrame,
+        gf3d_particle_get_pipeline());
 }
 
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
@@ -446,6 +461,11 @@ VkCommandBuffer gf3d_vgraphics_get_current_command_overlay_buffer()
     return gf3d_vgraphics.commandOverlayBuffer;
 }
 
+VkCommandBuffer gf3d_vgraphics_get_current_command_particle_buffer()
+{
+    return gf3d_vgraphics.commandParticleBuffer;
+}
+
 void gf3d_vgraphics_render_end()
 {
     VkPresentInfoKHR presentInfo = {0};
@@ -458,6 +478,7 @@ void gf3d_vgraphics_render_end()
     
     gf3d_command_rendering_end(gf3d_vgraphics.commandModelBuffer);
     gf3d_command_rendering_end(gf3d_vgraphics.commandHighlightBuffer);
+    gf3d_command_rendering_end(gf3d_vgraphics.commandParticleBuffer);
     gf3d_command_rendering_end(gf3d_vgraphics.commandOverlayBuffer);
 
     

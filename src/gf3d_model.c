@@ -3,6 +3,7 @@
 #include "simple_logger.h"
 
 #include "gf3d_buffers.h"
+#include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_obj_load.h"
@@ -71,17 +72,17 @@ void gf3d_model_manager_close()
     slog("model manager closed");
 }
 
-void gf3d_model_manager_init(Uint32 max_models,Uint32 chain_length,VkDevice device)
+void gf3d_model_manager_init(Uint32 max_models)
 {
     if (max_models == 0)
     {
         slog("cannot intilizat model manager for 0 models");
         return;
     }
-    gf3d_model.chain_length = chain_length;
+    gf3d_model.chain_length = gf3d_swapchain_get_chain_length();
     gf3d_model.model_list = (Model *)gfc_allocate_array(sizeof(Model),max_models);
     gf3d_model.max_models = max_models;
-    gf3d_model.device = device;
+    gf3d_model.device = gf3d_vgraphics_get_default_logical_device();
     gf3d_model.pipe = gf3d_mesh_get_pipeline();
     
     slog("model manager initiliazed");

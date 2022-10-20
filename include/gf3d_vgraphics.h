@@ -41,6 +41,11 @@ Uint32  gf3d_vgraphics_get_current_buffer_frame();
  */
 VkCommandBuffer gf3d_vgraphics_get_current_command_model_buffer();
 
+/**
+ * @brief get the handle to the active command buffer for the current model highlight rendering context
+ * @note: THIS SHOULD ONLY BE CALLED BETWEEN CALLS TO gf3d_vgraphics_render_start() and gf3d_vgraphics_render_end()
+ * @return the handle to the command buffer.
+ */
 VkCommandBuffer gf3d_vgraphics_get_current_command_model_highlight_buffer();
 
 /**
@@ -50,6 +55,12 @@ VkCommandBuffer gf3d_vgraphics_get_current_command_model_highlight_buffer();
  */
 VkCommandBuffer gf3d_vgraphics_get_current_command_overlay_buffer();
 
+/**
+ * @brief get the handle to the active command buffer for the current particle rendering context
+ * @note: THIS SHOULD ONLY BE CALLED BETWEEN CALLS TO gf3d_vgraphics_render_start() and gf3d_vgraphics_render_end()
+ * @return the handle to the command buffer.
+ */
+VkCommandBuffer gf3d_vgraphics_get_current_command_particle_buffer();
 
 /**
  * @brief After initialization 
@@ -59,6 +70,8 @@ VkDevice gf3d_vgraphics_get_default_logical_device();
 VkPhysicalDevice gf3d_vgraphics_get_default_physical_device();
 
 VkExtent2D gf3d_vgraphics_get_view_extent();
+Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
+
 
 void gf3d_vgraphics_clear();
 
