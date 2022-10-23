@@ -27,7 +27,7 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
-#include "gf3d_sprite.h"
+#include "gf2d_sprite.h"
 #include "gf3d_particle.h"
 
 #include "gf3d_vgraphics.h"
@@ -203,7 +203,7 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
     gf3d_model_manager_init(1024);
-    gf3d_sprite_manager_init(1024);
+    gf2d_sprite_manager_init(1024);
     gf3d_particle_manager_init(4096);
 
     gf3d_swapchain_create_depth_image();
@@ -488,7 +488,7 @@ void gf3d_vgraphics_render_start()
     gf3d_pipeline_reset_frame(gf3d_mesh_get_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh_get_highlight_pipeline(),gf3d_vgraphics.bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_particle_get_pipeline(),gf3d_vgraphics.bufferFrame);
-    gf3d_pipeline_reset_frame(gf3d_sprite_get_pipeline(),gf3d_vgraphics.bufferFrame);
+    gf3d_pipeline_reset_frame(gf2d_sprite_get_pipeline(),gf3d_vgraphics.bufferFrame);
         
     gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
@@ -504,7 +504,7 @@ void gf3d_vgraphics_render_start()
     
     gf3d_vgraphics.commandOverlayBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
-        gf3d_sprite_get_pipeline());
+        gf2d_sprite_get_pipeline());
 
 }
 

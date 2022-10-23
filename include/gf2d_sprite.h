@@ -1,8 +1,8 @@
-#ifndef __GF3D_SPRITE_H__
-#define __GF3D_SPRITE_H__
+#ifndef __GF2D_SPRITE_H__
+#define __GF2D_SPRITE_H__
 
 /**
- * gf3d_sprite
+ * gf2d_sprite
  * @license The MIT License (MIT)
    @copyright Copyright (c) 2019 EngineerOfLies
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,8 +37,8 @@ typedef struct
     Texture                    *texture;                /**<texture memory pointer*/
     Uint8                       framesPerLine;          /**<how many frames are per line in the sprite sheet*/
     Uint32                      frameWidth,frameHeight; /*<the size, in pixels, of the individual sprite frames*/
-    VkBuffer                    buffer;                 /**<vertex buffer for the sprite (always 4 vertices)*/
-    VkDeviceMemory              bufferMemory;           /**<memory handle for the vertex buffer*/
+    VkBuffer                    buffer;
+    VkDeviceMemory              bufferMemory;
     VkDescriptorSet            *descriptorSet;          /**<descriptor sets used for this sprite to render*/
 }Sprite;
 
@@ -46,22 +46,33 @@ typedef struct
  * @brief initialize the internal management system for sprites, auto-cleaned up on program exit
  * @param max_sprites how many concurrent sprites to support
  */
-void gf3d_sprite_manager_init(Uint32 max_sprites);
+void gf2d_sprite_manager_init(Uint32 max_sprites);
 
 /**
  * @brief loads a sprite sheet into memory
- * @param frame_width how wide an individual frame is on the sprite sheet
- * @param frame_height how high an individual frame is on the sprite sheet
+ * @param filename the name of the file containing the image data
+ * @param frame_width how wide an individual frame is on the sprite sheet.  if <= 0 this is assumed to be the image size
+ * @param frame_height how high an individual frame is on the sprite sheet.  if <= 0 this is assumed to be the image size
  * @param frames_per_line how many frames across are on the sprite sheet
  * @return NULL on error (check logs) or a pointer to a sprite that can be draw to the 2d overlay
  */
-Sprite * gf3d_sprite_load(char * filename,int frame_width,int frame_height, Uint32 frames_per_line);
+Sprite * gf2d_sprite_load(char * filename,int frame_width,int frame_height, Uint32 frames_per_line);
+
+/**
+ * @brief create a sprite from an SDL_Surface
+ * @param surface pointer to SDL_Surface image data
+ * @param frame_width how wide an individual frame is on the sprite sheet.  if <= 0 this is assumed to be the image size
+ * @param frame_height how high an individual frame is on the sprite sheet.  if <= 0 this is assumed to be the image size
+ * @param frames_per_line how many frames across are on the sprite sheet
+ * @return NULL on error (check logs) or a pointer to a sprite that can be draw to the 2d overlay
+ */
+Sprite * gf2d_sprite_from_surface(SDL_Surface *surface,int frame_width,int frame_height, Uint32 frames_per_line);
 
 /**
  * @brief free a previously loaded sprite
  * @param sprite a pointer to the sprite to be freed
  */
-void gf3d_sprite_free(Sprite *sprite);
+void gf2d_sprite_free(Sprite *sprite);
 
 /**
  * @brief draw a sprite frame to the current buffer frame
@@ -70,20 +81,20 @@ void gf3d_sprite_free(Sprite *sprite);
  * @param scale amount to scale the sprite by.  (1,1) is no scale
  * @param frame the frame of the sprite to draw
  */
-void gf3d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Uint32 frame);
+void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Uint32 frame);
 
 /**
  * @brief get the default pipeline for overlay rendering
  * @return NULL on error or not yet initlialized, the pipeline otherwise
  */
-Pipeline *gf3d_sprite_get_pipeline();
+Pipeline *gf2d_sprite_get_pipeline();
 
 /**
  * @brief get the binding description for a sprite
  */
-VkVertexInputBindingDescription * gf3d_sprite_get_bind_description();
+VkVertexInputBindingDescription * gf2d_sprite_get_bind_description();
 
-VkVertexInputAttributeDescription * gf3d_sprite_get_attribute_descriptions(Uint32 *count);
+VkVertexInputAttributeDescription * gf2d_sprite_get_attribute_descriptions(Uint32 *count);
 
 
 #endif

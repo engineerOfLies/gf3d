@@ -33,7 +33,15 @@ void gf3d_texture_init(Uint32 max_textures);
 Texture *gf3d_texture_load(const char *filename);
 
 /**
- * @brief free a previously loaded texture
+ * @brief create a texture based on the provided surface.
+ * @note the filename is not populated by this
+ * @param surface the SDL_Surface image data to convert
+ * @return NULL on error or a new Texture otherwise
+ */
+Texture *gf3d_texture_convert_surface(SDL_Surface * surface);
+
+/**
+* @brief free a previously loaded texture
  */
 void gf3d_texture_free(Texture *tex);
 

@@ -11,8 +11,10 @@
 #include "gf3d_model.h"
 #include "gf3d_camera.h"
 #include "gf3d_texture.h"
-#include "gf3d_sprite.h"
 #include "gf3d_particle.h"
+
+#include "gf2d_sprite.h"
+#include "gf2d_font.h"
 
 #include "entity.h"
 #include "agumon.h"
@@ -28,7 +30,7 @@ int main(int argc,char *argv[])
     
     Sprite *mouse = NULL;
     int mousex,mousey;
-    Uint32 then;
+    //Uint32 then;
     float mouseFrame = 0;
     World *w;
     Entity *agu;
@@ -46,11 +48,13 @@ int main(int argc,char *argv[])
     gfc_input_init("config/input.cfg");
     slog("gf3d begin");
     gf3d_vgraphics_init("config/setup.cfg");
+    gf2d_font_init("config/font.cfg");
+
     slog_sync();
     
     entity_system_init(1024);
     
-    mouse = gf3d_sprite_load("images/pointer.png",32,32, 16);
+    mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
     
     agu = agumon_new(vector3d(0 ,0,0));
@@ -73,8 +77,8 @@ int main(int argc,char *argv[])
     slog("gf3d main loop begin");
     while(!done)
     {
-        then = SDL_GetTicks();
         gfc_input_update();
+        gf2d_font_update();
         SDL_GetMouseState(&mousex,&mousey);
         
         mouseFrame += 0.01;
@@ -83,15 +87,8 @@ int main(int argc,char *argv[])
         entity_think_all();
         entity_update_all();
         gf3d_camera_update_view();
-        /*gf3d_camera_look_at(
-            vector3d(0,100,100),
-            vector3d(0,0,0),
-            vector3d(0,0,1)
-        );*/
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
 
-        // configure render command for graphics command pool
-        // for each mesh, get a command and configure it from the pool
         gf3d_vgraphics_render_start();
 
             //3D draws
@@ -103,11 +100,11 @@ int main(int argc,char *argv[])
                     gf3d_particle_draw(&particle[a]);
                 }
             //2D draws
-                gf3d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),(Uint32)mouseFrame);
+                gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
+                gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
-        //slog("time to handle one game loop: %i",SDL_GetTicks() - then);
     }    
     
     world_delete(w);

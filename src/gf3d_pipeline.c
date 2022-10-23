@@ -8,8 +8,6 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
 #include "gf3d_shaders.h"
-#include "gf3d_model.h"
-#include "gf3d_sprite.h"
 #include "gf3d_pipeline.h"
 
 extern int __DEBUG;
