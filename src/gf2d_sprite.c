@@ -294,8 +294,10 @@ void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Uint32 fra
     gfc_matrix_identity(modelMat);
     gfc_matrix_scale(
         modelMat,
-        vector3d(scale.x,scale.y,1));
-    gfc_matrix_make_translation(
+        vector3d(scale.x,scale.y,0));
+    
+    
+    gfc_matrix_translate(
         modelMat,
         vector3d(position.x*2/(float)extent.width,position.y*2/(float)extent.height,0));
 
