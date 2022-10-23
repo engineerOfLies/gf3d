@@ -79,9 +79,10 @@ void gf2d_sprite_free(Sprite *sprite);
  * @param sprite the sprite to draw
  * @param position where on the screen to draw the sprite
  * @param scale amount to scale the sprite by.  (1,1) is no scale
+ * @param color adjustment (1,1,1,1) is no adjustment
  * @param frame the frame of the sprite to draw
  */
-void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Uint32 frame);
+void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Vector3D rotation,Color color,Uint32 frame);
 
 /**
  * @brief get the default pipeline for overlay rendering

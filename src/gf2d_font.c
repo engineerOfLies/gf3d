@@ -356,7 +356,7 @@ void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position)
     if (image != NULL)
     {
         image->last_used = SDL_GetTicks();
-        gf2d_sprite_draw(image->image,position,vector2d(1,1),0);
+        gf2d_sprite_draw(image->image,position,vector2d(1,1),vector3d(0,0,0),gfc_color(1,1,1,1),0);
         return;
     }
 
@@ -373,7 +373,7 @@ void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position)
         SDL_FreeSurface(surface);
         return;
     }
-    gf2d_sprite_draw(sprite,position,vector2d(1,1),0);
+    gf2d_sprite_draw(sprite,position,vector2d(1,1),vector3d(0,0,0),gfc_color(1,1,1,1),0);
     gf2d_font_image_new(sprite,text,color,font);
 }
 
