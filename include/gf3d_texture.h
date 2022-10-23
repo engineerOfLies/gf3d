@@ -15,6 +15,7 @@ typedef struct
     VkDeviceMemory      textureImageMemory;
     VkImageView         textureImageView;
     VkSampler           textureSampler;
+    SDL_Surface        *surface;    /**<the image data in CPU space*/
 }Texture;
 
 /**

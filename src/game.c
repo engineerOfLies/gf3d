@@ -62,12 +62,11 @@ int main(int argc,char *argv[])
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(-50,0,0));
     
-    
     for (a = 0; a < 100; a++)
     {
         particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
         particle[a].color = gfc_color(gfc_random(),gfc_random(),gfc_random(),1);
-        particle[a].size = 10;
+        particle[a].size = 100 * gfc_random();
     }
     a = 0;
     // main game loop
@@ -108,7 +107,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_end();
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
-        slog("time to handle one game loop: %i",SDL_GetTicks() - then);
+        //slog("time to handle one game loop: %i",SDL_GetTicks() - then);
     }    
     
     world_delete(w);

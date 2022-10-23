@@ -14,5 +14,6 @@ void main()
     float l = length(coord);
     if (l > 1.0) discard;
     outColor = inColor;
+    outColor.w *= 1 + * _MipScale;
     outColor.w = 1 - l;
 }

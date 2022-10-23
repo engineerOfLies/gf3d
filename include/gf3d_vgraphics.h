@@ -93,6 +93,10 @@ Matrix4 *gf3d_vgraphics_get_view_matrix();
 
 
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
+
+/**
+ * @brief get the current MVP matrix for the render calls.
+ */
 UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
 
 /**
@@ -101,9 +105,34 @@ UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
  */
 Pipeline *gf3d_vgraphics_get_graphics_overlay_pipeline();
 
+/**
+ * @brief get a command from the graphics command pool
+ * @return NULL if non are left, or an empty command
+ */
 Command *gf3d_vgraphics_get_graphics_command_pool();
 
+/**
+ * @brief create an image view in the given vulkan format
+ * @param image the image to create the view for
+ * @param format the format to create the view for
+ * @return VkNullHandle on error or an imageview handle otherwise
+ */
 VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format);
 
+/**
+ * @brief create an empty SDL_Surface in the format supported by the screen
+ * @param w the width to create, should be non-zero
+ * @param h the hight to create, should be non-zero
+ * @return NULL on error, or an empty SDL_Surface in the proper format
+ */
+SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h);
+
+/**
+ * @brief convert a SDL_Surface to the format supported by the system
+ * @param surface a pointer to the SDL_Surface pointer that contains the image data to convert
+ * @return NULL on failure, or a new SDL surface of the same image, but in the supported format.
+ * @note this will clear the data of the original surface if it is successful automatically.
+ */
+SDL_Surface *gf3d_vgraphics_screen_convert(SDL_Surface **surface);
 
 #endif

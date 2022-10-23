@@ -72,6 +72,13 @@ typedef struct
     VkCommandBuffer             commandHighlightBuffer;
     VkCommandBuffer             commandOverlayBuffer;
     VkCommandBuffer             commandParticleBuffer;
+    
+    SDL_Surface                *screen;
+    Sint32                      bitdepth;
+    Uint32                      rmask;
+    Uint32                      gmask;
+    Uint32                      bmask;
+    Uint32                      amask;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -171,6 +178,25 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
     gf3d_pipeline_init(16);// how many different rendering pipelines we need
     gf3d_mesh_init(1024);//TODO: pull this from a parameter
+    
+    // 2D stuff
+    SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_RGBA32,
+                                &gf3d_vgraphics.bitdepth,
+                                &gf3d_vgraphics.rmask,
+                                &gf3d_vgraphics.gmask,
+                                &gf3d_vgraphics.bmask,
+                                &gf3d_vgraphics.amask);
+    
+    gf3d_vgraphics.screen = SDL_CreateRGBSurface(
+        0,
+        resolution.x,
+        resolution.y,
+        gf3d_vgraphics.bitdepth,
+        gf3d_vgraphics.rmask,
+        gf3d_vgraphics.gmask,
+        gf3d_vgraphics.bmask,
+        gf3d_vgraphics.amask);
+
     gf3d_texture_init(1024);
 
     gf3d_command_system_init(16 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
@@ -386,6 +412,46 @@ Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
     return vector2d(extent.width,extent.height);
 }
 
+SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h)
+{
+    SDL_Surface *surface;
+    surface = SDL_CreateRGBSurface(
+        0,w, h,
+        gf3d_vgraphics.bitdepth,
+        gf3d_vgraphics.rmask,
+        gf3d_vgraphics.gmask,
+        gf3d_vgraphics.bmask,
+        gf3d_vgraphics.amask);
+    return surface;
+}
+
+
+SDL_Surface *gf3d_vgraphics_screen_convert(SDL_Surface **surface)
+{
+    SDL_Surface *convert;
+    if (!(*surface))
+    {
+        slog("surface provided was NULL");
+        return NULL;
+    }
+    if (!gf3d_vgraphics.screen)
+    {
+        slog("graphics not yet initialized");
+        return NULL;
+    }
+    convert = SDL_ConvertSurface(*surface,
+                       gf3d_vgraphics.screen->format,
+                       0);
+    if (!convert)
+    {
+        slog("failed to convert surface: %s",SDL_GetError());
+        return NULL;
+    }
+    SDL_FreeSurface(*surface);
+    *surface = NULL;
+    return convert;
+}
+
 
 Uint32 gf3d_vgraphics_render_begin()
 {
@@ -428,6 +494,10 @@ void gf3d_vgraphics_render_start()
         gf3d_vgraphics.bufferFrame,
         gf3d_mesh_get_pipeline());
 
+    gf3d_vgraphics.commandParticleBuffer = gf3d_command_rendering_begin(
+        gf3d_vgraphics.bufferFrame,
+        gf3d_particle_get_pipeline());
+
     gf3d_vgraphics.commandHighlightBuffer = gf3d_command_rendering_begin(
         gf3d_vgraphics.bufferFrame,
         gf3d_mesh_get_highlight_pipeline());
@@ -436,9 +506,6 @@ void gf3d_vgraphics_render_start()
         gf3d_vgraphics.bufferFrame,
         gf3d_sprite_get_pipeline());
 
-    gf3d_vgraphics.commandParticleBuffer = gf3d_command_rendering_begin(
-        gf3d_vgraphics.bufferFrame,
-        gf3d_particle_get_pipeline());
 }
 
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
@@ -570,7 +637,6 @@ void gf3d_vgraphics_rotate_camera(float degrees)
         vector3d(0,0,1));
 
 }
-
 
 Command *gf3d_vgraphics_get_graphics_command_pool()
 {

@@ -198,9 +198,8 @@ void gf3d_texture_create_sampler(Texture *tex)
     slog("created texture sampler");
 }
 
-Texture *gf3d_texture_load(const char *filename)
+Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
 {
-    SDL_Surface * surface;
     void* data;
     Texture *tex;
     VkDeviceSize imageSize;
@@ -210,25 +209,19 @@ Texture *gf3d_texture_load(const char *filename)
     VkMemoryRequirements memRequirements;
     VkMemoryAllocateInfo allocInfo = {0};
 
-    tex = gf3d_texture_get_by_filename(filename);
-    if (tex)
-    {
-        tex->_refcount++;
-        return tex;
-    }
-    surface = IMG_Load(filename);
     if (!surface)
     {
-        slog("failed to load texture file %s",filename);
+        slog("no surface provided for texture conversion");
         return NULL;
     }
+    
+    surface = gf3d_vgraphics_screen_convert(&surface);
+
     tex = gf3d_texture_new();
     if (!tex)
     {
-        SDL_FreeSurface(surface);
         return NULL;
     }
-    gfc_line_cpy(tex->filename,filename);
     tex->width = surface->w;
     tex->height = surface->h;
     imageSize = surface->w * surface->h * 4;
@@ -291,8 +284,36 @@ Texture *gf3d_texture_load(const char *filename)
     
     vkDestroyBuffer(gf3d_texture.device, stagingBuffer, NULL);
     vkFreeMemory(gf3d_texture.device, stagingBufferMemory, NULL);
-    SDL_FreeSurface(surface);
-    slog("created texture for image: %s",filename);
+    return tex;
+}
+
+
+Texture *gf3d_texture_load(const char *filename)
+{
+    SDL_Surface * surface;
+    Texture *tex;
+
+    tex = gf3d_texture_get_by_filename(filename);
+    if (tex)
+    {
+        tex->_refcount++;
+        return tex;
+    }
+    surface = IMG_Load(filename);
+    if (!surface)
+    {
+        slog("failed to load texture file %s",filename);
+        return NULL;
+    }
+    tex = gf3d_texture_convert_surface(surface);
+    
+    if (!tex)
+    {
+        SDL_FreeSurface(surface);
+        return NULL;
+    }
+    gfc_line_cpy(tex->filename,filename);
+    tex->surface = surface;
     return tex;
 }
 
