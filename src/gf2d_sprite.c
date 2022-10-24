@@ -378,6 +378,7 @@ void gf2d_sprite_update_uniform_buffer(
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
 
+    slog("rotation: %f",rotation.z);
     vkMapMemory(gf2d_sprite.device, ubo->uniformBufferMemory, 0, sizeof(SpriteUBO), 0, &data);
     
         memcpy(data, &spriteUBO, sizeof(SpriteUBO));

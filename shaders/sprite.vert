@@ -23,7 +23,13 @@ layout(location = 1) out vec4 colorMod;
 
 void main()
 {
-    gl_Position = vec4(ubo.scale * inPosition + (ubo.position * 2)/ubo.extent,0, 1.0);
+    mat3 rotation = mat3(
+        cos(-ubo.rotation.z),-sin(-ubo.rotation.z),0,
+        sin(-ubo.rotation.z),cos(-ubo.rotation.z) ,0,
+        0                 ,0                  ,1);
+
+    vec3 position = rotation * vec3(inPosition,1);
+    gl_Position = vec4(ubo.scale * position.xy + (position.xy * 2)/ubo.extent,0, 1.0);
     gl_Position = gl_Position - vec4(1,1,0,0);
 
     fragTexCoord = inTexCoord + ubo.frame_offset;
