@@ -23,10 +23,19 @@ layout(location = 1) out vec4 colorMod;
 
 void main()
 {
-    vec2 s_position = inPosition.xy * ubo.scale;
-    vec4 r_position = ubo.rotation * vec4(s_position,0,1);
+    mat4 scale_m = mat4(ubo.scale.x,0,0,0,
+                        0,ubo.scale.y,0,0,
+                        0,0,1,0,
+                        0,0,0,1);
+    mat4 translate_m = mat4(1,0,0,ubo.position.x * 2/ubo.extent.x,
+                            0,1,0,ubo.position.y * 2/ubo.extent.y,
+                            0,0,1,0,
+                            0,0,0,1);
+    vec4 r_position = scale_m * ubo.rotation * vec4(inPosition,0,1);
+//    vec2 s_position = inPosition.xy * ubo.scale;
+ //   vec4 r_position = ubo.rotation * vec4(s_position,0,1);
     vec4 drawOffset = vec4((ubo.position * 2)/ubo.extent,0,0);
-    gl_Position = vec4(r_position.xy,0,1) - vec4(1,1,0,0) + drawOffset;
+    gl_Position = vec4(r_position.xy/ubo.extent,0,1) - vec4(1,1,0,0) + drawOffset;
         
     fragTexCoord = inTexCoord + ubo.frame_offset;
     colorMod = ubo.colorMod;

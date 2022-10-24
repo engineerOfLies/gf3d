@@ -329,6 +329,22 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
             {0,0}
         },
         {
+            {sprite->frameWidth,0},
+            {sprite->frameWidth/(float)sprite->texture->width,0}
+        },
+        {
+            {0,sprite->frameHeight},
+            {0,sprite->frameHeight/(float)sprite->texture->height}
+        },
+        {
+            {sprite->frameWidth,sprite->frameHeight},
+            {sprite->frameWidth/(float)sprite->texture->width,sprite->frameHeight/(float)sprite->texture->height}
+        }
+/*        {
+            {0,0},
+            {0,0}
+        },
+        {
             {sprite->frameWidth/(float)extent.width,0},
             {sprite->frameWidth/(float)sprite->texture->width,0}
         },
@@ -339,7 +355,7 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
         {
             {sprite->frameWidth/(float)extent.width,sprite->frameHeight/(float)extent.height},
             {sprite->frameWidth/(float)sprite->texture->width,sprite->frameHeight/(float)sprite->texture->height}
-        }
+        }*/
     };
     bufferSize = sizeof(SpriteVertex) * 4;
     
@@ -375,8 +391,8 @@ void gf2d_sprite_update_uniform_buffer(
     spriteUBO.scale = scale;
     gfc_matrix_identity(spriteUBO.rotation);
     spriteUBO.rotation[0][0] = cos(rotation.z);
-    spriteUBO.rotation[0][1] = sin(rotation.z) * -1;
-    spriteUBO.rotation[1][0] = sin(rotation.z);
+    spriteUBO.rotation[0][1] = sin(rotation.z);
+    spriteUBO.rotation[1][0] = sin(rotation.z) * -1;//clockwise rotation
     spriteUBO.rotation[1][1] = cos(rotation.z);
 
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
