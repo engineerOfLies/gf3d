@@ -183,22 +183,18 @@ void gf3d_mesh_delete(Mesh *mesh)
     if (mesh->faceBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->faceBuffer, NULL);
-        slog("mesh %s face buffer freed",mesh->filename);
     }
     if (mesh->faceBufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->faceBufferMemory, NULL);
-        slog("mesh %s face buffer memory freed",mesh->filename);
     }
     if (mesh->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->buffer, NULL);
-        slog("mesh %s vert buffer freed",mesh->filename);
     }
     if (mesh->bufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->bufferMemory, NULL);
-        slog("mesh %s vert buffer memory freed",mesh->filename);
     }
     memset(mesh,0,sizeof(Mesh));
 }

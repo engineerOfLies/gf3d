@@ -13,13 +13,13 @@
 
 typedef struct
 {
+    Matrix4 rotation;
+    Vector4D colorMod;
     Vector2D size;
     Vector2D extent;
-    Vector4D colorMod;
     Vector2D position;
     Vector2D scale;
     Vector2D frame_offset;
-    Vector3D rotation;
 }SpriteUBO;
 
 typedef struct
@@ -373,12 +373,18 @@ void gf2d_sprite_update_uniform_buffer(
     spriteUBO.colorMod = gfc_color_to_vector4f(color);
     spriteUBO.position = position;
     spriteUBO.scale = scale;
-    spriteUBO.rotation = rotation;
+    gfc_matrix_identity(spriteUBO.rotation);
+    spriteUBO.rotation[0][0] = cos(rotation.z);
+    spriteUBO.rotation[0][1] = sin(rotation.z) * -1;
+    spriteUBO.rotation[1][0] = sin(rotation.z);
+    spriteUBO.rotation[1][1] = cos(rotation.z);
 
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
 
     slog("rotation: %f",rotation.z);
+    gfc_matrix4_slog(spriteUBO.rotation);
+    
     vkMapMemory(gf2d_sprite.device, ubo->uniformBufferMemory, 0, sizeof(SpriteUBO), 0, &data);
     
         memcpy(data, &spriteUBO, sizeof(SpriteUBO));
