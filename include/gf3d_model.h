@@ -60,7 +60,7 @@ void gf3d_model_manager_init(Uint32 max_models);
 Model * gf3d_model_new();
 
 /**
- * @brief load a model and texture from file where both the model is in models/<filename>.obj and the
+ * @brief load a model and texture from a config file that describe where the mesh data and texture data can be found
  * texture is in images><filename>,png
  * @param filename the common filename to load by
  * @return NULL on error, or the loaded model data otherwise

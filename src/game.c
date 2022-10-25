@@ -35,6 +35,8 @@ int main(int argc,char *argv[])
     World *w;
     Entity *agu;
     Particle particle[100];
+    Matrix4 skyMat;
+    Model *sky;
 
     for (a = 1; a < argc;a++)
     {
@@ -73,6 +75,10 @@ int main(int argc,char *argv[])
         particle[a].size = 100 * gfc_random();
     }
     a = 0;
+    sky = gf3d_model_load("models/sky.model");
+    gfc_matrix_identity(skyMat);
+    gfc_matrix_scale(skyMat,vector3d(1000,1000,100000));
+    
     // main game loop
     slog("gf3d main loop begin");
     while(!done)
@@ -92,6 +98,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
+                gf3d_model_draw(sky,skyMat,vector4d(1,1,1,1),vector4d(1,1,1,1));
                 world_draw(w);
                 entity_draw_all();
                 

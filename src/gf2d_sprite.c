@@ -320,7 +320,6 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
     void *data = NULL;
     VkDevice device = gf2d_sprite.device;
     size_t bufferSize;
-    VkExtent2D extent = gf3d_vgraphics_get_view_extent();
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     SpriteVertex vertices[] = {
@@ -340,22 +339,6 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
             {sprite->frameWidth,sprite->frameHeight},
             {sprite->frameWidth/(float)sprite->texture->width,sprite->frameHeight/(float)sprite->texture->height}
         }
-/*        {
-            {0,0},
-            {0,0}
-        },
-        {
-            {sprite->frameWidth/(float)extent.width,0},
-            {sprite->frameWidth/(float)sprite->texture->width,0}
-        },
-        {
-            {0,sprite->frameHeight/(float)extent.height},
-            {0,sprite->frameHeight/(float)sprite->texture->height}
-        },
-        {
-            {sprite->frameWidth/(float)extent.width,sprite->frameHeight/(float)extent.height},
-            {sprite->frameWidth/(float)sprite->texture->width,sprite->frameHeight/(float)sprite->texture->height}
-        }*/
     };
     bufferSize = sizeof(SpriteVertex) * 4;
     
@@ -397,9 +380,6 @@ void gf2d_sprite_update_uniform_buffer(
 
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
-
-    slog("rotation: %f",rotation.z);
-    gfc_matrix4_slog(spriteUBO.rotation);
     
     vkMapMemory(gf2d_sprite.device, ubo->uniformBufferMemory, 0, sizeof(SpriteUBO), 0, &data);
     
