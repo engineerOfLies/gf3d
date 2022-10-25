@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
     a = 0;
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix_identity(skyMat);
-    gfc_matrix_scale(skyMat,vector3d(100,100,100));
+    gfc_matrix_scale(skyMat,vector3d(100,100,10000));
     
     // main game loop
     slog("gf3d main loop begin");
