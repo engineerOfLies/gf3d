@@ -29,6 +29,13 @@ typedef struct
 
 typedef struct
 {
+    Matrix4 view;
+    Matrix4 proj;
+    Vector4D color; 
+}SkyUBO;
+
+typedef struct
+{
     Vector3D vertex;
     Vector3D normal;
     Vector2D texel;
@@ -83,6 +90,23 @@ VkVertexInputBindingDescription * gf3d_mesh_get_bind_description();
  * @brief free a mesh that has been loaded from memory
  */
 void gf3d_mesh_free(Mesh *mesh);
+
+/**
+ * @brief needs to be called once at the beginning of each render frame
+ */
+void gf3d_mesh_reset_pipes();
+
+/**
+ * @brief called to submit all draw commands to the mesh pipelines
+ */
+void gf3d_mesh_submit_pipe_commands();
+
+/**
+ * @brief get the current command buffer for the mesh system
+ */
+VkCommandBuffer gf3d_mesh_get_model_command_buffer();
+VkCommandBuffer gf3d_mesh_get_highlight_command_buffer();
+VkCommandBuffer gf3d_mesh_get_sky_command_buffer();
 
 
 /**

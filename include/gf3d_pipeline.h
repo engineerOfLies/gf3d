@@ -28,6 +28,8 @@ typedef struct
     Uint32                  descriptorPoolCount;
     Uint32                  descriptorSetCount;
     UniformBufferList      *uboList;                /**<for draw calls sent through this pipeline*/
+    VkCommandBuffer         commandBuffer;          /**<for current command*/
+
 }Pipeline;
 
 /**
@@ -98,6 +100,13 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
  * @param frame the swap chain rendering frame to reset the cursor for
  */
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame);
+
+/**
+ * @brief submit the render calls to the pipeline for this frame.  Called after reset_frame and all draw calls
+ * @param pipe for the pipe in question
+ */
+void gf3d_pipeline_submit_commands(Pipeline *pipe);
+
 
 VkFormat gf3d_pipeline_find_depth_format();
 

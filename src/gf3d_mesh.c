@@ -18,6 +18,7 @@ typedef struct
     Mesh *mesh_list;
     Pipeline *pipe;
     Pipeline *highlight_pipe;
+    Pipeline *sky_pipe;
     Uint32 mesh_max;
     VkVertexInputAttributeDescription attributeDescriptions[ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription bindingDescription;
@@ -74,7 +75,18 @@ void gf3d_mesh_init(Uint32 mesh_max)
         sizeof(MeshUBO)
     );
 
-    gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
+    gf3d_mesh.sky_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/sky_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        sizeof(SkyUBO)
+    );
+
+        gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/highlight_pipeline.cfg",
         gf3d_vgraphics_get_view_extent(),
@@ -96,6 +108,40 @@ Pipeline *gf3d_mesh_get_pipeline()
 Pipeline *gf3d_mesh_get_highlight_pipeline()
 {
     return gf3d_mesh.highlight_pipe;
+}
+
+void gf3d_mesh_reset_pipes()
+{
+    Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
+    
+    gf3d_pipeline_reset_frame(gf3d_mesh.sky_pipe,bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_mesh.pipe,bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_mesh.highlight_pipe,bufferFrame);
+}
+
+void gf3d_mesh_submit_pipe_commands()
+{
+    gf3d_pipeline_submit_commands(gf3d_mesh.sky_pipe);
+    gf3d_pipeline_submit_commands(gf3d_mesh.pipe);
+    gf3d_pipeline_submit_commands(gf3d_mesh.highlight_pipe);
+}
+
+VkCommandBuffer gf3d_mesh_get_model_command_buffer()
+{
+    if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
+    return gf3d_mesh.pipe->commandBuffer;
+}
+
+VkCommandBuffer gf3d_mesh_get_highlight_command_buffer()
+{
+    if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
+    return gf3d_mesh.highlight_pipe->commandBuffer;
+}
+
+VkCommandBuffer gf3d_mesh_get_sky_command_buffer()
+{
+    if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
+    return gf3d_mesh.sky_pipe->commandBuffer;
 }
 
 

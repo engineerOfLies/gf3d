@@ -183,7 +183,7 @@ void gf3d_model_draw(Model *model,Matrix4 modelMat,Vector4D colorMod,Vector4D am
     {
         return;
     }
-    commandBuffer = gf3d_vgraphics_get_current_command_model_buffer();
+    commandBuffer = gf3d_mesh_get_model_command_buffer();
     bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
     if (descriptorSet == NULL)
@@ -204,7 +204,7 @@ void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat,Vector4D highlight)
     {
         return;
     }
-    commandBuffer = gf3d_vgraphics_get_current_command_model_highlight_buffer();
+    commandBuffer = gf3d_mesh_get_highlight_command_buffer();
     bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_mesh_get_highlight_pipeline(), bufferFrame);
     if (descriptorSet == NULL)

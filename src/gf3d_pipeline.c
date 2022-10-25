@@ -531,6 +531,13 @@ void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame)
         return;
     }
     pipe->descriptorCursor[frame] = 0;
+    pipe->commandBuffer = gf3d_command_rendering_begin(frame,pipe);
+}
+
+void gf3d_pipeline_submit_commands(Pipeline *pipe)
+{
+    if (!pipe)return;
+    gf3d_command_rendering_end(pipe->commandBuffer);
 }
 
 void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)

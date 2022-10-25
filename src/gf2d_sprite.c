@@ -145,6 +145,19 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     atexit(gf2d_sprite_manager_close);
 }
 
+void gf3d_sprite_reset_pipes()
+{
+    Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
+    
+    gf3d_pipeline_reset_frame(gf2d_sprite.pipe,bufferFrame);
+}
+
+void gf3d_sprite_submit_pipe_commands()
+{
+    gf3d_pipeline_submit_commands(gf2d_sprite.pipe);
+}
+
+
 Sprite *gf2d_sprite_get_by_filename(char *filename)
 {
     int i;
@@ -293,7 +306,7 @@ void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Vector3D r
         return;
     }
     
-    commandBuffer = gf3d_vgraphics_get_current_command_overlay_buffer();
+    commandBuffer = gf2d_sprite.pipe->commandBuffer;
     buffer_frame = gf3d_vgraphics_get_current_buffer_frame();
 
     descriptorSet = gf3d_pipeline_get_descriptor_set(gf2d_sprite.pipe, buffer_frame);

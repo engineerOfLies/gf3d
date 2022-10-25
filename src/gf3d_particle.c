@@ -72,6 +72,19 @@ void gf3d_particle_manager_init(Uint32 max_particles)
     atexit(gf3d_particles_manager_close);
 }
 
+void gf3d_particle_reset_pipes()
+{
+    Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
+    
+    gf3d_pipeline_reset_frame(gf3d_particle.pipe,bufferFrame);
+}
+
+void gf3d_particle_submit_pipe_commands()
+{
+    gf3d_pipeline_submit_commands(gf3d_particle.pipe);
+}
+
+
 Pipeline *gf3d_particle_get_pipeline()
 {
     return gf3d_particle.pipe;
@@ -211,7 +224,7 @@ void gf3d_particle_draw(Particle *particle)
         slog("cannot render a NULL particle");
         return;
     }
-    commandBuffer = gf3d_vgraphics_get_current_command_particle_buffer();
+    commandBuffer = gf3d_particle.pipe->commandBuffer;
     buffer_frame = gf3d_vgraphics_get_current_buffer_frame();
 
     descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_particle.pipe, buffer_frame);

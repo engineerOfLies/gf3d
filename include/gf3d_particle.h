@@ -23,6 +23,16 @@ typedef struct
 void gf3d_particle_manager_init(Uint32 max_particles);
 
 /**
+ * @brief needs to be called once at the beginning of each render frame
+ */
+void gf3d_particle_reset_pipes();
+
+/**
+ * @brief called to submit all draw commands to the particle pipelines
+ */
+void gf3d_particle_submit_pipe_commands();
+
+/**
  * @brief draw a single particle this frame
  * @param particle the particle to draw
  */

@@ -97,5 +97,15 @@ VkVertexInputBindingDescription * gf2d_sprite_get_bind_description();
 
 VkVertexInputAttributeDescription * gf2d_sprite_get_attribute_descriptions(Uint32 *count);
 
+/**
+ * @brief needs to be called once at the beginning of each render frame
+ */
+void gf3d_sprite_reset_pipes();
+
+/**
+ * @brief called to submit all draw commands to the sprite pipelines
+ */
+void gf3d_sprite_submit_pipe_commands();
+
 
 #endif

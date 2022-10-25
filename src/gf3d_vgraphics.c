@@ -68,10 +68,6 @@ typedef struct
     
     //render frame and command buffer for the current render pass
     Uint32                      bufferFrame;
-    VkCommandBuffer             commandModelBuffer;
-    VkCommandBuffer             commandHighlightBuffer;
-    VkCommandBuffer             commandOverlayBuffer;
-    VkCommandBuffer             commandParticleBuffer;
     
     SDL_Surface                *screen;
     Sint32                      bitdepth;
@@ -485,52 +481,15 @@ void gf3d_vgraphics_render_start()
 {
     gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
     
-    gf3d_pipeline_reset_frame(gf3d_mesh_get_pipeline(),gf3d_vgraphics.bufferFrame);
-    gf3d_pipeline_reset_frame(gf3d_mesh_get_highlight_pipeline(),gf3d_vgraphics.bufferFrame);
-    gf3d_pipeline_reset_frame(gf3d_particle_get_pipeline(),gf3d_vgraphics.bufferFrame);
-    gf3d_pipeline_reset_frame(gf2d_sprite_get_pipeline(),gf3d_vgraphics.bufferFrame);
-        
-    gf3d_vgraphics.commandModelBuffer = gf3d_command_rendering_begin(
-        gf3d_vgraphics.bufferFrame,
-        gf3d_mesh_get_pipeline());
-
-    gf3d_vgraphics.commandParticleBuffer = gf3d_command_rendering_begin(
-        gf3d_vgraphics.bufferFrame,
-        gf3d_particle_get_pipeline());
-
-    gf3d_vgraphics.commandHighlightBuffer = gf3d_command_rendering_begin(
-        gf3d_vgraphics.bufferFrame,
-        gf3d_mesh_get_highlight_pipeline());
     
-    gf3d_vgraphics.commandOverlayBuffer = gf3d_command_rendering_begin(
-        gf3d_vgraphics.bufferFrame,
-        gf2d_sprite_get_pipeline());
-
+    gf3d_mesh_reset_pipes();
+    gf3d_particle_reset_pipes();
+    gf3d_sprite_reset_pipes();
 }
 
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
 {
     return gf3d_vgraphics.bufferFrame;
-}
-
-VkCommandBuffer gf3d_vgraphics_get_current_command_model_highlight_buffer()
-{
-    return gf3d_vgraphics.commandHighlightBuffer;
-}
-
-VkCommandBuffer gf3d_vgraphics_get_current_command_model_buffer()
-{
-    return gf3d_vgraphics.commandModelBuffer;
-}
-
-VkCommandBuffer gf3d_vgraphics_get_current_command_overlay_buffer()
-{
-    return gf3d_vgraphics.commandOverlayBuffer;
-}
-
-VkCommandBuffer gf3d_vgraphics_get_current_command_particle_buffer()
-{
-    return gf3d_vgraphics.commandParticleBuffer;
 }
 
 void gf3d_vgraphics_render_end()
@@ -542,12 +501,9 @@ void gf3d_vgraphics_render_end()
     VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     
-    
-    gf3d_command_rendering_end(gf3d_vgraphics.commandModelBuffer);
-    gf3d_command_rendering_end(gf3d_vgraphics.commandHighlightBuffer);
-    gf3d_command_rendering_end(gf3d_vgraphics.commandParticleBuffer);
-    gf3d_command_rendering_end(gf3d_vgraphics.commandOverlayBuffer);
-
+    gf3d_mesh_submit_pipe_commands();
+    gf3d_particle_submit_pipe_commands();
+    gf3d_sprite_submit_pipe_commands();
     
     swapChains[0] = gf3d_swapchain_get();
 

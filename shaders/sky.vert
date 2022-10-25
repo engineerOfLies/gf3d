@@ -2,7 +2,6 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 layout(binding = 0) uniform UniformBufferObject {
-    mat4 model;
     mat4 view;
     mat4 proj;
     vec4 color;
@@ -23,11 +22,7 @@ layout(location = 3) out vec4 fragAmbient;
 
 void main()
 {
-    vec4 tempNormal;
-    tempNormal = ubo.model * vec4(inNormal,1.0);
-    fragNormal = normalize(tempNormal.xyz);
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    gl_Position = ubo.proj * ubo.view * vec4(inPosition, 1.0);
     fragTexCoord = inTexCoord;
     colorMod = ubo.color;
-    fragAmbient = ubo.ambient;
 }
