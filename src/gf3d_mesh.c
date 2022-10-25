@@ -110,6 +110,11 @@ Pipeline *gf3d_mesh_get_highlight_pipeline()
     return gf3d_mesh.highlight_pipe;
 }
 
+Pipeline *gf3d_mesh_get_sky_pipeline()
+{
+    return gf3d_mesh.sky_pipe;
+}
+
 void gf3d_mesh_reset_pipes()
 {
     Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
@@ -279,6 +284,25 @@ void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDesc
         return;
     }
     pipe = gf3d_mesh.highlight_pipe;
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
+    
+    vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
+    
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
+    
+    vkCmdDrawIndexed(commandBuffer, mesh->faceCount * 3, 1, 0, 0, 0);
+}
+
+void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
+{
+    VkDeviceSize offsets[] = {0};
+    Pipeline *pipe;
+    if (!mesh)
+    {
+        slog("cannot render a NULL mesh");
+        return;
+    }
+    pipe = gf3d_mesh.sky_pipe;
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);

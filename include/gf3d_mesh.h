@@ -29,6 +29,7 @@ typedef struct
 
 typedef struct
 {
+    Matrix4 model;
     Matrix4 view;
     Matrix4 proj;
     Vector4D color; 
@@ -125,6 +126,7 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet 
  */
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 
 /**
  * @brief create a mesh's internal buffers based on vertices
@@ -142,5 +144,6 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
  */
 Pipeline *gf3d_mesh_get_pipeline();
 Pipeline *gf3d_mesh_get_highlight_pipeline();
+Pipeline *gf3d_mesh_get_sky_pipeline();
 
 #endif

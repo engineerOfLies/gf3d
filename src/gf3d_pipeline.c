@@ -498,7 +498,6 @@ void gf3d_pipeline_create_basic_model_descriptor_pool(Pipeline *pipe)
         slog("no pipeline provided");
         return;
     }
-    slog("attempting to make %i descriptor pools of size %i",gf3d_pipeline.chainLength,pipe->descriptorSetCount);
     poolSize[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     poolSize[0].descriptorCount = pipe->descriptorSetCount;
     poolSize[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;

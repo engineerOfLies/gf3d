@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
     a = 0;
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix_identity(skyMat);
-    gfc_matrix_scale(skyMat,vector3d(1000,1000,100000));
+    gfc_matrix_scale(skyMat,vector3d(100,100,100));
     
     // main game loop
     slog("gf3d main loop begin");
@@ -98,7 +98,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
-                gf3d_model_draw(sky,skyMat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+                gf3d_model_draw_sky(sky,skyMat,gfc_color(1,1,1,1));
                 world_draw(w);
                 entity_draw_all();
                 
@@ -108,7 +108,7 @@ int main(int argc,char *argv[])
                 }
             //2D draws
                 gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
-                gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(1,2),vector3d(8,8,GFC_PI * mousex / 600.0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
+                gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,GFC_PI * mousex / 600.0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition

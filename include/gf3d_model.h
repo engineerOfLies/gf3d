@@ -100,6 +100,14 @@ void gf3d_model_draw(Model *model,Matrix4 modelMat,Vector4D colorMod,Vector4D am
 void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat,Vector4D highlight);
 
 /**
+ * @brief queue up a model for rendering as a sky
+ * @param model the model to render
+ * @param modelMat the model matrix (MVP)
+ * @param color the color adjustement (gfc_color(1,1,1,1) for no color change
+ */
+void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
+
+/**
  * @brief free a model
  */
 void gf3d_model_free(Model *model);
