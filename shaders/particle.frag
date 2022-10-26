@@ -6,6 +6,7 @@ layout(location = 0) in vec4 inColor;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) in vec2 center;
 layout(location = 2) in float size;
+layout(location = 3) in float depth;
 
 
 void main()
@@ -14,6 +15,5 @@ void main()
     float l = length(coord);
     if (l > 1.0) discard;
     outColor = inColor;
-    outColor.w *= 1 + * _MipScale;
     outColor.w = 1 - l;
 }
