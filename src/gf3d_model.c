@@ -238,7 +238,6 @@ void gf3d_model_update_sky_uniform_buffer(
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     
     vector4d_copy(modelUBO.color,colorMod);
-    slog("color %f,%f,%f,%f",modelUBO.color.x,modelUBO.color.y,modelUBO.color.z,modelUBO.color.w);
         
     vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
     

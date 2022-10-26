@@ -35,7 +35,8 @@ void gf2d_fonts_load_json(const char *filename);
 
 void gf2d_font_close()
 {
-    int i;
+    int i,c;
+    FontImage *image;
     for (i = 0;i < font_manager.font_max;i++)
     {
         if (font_manager.font_list[i].font != NULL)
@@ -43,7 +44,14 @@ void gf2d_font_close()
             TTF_CloseFont(font_manager.font_list[i].font);
         }
     }
-    gfc_list_foreach(font_manager.font_images,free);
+    c = gfc_list_get_count(font_manager.font_images);
+    for (i= 0; i < c; i++)
+    {
+        image = gfc_list_get_nth(font_manager.font_images,i);
+        if (!image)continue;
+        gf2d_sprite_free(image->image);
+        free(image);
+    }
     gfc_list_delete(font_manager.font_images);
     TTF_Quit();
     slog("text system closed");
