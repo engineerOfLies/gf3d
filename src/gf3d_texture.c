@@ -195,7 +195,6 @@ void gf3d_texture_create_sampler(Texture *tex)
         slog("failed to create texture sampler!");
         return;
     }
-    slog("created texture sampler");
 }
 
 Texture *gf3d_texture_convert_surface(SDL_Surface * surface)

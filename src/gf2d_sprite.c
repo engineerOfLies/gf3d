@@ -161,7 +161,7 @@ void gf3d_sprite_submit_pipe_commands()
 }
 
 
-Sprite *gf2d_sprite_get_by_filename(char *filename)
+Sprite *gf2d_sprite_get_by_filename(const char *filename)
 {
     int i;
     for (i = 0; i < gf2d_sprite.max_sprites; i++)
@@ -217,8 +217,12 @@ Sprite * gf2d_sprite_from_surface(SDL_Surface *surface,int frame_width,int frame
     return sprite;
 }
 
+Sprite * gf2d_sprite_load_image(const char * filename)
+{
+    return gf2d_sprite_load(filename,0,0, 1);
+}
 
-Sprite * gf2d_sprite_load(char * filename,int frame_width,int frame_height, Uint32 frames_per_line)
+Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height, Uint32 frames_per_line)
 {
     Sprite *sprite;
     sprite = gf2d_sprite_get_by_filename(filename);

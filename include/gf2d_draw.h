@@ -9,6 +9,12 @@
 
 
 /**
+ * @brief setup the draw manager internals
+ * @param ttl set how long drawn shapes stay in memory for reuse
+ */
+void gf2d_draw_manager_init(Uint32 ttl);
+
+/**
  * @brief draw the shape with the color specified
  * @param shape the shape to draw
  * @param color the color to draw with

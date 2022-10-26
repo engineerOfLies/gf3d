@@ -11,6 +11,7 @@ typedef struct
 {
     Sprite     *image;
     Shape       shape;
+    Uint8       filled;
     Uint32      last_used;
 }DrawImage;
 
@@ -22,7 +23,7 @@ typedef struct
 
 static DrawManager draw_manager = {0};
 
-void gf3d_draw_manager_close()
+void gf2d_draw_manager_close()
 {
     int i,c;
     DrawImage *image;
@@ -38,14 +39,14 @@ void gf3d_draw_manager_close()
     memset(&draw_manager,0,sizeof(DrawManager));
 }
 
-void gf3d_draw_manager_init(Uint32 ttl)
+void gf2d_draw_manager_init(Uint32 ttl)
 {
     draw_manager.ttl = ttl;
     draw_manager.draw_images = gfc_list_new();
-    atexit (gf3d_draw_manager_close);
+    atexit (gf2d_draw_manager_close);
 }
 
-void gf3d_draw_manager_update()
+void gf2d_draw_manager_update()
 {
     DrawImage *image;
     Uint32 now = SDL_GetTicks();
@@ -62,7 +63,8 @@ void gf3d_draw_manager_update()
 
 void gf2d_draw_image_new(
     Sprite     *sprite,
-    Shape       shape
+    Shape       shape,
+    Uint8       filled
 )
 {
     DrawImage *image;
@@ -71,12 +73,14 @@ void gf2d_draw_image_new(
     if (!image)return;
     image->image = sprite;
     image->shape = shape;
+    image->filled = filled;
     image->last_used = SDL_GetTicks();
     draw_manager.draw_images = gfc_list_append(draw_manager.draw_images,image);
 }
 
 DrawImage *gf2d_draw_image_get(
-    Shape       shape)
+    Shape       shape,
+    Uint8       filled)
 {
     DrawImage *image;
     int i,c;
@@ -85,6 +89,7 @@ DrawImage *gf2d_draw_image_get(
     {
         image = gfc_list_get_nth(draw_manager.draw_images,i);
         if (!image)continue;
+        if (image->filled != filled)continue;
         if (!gfc_shape_compare(image->shape, shape))continue;
         return image;
     }
@@ -101,7 +106,7 @@ void gf2d_draw_rect(Rect rect,Color color)
     DrawImage *image = NULL;
     
     shape = gfc_shape_from_rect(gfc_rect(0,0,rect.w,rect.h));
-    image = gf2d_draw_image_get(shape);
+    image = gf2d_draw_image_get(shape,0);
     if (image)
     {
         image->last_used = SDL_GetTicks();
@@ -127,8 +132,44 @@ void gf2d_draw_rect(Rect rect,Color color)
     sprite = gf2d_sprite_from_surface(surface,0,0, 1);
     
     gf2d_sprite_draw(sprite,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
-    gf2d_draw_image_new(sprite,shape);
+    gf2d_draw_image_new(sprite,shape,0);
 }
+
+void gf2d_draw_rect_filled(Rect rect,Color color)
+{
+    SDL_Surface *surface;
+    Sprite *sprite;
+    SDL_Rect rects;
+    Shape shape;
+    DrawImage *image = NULL;
+    
+    shape = gfc_shape_from_rect(gfc_rect(0,0,rect.w,rect.h));
+    image = gf2d_draw_image_get(shape,1);
+    if (image)
+    {
+        image->last_used = SDL_GetTicks();
+        gf2d_sprite_draw(image->image,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
+        return;
+    }
+    if ((!rect.w)||(!rect.h))
+    {
+        slog("cannot render a zero dimension rectangle");
+    }
+    surface = gf3d_vgraphics_create_surface((Uint32)rect.w + 1,(Uint32)rect.h + 1);
+    if (!surface)
+    {
+        slog("failed to create surface for rectangle draw");
+    }
+    rects = gfc_rect_to_sdl_rect(shape.s.r);
+
+    SDL_FillRect(surface, &rects,SDL_MapRGBA(surface->format,255,255,255,255));
+    
+    sprite = gf2d_sprite_from_surface(surface,0,0, 1);
+    
+    gf2d_sprite_draw(sprite,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
+    gf2d_draw_image_new(sprite,shape,1);
+}
+
 #if 0
 
 void gf2d_draw_shape(Shape shape,Color color,Vector2D offset)
@@ -378,20 +419,6 @@ void gf2d_draw_line(Vector2D p1,Vector2D p2, Color color)
                            255,
                            255,
                            255);
-}
-
-void gf2d_draw_rect_filled(Rect rect,Color color)
-{
-    Color drawColor;
-    SDL_Rect drawrect;
-    drawrect = gfc_rect_to_sdl_rect(rect);
-    drawColor = gfc_color_to_int8(color);
-    SDL_SetRenderDrawColor(gf2d_graphics_get_renderer(),
-                           drawColor.r,
-                           drawColor.g,
-                           drawColor.b,
-                           drawColor.a);
-    SDL_RenderFillRect(gf2d_graphics_get_renderer(),(const struct SDL_Rect *)&drawrect);
 }
 
 void gf2d_draw_rects(SDL_Rect *rects,Uint32 count,Color color)
