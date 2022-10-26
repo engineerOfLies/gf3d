@@ -9,6 +9,7 @@ layout(binding = 0) uniform UniformBufferObject {
     vec2 position;
     vec2 scale;
     vec2 frame_offset;
+    float drawOrder;
 } ubo;
 
 out gl_PerVertex
@@ -20,6 +21,7 @@ layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec2 inTexCoord;
 layout(location = 0) out vec2 fragTexCoord;
 layout(location = 1) out vec4 colorMod;
+layout(location = 2) out float drawOrder;
 
 void main()
 {
@@ -32,11 +34,10 @@ void main()
                             0,0,1,0,
                             0,0,0,1);
     vec4 r_position = scale_m * ubo.rotation * vec4(inPosition,0,1);
-//    vec2 s_position = inPosition.xy * ubo.scale;
- //   vec4 r_position = ubo.rotation * vec4(s_position,0,1);
     vec4 drawOffset = vec4((ubo.position * 2)/ubo.extent,0,0);
     gl_Position = vec4(r_position.xy/ubo.extent,0,1) - vec4(1,1,0,0) + drawOffset;
         
     fragTexCoord = inTexCoord + ubo.frame_offset;
     colorMod = ubo.colorMod;
+    drawOrder = ubo.drawOrder;
 }

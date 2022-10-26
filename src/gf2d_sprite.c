@@ -20,6 +20,7 @@ typedef struct
     Vector2D position;
     Vector2D scale;
     Vector2D frame_offset;
+    float drawOrder;
 }SpriteUBO;
 
 typedef struct
@@ -44,6 +45,7 @@ typedef struct
     VkDeviceMemory  faceBufferMemory; /**<memory habdle for tge face memory*/
     VkVertexInputAttributeDescription   attributeDescriptions[SPRITE_ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription     bindingDescription;
+    float           drawOrder;
 }SpriteManager;
 
 void gf2d_sprite_update_basic_descriptor_set(
@@ -150,6 +152,7 @@ void gf3d_sprite_reset_pipes()
     Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     
     gf3d_pipeline_reset_frame(gf2d_sprite.pipe,bufferFrame);
+    gf2d_sprite.drawOrder = 0;
 }
 
 void gf3d_sprite_submit_pipe_commands()
@@ -390,7 +393,8 @@ void gf2d_sprite_update_uniform_buffer(
     spriteUBO.rotation[0][1] = sin(rotation.z);
     spriteUBO.rotation[1][0] = sin(rotation.z) * -1;//clockwise rotation
     spriteUBO.rotation[1][1] = cos(rotation.z);
-
+    spriteUBO.drawOrder = gf2d_sprite.drawOrder;
+    gf2d_sprite.drawOrder += 0.000000001;
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
     
