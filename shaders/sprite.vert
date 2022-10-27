@@ -4,6 +4,7 @@
 layout(binding = 0) uniform UniformBufferObject {
     mat4 rotation;
     vec4 colorMod;
+    vec4 clip;
     vec2 size;
     vec2 extent;
     vec2 position;
@@ -33,11 +34,37 @@ void main()
                             0,1,0,ubo.position.y * 2/ubo.extent.y,
                             0,0,1,0,
                             0,0,0,1);
-    vec4 r_position = scale_m * ubo.rotation * vec4(inPosition,0,1);
+    
+    fragTexCoord = inTexCoord + ubo.frame_offset;
+    vec4 clip_position = vec4(inPosition,0,1);
+    
+    switch (gl_VertexIndex)
+    {
+        case 0:
+            clip_position = vec4(inPosition.x + ubo.clip.x*2,inPosition.y + ubo.clip.y*2,0,1);
+            fragTexCoord.x = fragTexCoord.x + ubo.clip.x/ubo.size.x;
+            fragTexCoord.y = fragTexCoord.y + ubo.clip.y/ubo.size.y;
+        break;
+        case 1:
+            clip_position = vec4(inPosition.x - ubo.clip.z*2,inPosition.y + ubo.clip.y*2,0,1);
+            fragTexCoord.x = fragTexCoord.x - ubo.clip.z/ubo.size.x;
+            fragTexCoord.y = fragTexCoord.y + ubo.clip.y/ubo.size.y;
+        break;
+        case 2:
+            clip_position = vec4(inPosition.x + ubo.clip.x*2,inPosition.y - ubo.clip.w*2,0,1);
+            fragTexCoord.x = fragTexCoord.x + ubo.clip.x/ubo.size.x;
+            fragTexCoord.y = fragTexCoord.y - ubo.clip.w/ubo.size.y;
+        break;
+        case 3:
+            clip_position = vec4(inPosition.x - ubo.clip.z*2,inPosition.y - ubo.clip.w*2,0,1);
+            fragTexCoord.x = fragTexCoord.x - ubo.clip.z/ubo.size.x;
+            fragTexCoord.y = fragTexCoord.y - ubo.clip.w/ubo.size.y;
+        break;
+    }
+    
+    vec4 r_position = scale_m * ubo.rotation * clip_position;
     vec4 drawOffset = vec4((ubo.position * 2)/ubo.extent,0,0);
     gl_Position = vec4(r_position.xy/ubo.extent,0,1) - vec4(1,1,0,0) + drawOffset;
-        
-    fragTexCoord = inTexCoord + ubo.frame_offset;
     colorMod = ubo.colorMod;
     drawOrder = ubo.drawOrder;
 }

@@ -15,6 +15,7 @@ typedef struct
 {
     Matrix4 rotation;
     Vector4D colorMod;
+    Vector4D clip;
     Vector2D size;
     Vector2D extent;
     Vector2D position;
@@ -56,6 +57,8 @@ void gf2d_sprite_update_basic_descriptor_set(
     Vector2D scale,
     Vector3D rotation,
     Color color,
+    Vector4D clip,
+    Vector2D flip,
     Uint32 frame);
 void gf2d_sprite_create_vertex_buffer(Sprite *sprite);
 void gf2d_sprite_delete(Sprite *sprite);
@@ -394,6 +397,8 @@ void gf2d_sprite_draw(
         drawScale,
         drawRotation,
         drawColorShift,
+        drawClip,
+        drawFlip,
         frame);
     gf2d_sprite_render(sprite,commandBuffer,descriptorSet);
 }
@@ -446,11 +451,13 @@ void gf2d_sprite_update_uniform_buffer(
     Vector2D scale,
     Vector3D rotation,
     Color color,
+    Vector4D clip,
+    Vector2D flip,
     Uint32 frame)
 {
     void* data;
     SpriteUBO spriteUBO = {0};
-    spriteUBO.size = vector2d(sprite->frameWidth,sprite->frameHeight);
+    spriteUBO.size = vector2d(sprite->texture->width,sprite->texture->height);
     spriteUBO.extent = gf3d_vgraphics_get_view_extent_as_vector2d();;
     spriteUBO.colorMod = gfc_color_to_vector4f(color);
     spriteUBO.position = position;
@@ -462,6 +469,17 @@ void gf2d_sprite_update_uniform_buffer(
     spriteUBO.rotation[1][1] = cos(rotation.z);
     spriteUBO.drawOrder = gf2d_sprite.drawOrder;
     gf2d_sprite.drawOrder += 0.000000001;
+    
+    if (flip.x)
+    {
+        scale.x = fabs(scale.x)*-1;
+    }
+    if (flip.y)
+    {
+        scale.y = fabs(scale.y)*-1;
+    }
+    
+    vector4d_copy(spriteUBO.clip,clip);
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
     
@@ -480,6 +498,8 @@ void gf2d_sprite_update_basic_descriptor_set(
     Vector2D scale,
     Vector3D rotation,
     Color color,
+    Vector4D clip,
+    Vector2D flip,
     Uint32 frame)
 {
     VkDescriptorImageInfo imageInfo = {0};
@@ -503,7 +523,7 @@ void gf2d_sprite_update_basic_descriptor_set(
     imageInfo.sampler = sprite->texture->textureSampler;
 
     ubo = gf3d_uniform_buffer_list_get_buffer(gf2d_sprite.pipe->uboList, chainIndex);
-    gf2d_sprite_update_uniform_buffer(sprite,ubo,position,scale,rotation,color,frame);
+    gf2d_sprite_update_uniform_buffer(sprite,ubo,position,scale,rotation,color,clip,flip,frame);
 
     bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
