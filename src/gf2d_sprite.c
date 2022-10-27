@@ -77,12 +77,10 @@ void gf2d_sprite_manager_close()
     if (gf2d_sprite.faceBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf2d_sprite.device, gf2d_sprite.faceBuffer, NULL);
-        slog("sprite manager face buffer freed");
     }
     if (gf2d_sprite.faceBufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf2d_sprite.device, gf2d_sprite.faceBufferMemory, NULL);
-        slog("sprite manager face buffer memory freed");
     }
 
     memset(&gf2d_sprite,0,sizeof(SpriteManager));

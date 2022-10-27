@@ -365,8 +365,6 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
     mesh->bufferMemory = mesh->bufferMemory;
     
     gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
-    
-    slog("created a mesh with %i vertices and %i face",vcount,fcount);
 }
 
 Mesh *gf3d_mesh_load(const char *filename)

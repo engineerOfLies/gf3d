@@ -7,6 +7,7 @@
 #include "gf3d_vqueues.h"
 #include "gf3d_vgraphics.h"
 
+extern int __DEBUG;
 
 typedef struct
 {
@@ -49,40 +50,41 @@ void gf3d_swapchain_init(VkPhysicalDevice device,VkDevice logicalDevice,VkSurfac
     
     vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &gf3d_swapchain.formatCount, NULL);
 
-    slog("device supports %i surface formats",gf3d_swapchain.formatCount);
     if (gf3d_swapchain.formatCount != 0)
     {
         gf3d_swapchain.formats = (VkSurfaceFormatKHR*)gfc_allocate_array(sizeof(VkSurfaceFormatKHR),gf3d_swapchain.formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &gf3d_swapchain.formatCount, gf3d_swapchain.formats);
-        for (i = 0; i < gf3d_swapchain.formatCount; i++)
+        if (__DEBUG)
         {
-            slog("surface format %i:",i);
-            slog("format: %i",gf3d_swapchain.formats[i].format);
-            slog("colorspace: %i",gf3d_swapchain.formats[i].colorSpace);
+            for (i = 0; i < gf3d_swapchain.formatCount; i++)
+            {
+                slog("surface format %i:",i);
+                slog("format: %i",gf3d_swapchain.formats[i].format);
+                slog("colorspace: %i",gf3d_swapchain.formats[i].colorSpace);
+            }
         }
     }
     
     vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &gf3d_swapchain.presentModeCount, NULL);
 
-    slog("device supports %i presentation modes",gf3d_swapchain.presentModeCount);
     if (gf3d_swapchain.presentModeCount != 0)
     {
         gf3d_swapchain.presentModes = (VkPresentModeKHR*)gfc_allocate_array(sizeof(VkPresentModeKHR),gf3d_swapchain.presentModeCount);
         vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &gf3d_swapchain.presentModeCount, gf3d_swapchain.presentModes);
-        for (i = 0; i < gf3d_swapchain.presentModeCount; i++)
+        if (__DEBUG)
         {
-            slog("presentation mode: %i is %i",i,gf3d_swapchain.presentModes[i]);
+            for (i = 0; i < gf3d_swapchain.presentModeCount; i++)
+            {
+                slog("presentation mode: %i is %i",i,gf3d_swapchain.presentModes[i]);
+            }
         }
     }
     
     gf3d_swapchain.chosenFormat = gf3d_swapchain_choose_format();
-    slog("chosing surface format %i",gf3d_swapchain.chosenFormat);
     
     gf3d_swapchain.chosenPresentMode = gf3d_swapchain_get_presentation_mode();
-    slog("chosing presentation mode %i",gf3d_swapchain.chosenPresentMode);
     
     gf3d_swapchain.extent = gf3d_swapchain_configure_extent(width,height);
-    slog("chosing swap chain extent of (%i,%i)",gf3d_swapchain.extent.width,gf3d_swapchain.extent.height);
     
     gf3d_swapchain_create(logicalDevice,surface);
     gf3d_swapchain.device = logicalDevice;
@@ -109,10 +111,6 @@ void gf3d_swapchain_create_frame_buffer(VkFramebuffer *buffer,VkImageView *image
     if (vkCreateFramebuffer(gf3d_swapchain.device, &framebufferInfo, NULL, buffer) != VK_SUCCESS)
     {
         slog("failed to create framebuffer!");
-    }
-    else
-    {
-        slog("created framebuffer");
     }
 }
 
@@ -141,11 +139,8 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     VkSwapchainCreateInfoKHR createInfo = {0};
     Uint32 queueFamilyIndices[3];
     
-    slog("minimum images needed for swap chain: %i",gf3d_swapchain.capabilities.minImageCount);
-    slog("Maximum images needed for swap chain: %i",gf3d_swapchain.capabilities.maxImageCount);
     gf3d_swapchain.swapChainCount = gf3d_swapchain.capabilities.minImageCount + 1;
     if (gf3d_swapchain.capabilities.maxImageCount)gf3d_swapchain.swapChainCount = MIN(gf3d_swapchain.swapChainCount,gf3d_swapchain.capabilities.maxImageCount);
-    slog("using %i images for the swap chain",gf3d_swapchain.swapChainCount);
     
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = surface;
@@ -187,7 +182,6 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
         gf3d_swapchain_close();
         return;
     }
-    slog("created a swap chain with length %i",gf3d_swapchain.swapChainCount);
     
     vkGetSwapchainImagesKHR(device, gf3d_swapchain.swapChain, &gf3d_swapchain.swapImageCount, NULL);
     if (gf3d_swapchain.swapImageCount == 0)
@@ -198,23 +192,23 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
     }
     gf3d_swapchain.swapImages = (VkImage *)gfc_allocate_array(sizeof(VkImage),gf3d_swapchain.swapImageCount);
     vkGetSwapchainImagesKHR(device, gf3d_swapchain.swapChain, &gf3d_swapchain.swapImageCount,gf3d_swapchain.swapImages );
-    slog("created swap chain with %i images",gf3d_swapchain.swapImageCount);
     
     gf3d_swapchain.imageViews = (VkImageView *)gfc_allocate_array(sizeof(VkImageView),gf3d_swapchain.swapImageCount);
     for (i = 0 ; i < gf3d_swapchain.swapImageCount; i++)
     {
         gf3d_swapchain.imageViews[i] = gf3d_vgraphics_create_image_view(gf3d_swapchain.swapImages[i],gf3d_swapchain.formats[gf3d_swapchain.chosenFormat].format);
     }
-    slog("create image views");
 }
 
 VkExtent2D gf3d_swapchain_configure_extent(Uint32 width,Uint32 height)
 {
     VkExtent2D actualExtent;
-    slog("Requested resolution: (%i,%i)",width,height);
-    slog("Minimum resolution: (%i,%i)",gf3d_swapchain.capabilities.minImageExtent.width,gf3d_swapchain.capabilities.minImageExtent.height);
-    slog("Maximum resolution: (%i,%i)",gf3d_swapchain.capabilities.maxImageExtent.width,gf3d_swapchain.capabilities.maxImageExtent.height);
-    
+    if (__DEBUG)
+    {
+        slog("Requested resolution: (%i,%i)",width,height);
+        slog("Minimum resolution: (%i,%i)",gf3d_swapchain.capabilities.minImageExtent.width,gf3d_swapchain.capabilities.minImageExtent.height);
+        slog("Maximum resolution: (%i,%i)",gf3d_swapchain.capabilities.maxImageExtent.width,gf3d_swapchain.capabilities.maxImageExtent.height);
+    }
     actualExtent.width = MAX(gf3d_swapchain.capabilities.minImageExtent.width,MIN(width,gf3d_swapchain.capabilities.maxImageExtent.width));
     actualExtent.height = MAX(gf3d_swapchain.capabilities.minImageExtent.height,MIN(height,gf3d_swapchain.capabilities.maxImageExtent.height));
     return actualExtent;
@@ -275,7 +269,6 @@ void gf3d_swapchain_close()
         for (i = 0;i < gf3d_swapchain.framebufferCount; i++)
         {
             vkDestroyFramebuffer(gf3d_swapchain.device, gf3d_swapchain.frameBuffers[i], NULL);
-            slog("framebuffer destroyed");
         }
         free (gf3d_swapchain.frameBuffers);
     }
@@ -285,7 +278,6 @@ void gf3d_swapchain_close()
         for (i = 0;i < gf3d_swapchain.swapImageCount;i++)
         {
             vkDestroyImageView(gf3d_swapchain.device,gf3d_swapchain.imageViews[i],NULL);
-            slog("imageview destroyed");
         }
         free(gf3d_swapchain.imageViews);
     }

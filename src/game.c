@@ -4,6 +4,7 @@
 #include "gfc_input.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_audio.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
@@ -74,6 +75,7 @@ int main(int argc,char *argv[])
     gfc_input_init("config/input.cfg");
     slog("gf3d begin");
     gf3d_vgraphics_init("config/setup.cfg");
+    gfc_audio_init(256,16,4,1,1,1);
     gf2d_font_init("config/font.cfg");
     gf2d_draw_manager_init(1000);
     gf2d_actor_init(1024);

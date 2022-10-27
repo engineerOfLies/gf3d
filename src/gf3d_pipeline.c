@@ -42,7 +42,6 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
     }
     gf3d_pipeline.maxPipelines = max_pipelines;
     gf3d_pipeline.chainLength = gf3d_swapchain_get_chain_length();
-    slog("pipeline manager created with chain length %i",gf3d_pipeline.chainLength);
     atexit(gf3d_pipeline_close);
     slog("pipeline system initialized");
 }
@@ -50,7 +49,6 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
 void gf3d_pipeline_close()
 {
     int i;
-    slog("cleaning up pipelines");
     if (gf3d_pipeline.pipelineList != 0)
     {
         for (i = 0; i < gf3d_pipeline.maxPipelines; i++)
@@ -60,6 +58,7 @@ void gf3d_pipeline_close()
         free(gf3d_pipeline.pipelineList);
     }
     memset(&gf3d_pipeline,0,sizeof(PipelineManager));
+    slog("pipeline system closed");
 }
 
 Pipeline *gf3d_pipeline_new()
@@ -546,7 +545,6 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
     VkDescriptorSetLayout *layouts = NULL;
     VkDescriptorSetAllocateInfo allocInfo = {0};
 
-    slog("making descriptor");
     layouts = (VkDescriptorSetLayout *)gfc_allocate_array(sizeof(VkDescriptorSetLayout),pipe->descriptorSetCount);
     for (i = 0; i < pipe->descriptorSetCount; i++)
     {
@@ -564,7 +562,6 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
     {    
         pipe->descriptorSets[i] = (VkDescriptorSet *)gfc_allocate_array(sizeof(VkDescriptorSet),pipe->descriptorSetCount);
         allocInfo.descriptorPool = pipe->descriptorPool[i];
-        slog("allocating descriptor sets");
         if ((r = vkAllocateDescriptorSets(pipe->device, &allocInfo, pipe->descriptorSets[i])) != VK_SUCCESS)
         {
             slog("failed to allocate descriptor sets!");
