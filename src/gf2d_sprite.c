@@ -21,6 +21,7 @@ typedef struct
     Vector2D position;
     Vector2D scale;
     Vector2D frame_offset;
+    Vector2D center;
     float drawOrder;
 }SpriteUBO;
 
@@ -356,7 +357,6 @@ void gf2d_sprite_draw(
     Uint32 buffer_frame;
     VkCommandBuffer commandBuffer;
     Vector2D drawScale = {1,1};
-    Vector2D drawCenter = {0,0};
     Vector3D drawRotation = {0,0,0};
     Vector2D drawFlip = {0,0};
     Vector4D drawClip = {0,0,0,0};
@@ -371,7 +371,6 @@ void gf2d_sprite_draw(
     if (scale)vector2d_copy(drawScale,(*scale));
     if (center)
     {
-        vector2d_copy(drawCenter,(*center));
         vector2d_copy(drawRotation,(*center));
     }
     if (rotation)drawRotation.z = *rotation;
@@ -469,7 +468,8 @@ void gf2d_sprite_update_uniform_buffer(
     spriteUBO.rotation[1][1] = cos(rotation.z);
     spriteUBO.drawOrder = gf2d_sprite.drawOrder;
     gf2d_sprite.drawOrder += 0.000000001;
-    
+    spriteUBO.center.x = rotation.x;
+    spriteUBO.center.y = rotation.y;
     if (flip.x)
     {
         scale.x = fabs(scale.x)*-1;

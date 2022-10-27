@@ -60,8 +60,8 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     if ((bg)&&(bg->frameWidth != 0)&&(bg->frameHeight != 0))
     {
         
-        scale.x = rect.w/bg->frameWidth;
-        scale.y = rect.h/bg->frameHeight;
+        scale.x = (rect.w + 0.5)/bg->frameWidth;
+        scale.y = (rect.h + 0.5)/bg->frameHeight;
         gf2d_sprite_draw(
             bg,
             vector2d(rect.x,rect.y),
@@ -134,7 +134,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     {
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2 +  + (i * border->frameHeight)),
+            vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -144,7 +144,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             BE_Left);
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2 +  + (i * border->frameHeight)),
+            vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -155,11 +155,13 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     }
     if (fraction.y > 0)
     {
+        clip.x = 0;
+        clip.y = 0;
         clip.z = 1;
         clip.w = fraction.y;
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2 +  + (i * border->frameHeight)),
+            vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -169,7 +171,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             BE_Left);
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2 +  + (i * border->frameHeight)),
+            vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,

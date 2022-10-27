@@ -10,6 +10,7 @@ layout(binding = 0) uniform UniformBufferObject {
     vec2 position;
     vec2 scale;
     vec2 frame_offset;
+    vec2 center;
     float drawOrder;
 } ubo;
 
@@ -61,8 +62,9 @@ void main()
             fragTexCoord.y = fragTexCoord.y - ubo.clip.w/ubo.size.y;
         break;
     }
-    
+    clip_position.xy = clip_position.xy - ubo.center;
     vec4 r_position = scale_m * ubo.rotation * clip_position;
+    r_position.xy = r_position.xy + ubo.center;
     vec4 drawOffset = vec4((ubo.position * 2)/ubo.extent,0,0);
     gl_Position = vec4(r_position.xy/ubo.extent,0,1) - vec4(1,1,0,0) + drawOffset;
     colorMod = ubo.colorMod;

@@ -89,8 +89,14 @@ FontImage *gf2d_font_image_get(
         image = gfc_list_get_nth(font_manager.font_images,i);
         if (!image)continue;
         if (image->font != font)continue;
-        if (!gfc_color_cmp(image->color, color))continue;
-        if (gfc_block_cmp(image->text,text)!= 0)continue;
+        if (!gfc_color_cmp(image->color, color))
+        {
+            continue;
+        }
+        if (gfc_block_cmp(image->text,text)!= 0)
+        {
+            continue;
+        }
         return image;
     }
     return NULL;
@@ -105,7 +111,7 @@ void gf2d_font_init(const char *configFile)
     }
     gf2d_fonts_load_json(configFile);
     font_manager.font_images = gfc_list_new();
-    font_manager.ttl = 100;// 100 milliseconds
+    font_manager.ttl = 1000;// 100 milliseconds
     slog("text system initialized");
     atexit(gf2d_font_close);
 }
