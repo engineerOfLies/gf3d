@@ -83,14 +83,46 @@ Sprite * gf2d_sprite_from_surface(SDL_Surface *surface,int frame_width,int frame
 void gf2d_sprite_free(Sprite *sprite);
 
 /**
- * @brief draw a sprite frame to the current buffer frame
+ * @brief draw a sprite to the screen with NULLable options
  * @param sprite the sprite to draw
- * @param position where on the screen to draw the sprite
- * @param scale amount to scale the sprite by.  (1,1) is no scale
- * @param color adjustment (1,1,1,1) is no adjustment
- * @param frame the frame of the sprite to draw
+ * @param position here on the screen to draw it
+ * @param scale (optional) if you want to scale the sprite
+ * @param center (optional) the center point for scaling and rotating
+ * @param rotation (optional) the angle in radians to rotate
+ * @param flip (optional) set to 1 if you want to flip in the horizontal,vertical axis
+ * @param colorShift (optional) if you want to gamma shift the sprite or set an alpha value
+ * @param frame which frame to draw
  */
-void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Vector3D rotation,Color color,Uint32 frame);
+void gf2d_sprite_draw(
+    Sprite * sprite,
+    Vector2D position,
+    Vector2D * scale,
+    Vector2D * center,
+    float    * rotation,
+    Vector2D * flip,
+    Color    * colorShift,
+    Uint32 frame);
+
+/**
+ * @brief draw a sprite to the screen
+ * @param sprite the sprite to draw
+ * @param position here on the screen to draw it
+ * @param scale scale the sprite (1,1) for no scale
+ * @param center the center point for scaling and rotating (0,0) for top left
+ * @param rotation the angle in radians to rotate
+ * @param flip set to 1 if you want to flip in the horizontal,vertical axis (0,0) is no flip
+ * @param colorShift color mod gfc_color(1,1,1,1) for no change
+ * @param frame which frame to draw
+ */
+void gf2d_sprite_draw_full(
+    Sprite   * sprite,
+    Vector2D   position,
+    Vector2D   scale,
+    Vector2D   center,
+    float      rotation,
+    Vector2D   flip,
+    Color      colorShift,
+    Uint32     frame);
 
 /**
  * @brief get the default pipeline for overlay rendering

@@ -42,7 +42,9 @@ VkDevice gf3d_vgraphics_get_default_logical_device();
 VkPhysicalDevice gf3d_vgraphics_get_default_physical_device();
 
 VkExtent2D gf3d_vgraphics_get_view_extent();
+
 Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
+Vector2D gf3d_vgraphics_get_resolution();
 
 
 void gf3d_vgraphics_clear();

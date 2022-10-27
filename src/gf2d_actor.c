@@ -599,17 +599,11 @@ void gf2d_actor_draw(
     Vector2D drawCenter;
     Vector2D drawScale;
     Vector2D drawPosition;
-    Vector3D drawRotation = {0};
     if (!actor)return;
     vector2d_copy(drawScale,actor->scale);
-    if (rotation)
-    {
-        drawRotation.z =*rotation;
-    }
     if (center)
     {
         vector2d_copy(drawCenter,(*center));
-        vector2d_copy(drawRotation,(*center));
     }
     else
     {
@@ -645,20 +639,12 @@ void gf2d_actor_draw(
     gf2d_sprite_draw(
         actor->sprite,
         drawPosition,
-        drawScale,
-        drawRotation,
-        drawColor,
-        (int)frame);
-/*    gf2d_sprite_draw(
-        actor->sprite,
-        drawPosition,
         &drawScale,
         &drawCenter,
         rotation,
         flip,
         &drawColor,
         (int)frame);
-*/
 }
 
 int gf2d_action_get_animation_frames(Action *action)

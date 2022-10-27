@@ -401,6 +401,11 @@ VkExtent2D gf3d_vgraphics_get_view_extent()
     return gf3d_swapchain_get_extent();
 }
 
+Vector2D gf3d_vgraphics_get_resolution()
+{
+    return gf3d_vgraphics_get_view_extent_as_vector2d();
+}
+
 Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
 {
     VkExtent2D extent;

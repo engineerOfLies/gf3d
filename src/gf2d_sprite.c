@@ -301,17 +301,61 @@ void gf2d_sprite_render(Sprite *sprite,VkCommandBuffer commandBuffer, VkDescript
 }
 
 
-void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Vector3D rotation,Color color,Uint32 frame)
+void gf2d_sprite_draw_full(
+    Sprite   * sprite,
+    Vector2D   position,
+    Vector2D   scale,
+    Vector2D   center,
+    float      rotation,
+    Vector2D   flip,
+    Color      colorShift,
+    Uint32     frame)
+{
+    gf2d_sprite_draw(
+        sprite,
+        position,
+        &scale,
+        &center,
+        &rotation,
+        &flip,
+        &colorShift,
+        frame);
+}
+
+void gf2d_sprite_draw(
+    Sprite   * sprite,
+    Vector2D   position,
+    Vector2D * scale,
+    Vector2D * center,
+    float    * rotation,
+    Vector2D * flip,
+    Color    * colorShift,
+    Uint32     frame)
 {
     VkDescriptorSet *descriptorSet = NULL;
     Uint32 buffer_frame;
     VkCommandBuffer commandBuffer;
+    Vector2D drawScale = {1,1};
+    Vector2D drawCenter = {0,0};
+    Vector3D drawRotation = {0,0,0};
+    Vector2D drawFlip = {0,0};
+    Color    drawColorShift = gfc_color(1,1,1,1);
 
     if (!sprite)
     {
         slog("cannot render a NULL sprite");
         return;
     }
+    
+    if (scale)vector2d_copy(drawScale,(*scale));
+    if (center)
+    {
+        vector2d_copy(drawCenter,(*center));
+        vector2d_copy(drawRotation,(*center));
+    }
+    if (rotation)drawRotation.z = *rotation;
+    if (flip)vector2d_copy(drawFlip,(*flip));
+    if (colorShift)drawColorShift = *colorShift;
     
     commandBuffer = gf2d_sprite.pipe->commandBuffer;
     buffer_frame = gf3d_vgraphics_get_current_buffer_frame();
@@ -328,9 +372,9 @@ void gf2d_sprite_draw(Sprite *sprite,Vector2D position,Vector2D scale,Vector3D r
         *descriptorSet,
         buffer_frame,
         position,
-        scale,
-        rotation,
-        color,
+        drawScale,
+        drawRotation,
+        drawColorShift,
         frame);
     gf2d_sprite_render(sprite,commandBuffer,descriptorSet);
 }

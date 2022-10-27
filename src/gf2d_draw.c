@@ -110,7 +110,15 @@ void gf2d_draw_rect(Rect rect,Color color)
     if (image)
     {
         image->last_used = SDL_GetTicks();
-        gf2d_sprite_draw(image->image,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
+        gf2d_sprite_draw_full(
+            image->image,
+            vector2d(rect.x,rect.y),
+            vector2d(1,1),
+            vector2d(0,0),
+            0,
+            vector2d(0,0),
+            color,
+            0);
         return;
     }
     if ((!rect.w)||(!rect.h))
@@ -131,7 +139,16 @@ void gf2d_draw_rect(Rect rect,Color color)
     
     sprite = gf2d_sprite_from_surface(surface,0,0, 1);
     
-    gf2d_sprite_draw(sprite,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
+    gf2d_sprite_draw_full(
+        sprite,
+        vector2d(rect.x,rect.y),
+        vector2d(1,1),
+        vector2d(0,0),
+        0,
+        vector2d(0,0),
+        color,
+        0);
+
     gf2d_draw_image_new(sprite,shape,0);
 }
 
@@ -148,7 +165,16 @@ void gf2d_draw_rect_filled(Rect rect,Color color)
     if (image)
     {
         image->last_used = SDL_GetTicks();
-        gf2d_sprite_draw(image->image,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
+        gf2d_sprite_draw_full(
+            image->image,
+            vector2d(rect.x,rect.y),
+            vector2d(1,1),
+            vector2d(0,0),
+            0,
+            vector2d(0,0),
+            color,
+            0);
+
         return;
     }
     if ((!rect.w)||(!rect.h))
@@ -166,7 +192,15 @@ void gf2d_draw_rect_filled(Rect rect,Color color)
     
     sprite = gf2d_sprite_from_surface(surface,0,0, 1);
     
-    gf2d_sprite_draw(sprite,vector2d(rect.x,rect.y),vector2d(1,1),vector3d(0,0,0),color,0);
+    gf2d_sprite_draw_full(
+        sprite,
+        vector2d(rect.x,rect.y),
+        vector2d(1,1),
+        vector2d(0,0),
+        0,
+        vector2d(0,0),
+        color,
+        0);
     gf2d_draw_image_new(sprite,shape,1);
 }
 
