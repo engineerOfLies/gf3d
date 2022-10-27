@@ -91,6 +91,7 @@ void gf2d_sprite_free(Sprite *sprite);
  * @param rotation (optional) the angle in radians to rotate
  * @param flip (optional) set to 1 if you want to flip in the horizontal,vertical axis
  * @param colorShift (optional) if you want to gamma shift the sprite or set an alpha value
+ * @param clip (optional) if you want to crop the image (pixels from left, pixels from top, pixels from right, pixels from bottom)
  * @param frame which frame to draw
  */
 void gf2d_sprite_draw(
@@ -101,6 +102,7 @@ void gf2d_sprite_draw(
     float    * rotation,
     Vector2D * flip,
     Color    * colorShift,
+    Vector4D * clip,
     Uint32 frame);
 
 /**
@@ -112,6 +114,7 @@ void gf2d_sprite_draw(
  * @param rotation the angle in radians to rotate
  * @param flip set to 1 if you want to flip in the horizontal,vertical axis (0,0) is no flip
  * @param colorShift color mod gfc_color(1,1,1,1) for no change
+ * @param clip if you want to crop the image (pixels from left, pixels from top, pixels from right, pixels from bottom)
  * @param frame which frame to draw
  */
 void gf2d_sprite_draw_full(
@@ -122,6 +125,18 @@ void gf2d_sprite_draw_full(
     float      rotation,
     Vector2D   flip,
     Color      colorShift,
+    Vector4D   clip,
+    Uint32     frame);
+
+/**
+ * @brief draw a sprite to the screen
+ * @param sprite the sprite to draw
+ * @param position here on the screen to draw it
+ * @param frame which frame to draw
+ */
+void gf2d_sprite_draw_simple(
+    Sprite   * sprite,
+    Vector2D   position,
     Uint32     frame);
 
 /**

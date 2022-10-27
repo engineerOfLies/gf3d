@@ -1,0 +1,20 @@
+{
+"window":{
+    "dimensions" : [0.15,68,0.7,60],
+    "elements":
+    [
+      {
+        "type": "list",
+        "name": "list",
+        "id" : 0,
+        "bounds": [0,0,1,1],
+        "style": "vertical",
+        "packed":true,
+        "item_size" : [100,24],
+        "elements":
+        [
+        ]
+      }
+    ]
+    }
+}

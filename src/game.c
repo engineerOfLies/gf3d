@@ -17,6 +17,9 @@
 #include "gf2d_font.h"
 #include "gf2d_draw.h"
 #include "gf2d_actor.h"
+#include "gf2d_mouse.h"
+#include "gf2d_windows.h"
+#include "gf2d_windows_common.h"
 
 #include "entity.h"
 #include "agumon.h"
@@ -25,23 +28,39 @@
 
 extern int __DEBUG;
 
+static int _done = 0;
+static Window *_quit = NULL;
+
+void onCancel(void *data)
+{
+    _quit = NULL;
+}
+
+void onExit(void *data)
+{
+    _done = 1;
+    _quit = NULL;
+}
+
+void exitGame()
+{
+    _done = 1;
+}
+
+void exitCheck()
+{
+    if (_quit)return;
+    _quit = window_yes_no("Exit?",onExit,onCancel,NULL);
+}
+
 int main(int argc,char *argv[])
 {
-    int done = 0;
     int a;
-    
-    int mousex,mousey;
-    //Uint32 then;
-    Actor *mouse;
-    float mouseFrame;
     World *w;
     Entity *agu;
     Particle particle[100];
     Matrix4 skyMat;
     Model *sky;
-    Vector2D mouseScale = {2,2};
-    Color mouseColor;
-    Action  *mouseAction;
 
     for (a = 1; a < argc;a++)
     {
@@ -58,15 +77,13 @@ int main(int argc,char *argv[])
     gf2d_font_init("config/font.cfg");
     gf2d_draw_manager_init(1000);
     gf2d_actor_init(1024);
-
+    gf2d_windows_init(128,"config/windows.cfg");
+    gf2d_mouse_load("actors/mouse.actor");
+    
     slog_sync();
     
     entity_system_init(1024);
-    
-    mouse = gf2d_actor_load("actors/mouse.actor");    
-    mouseColor = gfc_color(.3,.9,1,0.9);
-    mouseAction = gf2d_actor_set_action(mouse, "default",&mouseFrame);
-    
+        
     agu = agumon_new(vector3d(0 ,0,0));
     if (agu)agu->selected = 1;
     w = world_load("config/testworld.json");
@@ -90,12 +107,12 @@ int main(int argc,char *argv[])
     
     // main game loop
     slog("gf3d main loop begin");
-    while(!done)
+    while(!_done)
     {
         gfc_input_update();
+        gf2d_mouse_update();
         gf2d_font_update();
-        SDL_GetMouseState(&mousex,&mousey);
-        gf2d_action_next_frame(mouseAction,&mouseFrame);        
+        gf2d_windows_update_all();
         world_run_updates(w);
         entity_think_all();
         entity_update_all();
@@ -114,22 +131,15 @@ int main(int argc,char *argv[])
                     gf3d_particle_draw(&particle[a]);
                 }
             //2D draws
-                gf2d_draw_rect_filled(gfc_rect(6,6,1000,40),gfc_color(0.5,0.5,0.5,1));
-                gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
-                
-                gf2d_draw_rect(gfc_rect(6,6,1000,40),gfc_color(1,1,0,1));
-                gf2d_actor_draw(
-                    mouse,
-                    mouseFrame,
-                    vector2d(mousex,mousey),
-                    &mouseScale,
-                    NULL,
-                    NULL,
-                    &mouseColor,
-                    NULL);
+                gf2d_windows_draw_all();
+                gf2d_mouse_draw();
+
         gf3d_vgraphics_render_end();
 
-        if (gfc_input_command_down("exit"))done = 1; // exit condition
+        if ((gfc_input_command_down("exit"))&&(_quit == NULL))
+        {
+            exitCheck();
+        }
     }    
     
     world_delete(w);

@@ -599,6 +599,7 @@ void gf2d_actor_draw(
     Vector2D drawCenter;
     Vector2D drawScale;
     Vector2D drawPosition;
+    Vector4D drawClip = {0};
     if (!actor)return;
     vector2d_copy(drawScale,actor->scale);
     if (center)
@@ -644,6 +645,7 @@ void gf2d_actor_draw(
         rotation,
         flip,
         &drawColor,
+        &drawClip,
         (int)frame);
 }
 

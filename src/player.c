@@ -19,7 +19,7 @@ Entity *player_new(Vector3D position)
         return NULL;
     }
     
-    ent->model = gf3d_model_load("dino");
+    ent->model = gf3d_model_load("models/dino.model");
     ent->think = player_think;
     ent->update = player_update;
     vector3d_copy(ent->position,position);

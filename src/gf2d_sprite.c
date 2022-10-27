@@ -268,12 +268,10 @@ void gf2d_sprite_delete(Sprite *sprite)
     if (sprite->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf2d_sprite.device, sprite->buffer, NULL);
-        slog("sprite %s vert buffer freed",sprite->filename);
     }
     if (sprite->bufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf2d_sprite.device, sprite->bufferMemory, NULL);
-        slog("sprite %s vert buffer memory freed",sprite->filename);
     }
 
     gf3d_texture_free(sprite->texture);
@@ -309,6 +307,7 @@ void gf2d_sprite_draw_full(
     float      rotation,
     Vector2D   flip,
     Color      colorShift,
+    Vector4D   clip,
     Uint32     frame)
 {
     gf2d_sprite_draw(
@@ -319,8 +318,27 @@ void gf2d_sprite_draw_full(
         &rotation,
         &flip,
         &colorShift,
+        &clip,
+       frame);
+}
+
+void gf2d_sprite_draw_simple(
+    Sprite   * sprite,
+    Vector2D   position,
+    Uint32     frame)
+{
+    gf2d_sprite_draw(
+        sprite,
+        position,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
         frame);
 }
+
 
 void gf2d_sprite_draw(
     Sprite   * sprite,
@@ -330,6 +348,7 @@ void gf2d_sprite_draw(
     float    * rotation,
     Vector2D * flip,
     Color    * colorShift,
+    Vector4D * clip,
     Uint32     frame)
 {
     VkDescriptorSet *descriptorSet = NULL;
@@ -339,6 +358,7 @@ void gf2d_sprite_draw(
     Vector2D drawCenter = {0,0};
     Vector3D drawRotation = {0,0,0};
     Vector2D drawFlip = {0,0};
+    Vector4D drawClip = {0,0,0,0};
     Color    drawColorShift = gfc_color(1,1,1,1);
 
     if (!sprite)
@@ -356,6 +376,7 @@ void gf2d_sprite_draw(
     if (rotation)drawRotation.z = *rotation;
     if (flip)vector2d_copy(drawFlip,(*flip));
     if (colorShift)drawColorShift = *colorShift;
+    if (clip)vector4d_copy(drawClip,(*clip));
     
     commandBuffer = gf2d_sprite.pipe->commandBuffer;
     buffer_frame = gf3d_vgraphics_get_current_buffer_frame();
@@ -392,15 +413,15 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
             {0,0}
         },
         {
-            {sprite->frameWidth,0},
+            {sprite->frameWidth*2,0},
             {sprite->frameWidth/(float)sprite->texture->width,0}
         },
         {
-            {0,sprite->frameHeight},
+            {0,sprite->frameHeight*2},
             {0,sprite->frameHeight/(float)sprite->texture->height}
         },
         {
-            {sprite->frameWidth,sprite->frameHeight},
+            {sprite->frameWidth*2,sprite->frameHeight*2},
             {sprite->frameWidth/(float)sprite->texture->width,sprite->frameHeight/(float)sprite->texture->height}
         }
     };

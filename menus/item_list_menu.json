@@ -1,0 +1,44 @@
+{
+"window":{
+    "color" : [255,255,255, 255],
+    "dimensions" : [0,0,500,60],
+    "align" : "middle",
+    "justify" : "center",
+    "elements":
+    [
+      {
+        "type": "list",
+        "name": "list",
+        "id" : 0,
+        "bounds": [0,10,1,1],
+        "color" : [255,255,255,255],
+        "style": "vertical",
+        "item_size" : [100,36],
+        "elements":
+        [
+            {
+            "type": "label",
+            "name" : "title",
+            "bounds": [0,0,1,36],
+            "color" : [255,255,255,255],
+            "text":"Title",
+            "justify" : "center",
+            "align" : "middle",
+            "style":"H3"
+            },
+            {
+            "type": "list",
+            "name": "options",
+            "bounds": [6,10,160,1],
+            "color" : [255,255,255,255],
+            "style": "vertical",
+            "item_size" : [0.8,36],
+            "elements":
+            [
+            ]
+            }
+        ]
+      }
+    ]
+    }
+}

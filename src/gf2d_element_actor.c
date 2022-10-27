@@ -22,6 +22,7 @@ void gf2d_element_actor_draw(Element *element,Vector2D offset)
             0,
             actor->flip,
             element->color,
+            vector4d(0,0,0,0),
             actor->frame);
     }
     else if (actor->actor)

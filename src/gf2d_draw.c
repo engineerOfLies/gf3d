@@ -125,6 +125,7 @@ void gf2d_draw_rect(Rect rect,Color color)
             0,
             vector2d(0,0),
             color,
+            vector4d(0,0,0,0),
             0);
         return;
     }
@@ -154,6 +155,7 @@ void gf2d_draw_rect(Rect rect,Color color)
         0,
         vector2d(0,0),
         color,
+        vector4d(0,0,0,0),
         0);
 
     gf2d_draw_image_new(sprite,shape,0);
@@ -180,6 +182,7 @@ void gf2d_draw_rect_filled(Rect rect,Color color)
             0,
             vector2d(0,0),
             color,
+            vector4d(0,0,0,0),
             0);
 
         return;
@@ -207,6 +210,7 @@ void gf2d_draw_rect_filled(Rect rect,Color color)
         0,
         vector2d(0,0),
         color,
+        vector4d(0,0,0,0),
         0);
     gf2d_draw_image_new(sprite,shape,1);
 }
