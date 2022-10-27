@@ -57,6 +57,13 @@ void gf2d_font_close()
     slog("text system closed");
 }
 
+void gf2d_font_image_free(FontImage *image)
+{
+    if (!image)return;
+    gf2d_sprite_free(image->image);
+    free(image);
+}
+
 void gf2d_font_image_new(
     Sprite     *sprite,
     TextBlock   text,
@@ -120,7 +127,8 @@ void gf2d_font_update()
         image = gfc_list_get_nth(font_manager.font_images,i);
         if (!image)continue;
         if ((now - image->last_used) < font_manager.ttl)continue;
-        free(image);
+        gfc_list_delete_data(font_manager.font_images,image);
+        gf2d_font_image_free(image);        
         i--;
     }
 }

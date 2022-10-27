@@ -46,6 +46,13 @@ void gf2d_draw_manager_init(Uint32 ttl)
     atexit (gf2d_draw_manager_close);
 }
 
+void gf2d_draw_image_free(DrawImage *image)
+{
+    if (!image)return;
+    gf2d_sprite_free(image->image);
+    free(image);
+}
+
 void gf2d_draw_manager_update()
 {
     DrawImage *image;
@@ -56,7 +63,8 @@ void gf2d_draw_manager_update()
         image = gfc_list_get_nth(draw_manager.draw_images,i);
         if (!image)continue;
         if ((now - image->last_used) < draw_manager.ttl)continue;
-        free(image);
+        gfc_list_delete_data(draw_manager.draw_images,image);
+        gf2d_draw_image_free(image);
         i--;
     }
 }
