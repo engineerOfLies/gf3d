@@ -268,12 +268,10 @@ void gf2d_sprite_delete(Sprite *sprite)
     if (sprite->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf2d_sprite.device, sprite->buffer, NULL);
-        slog("sprite %s vert buffer freed",sprite->filename);
     }
     if (sprite->bufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf2d_sprite.device, sprite->bufferMemory, NULL);
-        slog("sprite %s vert buffer memory freed",sprite->filename);
     }
 
     gf3d_texture_free(sprite->texture);

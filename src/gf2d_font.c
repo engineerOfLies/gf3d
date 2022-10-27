@@ -112,7 +112,7 @@ void gf2d_font_init(const char *configFile)
     }
     gf2d_fonts_load_json(configFile);
     font_manager.font_images = gfc_list_new();
-    font_manager.ttl = 100;// 100 milliseconds
+    font_manager.ttl = 1000;// 1000 milliseconds
     slog("text system initialized");
     atexit(gf2d_font_close);
 }
