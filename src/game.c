@@ -13,6 +13,7 @@
 #include "gf3d_camera.h"
 #include "gf3d_texture.h"
 #include "gf3d_particle.h"
+#include "gf3d_draw.h"
 
 #include "gf2d_sprite.h"
 #include "gf2d_font.h"
@@ -23,7 +24,7 @@
 #include "gf2d_windows_common.h"
 
 #include "entity.h"
-#include "agumon.h"
+#include "station.h"
 #include "player.h"
 #include "world.h"
 
@@ -58,10 +59,11 @@ int main(int argc,char *argv[])
 {
     int a;
     World *w;
-    Entity *agu;
-    Particle particle[100];
-    Matrix4 skyMat;
-    Model *sky;
+    Box  b = {
+        0,0,0,1,1,1
+    };
+    Sphere s = {0,0,0,1};
+    Circle circle = {0,0,1};
 
     for (a = 1; a < argc;a++)
     {
@@ -77,35 +79,23 @@ int main(int argc,char *argv[])
     gf3d_vgraphics_init("config/setup.cfg");
     gfc_audio_init(256,16,4,1,1,1);
     gf2d_font_init("config/font.cfg");
-    gf2d_draw_manager_init(1000);
+    gf3d_draw_init();//3D
+    gf2d_draw_manager_init(1000);//2D
     gf2d_actor_init(1024);
     gf2d_windows_init(128,"config/windows.cfg");
     gf2d_mouse_load("actors/mouse.actor");
+    entity_system_init(1024);
     
     slog_sync();
     
-    entity_system_init(1024);
         
-    agu = agumon_new(vector3d(0 ,0,0));
-    if (agu)agu->selected = 1;
     w = world_load("config/testworld.json");
     
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(-50,0,0));
-    
-    for (a = 0; a < 100; a++)
-    {
-        particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
-//        particle[a].color = gfc_color(0,0,0,1);
-        particle[a].color = gfc_color(gfc_random(),gfc_random(),gfc_random(),1);
-        particle[a].size = 100 * gfc_random();
-    }
-    a = 0;
-    sky = gf3d_model_load("models/sky.model");
-    gfc_matrix_identity(skyMat);
-    gfc_matrix_scale(skyMat,vector3d(100,100,100));
+    station_new(vector3d(0,0,0));
     
     // main game loop
     slog("gf3d main loop begin");
@@ -124,14 +114,13 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
-                gf3d_model_draw_sky(sky,skyMat,gfc_color(1,1,1,1));
                 world_draw(w);
                 entity_draw_all();
-                
-                for (a = 0; a < 100; a++)
-                {
-                    gf3d_particle_draw(&particle[a]);
-                }
+                gf3d_draw_circle(circle,vector3d(0,0,-10),vector3d(0,0,0),vector3d(5,5,5),gfc_color(0.4,1,0.4,1));
+                gf3d_draw_cube_solid(b,vector3d(-5,0,0),vector3d(0,0,0),vector3d(1,1,1),gfc_color(1,0.2,1,0.5));
+                gf3d_draw_cube_wireframe(b,vector3d(0,0,0),vector3d(0,0,0),vector3d(10,10,10),gfc_color(1,0.7,0.2,1));
+                gf3d_draw_sphere_wireframe(s,vector3d(0,-0,0),vector3d(0,0,0),vector3d(2,2,2),gfc_color(0.2,0.7,1,1));
+                gf3d_draw_sphere_solid(s,vector3d(0,-5,0),vector3d(0,0,0),vector3d(2,2,2),gfc_color(0.2,0.7,1,1));
             //2D draws
                 gf2d_windows_draw_all();
                 gf2d_mouse_draw();

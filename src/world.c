@@ -6,20 +6,11 @@
 
 #include "world.h"
 
-/*
-typedef struct
-{
-
-    Model *worldModel;
-    List *spawnList;        //entities to spawn
-    List *entityList;       //entities that exist in the world
-}World;
-*/
-
 World *world_load(char *filename)
 {
     SJson *json,*wjson;
     World *w = NULL;
+    Vector3D skyScale = {1,1,1};
     const char *modelName = NULL;
     w = gfc_allocate_array(sizeof(World),1);
     if (w == NULL)
@@ -50,12 +41,25 @@ World *world_load(char *filename)
         return w;
     }
     w->model = gf3d_model_load(modelName);
-
+    
+    modelName = sj_get_string_value(sj_object_get_value(wjson,"sky"));
+    if (!modelName)
+    {
+        slog("world data (%s) has no sky",filename);
+    }
+    else
+    {
+        w->sky = gf3d_model_load(modelName);
+    }
+    sj_value_as_vector3d(sj_object_get_value(wjson,"skyScale"),&skyScale);
     sj_value_as_vector3d(sj_object_get_value(wjson,"scale"),&w->scale);
     sj_value_as_vector3d(sj_object_get_value(wjson,"position"),&w->position);
     sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
+    gfc_matrix_identity(w->skyMat);
+    gfc_matrix_scale(w->skyMat,skyScale);
+
     return w;
 }
 
@@ -63,8 +67,8 @@ void world_draw(World *world)
 {
     if (!world)return;
     if (!world->model)return;// no model to draw, do nothing
+    gf3d_model_draw_sky(world->sky,world->skyMat,gfc_color(1,1,1,1));
     gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(2,2,2,2));
-    //gf3d_model_draw_highlight(world->worldModel,world->modelMat,vector4d(1,.5,.1,1));
 }
 
 void world_delete(World *world)

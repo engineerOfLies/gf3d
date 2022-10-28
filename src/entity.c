@@ -66,6 +66,10 @@ void entity_free(Entity *self)
 {
     if (!self)return;
     //MUST DESTROY
+    if (self->free)
+    {
+        self->free(self);
+    }
     gf3d_model_free(self->model);
     memset(self,0,sizeof(Entity));
 }
@@ -75,6 +79,7 @@ void entity_draw(Entity *self)
 {
     if (!self)return;
     if (self->hidden)return;
+    if (self->draw)self->draw(self);
     gf3d_model_draw(self->model,self->modelMat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
     if (self->selected)
     {
@@ -126,11 +131,11 @@ void entity_update(Entity *self)
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_add(self->velocity,self->acceleration,self->velocity);
     
-    gfc_matrix_identity(self->modelMat);
-    
-    gfc_matrix_scale(self->modelMat,self->scale);
-    gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
-    gfc_matrix_translate(self->modelMat,self->position);
+    gfc_matrix4_from_vectors(
+        self->modelMat,
+        self->position,
+        self->rotation,
+        self->scale);
     
     if (self->update)self->update(self);
 }

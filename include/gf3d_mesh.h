@@ -13,7 +13,8 @@ typedef struct
     Matrix4 view;
     Matrix4 proj;
     Vector4D color; //color mod
-    Vector4D ambient;
+    Vector4D ambientColor;
+    Vector3D ambientDir;
 }MeshUBO;
 
 /**

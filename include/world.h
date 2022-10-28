@@ -19,9 +19,9 @@ typedef struct
     Vector3D rotation;
     Vector3D scale;
     Model *model;
+    Matrix4 skyMat;
+    Model *sky;
     Color color;
-    List *spawnList;        //entities to spawn
-    List *entityList;       //entities that exist in the world
 }World;
 
 World *world_load(char *filename);

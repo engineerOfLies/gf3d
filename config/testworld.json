@@ -2,6 +2,8 @@
     "world":
     {
         "model":"models/antioch.model",
+        "sky":"models/sky.model",
+        "skyScale":[1000,1000,1000],
         "position":[7000,-2500,-5000],
         "scale":[2000,2000,2000],
         "rotation":[0,0.001,0]
