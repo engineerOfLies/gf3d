@@ -78,6 +78,24 @@ void gf3d_obj_load_reorg(ObjData *obj)
     }
 }
 
+void gf3d_obj_get_bounds(ObjData *obj)
+{
+    int i;
+    if (!obj)return;
+    for (i = 0; i < obj->vertex_count; i++)
+    {
+        if (obj->vertices[i].x < obj->bounds.x)obj->bounds.x = obj->vertices[i].x;
+        if (obj->vertices[i].y < obj->bounds.y)obj->bounds.y = obj->vertices[i].y;
+        if (obj->vertices[i].z < obj->bounds.z)obj->bounds.z = obj->vertices[i].z;
+        if (obj->vertices[i].x > obj->bounds.w)obj->bounds.w = obj->vertices[i].x;
+        if (obj->vertices[i].y > obj->bounds.h)obj->bounds.h = obj->vertices[i].y;
+        if (obj->vertices[i].z > obj->bounds.d)obj->bounds.d = obj->vertices[i].z;
+    }
+    obj->bounds.w -= obj->bounds.x;
+    obj->bounds.h -= obj->bounds.y;
+    obj->bounds.d -= obj->bounds.z;
+}
+
 ObjData *gf3d_obj_load_from_file(const char *filename)
 {
     FILE *file;
@@ -103,6 +121,7 @@ ObjData *gf3d_obj_load_from_file(const char *filename)
     
     gf3d_obj_load_get_data_from_file(obj, file);
     fclose(file);
+    gf3d_obj_get_bounds(obj);
     gf3d_obj_load_reorg(obj);
     return obj;
 }

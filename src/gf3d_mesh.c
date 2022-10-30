@@ -367,6 +367,16 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
     gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
 }
 
+Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,Vector3D size)
+{
+    Vector3D outScale = {1,1,1};
+    if (!mesh)return outScale;
+    if (size.x)outScale.x = mesh->bounds.w / size.x;
+    if (size.y)outScale.y = mesh->bounds.h / size.y;
+    if (size.z)outScale.z = mesh->bounds.d / size.z;    
+    return outScale;
+}
+
 Mesh *gf3d_mesh_load(const char *filename)
 {
     Mesh *mesh;
@@ -387,8 +397,10 @@ Mesh *gf3d_mesh_load(const char *filename)
         return NULL;
     }
     gf3d_mesh_create_vertex_buffer_from_vertices(mesh,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
+    memcpy(&mesh->bounds,&obj->bounds,sizeof(Box));
     gf3d_obj_free(obj);
     gfc_line_cpy(mesh->filename,filename);
+    
     return mesh;
 }
 

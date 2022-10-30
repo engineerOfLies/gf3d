@@ -95,7 +95,7 @@ int main(int argc,char *argv[])
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(-50,0,0));
-    station_new(vector3d(0,0,0));
+//    station_new(vector3d(0,0,0));
     
     // main game loop
     slog("gf3d main loop begin");
@@ -116,11 +116,9 @@ int main(int argc,char *argv[])
             //3D draws
                 world_draw(w);
                 entity_draw_all();
-                gf3d_draw_circle(circle,vector3d(0,0,-10),vector3d(0,0,0),vector3d(5,5,5),gfc_color(0.4,1,0.4,1));
-                gf3d_draw_cube_solid(b,vector3d(-5,0,0),vector3d(0,0,0),vector3d(1,1,1),gfc_color(1,0.2,1,0.5));
-                gf3d_draw_cube_wireframe(b,vector3d(0,0,0),vector3d(0,0,0),vector3d(10,10,10),gfc_color(1,0.7,0.2,1));
-                gf3d_draw_sphere_wireframe(s,vector3d(0,-0,0),vector3d(0,0,0),vector3d(2,2,2),gfc_color(0.2,0.7,1,1));
-                gf3d_draw_sphere_solid(s,vector3d(0,-5,0),vector3d(0,0,0),vector3d(2,2,2),gfc_color(0.2,0.7,1,1));
+                gf3d_draw_circle(circle,vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),gfc_color(1,0,0,1));
+                gf3d_draw_circle(circle,vector3d(-100,0,100),vector3d(0,0,0),vector3d(1,1,1),gfc_color(0,0,1,1));
+                gf3d_draw_edge_3d(gfc_edge3d(0,0,0,-100,0,100),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(0,1,0,1));
             //2D draws
                 gf2d_windows_draw_all();
                 gf2d_mouse_draw();

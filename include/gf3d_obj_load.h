@@ -22,6 +22,7 @@ typedef struct
     
     Vertex *faceVertices;
     Uint32  face_vert_count;
+    Box     bounds;
 }ObjData;
 
 /**

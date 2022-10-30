@@ -2,9 +2,12 @@
 #define __GF3D_MESH_H__
 
 #include <vulkan/vulkan.h>
+
 #include "gfc_vector.h"
 #include "gfc_text.h"
 #include "gfc_matrix.h"
+#include "gfc_primitives.h"
+
 #include "gf3d_pipeline.h"
 
 typedef struct
@@ -59,6 +62,7 @@ typedef struct
     Uint32          faceCount;
     VkBuffer        faceBuffer;
     VkDeviceMemory  faceBufferMemory;
+    Box             bounds;
 }Mesh;
 
 /**
@@ -74,6 +78,15 @@ void gf3d_mesh_init(Uint32 mesh_max);
  * @return NULL on error or Mesh data
  */
 Mesh *gf3d_mesh_load(const char *filename);
+
+/**
+ * @brief get the scaling factor necessary to make the mesh fit within the bounds
+ * @param mesh the mesh to validate (if this is NULL, returns (1,1,1)
+ * @param size the dimensions to scale to
+ * @return the factor to scale a mesh so that it fits exactly within the size provided.
+ * @note: likely you want to uniformly scale based on the SMALLEST of the dimensions
+ */
+Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,Vector3D size);
 
 /**
  * @brief get the input attribute descriptions for mesh based rendering

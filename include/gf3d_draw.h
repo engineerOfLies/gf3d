@@ -13,6 +13,16 @@
 void gf3d_draw_init();
 
 /**
+ * @brief draw an edge with the given orientation
+ * @param edge the edge to draw.  (x,y,and z are offsets from center)
+ * @param position where to move the sphere (final location is position + edge.a.xyz
+ * @param rotation how to rotation the edge about point a
+ * @param scale how much to scale the scale.  The size of the edge is also a factor
+ * @param color the color to draw with
+ */
+void gf3d_draw_edge_3d(Edge3D edge,Vector3D position,Vector3D rotation,Vector3D scale,float radius,Color color);
+
+/**
  * @brief draw a cube outline with the given orientation
  * @param cube the cube dimensions to draw.  (x,y,and z are offsets from center)
  * @param position where to move the sphere (final location is position + cube.xyz
