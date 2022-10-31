@@ -2,11 +2,12 @@
 #define __GF3D_LIGHTS_H__
 
 #include "gf3d_vgraphics.h"
+#include "gf3d_mesh.h"
 
 typedef struct
 {
     Uint8   _inuse;
-    Vector4D color;
+    Vector3D color;
     Vector3D position;
     Vector3D direction;     //for alignment
 }Gf3D_Light;

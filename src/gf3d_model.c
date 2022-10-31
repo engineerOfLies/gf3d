@@ -465,10 +465,9 @@ void gf3d_model_update_uniform_buffer(
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     
     vector4d_copy(modelUBO.color,colorMod);
-    modelUBO.ambientColor = vector4d(1,1,1,1);
-    modelUBO.ambientDir = vector3d(0,0,1);
 
     vector4d_copy(modelUBO.ambientColor,ambient);
+    modelUBO.ambientDir = vector3d(0,0,1);
 
     vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
     

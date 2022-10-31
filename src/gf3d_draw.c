@@ -51,23 +51,19 @@ void gf3d_draw_edge_3d(Edge3D edge,Vector3D position,Vector3D rotation,Vector3D 
     
     //z scale based on vector length
     d = vector3d_magnitude(v);
-    slog("d : %f",d);
     if (!d)return;// can't draw a zero length edge
     scale.x *= d /gf3d_draw_manager.icylinder->mesh->bounds.w;
     // y and z scale based on radius
     scale.y *= radius / gf3d_draw_manager.icylinder->mesh->bounds.h;
     scale.z *= radius / gf3d_draw_manager.icylinder->mesh->bounds.d;
-    
-    slog("edge angles: %f,%f,%f",angles.x,angles.y,angles.z);
-    
-    
+
     gfc_matrix4_from_vectors(
         modelMat,
         vector3d(position.x + edge.a.x,position.y + edge.a.y,position.z + edge.a.z),
         vector3d(rotation.x + angles.x,rotation.y + angles.y,rotation.z + angles.z),
         scale);
 //    gf3d_model_draw_highlight(gf3d_draw_manager.icylinder,modelMat,gfc_color_to_vector4f(color));
-    gf3d_model_draw(gf3d_draw_manager.icylinder,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,1));
+    gf3d_model_draw(gf3d_draw_manager.icylinder,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,0));
 }
 
 void gf3d_draw_cube_wireframe(Box cube,Vector3D position,Vector3D rotation,Vector3D scale,Color color)

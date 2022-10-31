@@ -68,7 +68,7 @@ void world_draw(World *world)
     if (!world)return;
     if (!world->model)return;// no model to draw, do nothing
     gf3d_model_draw_sky(world->sky,world->skyMat,gfc_color(1,1,1,1));
-    gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(2,2,2,2));
+    gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,1));
 }
 
 void world_delete(World *world)

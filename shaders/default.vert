@@ -8,6 +8,8 @@ layout(binding = 0) uniform UniformBufferObject {
     vec4 color;
     vec4 ambientColor;
     vec3 ambientDir;
+    float dynamicLightCount;
+    mat3 dynamicLights[8];
 } ubo;
 
 out gl_PerVertex

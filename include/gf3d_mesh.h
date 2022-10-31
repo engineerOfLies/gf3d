@@ -10,6 +10,16 @@
 
 #include "gf3d_pipeline.h"
 
+
+#define MESH_LIGHTS_MAX 8
+
+typedef struct
+{
+    Vector3D color;
+    Vector3D position;
+    Vector3D direction;     //for alignment
+}MeshLights;
+
 typedef struct
 {
     Matrix4 model;
@@ -18,6 +28,8 @@ typedef struct
     Vector4D color; //color mod
     Vector4D ambientColor;
     Vector3D ambientDir;
+    float    dynamicLightCount;//how many
+    MeshLights dynamicLights[MESH_LIGHTS_MAX];
 }MeshUBO;
 
 /**

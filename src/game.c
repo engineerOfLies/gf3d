@@ -14,6 +14,7 @@
 #include "gf3d_texture.h"
 #include "gf3d_particle.h"
 #include "gf3d_draw.h"
+#include "gf3d_lights.h"
 
 #include "gf2d_sprite.h"
 #include "gf2d_font.h"
@@ -117,8 +118,8 @@ int main(int argc,char *argv[])
                 world_draw(w);
                 entity_draw_all();
                 gf3d_draw_circle(circle,vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),gfc_color(1,0,0,1));
-                gf3d_draw_circle(circle,vector3d(-100,0,100),vector3d(0,0,0),vector3d(1,1,1),gfc_color(0,0,1,1));
-                gf3d_draw_edge_3d(gfc_edge3d(0,0,0,-100,0,100),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(0,1,0,1));
+                gf3d_draw_edge_3d(gfc_edge3d(0,0,0,6,6,6),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),0.3,gfc_color(1,1,1,1));
+                gf3d_draw_edge_3d(gfc_edge3d(0,0,0,7,7,7),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(0,1,0,1));
             //2D draws
                 gf2d_windows_draw_all();
                 gf2d_mouse_draw();
