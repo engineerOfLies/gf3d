@@ -1,0 +1,19 @@
+{
+    "actor":
+    {
+        "model":"models/station/station_%04i.obj",
+        "texture": "models/station/station.png",
+        "scale": [1,1],
+        "color": [20,200,255,230],
+        "actionList":
+        [
+            {
+                "action": "default",
+                "startFrame": 0,
+                "endFrame": 15,
+                "frameRate": 0.05,
+                "type": "loop"
+            }
+        ]
+    }
+}

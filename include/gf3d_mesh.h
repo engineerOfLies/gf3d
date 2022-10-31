@@ -15,9 +15,8 @@
 
 typedef struct
 {
-    Vector3D color;
-    Vector3D position;
-    Vector3D direction;     //for alignment
+    Vector4D color;
+    Vector4D position;
 }MeshLights;
 
 typedef struct
@@ -27,9 +26,10 @@ typedef struct
     Matrix4 proj;
     Vector4D color; //color mod
     Vector4D ambientColor;
-    Vector3D ambientDir;
-    float    dynamicLightCount;//how many
+    Vector4D ambientDir;
+    Vector4D cameraPosition;
     MeshLights dynamicLights[MESH_LIGHTS_MAX];
+    float    dynamicLightCount;//how many
 }MeshUBO;
 
 /**

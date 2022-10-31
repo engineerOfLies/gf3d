@@ -36,7 +36,13 @@ void gf3d_lights_init(Uint32 max_lights)
     atexit(gf3d_lights_close);
 }
 
-void gf3d_lights_set_global_light(Vector4D color,Vector3D direction)
+void gf3d_lights_get_global_light(Vector4D *color, Vector4D *direction)
+{
+    if (color)vector4d_copy((*color),light_manager.globalColor);
+    if (direction)vector3d_copy((*direction),light_manager.globalDir);
+}
+
+void gf3d_lights_set_global_light(Vector4D color,Vector4D direction)
 {
     vector4d_copy(light_manager.globalColor,color);
     vector3d_copy(light_manager.globalDir,direction);
@@ -68,9 +74,8 @@ void gf3d_lights_insert(Vector3D position,MeshLights *dynamicLights,Uint32 count
     if ((!dynamicLights)||(!light))return;
     if (count < MESH_LIGHTS_MAX)
     {
-        vector3d_copy(dynamicLights[count].color,light->color);
+        vector4d_copy(dynamicLights[count].color,light->color);
         vector3d_copy(dynamicLights[count].position,light->position);
-        vector3d_copy(dynamicLights[count].direction,light->direction);
         return;
     }
     magnitude_to_new = vector3d_magnitude_squared(vector3d(light->position.x - position.x,light->position.y - position.y,light->position.z - position.z));
@@ -79,9 +84,8 @@ void gf3d_lights_insert(Vector3D position,MeshLights *dynamicLights,Uint32 count
     {
         if (vector3d_magnitude_squared(vector3d(position.x - dynamicLights[i].position.x,position.y - dynamicLights[i].position.y,position.z - dynamicLights[i].position.z)) > magnitude_to_new)
         {
-            vector3d_copy(dynamicLights[i].color,light->color);
+            vector4d_copy(dynamicLights[i].color,light->color);
             vector3d_copy(dynamicLights[i].position,light->position);
-            vector3d_copy(dynamicLights[i].direction,light->direction);
             return;
         }
     }
@@ -111,8 +115,6 @@ Gf3D_Light *gf3d_light_make(Vector4D color,Vector3D position,Vector3D direction)
     if (!light)return NULL;
     vector3d_copy(light->color,color);
     vector3d_copy(light->position,position);
-    vector3d_copy(light->direction,direction);
-    vector3d_normalize(&light->direction);//sanity check
     return light;
 }
 

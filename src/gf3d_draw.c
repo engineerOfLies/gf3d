@@ -103,7 +103,7 @@ void gf3d_draw_sphere_wireframe(Sphere sphere,Vector3D position,Vector3D rotatio
     gf3d_model_draw_highlight(gf3d_draw_manager.isphere,modelMat,gfc_color_to_vector4f(color));
 }
 
-void gf3d_draw_sphere_solid(Sphere sphere,Vector3D position,Vector3D rotation,Vector3D scale,Color color)
+void gf3d_draw_sphere_solid(Sphere sphere,Vector3D position,Vector3D rotation,Vector3D scale,Color color,Color ambient)
 {
     Matrix4 modelMat;
     
@@ -112,7 +112,7 @@ void gf3d_draw_sphere_solid(Sphere sphere,Vector3D position,Vector3D rotation,Ve
         vector3d(position.x + sphere.x,position.y + sphere.y,position.z + sphere.z),
         rotation,
         vector3d(scale.x * sphere.r,scale.y * sphere.r,scale.z * sphere.r));
-    gf3d_model_draw(gf3d_draw_manager.sphere,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,1));
+    gf3d_model_draw(gf3d_draw_manager.sphere,modelMat,gfc_color_to_vector4f(color),gfc_color_to_vector4f(ambient));
 }
 
 

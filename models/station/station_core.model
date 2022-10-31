@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/station/station_core.obj",
+        "texture":"models/station/station_core.png"
+    }
+}

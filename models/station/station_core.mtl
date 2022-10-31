@@ -1,0 +1,20 @@
+# Blender MTL File: 'station_core.blend'
+# Material Count: 2
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl core
+Ns 169.000003
+Ka 1.000000 1.000000 1.000000
+Kd 0.326378 0.326378 0.326378
+Ks 0.705128 0.705128 0.705128
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2

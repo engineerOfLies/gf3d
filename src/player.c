@@ -2,6 +2,8 @@
 #include "gfc_types.h"
 
 #include "gf3d_camera.h"
+#include "gf3d_lights.h"
+
 #include "player.h"
 
 static int thirdPersonMode = 0;
@@ -80,6 +82,7 @@ void player_think(Entity *self)
         thirdPersonMode = !thirdPersonMode;
         self->hidden = !self->hidden;
     }
+    
 }
 
 void player_update(Entity *self)

@@ -8,6 +8,8 @@
 #include "gf3d_vgraphics.h"
 #include "gf3d_obj_load.h"
 #include "gf3d_uniform_buffers.h"
+#include "gf3d_lights.h"
+#include "gf3d_camera.h"
 
 #include "gf3d_model.h"
 
@@ -456,6 +458,7 @@ void gf3d_model_update_uniform_buffer(
     Vector4D ambient)
 {
     void* data;
+    Vector3D cameraPosition;
     UniformBufferObject graphics_ubo;
     MeshUBO modelUBO;
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
@@ -465,10 +468,17 @@ void gf3d_model_update_uniform_buffer(
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     
     vector4d_copy(modelUBO.color,colorMod);
+    
+    
+    cameraPosition = gf3d_camera_get_position();
+    vector3d_copy(modelUBO.cameraPosition,cameraPosition);
+    modelUBO.cameraPosition.w = 1;
+    
 
-    vector4d_copy(modelUBO.ambientColor,ambient);
-    modelUBO.ambientDir = vector3d(0,0,1);
-
+    gf3d_lights_get_global_light(&modelUBO.ambientColor, &modelUBO.ambientDir);
+    
+    vector4d_scale_by(modelUBO.ambientColor,modelUBO.ambientColor,ambient);
+        
     vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
     
         memcpy(data, &modelUBO, sizeof(MeshUBO));

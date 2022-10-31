@@ -4,10 +4,14 @@
 #include "gfc_types.h"
 #include "gfc_config.h"
 
+#include "gf3d_lights.h"
+
 #include "world.h"
 
 World *world_load(char *filename)
 {
+    Vector4D globalColor = {0};
+    Vector3D globalDir  = {0};
     SJson *json,*wjson;
     World *w = NULL;
     Vector3D skyScale = {1,1,1};
@@ -55,11 +59,13 @@ World *world_load(char *filename)
     sj_value_as_vector3d(sj_object_get_value(wjson,"scale"),&w->scale);
     sj_value_as_vector3d(sj_object_get_value(wjson,"position"),&w->position);
     sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
+    sj_value_as_vector3d(sj_object_get_value(wjson,"lightDir"),&globalDir);
+    sj_value_as_vector4d(sj_object_get_value(wjson,"lightColor"),&globalColor);
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
     gfc_matrix_identity(w->skyMat);
     gfc_matrix_scale(w->skyMat,skyScale);
-
+    gf3d_lights_set_global_light(globalColor,vector4d(globalDir.x,globalDir.y,globalDir.z,1));
     return w;
 }
 
@@ -68,7 +74,7 @@ void world_draw(World *world)
     if (!world)return;
     if (!world->model)return;// no model to draw, do nothing
     gf3d_model_draw_sky(world->sky,world->skyMat,gfc_color(1,1,1,1));
-    gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,1));
+    gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,0.5));
 }
 
 void world_delete(World *world)
