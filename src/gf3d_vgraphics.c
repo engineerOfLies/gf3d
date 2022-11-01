@@ -584,6 +584,19 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
+void gf3d_vgraphics_get_projection_matrix(Matrix4 *proj)
+{
+    if (!proj)return;
+    memcpy(proj,gf3d_vgraphics.ubo.proj,sizeof(Matrix4));
+}
+
+void gf3d_vgraphics_get_view(Matrix4 *view)
+{
+    if (!view)return;
+    memcpy(view,gf3d_vgraphics.ubo.view,sizeof(Matrix4));
+}
+
+
 Matrix4 *gf3d_vgraphics_get_view_matrix()
 {
     return &gf3d_vgraphics.ubo.view;

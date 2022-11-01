@@ -6,7 +6,7 @@
         "frameHeight": 32,
         "framesPerLine": 16,
         "scale": [1,1],
-        "color": [20,200,255,230],
+        "color": [20,200,255,128],
         "actionList":
         [
             {

@@ -46,6 +46,8 @@ VkExtent2D gf3d_vgraphics_get_view_extent();
 Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
 Vector2D gf3d_vgraphics_get_resolution();
 
+void gf3d_vgraphics_get_view(Matrix4 *view);
+
 
 void gf3d_vgraphics_clear();
 
@@ -64,6 +66,12 @@ void gf3d_vgraphics_rotate_camera(float degrees);
  * @return the view matrix sent to every rendering call
  */
 Matrix4 *gf3d_vgraphics_get_view_matrix();
+
+/**
+ * @brief get the projection matrix
+ * @param proj where to put the projection matrix
+ */
+void gf3d_vgraphics_get_projection_matrix(Matrix4 *proj);
 
 
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
