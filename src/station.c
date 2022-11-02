@@ -1,5 +1,7 @@
-
 #include "simple_logger.h"
+
+#include "gf3d_draw.h"
+
 #include "station.h"
 
 typedef struct
@@ -56,15 +58,29 @@ void station_update(Entity *self)
         return;
     }
     vector3d_add(self->position,self->position,self->velocity);
-    self->rotation.y += 0.001;
+    self->rotation.x += 0.001;
 }
 
 void station_draw(Entity *self)
 {
     StationData *data;
+    Vector3D forward,right,up;
     if (!self)return;
     data = (StationData *)self->data;
     gf3d_model_draw(data->segment,self->modelMat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
+    
+    vector3d_angle_vectors(self->rotation, &forward, &right,&up);
+    
+    vector3d_scale(forward,forward,100);
+    vector3d_add(forward,forward,self->position);
+    vector3d_scale(right,right,100);
+    vector3d_add(right,right,self->position);
+    vector3d_scale(up,up,100);
+    vector3d_add(up,up,self->position);
+    
+    gf3d_draw_edge_3d(gfc_edge3d_from_vectors(self->position,forward),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),0.1,gfc_color(1,1,0,1));
+    gf3d_draw_edge_3d(gfc_edge3d_from_vectors(self->position,right),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),0.1,gfc_color(0,1,1,1));
+    gf3d_draw_edge_3d(gfc_edge3d_from_vectors(self->position,up),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),0.1,gfc_color(1,0,1,1));
 }
 
 void station_think(Entity *self)

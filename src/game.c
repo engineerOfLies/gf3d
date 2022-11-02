@@ -60,11 +60,6 @@ int main(int argc,char *argv[])
 {
     int a;
     World *w;
-    Box  b = {
-        0,0,0,1,1,1
-    };
-    Sphere s = {0,0,0,1};
-    Circle circle = {0,0,1};
 
     for (a = 1; a < argc;a++)
     {
@@ -95,7 +90,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(-50,0,0));
+    player_new(vector3d(0,0.11,0));
     //station_new(vector3d(0,0,0));
     
     // main game loop
@@ -117,8 +112,15 @@ int main(int argc,char *argv[])
             //3D draws
                 world_draw(w);
                 entity_draw_all();
-                gf3d_draw_sphere_solid(s,vector3d(0,10,0),vector3d(0,0,0),vector3d(1,1,1),gfc_color(0.5,0.5,0.5,1),gfc_color(1,1,1,1));
-            //2D draws
+                gf3d_particle_draw(gf3d_particle(vector3d(0,0,0),gfc_color(1,1,1,1),1));
+                gf3d_particle_draw(gf3d_particle(vector3d(10,0,0),gfc_color(1,0,0,1),1));
+                gf3d_particle_draw(gf3d_particle(vector3d(0,10,0),gfc_color(0,1,0,1),1));
+                gf3d_particle_draw(gf3d_particle(vector3d(0,0,10),gfc_color(0,0,1,1),1));                
+                gf3d_particle_draw(gf3d_particle(vector3d(-10,0,0),gfc_color(1,1,0,1),1));
+                gf3d_particle_draw(gf3d_particle(vector3d(0,-10,0),gfc_color(0,1,1,1),1));
+                gf3d_particle_draw(gf3d_particle(vector3d(0,0,-10),gfc_color(1,0,1,1),1));                
+                //gf3d_draw_edge_3d(gfc_edge3d(0,0,0,7000,-2500,-5000),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(1,0,1,1));
+                //2D draws
                 gf2d_windows_draw_all();
                 gf2d_mouse_draw();
 

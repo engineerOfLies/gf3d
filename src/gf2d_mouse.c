@@ -1,5 +1,8 @@
 #include <SDL.h>
 
+#include "gf3d_vgraphics.h"
+#include "gf3d_camera.h"
+
 #include "gf2d_actor.h"
 #include "gf2d_mouse.h"
 
@@ -133,6 +136,41 @@ float gf2d_mouse_get_angle_to(Vector2D point)
     Vector2D delta;
     vector2d_sub(delta,_mouse.mouse[0].position,point);
     return vector2d_angle(delta);
+}
+
+Edge3D gf2d_mouse_get_cast_ray()
+{
+    Vector2D mouse,res,w;
+    Vector3D position;
+    Vector3D a = {0,5000,0},b;
+    
+    Vector3D forward = {0};
+    Vector3D rightNear,right = {0};
+    Vector3D upNear,up = {0};
+
+    mouse = gf2d_mouse_get_position();
+    
+    res = gf3d_vgraphics_get_resolution();
+    position = gf3d_camera_get_position();
+    
+    w.x = (mouse.x/res.x *2) -1;//amount right to move
+    w.y = ((mouse.y/res.y *2) -1) * -1;//amount up to move
+    
+    vector2d_normalize(&res);
+    vector3d_angle_vectors(gf3d_camera_get_angles(), &forward, &right, &up);
+
+    vector3d_scale(rightNear,right,-1 * w.x * (res.x * 0.15));
+    vector3d_scale(upNear,up,-1 * w.y * (res.y * 0.15));
+     a.x = position.x + rightNear.x+ upNear.x;
+     a.y = position.y + rightNear.y+ upNear.y;
+     a.z = position.z + rightNear.z+ upNear.z;
+    vector3d_scale(forward,forward,5000);
+    vector3d_scale(right,right,-5000 * w.x);
+    vector3d_scale(up,up,-5000 * w.y);
+     b.x = forward.x + rightNear.x + upNear.x;
+     b.y = forward.y + rightNear.y + upNear.y;
+     b.z = forward.z + rightNear.z + upNear.z;
+    return gfc_edge3d_from_vectors(a,b);
 }
 
 Vector2D gf2d_mouse_get_position()

@@ -23,6 +23,12 @@ typedef struct
 void gf3d_particle_manager_init(Uint32 max_particles);
 
 /**
+ * @brief set a particle
+ * @return a set particle
+ */
+Particle gf3d_particle(Vector3D position, Color color, float size);
+
+/**
  * @brief needs to be called once at the beginning of each render frame
  */
 void gf3d_particle_reset_pipes();
@@ -36,7 +42,12 @@ void gf3d_particle_submit_pipe_commands();
  * @brief draw a single particle this frame
  * @param particle the particle to draw
  */
-void gf3d_particle_draw(Particle *particle);
+void gf3d_particle_draw(Particle particle);
+
+/**
+ * @brief draw an array of particles
+ */
+void gf3d_particle_draw_array(Particle *particle,Uint32 count);
 
 /**
  * @brief draw a list of particles this frame

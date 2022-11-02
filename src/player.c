@@ -4,6 +4,7 @@
 #include "gf3d_vgraphics.h"
 #include "gf3d_camera.h"
 #include "gf3d_lights.h"
+#include "gf3d_particle.h"
 #include "gf3d_draw.h"
 
 #include "gf2d_mouse.h"
@@ -16,25 +17,7 @@ void player_update(Entity *self);
 
 void player_draw(Entity *self)
 {
-    Matrix4 view,proj;
-    Vector2D mouse,res;
-    Vector3D a,b;    
-    mouse = gf2d_mouse_get_position();
-    gf3d_vgraphics_get_projection_matrix(&proj);
-    gf3d_vgraphics_get_view(&view);
-    res = gf3d_vgraphics_get_resolution();
-            
-    a = gfc_unproject(vector3d(mouse.x,mouse.y,0),view, proj,res);
-    b = gfc_unproject(vector3d(mouse.x,mouse.y,1),view, proj,res);
-    
-    slog("a : %f,%f,%f",a.x,a.y,a.z);
-    slog("b : %f,%f,%f",b.x,b.y,b.z);
-    
-    gf3d_draw_edge_3d(gfc_edge3d_from_vectors(a,b),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),0.5,gfc_color(0,1,1,1));
-    gf3d_draw_sphere_solid(
-        gfc_sphere(0,0,0,1),vector3d(a.x,a.y,a.z),vector3d(0,0,0),vector3d(1,1,1),gfc_color(1,0,0,1),gfc_color(0,0,0,0));
-    gf3d_draw_sphere_solid(
-        gfc_sphere(0,0,0,1),vector3d(b.x,b.y,b.z),vector3d(0,0,0),vector3d(1,1,1),gfc_color(0,1,0,1),gfc_color(0,0,0,0));
+    gf3d_draw_edge_3d(gf2d_mouse_get_cast_ray(),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),0.025,gfc_color(0,1,0,1));
 }
 
 Entity *player_new(Vector3D position)
@@ -52,8 +35,8 @@ Entity *player_new(Vector3D position)
     ent->think = player_think;
     ent->update = player_update;
     vector3d_copy(ent->position,position);
-    ent->rotation.x = -GFC_PI;
-    ent->rotation.z = -GFC_HALF_PI;
+    ent->rotation.x = GFC_PI;
+//    ent->rotation.z = -GFC_HALF_PI;
     ent->hidden = 0;
     ent->draw = player_draw;
     return ent;
