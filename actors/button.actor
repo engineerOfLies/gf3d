@@ -1,13 +1,13 @@
 {
     "actor":
     {
-        "sprite": "images/ui/gem_button.png",
+        "sprite": "images/ui/com_button.png",
         "frameWidth": 256,
         "frameHeight": 64,
         "framesPerLine": 1,
         "scale": [0.64,0.9],
         "drawOffset":[2,4],
-        "color": [255,255,255,255],
+        "color": [64,200,255,200],
         "actionList":
         [
             {
