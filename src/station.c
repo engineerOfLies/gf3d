@@ -127,21 +127,7 @@ void station_draw(Entity *self)
 void station_think(Entity *self)
 {
     if (!self)return;
-    switch(self->state)
-    {
-        case ES_idle:
-            //look for player
-            break;
-        case ES_hunt:
-            // set move towards player
-            break;
-        case ES_dead:
-            // remove myself from the system
-            break;
-        case ES_attack:
-            // run through attack animation / deal damage
-            break;
-    }
+    // do maintenance
 }
 
 /*eol@eof*/

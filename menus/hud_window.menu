@@ -1,0 +1,104 @@
+{
+    "window":{
+        "color" : [255,255,255,255],
+        "dimensions" : [0,0,1,64],
+        "elements":
+        [
+        {
+            "type": "list",
+            "name": "list",
+            "bounds": [32,0,1,1],
+            "style": "horizontal",
+            "item_size" : [128,40],
+            "packed":true,
+            "elements":
+            [
+            {
+                "type": "button",
+                "name":"station",
+                "bounds": [0,0,160,64],
+                "hotkey":"station",
+                "label" :
+                {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Station",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                }
+            }, 
+            {
+                "type": "button",
+                "name":"personnel",
+                "bounds": [0,0,160,64],
+                "hotkey":"personnel",
+                "label" :
+                {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Personnel",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                }
+            }, 
+            {
+                "type": "button",
+                "name":"research",
+                "bounds": [0,0,160,64],
+                "hotkey":"research",
+                "label" :
+                {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Research",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"governance",
+                "bounds": [0,0,160,64],
+                "hotkey":"governance",
+                "label" :
+                {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Governance",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                }
+            }
+            ]
+        }
+        ]
+    }
+}

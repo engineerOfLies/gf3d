@@ -25,9 +25,10 @@
 #include "gf2d_windows_common.h"
 
 #include "entity.h"
-#include "station.h"
 #include "player.h"
 #include "world.h"
+
+#include "hud_window.h"
 
 extern int __DEBUG;
 
@@ -91,8 +92,8 @@ int main(int argc,char *argv[])
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(-7.390132,10.103416,4.000000),vector3d(3.556602,0.000000,-2.365007));
-    station_new(vector3d(0,0,0));
     
+    hud_window();    
     // main game loop
     slog("gf3d main loop begin");
     while(!_done)

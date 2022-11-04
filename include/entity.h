@@ -7,15 +7,6 @@
 
 #include "gf3d_model.h"
 
-typedef enum
-{
-    ES_idle = 0,
-    ES_hunt,
-    ES_dead,
-    ES_attack
-}EntityState;
-
-
 typedef struct Entity_S
 {
     Uint8       _inuse;     /**<keeps track of memory usage*/
@@ -36,10 +27,7 @@ typedef struct Entity_S
     void       (*damage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     void       (*free)(struct Entity_S *self); /**<pointer to the custom free function, necessar when there is custom data*/
-    
-    EntityState state;
-    
-    
+        
     Vector3D    velocity;
     Vector3D    acceleration;
             
