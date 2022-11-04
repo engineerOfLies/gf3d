@@ -90,8 +90,8 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(0,0.11,0));
-    //station_new(vector3d(0,0,0));
+    player_new(vector3d(-7.390132,10.103416,4.000000),vector3d(3.556602,0.000000,-2.365007));
+    station_new(vector3d(0,0,0));
     
     // main game loop
     slog("gf3d main loop begin");
@@ -112,14 +112,6 @@ int main(int argc,char *argv[])
             //3D draws
                 world_draw(w);
                 entity_draw_all();
-                gf3d_particle_draw(gf3d_particle(vector3d(0,0,0),gfc_color(1,1,1,1),1));
-                gf3d_particle_draw(gf3d_particle(vector3d(10,0,0),gfc_color(1,0,0,1),1));
-                gf3d_particle_draw(gf3d_particle(vector3d(0,10,0),gfc_color(0,1,0,1),1));
-                gf3d_particle_draw(gf3d_particle(vector3d(0,0,10),gfc_color(0,0,1,1),1));                
-                gf3d_particle_draw(gf3d_particle(vector3d(-10,0,0),gfc_color(1,1,0,1),1));
-                gf3d_particle_draw(gf3d_particle(vector3d(0,-10,0),gfc_color(0,1,1,1),1));
-                gf3d_particle_draw(gf3d_particle(vector3d(0,0,-10),gfc_color(1,0,1,1),1));                
-                //gf3d_draw_edge_3d(gfc_edge3d(0,0,0,7000,-2500,-5000),vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(1,0,1,1));
                 //2D draws
                 gf2d_windows_draw_all();
                 gf2d_mouse_draw();

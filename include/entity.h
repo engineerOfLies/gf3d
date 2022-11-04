@@ -19,7 +19,7 @@ typedef enum
 typedef struct Entity_S
 {
     Uint8       _inuse;     /**<keeps track of memory usage*/
-    Matrix4     modelMat;   /**<orientation matrix for the model*/
+    ModelMat    mat;   /**<orientation matrix for the model*/
     Color       color;      /**<default color for the model*/
     Model      *model;      /**<pointer to the entity model to draw  (optional)*/
     Uint8       hidden;     /**<if true, not drawn*/
@@ -39,13 +39,10 @@ typedef struct Entity_S
     
     EntityState state;
     
-    Vector3D    position;  
+    
     Vector3D    velocity;
     Vector3D    acceleration;
-        
-    Vector3D    scale;
-    Vector3D    rotation;
-    
+            
     Uint32      health;     /**<entity dies when it reaches zero*/
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     struct Entity_S *target;    /**<entity to target for weapons / ai*/

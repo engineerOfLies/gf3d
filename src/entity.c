@@ -47,10 +47,8 @@ Entity *entity_new()
         if (!entity_manager.entity_list[i]._inuse)// not used yet, so we can!
         {
             entity_manager.entity_list[i]._inuse = 1;
-            gfc_matrix_identity(entity_manager.entity_list[i].modelMat);
-            entity_manager.entity_list[i].scale.x = 1;
-            entity_manager.entity_list[i].scale.y = 1;
-            entity_manager.entity_list[i].scale.z = 1;
+            
+            gf3d_model_mat_reset(&entity_manager.entity_list[i].mat);
             
             entity_manager.entity_list[i].color = gfc_color(1,1,1,1);
             entity_manager.entity_list[i].selectedColor = gfc_color(1,1,1,1);
@@ -80,12 +78,12 @@ void entity_draw(Entity *self)
     if (!self)return;
     if (self->hidden)return;
     if (self->draw)self->draw(self);
-    gf3d_model_draw(self->model,self->modelMat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
+    gf3d_model_draw(self->model,self->mat.mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
     if (self->selected)
     {
         gf3d_model_draw_highlight(
             self->model,
-            self->modelMat,
+            self->mat.mat,
             gfc_color_to_vector4f(self->selectedColor));
     }
 }
@@ -128,14 +126,11 @@ void entity_update(Entity *self)
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
     
-    vector3d_add(self->position,self->position,self->velocity);
+    gf3d_model_mat_move(&self->mat,self->velocity);
     vector3d_add(self->velocity,self->acceleration,self->velocity);
     
-    gfc_matrix4_from_vectors(
-        self->modelMat,
-        self->position,
-        self->rotation,
-        self->scale);
+    gf3d_model_mat_set_matrix(&self->mat);
+    
     
     if (self->update)self->update(self);
 }

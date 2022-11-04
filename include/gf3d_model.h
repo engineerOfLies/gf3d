@@ -45,6 +45,15 @@ typedef struct
     VkDescriptorSet         *   descriptorSet;
 }Model;
 
+typedef struct
+{
+    Model *model;
+    Matrix4 mat;
+    Vector3D position;
+    Vector3D rotation;
+    Vector3D scale;
+}ModelMat;
+
 /**
  * @brief setup the model manager
  * @param max_models the maximum number of models that can be held in memory
@@ -111,5 +120,60 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
  * @brief free a model
  */
 void gf3d_model_free(Model *model);
+
+/**
+ * @brief reset a ModelMat to identity (all values zero except for the scale values to 1)
+ * @param mat the ModelMat to reset.
+ */
+void gf3d_model_mat_reset(ModelMat *mat);
+
+/**
+ * @brief set the modelMat matrix based on its position,rotation, and scale
+ * @param mat the modelMat that will have its matrix set
+ */
+void gf3d_model_mat_set_matrix(ModelMat *mat);
+
+/**
+ * @brief set a model mat scale
+ * @param mat the modelMat to set
+ * @param scale the scale value (1,1,1) is no scale at all
+ */
+void gf3d_model_mat_set_scale(ModelMat *mat,Vector3D scale);
+
+/**
+ * @brief set a model mat scale
+ * @param mat the modelMat to set
+ * @param position the position to set
+ */
+void gf3d_model_mat_set_position(ModelMat *mat,Vector3D position);
+
+/**
+ * @brief set a model mat rotation
+ * @param mat the modelMat to set
+ * @param rotation the rotation to set
+ */
+void gf3d_model_mat_set_rotation(ModelMat *mat,Vector3D rotation);
+
+/**
+ * @brief scale a modelMat from its current scale
+ * @param mat the modelMat to change
+ * @param scale the amount to change the scale by
+ */
+void gf3d_model_mat_scale(ModelMat *mat,Vector3D scale);
+
+/**
+ * @brief move a modelMat from its current position
+ * @param mat the modelMat to change
+ * @param translation the amount to change the position by
+ */
+void gf3d_model_mat_move(ModelMat *mat,Vector3D translation);
+
+/**
+ * @brief rotate a modelMat from its current rotation
+ * @param mat the modelMat to change
+ * @param rotation the amount to change the rotation by
+ */
+void gf3d_model_mat_rotate(ModelMat *mat,Vector3D rotation);
+
 
 #endif

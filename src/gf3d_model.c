@@ -448,7 +448,59 @@ void gf3d_model_update_highlight_model_descriptor_set(
     vkUpdateDescriptorSets(gf3d_model.device, 2, descriptorWrite, 0, NULL);
 }
 
+void gf3d_model_mat_set_scale(ModelMat *mat,Vector3D scale)
+{
+    if (!mat)return;
+    vector3d_copy(mat->scale,scale);
+}
 
+void gf3d_model_mat_set_position(ModelMat *mat,Vector3D position)
+{
+    if (!mat)return;
+    vector3d_copy(mat->position,position);
+}
+
+void gf3d_model_mat_set_rotation(ModelMat *mat,Vector3D rotation)
+{
+    if (!mat)return;
+    vector3d_copy(mat->rotation,rotation);
+}
+
+void gf3d_model_mat_scale(ModelMat *mat,Vector3D scale)
+{
+    if (!mat)return;
+    vector3d_multiply(mat->scale,scale);
+}
+
+void gf3d_model_mat_move(ModelMat *mat,Vector3D translation)
+{
+    if (!mat)return;
+    vector3d_add(mat->position,mat->position,translation);
+}
+
+void gf3d_model_mat_rotate(ModelMat *mat,Vector3D rotation)
+{
+    if (!mat)return;
+    vector3d_add(mat->rotation,mat->rotation,rotation);
+}
+
+void gf3d_model_mat_reset(ModelMat *mat)
+{
+    if (!mat)return;
+    memset(mat,0,sizeof(ModelMat));
+    gfc_matrix_identity(mat->mat);
+    mat->scale = vector3d(1,1,1);
+}
+
+void gf3d_model_mat_set_matrix(ModelMat *mat)
+{
+    if (!mat)return;
+    gfc_matrix4_from_vectors(
+        mat->mat,
+        mat->position,
+        mat->rotation,
+        mat->scale);
+}
 
 void gf3d_model_update_uniform_buffer(
     Model *model,

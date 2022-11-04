@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/station/station_habitat.obj",
+        "texture":"models/station/station_habitat.png"
+    }
+}
