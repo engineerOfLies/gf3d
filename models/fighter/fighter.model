@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/fighter/fighter.obj",
+        "texture":"models/fighter/fighter.png"
+    }
+}

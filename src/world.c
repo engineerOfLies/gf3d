@@ -55,6 +55,20 @@ World *world_load(char *filename)
     {
         w->sky = gf3d_model_load(modelName);
     }
+    modelName = sj_get_string_value(sj_object_get_value(wjson,"backgroundMusic"));
+    if (modelName)
+    {
+        w->backgroundMusic = Mix_LoadMUS(modelName);
+        if (!w->backgroundMusic)
+        {
+            slog("failed to open background music %s",modelName);
+        }
+        else
+        {
+            Mix_PlayMusic(w->backgroundMusic,-1);
+        }
+    }
+
     sj_value_as_vector3d(sj_object_get_value(wjson,"skyScale"),&skyScale);
     sj_value_as_vector3d(sj_object_get_value(wjson,"scale"),&w->scale);
     sj_value_as_vector3d(sj_object_get_value(wjson,"position"),&w->position);
@@ -74,7 +88,7 @@ void world_draw(World *world)
     if (!world)return;
     if (!world->model)return;// no model to draw, do nothing
     gf3d_model_draw_sky(world->sky,world->skyMat,gfc_color(1,1,1,1));
-    gf3d_model_draw(world->model,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,0.5));
+    gf3d_model_draw(world->model,0,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,0.5));
 }
 
 void world_delete(World *world)

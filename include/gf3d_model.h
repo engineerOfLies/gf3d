@@ -28,6 +28,7 @@
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
 #include "gfc_text.h"
+#include "gfc_list.h"
 
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
@@ -38,11 +39,11 @@
  */
 typedef struct
 {
-    Uint8                       _inuse;
-    TextLine                    filename;
-    Mesh                    *   mesh;
-    Texture                 *   texture;
-    VkDescriptorSet         *   descriptorSet;
+    Uint32              refCount;
+    TextLine            filename;
+    
+    List               *mesh_list;
+    Texture            *texture;
 }Model;
 
 typedef struct
@@ -94,11 +95,12 @@ Model * gf3d_model_load_from_config(SJson *json);
 /**
  * @brief queue up a model for rendering
  * @param model the model to render
+ * @param index the mesh to render from the mesh_list
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
  * @param ambient how much ambient light there is
  */
-void gf3d_model_draw(Model *model,Matrix4 modelMat,Vector4D colorMod,Vector4D ambient);
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambient);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe
@@ -106,7 +108,7 @@ void gf3d_model_draw(Model *model,Matrix4 modelMat,Vector4D colorMod,Vector4D am
  * @param modelMat the model matrix (MVP)
  * @param highlightColor the color of the outline
  */
-void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat,Vector4D highlight);
+void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector4D highlight);
 
 /**
  * @brief queue up a model for rendering as a sky

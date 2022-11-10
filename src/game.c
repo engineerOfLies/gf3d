@@ -26,6 +26,7 @@
 
 #include "entity.h"
 #include "player.h"
+#include "gate.h"
 #include "world.h"
 
 #include "hud_window.h"
@@ -91,7 +92,9 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(-7.390132,10.103416,4.000000),vector3d(3.556602,0.000000,-2.365007));
+    //player_new(vector3d(-934.477356,922.957886,314.309998),vector3d(3.401598,0.000000,-2.275005));
+    player_new(vector3d(-4000,0,0),vector3d(3.401598,0.000000,-2.275005));
+    gate_new(vector3d(-4000,0,0));
     
     hud_window();    
     // main game loop

@@ -25,6 +25,7 @@ typedef struct
 static ModelManager gf3d_model = {0};
 
 void gf3d_model_delete(Model *model);
+Model * gf3d_model_get_by_filename(const char *filename);
 
 void gf3d_model_create_descriptor_pool(Model *model);
 void gf3d_model_create_descriptor_sets(Model *model);
@@ -91,15 +92,30 @@ void gf3d_model_manager_init(Uint32 max_models)
     atexit(gf3d_model_manager_close);
 }
 
+Model * gf3d_model_get_by_filename(const char *filename)
+{
+    int i;
+    for (i = 0; i < gf3d_model.max_models;i++)
+    {
+        if (!gf3d_model.model_list[i].refCount)
+        {
+            continue;
+        }
+        if (strcmp(filename,gf3d_model.model_list[i].filename)==0)return &gf3d_model.model_list[i];
+    }
+    return NULL;
+}
+
 Model * gf3d_model_new()
 {
     int i;
     for (i = 0; i < gf3d_model.max_models;i++)
     {
-        if (!gf3d_model.model_list[i]._inuse)
+        if (!gf3d_model.model_list[i].refCount)
         {
             gf3d_model_delete(&gf3d_model.model_list[i]);
-            gf3d_model.model_list[i]._inuse = 1;
+            gf3d_model.model_list[i].refCount = 1;
+            gf3d_model.model_list[i].mesh_list = gfc_list_new();
             return &gf3d_model.model_list[i];
         }
     }
@@ -112,6 +128,13 @@ Model * gf3d_model_load(const char * filename)
     SJson *json,*config;
     Model *model;
     if (!filename)return NULL;
+    
+    model = gf3d_model_get_by_filename(filename);
+    if (model)
+    {
+        model->refCount++;
+        return model;
+    }
     json = sj_load(filename);
     if (!json)return NULL;
     config = sj_object_get_value(json,"model");
@@ -122,24 +145,108 @@ Model * gf3d_model_load(const char * filename)
         return NULL;
     }
     model = gf3d_model_load_from_config(config);
+    if (model)
+    {
+        gfc_line_cpy(model->filename,filename);
+    }
     sj_free(json);
     return model;
 }
 
+Model * gf3d_model_load_from_config(SJson *json)
+{
+    int i,c;
+    Mesh *mesh;
+    SJson *array,*item;
+    Model *model;
+    const char *modelFile;
+    const char *textureFile;
+    if (!json)return NULL;
+    model = gf3d_model_new();
+    if (!model)return NULL;
+    textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
+    
+    model->texture = gf3d_texture_load(textureFile);
+    if (!model->texture)
+    {
+        model->texture = gf3d_texture_load("images/default.png");
+    }
+
+    modelFile = sj_get_string_value(sj_object_get_value(json,"model"));
+    if (modelFile)
+    {
+        mesh = gf3d_mesh_load(modelFile);
+        if (mesh)model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+        return model;
+    }
+    array = sj_object_get_value(json,"model_list");
+    c = sj_array_get_count(array);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(array,i);
+        if (!item)continue;
+        modelFile = sj_get_string_value(item);
+        if (modelFile)
+        {
+            mesh = gf3d_mesh_load(modelFile);
+            if (mesh)model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+        }
+    }
+    return model;
+}
+
+
+void gf3d_model_free(Model *model)
+{
+    if (!model)return;
+    model->refCount--;
+    if (!model->refCount)
+    {
+        gf3d_model_delete(model);
+    }
+}
+
+void gf3d_model_delete(Model *model)
+{
+    int i,c;
+    Mesh *mesh;
+    if (!model)return;
+    c = gfc_list_get_count(model->mesh_list);
+    for (i = 0; i < c; i++)
+    {
+        mesh = gfc_list_get_nth(model->mesh_list,i);
+        if (!mesh)continue;
+        gf3d_mesh_free(mesh);
+    }
+    gfc_list_delete(model->mesh_list);
+    gf3d_texture_free(model->texture);
+    memset(model,0,sizeof(Model));
+}
+
 Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
 {
+    Mesh *mesh;
     Model *model;
+    
+    model = gf3d_model_get_by_filename(modelFile);
+    if (model)
+    {
+        model->refCount++;
+        return model;
+    }
     model = gf3d_model_new();
     if (!model)return NULL;
     
     gfc_line_cpy(model->filename,modelFile);
 
-    model->mesh = gf3d_mesh_load(modelFile);
-    if (!model->mesh)
+    mesh = gf3d_mesh_load(modelFile);
+    if (!mesh)
     {
         gf3d_model_free(model);
         return NULL;
     }
+    model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+    
     model->texture = gf3d_texture_load(textureFile);
 
     if (!model->texture)
@@ -150,34 +257,10 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
     return model;
 }
 
-Model * gf3d_model_load_from_config(SJson *json)
-{
-    const char *model;
-    const char *texture;
-    if (!json)return NULL;
-    model = sj_get_string_value(sj_object_get_value(json,"model"));
-    texture = sj_get_string_value(sj_object_get_value(json,"texture"));
-    return gf3d_model_load_full(model,texture);
-}
 
-
-void gf3d_model_free(Model *model)
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambientLight)
 {
-    gf3d_model_delete(model);
-}
-
-void gf3d_model_delete(Model *model)
-{
-    if (!model)return;
-    if (!model->_inuse)return;// not in use, nothing to do
-    
-    gf3d_mesh_free(model->mesh);
-    gf3d_texture_free(model->texture);
-    memset(model,0,sizeof(Model));
-}
-
-void gf3d_model_draw(Model *model,Matrix4 modelMat,Vector4D colorMod,Vector4D ambientLight)
-{
+    Mesh *mesh;
     VkDescriptorSet *descriptorSet = NULL;
     VkCommandBuffer commandBuffer;
     Uint32 bufferFrame;
@@ -194,11 +277,13 @@ void gf3d_model_draw(Model *model,Matrix4 modelMat,Vector4D colorMod,Vector4D am
         return;
     }
     gf3d_model_update_basic_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat,colorMod,ambientLight);
-    gf3d_mesh_render(model->mesh,commandBuffer,descriptorSet);
+    mesh = gfc_list_get_nth(model->mesh_list,index);
+    gf3d_mesh_render(mesh,commandBuffer,descriptorSet);
 }
 
-void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat,Vector4D highlight)
+void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector4D highlight)
 {
+    Mesh *mesh;
     VkDescriptorSet *descriptorSet = NULL;
     VkCommandBuffer commandBuffer;
     Uint32 bufferFrame;
@@ -215,7 +300,8 @@ void gf3d_model_draw_highlight(Model *model,Matrix4 modelMat,Vector4D highlight)
         return;
     }
     gf3d_model_update_highlight_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat,highlight);
-    gf3d_mesh_render_highlight(model->mesh,commandBuffer,descriptorSet);
+    mesh = gfc_list_get_nth(model->mesh_list,index);
+    gf3d_mesh_render_highlight(mesh,commandBuffer,descriptorSet);
 }
 
 void gf3d_model_update_sky_uniform_buffer(
@@ -309,6 +395,7 @@ void gf3d_model_update_sky_model_descriptor_set(
 
 void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
 {
+    Mesh *mesh;
     VkDescriptorSet *descriptorSet = NULL;
     VkCommandBuffer commandBuffer;
     Uint32 bufferFrame;
@@ -325,7 +412,8 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
         return;
     }
     gf3d_model_update_sky_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat,gfc_color_to_vector4f(color));
-    gf3d_mesh_render_sky(model->mesh,commandBuffer,descriptorSet);
+    mesh = gfc_list_get_nth(model->mesh_list,0);
+    gf3d_mesh_render_sky(mesh,commandBuffer,descriptorSet);
 }
 
 

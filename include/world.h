@@ -6,6 +6,7 @@
 #include "gfc_list.h"
 #include "gfc_color.h"
 #include "gfc_matrix.h"
+#include "gfc_audio.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_model.h"
@@ -22,6 +23,7 @@ typedef struct
     Matrix4 skyMat;
     Model *sky;
     Color color;
+    Mix_Music *backgroundMusic;
 }World;
 
 World *world_load(char *filename);

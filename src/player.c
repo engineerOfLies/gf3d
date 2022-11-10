@@ -55,6 +55,9 @@ void player_think(Entity *self)
     w = vector2d_from_angle(self->mat.rotation.z - GFC_HALF_PI);
     right.x = w.x;
     right.y = w.y;
+    
+    vector3d_scale(forward,forward,0.1);
+    vector3d_scale(right,right,0.1);
     if (keys[SDL_SCANCODE_W])
     {   
         gf3d_model_mat_move(&self->mat,forward);
@@ -71,8 +74,8 @@ void player_think(Entity *self)
     {
         gf3d_model_mat_move(&self->mat,vector3d(-right.x,-right.y,-right.z));
     }
-    if (keys[SDL_SCANCODE_SPACE])self->mat.position.z += 1;
-    if (keys[SDL_SCANCODE_Z])self->mat.position.z -= 1;
+    if (keys[SDL_SCANCODE_SPACE])self->mat.position.z += 0.1;
+    if (keys[SDL_SCANCODE_Z])self->mat.position.z -= 0.1;
     
     if (keys[SDL_SCANCODE_UP])self->mat.rotation.x -= 0.0050;
     if (keys[SDL_SCANCODE_DOWN])self->mat.rotation.x += 0.0050;

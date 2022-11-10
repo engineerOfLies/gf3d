@@ -239,13 +239,13 @@ void gf3d_mesh_delete(Mesh *mesh)
     {
         vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->faceBufferMemory, NULL);
     }
-    if (mesh->buffer != VK_NULL_HANDLE)
+    if (mesh->vertexBuffer != VK_NULL_HANDLE)
     {
-        vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->buffer, NULL);
+        vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), mesh->vertexBuffer, NULL);
     }
-    if (mesh->bufferMemory != VK_NULL_HANDLE)
+    if (mesh->vertexBufferMemory != VK_NULL_HANDLE)
     {
-        vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->bufferMemory, NULL);
+        vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), mesh->vertexBufferMemory, NULL);
     }
     memset(mesh,0,sizeof(Mesh));
 }
@@ -265,7 +265,7 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet 
         return;
     }
     pipe = gf3d_mesh_get_pipeline();
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->vertexBuffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
     
@@ -284,7 +284,7 @@ void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDesc
         return;
     }
     pipe = gf3d_mesh.highlight_pipe;
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->vertexBuffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
     
@@ -303,7 +303,7 @@ void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptor
         return;
     }
     pipe = gf3d_mesh.sky_pipe;
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->buffer, offsets);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &mesh->vertexBuffer, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, mesh->faceBuffer, 0, VK_INDEX_TYPE_UINT32);
     
@@ -354,15 +354,14 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Ui
     memcpy(data, vertices, (size_t) bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->buffer, &mesh->bufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &mesh->vertexBuffer, &mesh->vertexBufferMemory);
 
-    gf3d_buffer_copy(stagingBuffer, mesh->buffer, bufferSize);
+    gf3d_buffer_copy(stagingBuffer, mesh->vertexBuffer, bufferSize);
 
     vkDestroyBuffer(device, stagingBuffer, NULL);
     vkFreeMemory(device, stagingBufferMemory, NULL);
     
     mesh->vertexCount = vcount;
-    mesh->bufferMemory = mesh->bufferMemory;
     
     gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
 }

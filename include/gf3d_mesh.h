@@ -69,8 +69,8 @@ typedef struct
     Uint32          _refCount;
     Uint8           _inuse;
     Uint32          vertexCount;
-    VkBuffer        buffer;
-    VkDeviceMemory  bufferMemory;
+    VkBuffer        vertexBuffer;
+    VkDeviceMemory  vertexBufferMemory;
     Uint32          faceCount;
     VkBuffer        faceBuffer;
     VkDeviceMemory  faceBufferMemory;

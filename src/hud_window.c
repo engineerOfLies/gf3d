@@ -11,6 +11,7 @@
 
 #include "entity.h"
 #include "station.h"
+#include "fighter.h"
 #include "hud_window.h"
 
 typedef struct
@@ -72,5 +73,7 @@ Window *hud_window()
     win->draw = hud_draw;
     win->data = data;
     data->station = station_new(vector3d(0,0,0));
+    
+    fighter_new(vector3d(-900,900,300));
     return win;
 }

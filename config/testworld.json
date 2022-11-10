@@ -3,6 +3,7 @@
     {
         "model":"models/antioch.model",
         "sky":"models/sky.model",
+        "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
         "skyScale":[1000,1000,1000],
         "position":[7000,-2500,-5000],
         "scale":[2000,2000,2000],
