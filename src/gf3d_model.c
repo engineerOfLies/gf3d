@@ -11,6 +11,7 @@
 #include "gf3d_lights.h"
 #include "gf3d_camera.h"
 
+#include "gf3d_gltf_parse.h"
 #include "gf3d_model.h"
 
 typedef struct
@@ -20,6 +21,8 @@ typedef struct
     Uint32                  chain_length;   /**<length of swap chain*/
     VkDevice                device;
     Pipeline            *   pipe;           /**<the pipeline associated with model rendering*/
+    Texture             *   defaultTexture; /**<if a model has no texture, use this one*/
+
 }ModelManager;
 
 static ModelManager gf3d_model = {0};
@@ -87,6 +90,7 @@ void gf3d_model_manager_init(Uint32 max_models)
     gf3d_model.max_models = max_models;
     gf3d_model.device = gf3d_vgraphics_get_default_logical_device();
     gf3d_model.pipe = gf3d_mesh_get_pipeline();
+    gf3d_model.defaultTexture = gf3d_texture_load("images/default.png");
     
     slog("model manager initiliazed");
     atexit(gf3d_model_manager_close);
@@ -137,6 +141,7 @@ Model * gf3d_model_load(const char * filename)
     }
     json = sj_load(filename);
     if (!json)return NULL;
+    
     config = sj_object_get_value(json,"model");
     if (!config)
     {
@@ -148,6 +153,7 @@ Model * gf3d_model_load(const char * filename)
     if (model)
     {
         gfc_line_cpy(model->filename,filename);
+        slog("loaded model %s",filename);
     }
     sj_free(json);
     return model;
@@ -162,37 +168,65 @@ Model * gf3d_model_load_from_config(SJson *json)
     const char *modelFile;
     const char *textureFile;
     if (!json)return NULL;
-    model = gf3d_model_new();
-    if (!model)return NULL;
-    textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
-    
-    model->texture = gf3d_texture_load(textureFile);
-    if (!model->texture)
-    {
-        model->texture = gf3d_texture_load("images/default.png");
-    }
 
-    modelFile = sj_get_string_value(sj_object_get_value(json,"model"));
+    modelFile = sj_get_string_value(sj_object_get_value(json,"gltf"));
     if (modelFile)
     {
+        slog("parsing gltf for model file");
+        model = gf3d_gltf_parse_model(modelFile);
+        textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
+        if (textureFile)
+        {
+            model->texture = gf3d_texture_load(textureFile);
+
+        }
+        return model;
+    }    
+    
+    model = gf3d_model_new();
+    if (!model)return NULL;
+    
+    textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
+    if (textureFile)
+    {
+        model->texture = gf3d_texture_load(textureFile);
+    }
+
+    modelFile = sj_get_string_value(sj_object_get_value(json,"obj"));
+    if (modelFile)
+    {
+        slog("parsing obj file");
         mesh = gf3d_mesh_load(modelFile);
-        if (mesh)model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+        if (!mesh)
+        {
+            slog("failed to parse mesh data from obj file");
+            gf3d_model_free(model);
+            return NULL;
+        }
+        model->mesh_list = gfc_list_append(model->mesh_list,mesh);
         return model;
     }
-    array = sj_object_get_value(json,"model_list");
-    c = sj_array_get_count(array);
-    for (i = 0; i < c; i++)
+    array = sj_object_get_value(json,"obj_list");
+    if (array)
     {
-        item = sj_array_get_nth(array,i);
-        if (!item)continue;
-        modelFile = sj_get_string_value(item);
-        if (modelFile)
+        slog("parsing obj_list");
+        c = sj_array_get_count(array);
+        for (i = 0; i < c; i++)
         {
-            mesh = gf3d_mesh_load(modelFile);
-            if (mesh)model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+            item = sj_array_get_nth(array,i);
+            if (!item)continue;
+            modelFile = sj_get_string_value(item);
+            if (modelFile)
+            {
+                mesh = gf3d_mesh_load(modelFile);
+                if (mesh)model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+            }
         }
+        return model;
     }
-    return model;
+    slog("no known way to parse model file");
+    gf3d_model_free(model);
+    return NULL;
 }
 
 
@@ -266,6 +300,7 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
     Uint32 bufferFrame;
     if (!model)
     {
+        slog("no model provided to draw");
         return;
     }
     commandBuffer = gf3d_mesh_get_model_command_buffer();
@@ -278,6 +313,11 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
     }
     gf3d_model_update_basic_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat,colorMod,ambientLight);
     mesh = gfc_list_get_nth(model->mesh_list,index);
+    if (!mesh)
+    {
+        slog("no mesh for index %i for model %s",index,model->filename);
+        return;
+    }
     gf3d_mesh_render(mesh,commandBuffer,descriptorSet);
 }
 
@@ -425,6 +465,7 @@ void gf3d_model_update_basic_model_descriptor_set(
     Vector4D colorMod,
     Vector4D ambientLight)
 {
+    Texture *texture = NULL;
     VkDescriptorImageInfo imageInfo = {0};
     VkWriteDescriptorSet descriptorWrite[2] = {0};
     VkDescriptorBufferInfo bufferInfo = {0};
@@ -447,9 +488,12 @@ void gf3d_model_update_basic_model_descriptor_set(
         return;
     }
     
+    if (model->texture)texture = model->texture;
+    else texture = gf3d_model.defaultTexture;
+    
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = model->texture->textureImageView;
-    imageInfo.sampler = model->texture->textureSampler;
+    imageInfo.imageView = texture->textureImageView;
+    imageInfo.sampler = texture->textureSampler;
 
     gf3d_model_update_uniform_buffer(model,ubo,modelMat,colorMod,ambientLight);
     bufferInfo.buffer = ubo->uniformBuffer;

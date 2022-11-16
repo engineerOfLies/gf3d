@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 
 #include "gfc_vector.h"
+#include "gfc_list.h"
 #include "gfc_text.h"
 #include "gfc_matrix.h"
 #include "gfc_primitives.h"
@@ -60,21 +61,26 @@ typedef struct
 
 typedef struct
 {
-    Uint32  verts[3];
+    Uint16  verts[3];
 }Face;
 
 typedef struct
 {
-    TextLine        filename;
-    Uint32          _refCount;
-    Uint8           _inuse;
     Uint32          vertexCount;
     VkBuffer        vertexBuffer;
     VkDeviceMemory  vertexBufferMemory;
     Uint32          faceCount;
     VkBuffer        faceBuffer;
     VkDeviceMemory  faceBufferMemory;
-    Box             bounds;
+}MeshPrimitive;
+
+typedef struct
+{
+    TextLine        filename;
+    Uint32          _refCount;
+    Uint8           _inuse;
+    List           *primitives;
+    Box             bounds;    
 }Mesh;
 
 /**
@@ -82,6 +88,13 @@ typedef struct
  * @param mesh_max the maximum allowed simultaneous meshes supported at once.  Must be > 0
  */
 void gf3d_mesh_init(Uint32 mesh_max);
+
+
+/**
+ * @brief get a new empty model
+ * @return NULL on error, or an empty model
+ */
+Mesh *gf3d_mesh_new();
 
 /**
  * @brief load mesh data from the filename.
@@ -162,7 +175,7 @@ void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptor
  * @param faces an array of faces to make the mesh with
  * @param fcount how many faces are in the array
  */
-void gf3d_mesh_create_vertex_buffer_from_vertices(Mesh *mesh,Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount);
+void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh,Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount);
 
 /**
  * @brief get the pipeline that is used to render basic 3d meshes

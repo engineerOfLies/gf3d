@@ -10,6 +10,7 @@
 typedef struct Entity_S
 {
     Uint8       _inuse;     /**<keeps track of memory usage*/
+    TextLine    name;
     ModelMat    mat;   /**<orientation matrix for the model*/
     Color       color;      /**<default color for the model*/
     Model      *model;      /**<pointer to the entity model to draw  (optional)*/

@@ -32,6 +32,12 @@ typedef struct
  */
 ObjData *gf3d_obj_load_from_file(const char *filename);
 
+/**
+ * @brief re-organize the vertices into faceVertices for use with the rendering pipeline
+ * @param obj the object to reorg
+ */
+void gf3d_obj_load_reorg(ObjData *obj);
+
 void gf3d_obj_free(ObjData *obj);
 
 #endif

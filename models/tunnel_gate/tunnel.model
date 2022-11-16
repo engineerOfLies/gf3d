@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model_list":
+        "obj_list":
         [
             "models/tunnel_gate/tunnel_000001.obj",
             "models/tunnel_gate/tunnel_000002.obj",

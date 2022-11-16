@@ -15,6 +15,7 @@
 #include "gf3d_particle.h"
 #include "gf3d_draw.h"
 #include "gf3d_lights.h"
+#include "gf3d_gltf_parse.h"
 
 #include "gf2d_sprite.h"
 #include "gf2d_font.h"
@@ -92,11 +93,12 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    //player_new(vector3d(-934.477356,922.957886,314.309998),vector3d(3.401598,0.000000,-2.275005));
-    player_new(vector3d(-4000,0,0),vector3d(3.401598,0.000000,-2.275005));
+    player_new(vector3d(-934.477356,922.957886,314.309998),vector3d(3.401598,0.000000,-2.275005));
+//    player_new(vector3d(-4000,0,0),vector3d(3.401598,0.000000,-2.275005));
     gate_new(vector3d(-4000,0,0));
     
     hud_window();    
+    
     // main game loop
     slog("gf3d main loop begin");
     while(!_done)

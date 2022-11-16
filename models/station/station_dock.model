@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/station/station_dock.obj",
+        "obj":"models/station/station_dock.obj",
         "texture":"models/station/station_dock.png"
     }
 }

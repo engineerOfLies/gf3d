@@ -78,6 +78,8 @@ void entity_draw(Entity *self)
     if (!self)return;
     if (self->hidden)return;
     if (self->draw)self->draw(self);
+    if (!self->model)return;
+    slog("attempting to draw entity %s",self->name);
     gf3d_model_draw(self->model,0,self->mat.mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
     if (self->selected)
     {

@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/station/station_core.obj",
+        "obj":"models/station/station_core.obj",
         "texture":"models/station/station_core.png"
     }
 }

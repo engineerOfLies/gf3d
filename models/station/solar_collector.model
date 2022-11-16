@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/station/solar_collector.obj",
+        "obj":"models/station/solar_collector.obj",
         "texture":"models/station/solar_collector.png"
     }
 }

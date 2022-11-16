@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/fighter/fighter.obj",
+        "gltf":"models/fighter/fighter.gltf",
         "texture":"models/fighter/fighter.png"
     }
 }
