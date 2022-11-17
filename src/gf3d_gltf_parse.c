@@ -223,10 +223,6 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
         vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
         vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
         vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
-        slog("Vertex %i : (%f,%f,%f), (%f,%f,%f),(%f,%f))",i,
-             obj->faceVertices[i].vertex.x,obj->faceVertices[i].vertex.y,obj->faceVertices[i].vertex.z,
-             obj->faceVertices[i].normal.x,obj->faceVertices[i].normal.y,obj->faceVertices[i].normal.z,
-             obj->faceVertices[i].texel.x,obj->faceVertices[i].texel.y);
     }
 }
 

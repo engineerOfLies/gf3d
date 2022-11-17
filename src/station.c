@@ -56,10 +56,10 @@ Entity *station_new(Vector3D position)
     data = gfc_allocate_array(sizeof(StationData),1);
     ent->data = data;
     data->sections = gfc_list_new();
-    station_add_section(data,gf3d_model_load("models/station/station_core.model"), vector3d(0,0,0),0.75, vector3d(100,100,100));
+    station_add_section(data,gf3d_model_load("models/station/station_core.model"), vector3d(0,0,0),0, vector3d(100,100,100));
     station_add_section(data,gf3d_model_load("models/station/station_habitat.model"), vector3d(-2,0,0),1, vector3d(100,100,100));
-    station_add_section(data,gf3d_model_load("models/station/solar_collector.model"), vector3d(2,0,0),0.01, vector3d(100,100,100));
-    station_add_section(data,gf3d_model_load("models/station/station_dock.model"), vector3d(-4,0,0),0.01, vector3d(100,100,100));
+    station_add_section(data,gf3d_model_load("models/station/solar_collector.model"), vector3d(2,0,0),0, vector3d(100,100,100));
+    station_add_section(data,gf3d_model_load("models/station/station_dock.model"), vector3d(-4,0,0),1, vector3d(100,100,100));
 
     ent->selectedColor = gfc_color(0.9,0.7,0.1,1);
     ent->color = gfc_color(1,1,1,1);
