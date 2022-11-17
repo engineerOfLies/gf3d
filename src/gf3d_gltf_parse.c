@@ -14,6 +14,7 @@
 char *gfc_base64_decode (const char *in, size_t inLen, size_t *outLen);
 char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize);
 
+void gf3d_gltf_reorg_obj(ObjData *obj);
 
 
 SJson *gf3d_gltf_parse_get_accessor(SJson *gltf,Uint32 index)
@@ -36,36 +37,27 @@ SJson *gf3d_gltf_parse_get_buffer_view(SJson *gltf,Uint32 index)
     return sj_array_get_nth(bufferViews,index);
 }
 
-void gf3d_gltf_decode(SJson *gltf)
+char *gf3d_gltf_decode(SJson *gltf, Uint32 bufferIndex)
 {
-    int i,c;
     int byteLength;
-    SJson *buffers,*buffer,*decoded;
+    SJson *buffers,*buffer;
     const char *data;
-    char *decodedData;
-    size_t decodedSize;
-    if (!gltf)return;
+    if (!gltf)return NULL;
     
     buffers = sj_object_get_value(gltf,"buffers");
-    if (!buffers)return;
-    c = sj_array_get_count(buffers);
-    for (i = 0; i < c; i++)
-    {
-        buffer = sj_array_get_nth(buffers,i);
-        if (!buffer)continue;
-        decoded = sj_object_get_value(buffer,"decoded");
-        if (decoded)continue;
-        data = sj_object_get_value_as_string(buffer,"uri");
-        if (!data)return;
-        sj_get_integer_value(sj_object_get_value(buffer,"byteLength"),&byteLength);
-        
-        data = strchr(data, ',');
-        data++;// move past the header
-        decodedData = gfc_base64_decode (data, byteLength, &decodedSize);
-        if (!decodedData)continue;
-        sj_object_insert(buffer,"decoded",sj_new_str(decodedData));
-        free(decodedData);
-    }
+    if (!buffers)return NULL;
+
+    buffer = sj_array_get_nth(buffers,bufferIndex);
+    if (!buffer)return NULL;
+    
+    data = sj_object_get_value_as_string(buffer,"uri");
+    if (!data)return NULL;
+    
+    sj_get_integer_value(sj_object_get_value(buffer,"byteLength"),&byteLength);
+    
+    data = strchr(data, ',');
+    data++;// move past the header
+    return gfc_base64_decode (data, strlen(data), NULL);
 }
 
 const char *gf3d_gltf_parse_get_buffer_data(SJson *gltf,Uint32 index,size_t offset)
@@ -81,24 +73,22 @@ const char *gf3d_gltf_parse_get_buffer_data(SJson *gltf,Uint32 index,size_t offs
     if (!buffer)return NULL;
     data = sj_object_get_value_as_string(buffer,"decoded");
     if (!data)return NULL;
-    
     return &data[offset];
 }
 
 Uint8 gf3d_gltf_parse_copy_buffer_data(SJson *gltf,Uint32 index,size_t offset,size_t length, char *output)
 {
-    const char *data;
+    char *data;
     
     if (!output)
     {
         slog("no output parameter provided");
         return 0;
     }
-    data  = gf3d_gltf_parse_get_buffer_data(gltf,index,offset);
-    
-    if (!data)return 0;
-    
-    memcpy(output,data,sizeof(length));
+    data = gf3d_gltf_decode(gltf, index);    
+    if (!data)return 0;    
+    memcpy(output,&data[offset],length);
+    free(data);
     return 1;
 }
 
@@ -108,7 +98,6 @@ ObjData *gf3d_gltf_parse_primitive(SJson *gltf,SJson *primitive)
     Vector3D min,max;
     int index,byteLength,byteOffset;
     SJson *attributes,*position,*accessor,*bufferView,*normal,*texcoord,*indices;
-    
 
     if ((!gltf)||(!primitive))return NULL;
     obj = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
@@ -200,26 +189,47 @@ ObjData *gf3d_gltf_parse_primitive(SJson *gltf,SJson *primitive)
         if (accessor)
         {
             sj_get_integer_value(sj_object_get_value(accessor,"count"),(int *)&obj->face_count);
+            obj->face_count /= 3;
             sj_get_integer_value(sj_object_get_value(accessor,"bufferView"),&index);
             
             bufferView = gf3d_gltf_parse_get_buffer_view(gltf,index);
             if (bufferView)
             {
-                obj->faceVerts = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
-                obj->faceNormals = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
-                obj->faceTexels = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
+                obj->outFace = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
                 sj_get_integer_value(sj_object_get_value(bufferView,"buffer"),&index);
                 sj_get_integer_value(sj_object_get_value(bufferView,"byteLength"),&byteLength);
                 sj_get_integer_value(sj_object_get_value(bufferView,"byteOffset"),&byteOffset);
-                gf3d_gltf_parse_copy_buffer_data(gltf,index,byteOffset,byteLength, (char *)obj->faceVerts);
-                memcpy(obj->faceNormals,obj->faceVerts,sizeof(Face)*obj->face_count);
+                
+                gf3d_gltf_parse_copy_buffer_data(gltf,index,byteOffset,byteLength, (char *)obj->outFace);
             }
         }
         
     }
-    gf3d_obj_load_reorg(obj);
+    gf3d_gltf_reorg_obj(obj);
     return obj;
 }
+
+void gf3d_gltf_reorg_obj(ObjData *obj)
+{
+    int i;
+    
+    if (!obj)return;
+    
+    obj->face_vert_count = obj->vertex_count;
+    obj->faceVertices = (Vertex *)gfc_allocate_array(sizeof(Vertex),obj->face_vert_count);
+
+    for (i = 0; i< obj->vertex_count;i++)
+    {
+        vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
+        vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
+        vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
+        slog("Vertex %i : (%f,%f,%f), (%f,%f,%f),(%f,%f))",i,
+             obj->faceVertices[i].vertex.x,obj->faceVertices[i].vertex.y,obj->faceVertices[i].vertex.z,
+             obj->faceVertices[i].normal.x,obj->faceVertices[i].normal.y,obj->faceVertices[i].normal.z,
+             obj->faceVertices[i].texel.x,obj->faceVertices[i].texel.y);
+    }
+}
+
 
 Mesh *gf3d_gltf_parse_mesh(SJson *meshData,SJson *gltf)
 {
@@ -251,6 +261,8 @@ Mesh *gf3d_gltf_parse_mesh(SJson *meshData,SJson *gltf)
             gf3d_obj_free(obj);
             continue;
         }
+        
+        
         gf3d_mesh_create_vertex_buffer_from_vertices(primitive,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
         mesh->primitives = gfc_list_append(mesh->primitives,primitive);
         mesh->bounds.x = MIN(mesh->bounds.x,obj->bounds.x);
@@ -286,7 +298,6 @@ Model *gf3d_gltf_parse_model(const char *filename)
         sj_free(json);
         return NULL;
     }
-    gf3d_gltf_decode(json);
     
     meshes = sj_object_get_value(json,"meshes");
     slog("loaded %i meshes.",sj_array_get_count(meshes));

@@ -153,7 +153,6 @@ Model * gf3d_model_load(const char * filename)
     if (model)
     {
         gfc_line_cpy(model->filename,filename);
-        slog("loaded model %s",filename);
     }
     sj_free(json);
     return model;
@@ -195,7 +194,6 @@ Model * gf3d_model_load_from_config(SJson *json)
     modelFile = sj_get_string_value(sj_object_get_value(json,"obj"));
     if (modelFile)
     {
-        slog("parsing obj file");
         mesh = gf3d_mesh_load(modelFile);
         if (!mesh)
         {
@@ -209,7 +207,6 @@ Model * gf3d_model_load_from_config(SJson *json)
     array = sj_object_get_value(json,"obj_list");
     if (array)
     {
-        slog("parsing obj_list");
         c = sj_array_get_count(array);
         for (i = 0; i < c; i++)
         {
