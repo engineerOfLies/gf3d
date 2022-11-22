@@ -6,7 +6,6 @@
 
 static Camera gf3d_camera = {0};
 
-
 void gf3d_camera_get_view_mat4(Matrix4 *view)
 {
     if (!view)return;
@@ -102,6 +101,40 @@ void gf3d_camera_walk_forward(float magnitude)
     gf3d_camera_move(forward);
 
 }
+
+void gf3d_camera_walk_right(float magnitude)
+{
+    Vector2D w;
+    Vector3D right = {0};
+    w = vector2d_from_angle(-gf3d_camera.rotation.z - GFC_HALF_PI);
+    right.x = w.x;
+    right.y = w.y;
+    vector3d_set_magnitude(&right,magnitude);
+    gf3d_camera_move(right);
+
+}
+
+void gf3d_camera_move_up(float magnitude)
+{
+    Vector3D up = {0,0,magnitude};
+    gf3d_camera_move(up);
+}
+
+void gf3d_camera_yaw(float magnitude)
+{
+    gf3d_camera.rotation.z -= magnitude;
+}
+
+void gf3d_camera_pitch(float magnitude)
+{
+    gf3d_camera.rotation.x -= magnitude;
+}
+
+void gf3d_camera_roll(float magnitude)
+{
+    gf3d_camera.rotation.y -= magnitude;
+}
+
 
 void gf3d_camera_fly_forward(float magnitude)
 {

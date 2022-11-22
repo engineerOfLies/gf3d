@@ -12,7 +12,6 @@ typedef struct
     Vector3D rotation;      // pitch, roll, yaw
 }Camera;
 
-
 /**
  * @brief take the position,scale, and rotation to calculate the view matrix
  * @note: Do not use if you are tailoring the camera matrix by hand
@@ -41,6 +40,63 @@ void gf3d_camera_look_at(
     Vector3D target,
     Vector3D up
 );
+
+/**
+ * @brief move the camera "FORWARD" relative to the view angles of the camera
+ * @param magnitude how much to move
+ */
+void gf3d_camera_fly_forward(float magnitude);
+
+/**
+ * @brief move the camera "RIGHT" relative to the view angles of the camera
+ * @param magnitude how much to move
+ */
+void gf3d_camera_fly_right(float magnitude);
+
+/**
+ * @brief move the camera "UP" relative to the view angles of the camera
+ * @param magnitude how much to move
+ */
+void gf3d_camera_fly_up(float magnitude);
+
+/**
+ * @brief move the camera forward relative to the camera view angle
+ * @note does not move along the z axis
+ * @param magnitude how far to move
+ */
+void gf3d_camera_walk_forward(float magnitude);
+
+/**
+ * @brief move the camera right relative to the camera view angle
+ * @note does not move along the z axis
+ * @param magnitude how far to move
+ */
+void gf3d_camera_walk_right(float magnitude);
+
+/**
+ * @brief move the camera up along the z axis.
+ * @note does not consider view angles.
+ * @param magnitude how far to move
+ */
+void gf3d_camera_move_up(float magnitude);
+
+/**
+ * @brief rotate the camera's yaw
+ * @param magnitude how far, in radians, to rotate
+ */
+void gf3d_camera_yaw(float magnitude);
+
+/**
+ * @brief rotate the camera's pitch
+ * @param magnitude how far, in radians, to rotate
+ */
+void gf3d_camera_pitch(float magnitude);
+
+/**
+ * @brief rotate the camera's roll
+ * @param magnitude how far, in radians, to rotate
+ */
+void gf3d_camera_roll(float magnitude);
 
 /**
  * @brief get the current camera position in world space;

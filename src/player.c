@@ -11,7 +11,6 @@
 
 #include "player.h"
 
-static int thirdPersonMode = 0;
 void player_think(Entity *self);
 void player_update(Entity *self);
 
@@ -37,56 +36,43 @@ Entity *player_new(Vector3D position,Vector3D rotation)
 
     ent->hidden = 0;
     ent->draw = player_draw;
+    
+    gf3d_camera_set_position(position);
+    gf3d_camera_set_rotation(rotation);
     return ent;
 }
 
 
 void player_think(Entity *self)
 {
-    Vector3D forward = {0};
-    Vector3D right = {0};
-    Vector2D w;
+    float moveSpeed = 0.1;
     const Uint8 * keys;
     keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
-    w = vector2d_from_angle(self->mat.rotation.z);
-    forward.x = w.x;
-    forward.y = w.y;
-    w = vector2d_from_angle(self->mat.rotation.z - GFC_HALF_PI);
-    right.x = w.x;
-    right.y = w.y;
     
-    vector3d_scale(forward,forward,0.1);
-    vector3d_scale(right,right,0.1);
     if (keys[SDL_SCANCODE_W])
-    {   
-        gf3d_model_mat_move(&self->mat,forward);
+    {
+        gf3d_camera_walk_forward(moveSpeed);
     }
     if (keys[SDL_SCANCODE_S])
     {
-        gf3d_model_mat_move(&self->mat,vector3d(-forward.x,-forward.y,-forward.z));
+        gf3d_camera_walk_forward(-moveSpeed);
     }
     if (keys[SDL_SCANCODE_D])
     {
-        gf3d_model_mat_move(&self->mat,right);
+        gf3d_camera_walk_right(moveSpeed);
     }
     if (keys[SDL_SCANCODE_A])    
     {
-        gf3d_model_mat_move(&self->mat,vector3d(-right.x,-right.y,-right.z));
+        gf3d_camera_walk_right(-moveSpeed);
     }
-    if (keys[SDL_SCANCODE_SPACE])self->mat.position.z += 0.1;
-    if (keys[SDL_SCANCODE_Z])self->mat.position.z -= 0.1;
+    if (keys[SDL_SCANCODE_SPACE])gf3d_camera_move_up(moveSpeed);
+    if (keys[SDL_SCANCODE_Z])gf3d_camera_move_up(-moveSpeed);
     
-    if (keys[SDL_SCANCODE_UP])self->mat.rotation.x -= 0.0050;
-    if (keys[SDL_SCANCODE_DOWN])self->mat.rotation.x += 0.0050;
-    if (keys[SDL_SCANCODE_RIGHT])self->mat.rotation.z -= 0.0050;
-    if (keys[SDL_SCANCODE_LEFT])self->mat.rotation.z += 0.0050;
-    
-    if (keys[SDL_SCANCODE_F3])
-    {
-        thirdPersonMode = !thirdPersonMode;
-        self->hidden = !self->hidden;
-    }
+    if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-0.005);
+    if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(0.005);
+    if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.005);
+    if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.005);
     
     if (keys[SDL_SCANCODE_O])
     {
@@ -97,26 +83,8 @@ void player_think(Entity *self)
 
 void player_update(Entity *self)
 {
-    Vector3D forward = {0};
-    Vector3D position;
-    Vector3D rotation;
-    Vector2D w;
     
     if (!self)return;
-    
-    vector3d_copy(position,self->mat.position);
-    vector3d_copy(rotation,self->mat.rotation);
-    if (thirdPersonMode)
-    {
-        position.z += 100;
-        rotation.x += M_PI*0.125;
-        w = vector2d_from_angle(self->mat.rotation.z);
-        forward.x = w.x * 100;
-        forward.y = w.y * 100;
-        vector3d_add(position,position,-forward);
-    }
-    gf3d_camera_set_position(position);
-    gf3d_camera_set_rotation(rotation);
 }
 
 /*eol@eof*/
