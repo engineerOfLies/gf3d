@@ -72,7 +72,7 @@ Window *hud_window()
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
-    data->station = station_new(vector3d(0,-1000,0));
+    data->station = station_new(vector3d(0,0,0));
     
     fighter_new(vector3d(-900,900,300));
     return win;

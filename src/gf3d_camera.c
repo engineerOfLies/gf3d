@@ -86,6 +86,52 @@ void gf3d_camera_set_position(Vector3D position)
     gf3d_camera.position.z = -position.z;
 }
 
+void gf3d_camera_move(Vector3D translation)
+{
+    vector3d_sub(gf3d_camera.position,gf3d_camera.position,translation);
+}
+
+void gf3d_camera_walk_forward(float magnitude)
+{
+    Vector2D w;
+    Vector3D forward = {0};
+    w = vector2d_from_angle(-gf3d_camera.rotation.z);
+    forward.x = w.x;
+    forward.y = w.y;
+    vector3d_set_magnitude(&forward,magnitude);
+    gf3d_camera_move(forward);
+
+}
+
+void gf3d_camera_fly_forward(float magnitude)
+{
+    Vector3D forward;
+    gf3d_camera_get_view_vectors(&forward, NULL, NULL);
+    vector3d_set_magnitude(&forward,magnitude);
+    gf3d_camera_move(forward);
+}
+
+void gf3d_camera_fly_right(float magnitude)
+{
+    Vector3D right;
+    gf3d_camera_get_view_vectors(NULL, &right, NULL);
+    vector3d_set_magnitude(&right,magnitude);
+    gf3d_camera_move(right);
+}
+
+void gf3d_camera_fly_up(float magnitude)
+{
+    Vector3D up;
+    gf3d_camera_get_view_vectors(NULL, NULL, &up);
+    vector3d_set_magnitude(&up,magnitude);
+    gf3d_camera_move(up);
+}
+
+void gf3d_camera_get_view_vectors(Vector3D *forward, Vector3D *right, Vector3D *up)
+{
+    vector3d_angle_vectors(gf3d_camera_get_angles(), forward, right, up);
+}
+
 Vector3D gf3d_camera_get_angles()
 {
     return vector3d(gf3d_camera.rotation.x,-gf3d_camera.rotation.y,-gf3d_camera.rotation.z - GFC_HALF_PI);

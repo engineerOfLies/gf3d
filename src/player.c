@@ -106,15 +106,6 @@ void player_update(Entity *self)
     
     vector3d_copy(position,self->mat.position);
     vector3d_copy(rotation,self->mat.rotation);
-    if (thirdPersonMode)
-    {
-        position.z += 100;
-        rotation.x += M_PI*0.125;
-        w = vector2d_from_angle(self->mat.rotation.z);
-        forward.x = w.x * 100;
-        forward.y = w.y * 100;
-        vector3d_add(position,position,-forward);
-    }
     gf3d_camera_set_position(position);
     gf3d_camera_set_rotation(rotation);
 }

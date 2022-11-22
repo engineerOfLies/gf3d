@@ -73,5 +73,12 @@ void gf3d_camera_set_rotation(Vector3D rotation);
  */
 Vector3D gf3d_camera_get_angles();
 
+/**
+ * @brief get the vectors for forward, right, and up based on the camera view angles
+ * @param forward   [output] if provided, it will be set with the normal vector in the direction the camera is looking
+ * @param right     [output] if provided, it will be set with the normal vector to the right of where the camera is looking
+ * @param up        [output] if provided, it will be set with the normal vector directly up from where the camera is looking
+ */
+void gf3d_camera_get_view_vectors(Vector3D *forward, Vector3D *right, Vector3D *up);
 
 #endif
