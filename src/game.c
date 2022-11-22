@@ -77,9 +77,7 @@ void draw_origin()
 int main(int argc,char *argv[])
 {
     int a;
-    int maxhealth = 0;
     World *w;
-    SJson *json,*cannon;
 
     for (a = 1; a < argc;a++)
     {
@@ -111,20 +109,10 @@ int main(int argc,char *argv[])
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(-934.477356,922.957886,314.309998),vector3d(3.401598,0.000000,-2.275005));
-//    player_new(vector3d(-4000,0,0),vector3d(3.401598,0.000000,-2.275005));
     gate_new(vector3d(-4000,0,0));
     
     hud_window();    
     
-    json = sj_load("buildings.json");
-    
-    cannon = sj_object_get_value(json,"cannon");
-    
-    sj_get_integer_value(sj_object_get_value(cannon,"maxHealth"),&maxhealth);
-    
-    slog("cannon maxHealth: %i",maxhealth);
-    
-    sj_free(json);
     
     // main game loop
     slog("gf3d main loop begin");
