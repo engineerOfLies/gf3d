@@ -1,6 +1,8 @@
 #include <SDL.h>            
 
+#include "simple_json.h"
 #include "simple_logger.h"
+
 #include "gfc_input.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
@@ -75,7 +77,9 @@ void draw_origin()
 int main(int argc,char *argv[])
 {
     int a;
+    int maxhealth = 0;
     World *w;
+    SJson *json,*cannon;
 
     for (a = 1; a < argc;a++)
     {
@@ -111,6 +115,16 @@ int main(int argc,char *argv[])
     gate_new(vector3d(-4000,0,0));
     
     hud_window();    
+    
+    json = sj_load("buildings.json");
+    
+    cannon = sj_object_get_value(json,"cannon");
+    
+    sj_get_integer_value(sj_object_get_value(cannon,"maxHealth"),&maxhealth);
+    
+    slog("cannon maxHealth: %i",maxhealth);
+    
+    sj_free(json);
     
     // main game loop
     slog("gf3d main loop begin");
