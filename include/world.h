@@ -15,14 +15,9 @@
 
 typedef struct
 {
-    Matrix4 modelMat;
-    Vector3D position;
-    Vector3D rotation;
-    Vector3D scale;
-    Model *model;
+    List    *model_list;
     Matrix4 skyMat;
     Model *sky;
-    Color color;
     Mix_Music *backgroundMusic;
 }World;
 

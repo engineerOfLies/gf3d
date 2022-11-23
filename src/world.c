@@ -6,16 +6,21 @@
 
 #include "gf3d_lights.h"
 
+#include "camera_entity.h"
 #include "world.h"
 
 World *world_load(char *filename)
 {
     Vector4D globalColor = {0};
     Vector3D globalDir  = {0};
-    SJson *json,*wjson;
+    Vector3D position,rotation;
+    SJson *json,*wjson,*list,*item;
     World *w = NULL;
     Vector3D skyScale = {1,1,1};
+    int i,c;
+    ModelMat *m;
     const char *modelName = NULL;
+    const char *str;
     w = gfc_allocate_array(sizeof(World),1);
     if (w == NULL)
     {
@@ -37,14 +42,24 @@ World *world_load(char *filename)
         sj_free(json);
         return NULL;
     }
-    modelName = sj_get_string_value(sj_object_get_value(wjson,"model"));
-    if (!modelName)
+    list = sj_object_get_value(wjson,"models");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
     {
-        slog("world data (%s) has no model",filename);
-        sj_free(json);
-        return w;
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        modelName = sj_get_string_value(sj_object_get_value(item,"model"));
+        if (!modelName)continue;
+        m = gf3d_model_mat_new();
+        m->model = gf3d_model_load(modelName);
+        sj_value_as_vector3d(sj_object_get_value(item,"scale"),&m->scale);
+        sj_value_as_vector3d(sj_object_get_value(item,"position"),&m->position);
+        sj_value_as_vector3d(sj_object_get_value(item,"rotation"),&m->rotation);
+        sj_value_as_vector3d(sj_object_get_value(item,"positionDelta"),&m->positionDelta);
+        sj_value_as_vector3d(sj_object_get_value(item,"rotationDelta"),&m->rotationDelta);
+        gf3d_model_mat_set_matrix(m);
+        w->model_list = gfc_list_append(w->model_list,m);
     }
-    w->model = gf3d_model_load(modelName);
     
     modelName = sj_get_string_value(sj_object_get_value(wjson,"sky"));
     if (!modelName)
@@ -55,6 +70,10 @@ World *world_load(char *filename)
     {
         w->sky = gf3d_model_load(modelName);
     }
+    sj_value_as_vector3d(sj_object_get_value(wjson,"skyScale"),&skyScale);
+    gfc_matrix_identity(w->skyMat);
+    gfc_matrix_scale(w->skyMat,skyScale);
+
     modelName = sj_get_string_value(sj_object_get_value(wjson,"backgroundMusic"));
     if (modelName)
     {
@@ -69,47 +88,72 @@ World *world_load(char *filename)
         }
     }
 
-    sj_value_as_vector3d(sj_object_get_value(wjson,"skyScale"),&skyScale);
-    sj_value_as_vector3d(sj_object_get_value(wjson,"scale"),&w->scale);
-    sj_value_as_vector3d(sj_object_get_value(wjson,"position"),&w->position);
-    sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
-    sj_value_as_vector3d(sj_object_get_value(wjson,"lightDir"),&globalDir);
-    sj_value_as_vector4d(sj_object_get_value(wjson,"lightColor"),&globalColor);
+    list = sj_object_get_value(wjson,"lights");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_get_string_value(sj_object_get_value(item,"type"));
+        if (!str)continue;
+        vector3d_set(globalDir,0,0,0);
+        sj_value_as_vector3d(sj_object_get_value(item,"direction"),&globalDir);
+        vector4d_set(globalColor,0,0,0,0);
+        sj_value_as_vector4d(sj_object_get_value(item,"color"),&globalColor);
+        vector3d_set(position,0,0,0);
+        sj_value_as_vector3d(sj_object_get_value(item,"position"),&position);
+        if (strcmp(str,"global")==0)
+        {
+            gf3d_lights_set_global_light(globalColor,vector4d(globalDir.x,globalDir.y,globalDir.z,1));
+        }
+    }
+    item = sj_object_get_value(wjson,"camera");
+    if (item)
+    {
+        sj_value_as_vector3d(sj_object_get_value(item,"position"),&position);
+        sj_value_as_vector3d(sj_object_get_value(item,"rotation"),&rotation);
+        camera_entity_new(position,rotation);
+    }
     sj_free(json);
-    w->color = gfc_color(1,1,1,1);
-    gfc_matrix_identity(w->skyMat);
-    gfc_matrix_scale(w->skyMat,skyScale);
-    gf3d_lights_set_global_light(globalColor,vector4d(globalDir.x,globalDir.y,globalDir.z,1));
     return w;
 }
 
 void world_draw(World *world)
 {
+    int i,c;
+    ModelMat *m;
     if (!world)return;
-    if (!world->model)return;// no model to draw, do nothing
     gf3d_model_draw_sky(world->sky,world->skyMat,gfc_color(1,1,1,1));
-    gf3d_model_draw(world->model,0,world->modelMat,gfc_color_to_vector4f(world->color),vector4d(1,1,1,0.5));
+    c = gfc_list_get_count(world->model_list);
+    for (i = 0; i < c; i++)
+    {
+        m = gfc_list_get_nth(world->model_list,i);
+        if (!m)continue;
+        gf3d_model_draw(m->model,0,m->mat,vector4d(1,1,1,1),vector4d(1,1,1,0.5));
+    }
 }
 
 void world_delete(World *world)
 {
+    int i,c;
+    ModelMat *m;
     if (!world)return;
-    gf3d_model_free(world->model);
+    c = gfc_list_get_count(world->model_list);
+    for (i = 0; i < c; i++)
+    {
+        m = gfc_list_get_nth(world->model_list,i);
+        if (!m)continue;
+        gf3d_model_mat_free(m);
+    }
+    gfc_list_delete(world->model_list);
     free(world);
 }
 
 void world_run_updates(World *self)
 {
-    self->rotation.z += 0.0001;
-    gfc_matrix_identity(self->modelMat);
-    
-    gfc_matrix_scale(self->modelMat,self->scale);
-    gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
-    gfc_matrix_translate(self->modelMat,self->position);
+    if (!self)return;
 
 }
-
-void world_add_entity(World *world,Entity *entity);
 
 
 /*eol@eof*/

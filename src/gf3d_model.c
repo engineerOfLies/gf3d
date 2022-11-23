@@ -631,6 +631,23 @@ void gf3d_model_mat_set_matrix(ModelMat *mat)
         mat->scale);
 }
 
+void gf3d_model_mat_free(ModelMat *mat)
+{
+    if (!mat)return;
+    if (mat->model)gf3d_model_free(mat->model);
+    free(mat);
+}
+
+ModelMat *gf3d_model_mat_new()
+{
+    ModelMat *modelMat;
+    modelMat = gfc_allocate_array(sizeof(ModelMat),1);
+    if (!modelMat)return NULL;
+    gfc_matrix_identity(modelMat->mat);
+    vector3d_set(modelMat->scale,1,1,1);
+    return modelMat;
+}
+
 void gf3d_model_update_uniform_buffer(
     Model *model,
     UniformBuffer *ubo,

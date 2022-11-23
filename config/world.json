@@ -1,0 +1,30 @@
+{
+    "world":
+    {
+        "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
+        "sky":"models/sky.model",
+        "skyScale":[1,1,1],
+        "camera":
+        {
+            "position":[-934.477356,922.957886,314.309998],
+            "rotation":[3.401598,0.000000,-2.275005]
+        },
+        "models":
+        [
+            {
+                "model":"models/antioch.model",
+                "position":[7000,-2500,-5000],
+                "scale":[2000,2000,2000],
+                "rotation":[0,0.001,0]
+            }
+        ],
+        "lights":
+        [
+            {
+                "type":"global",
+                "color":[1,1,1,1],
+                "direction":[-1,-1,0]
+            }
+        ]
+    }
+}

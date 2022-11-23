@@ -167,6 +167,11 @@
                 }
             }
             ]
+        },
+        {
+            "type": "button",
+            "name": "freelook",
+            "hotkey":"freelook"
         }
         ]
     }

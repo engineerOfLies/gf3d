@@ -10,8 +10,10 @@
 #include "gf2d_element_entry.h"
 
 #include "entity.h"
+#include "camera_entity.h"
 #include "station.h"
 #include "fighter.h"
+#include "player.h"
 #include "hud_window.h"
 
 typedef struct
@@ -41,8 +43,9 @@ int hud_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if (strcmp(e->name,"station")==0)
+        if (strcmp(e->name,"freelook")==0)
         {
+            camera_entity_toggle_free_look();
             return 1;
         }
     }
@@ -75,5 +78,7 @@ Window *hud_window()
     data->station = station_new(vector3d(0,0,0));
     
     fighter_new(vector3d(-900,900,300));
+    
+    player_new("config/playerData.cfg");
     return win;
 }

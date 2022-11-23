@@ -53,6 +53,8 @@ typedef struct
     Vector3D position;
     Vector3D rotation;
     Vector3D scale;
+    Vector3D positionDelta;
+    Vector3D rotationDelta;
 }ModelMat;
 
 /**
@@ -122,6 +124,18 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
  * @brief free a model
  */
 void gf3d_model_free(Model *model);
+
+/**
+ * @brief allocate an initialize a blank ModelMat
+ * @return NULL on memory error, or an initialized modelMat otherwise
+ */
+ModelMat *gf3d_model_mat_new();
+
+/**
+ * @brief free an allocated modelMat and its model
+ * @param mat the modelmat to free
+ */
+void gf3d_model_mat_free(ModelMat *mat);
 
 /**
  * @brief reset a ModelMat to identity (all values zero except for the scale values to 1)
