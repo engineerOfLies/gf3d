@@ -167,7 +167,7 @@ void gf3d_camera_get_view_vectors(Vector3D *forward, Vector3D *right, Vector3D *
 
 Vector3D gf3d_camera_get_angles()
 {
-    return vector3d(gf3d_camera.rotation.x,-gf3d_camera.rotation.y,-gf3d_camera.rotation.z - GFC_HALF_PI);
+    return vector3d(-gf3d_camera.rotation.x,-gf3d_camera.rotation.y,-gf3d_camera.rotation.z);
 }
 
 void gf3d_camera_set_rotation(Vector3D rotation)

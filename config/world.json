@@ -1,20 +1,20 @@
 {
     "world":
     {
-        "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
+        "backgroundMusicm":"music/370801__romariogrande__space-chase.wav",
         "sky":"models/sky.model",
         "skyScale":[1,1,1],
         "camera":
         {
-            "position":[-934.477356,922.957886,314.309998],
-            "rotation":[3.401598,0.000000,-2.275005]
+            "position":[-1123.226318,-1096.660156,314.309998],
+            "rotation":[3.261595,0.000000,-1.005787]
         },
         "models":
         [
             {
                 "model":"models/antioch.model",
-                "position":[7000,-2500,-5000],
-                "scale":[2000,2000,2000],
+                "position":[10000,3000,-5000],
+                "scale":[2500,2500,2500],
                 "rotation":[0,0.001,0]
             }
         ],
@@ -22,7 +22,7 @@
         [
             {
                 "type":"global",
-                "color":[1,1,1,1],
+                "color":[1,1,0.9,1],
                 "direction":[-1,-1,0]
             }
         ]

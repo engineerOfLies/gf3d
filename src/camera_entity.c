@@ -56,7 +56,8 @@ void camera_entity_enable_free_look(Uint8 enable)
 
 void camera_entity_think(Entity *self)
 {
-    float moveSpeed = 0.1;
+    float moveSpeed = 1;
+    Vector3D position,rotation;
     const Uint8 * keys;
     keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
@@ -88,8 +89,10 @@ void camera_entity_think(Entity *self)
     
     if (keys[SDL_SCANCODE_O])
     {
-        slog("position: %f,%f,%f",self->mat.position.x,self->mat.position.y,self->mat.position.z);
-        slog("rotation: %f,%f,%f",self->mat.rotation.x,self->mat.rotation.y,self->mat.rotation.z);
+        position = gf3d_camera_get_position();
+        rotation = gf3d_camera_get_angles();
+        slog("position: %f,%f,%f",position.x,position.y,position.z);
+        slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
     }
 }
 

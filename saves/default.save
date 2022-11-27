@@ -1,0 +1,37 @@
+{
+    "station":
+    {
+        "idPool":5,
+        "sections":
+        [
+            {
+                "name":"station_core",
+                "id":0
+            },
+            {
+                "name":"station_reactor",
+                "id":1,
+                "parent":0,
+                "slot":1
+            },
+            {
+                "name":"solar_collector",
+                "id":2,
+                "parent":1,
+                "slot":0
+            },
+            {
+                "name":"station_habitat",
+                "id":3,
+                "parent":0,
+                "slot":0
+            },
+            {
+                "name":"station_dock",
+                "id":4,
+                "parent":3,
+                "slot":0
+            }
+        ]
+    }
+}

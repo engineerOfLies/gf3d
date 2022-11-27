@@ -126,6 +126,14 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
 void gf3d_model_free(Model *model);
 
 /**
+ * @brief populate a modelMat based on config info
+ * @note pulls model,position,rotation, and scale out of the config
+ * @param mat the matrix to populate
+ * @param config the json to find the information
+ */
+void gf3d_model_mat_parse(ModelMat *mat,SJson *config);
+
+/**
  * @brief allocate an initialize a blank ModelMat
  * @return NULL on memory error, or an initialized modelMat otherwise
  */

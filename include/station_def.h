@@ -17,4 +17,13 @@ void station_def_load(const char *filename);
  */
 SJson *station_def_get_by_name(const char *name);
 
+/**
+ * @brief get the station section extension information by its index
+ * @param section the section def to check
+ * @param index the index of the extension slot
+ * @return NULL on error or not found, or the describing json otherwise
+ * @note YOU DO NOT OWN THAT DATA, do not free it!
+ */
+SJson *station_def_get_extension_by_index(SJson *section,Uint8 index);
+
 #endif

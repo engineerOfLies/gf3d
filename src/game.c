@@ -27,6 +27,7 @@
 #include "gf2d_windows.h"
 #include "gf2d_windows_common.h"
 
+#include "station_def.h"
 #include "entity.h"
 #include "gate.h"
 #include "world.h"
@@ -106,8 +107,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    gate_new(vector3d(-4000,0,0));
-    
+    station_def_load("config/station_def.cfg");    
     hud_window();    
         
     // main game loop

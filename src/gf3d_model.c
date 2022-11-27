@@ -2,6 +2,8 @@
 
 #include "simple_logger.h"
 
+#include "gfc_config.h"
+
 #include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
@@ -636,6 +638,18 @@ void gf3d_model_mat_free(ModelMat *mat)
     if (!mat)return;
     if (mat->model)gf3d_model_free(mat->model);
     free(mat);
+}
+
+void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
+{
+    if (!mat)return;
+    if (!config)return;
+    mat->model = gf3d_model_load(sj_object_get_value_as_string(config,"model"));
+    sj_value_as_vector3d(sj_object_get_value(config,"position"),&mat->position);
+    sj_value_as_vector3d(sj_object_get_value(config,"rotation"),&mat->rotation);
+    vector3d_scale(mat->rotation,mat->rotation,GFC_DEGTORAD);//config file is in degrees
+
+    sj_value_as_vector3d(sj_object_get_value(config,"scale"),&mat->scale);
 }
 
 ModelMat *gf3d_model_mat_new()

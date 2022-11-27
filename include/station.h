@@ -6,9 +6,10 @@
 /**
  * @brief Create a new station entity
  * @param position where to spawn the aguman at
+ * @param stationFile if provided, load it from file instead of hard coded
  * @return NULL on error, or an agumon entity pointer on success
  */
-Entity *station_new(Vector3D position);
+Entity *station_new(Vector3D position,const char *stationFile);
 
 
 #endif

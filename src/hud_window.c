@@ -18,7 +18,7 @@
 
 typedef struct
 {
-    Entity *station;
+    Entity *player;
 }HUDWindowData;
 
 int hud_free(Window *win)
@@ -75,10 +75,8 @@ Window *hud_window()
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
-    data->station = station_new(vector3d(0,0,0));
+    data->player = player_new("config/playerData.cfg");
+        
     
-    fighter_new(vector3d(-900,900,300));
-    
-    player_new("config/playerData.cfg");
     return win;
 }

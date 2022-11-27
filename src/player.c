@@ -10,7 +10,10 @@
 
 #include "gf2d_mouse.h"
 
+#include "station.h"
 #include "player.h"
+
+static Entity *player_entity = NULL;
 
 void player_draw(Entity *self);
 void player_free(Entity *self);
@@ -48,7 +51,7 @@ PlayerData *player_data_parse(SJson *json)
         if (str)gfc_line_cpy(resource->name,str);
         data->resources = gfc_list_append(data->resources,resource);
     }
-    
+    data->station = station_new(vector3d(0,0,0),"saves/default.save");
     return data;
 }
 
@@ -65,15 +68,28 @@ Entity *player_new(const char *file)
     json = sj_load(file);
     if (!json)return NULL;
 
-    ent = entity_new();
-    if (!ent)
+    if (!player_entity)
     {
-        slog("UGH OHHHH, no player for you!");
-        return NULL;
+        ent = entity_new();
+        if (!ent)
+        {
+            slog("UGH OHHHH, no player for you!");
+            return NULL;
+        }
+        player_entity = ent;
+    }
+    else
+    {
+        ent = player_entity;
+        if (ent->data)
+        {
+            player_free(ent);
+        }
+        ent->data = NULL;
     }
     ent->data = player_data_parse(json);
     sj_free(json);
-
+    
     
     ent->think = player_think;
     ent->update = player_update;
@@ -98,6 +114,7 @@ void player_free(Entity *self)
         free(resource);
     }
     gfc_list_delete(data->resources);
+    entity_free(data->station);
     free(data);
 }
 
@@ -111,7 +128,13 @@ void player_think(Entity *self)
 
 void player_update(Entity *self)
 {
-    
+    // this will be where I run the economy upkeep for the player.
+}
+
+PlayerData *player_get_data()
+{
+    if (!player_entity)return NULL;
+    return player_entity->data;
 }
 
 /*eol@eof*/
