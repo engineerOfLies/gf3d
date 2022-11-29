@@ -53,5 +53,5 @@ gf3d
 *.log
 
 # backup files
-*.blend*
+*.blend1
 

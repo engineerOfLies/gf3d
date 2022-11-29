@@ -1,7 +1,9 @@
 #include "simple_logger.h"
 
 #include "gfc_callbacks.h"
+#include "gfc_input.h"
 
+#include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_list.h"
 #include "gf2d_element_label.h"
@@ -43,6 +45,30 @@ int item_list_menu_update(Window *win,List *updateList)
             if (data->result)
             {
                 *data->result = e->index - 1000;
+            }
+            gfc_callback_call(&data->callback);
+            gf2d_window_free(win);
+            return 1;
+        }
+    }
+    if (gfc_input_command_released("cancel"))
+    {
+            if (data->result)
+            {
+                *data->result = -1;
+            }
+            gfc_callback_call(&data->callback);
+            gf2d_window_free(win);
+            return 1;
+    }
+    if ((gf2d_mouse_button_state(0))||(gf2d_mouse_button_state(1)))
+    {
+        if (!gf2d_window_mouse_in(win))
+        {
+            //clicked outside of the menu
+            if (data->result)
+            {
+                *data->result = -1;
             }
             gfc_callback_call(&data->callback);
             gf2d_window_free(win);

@@ -1,7 +1,7 @@
 {
     "station":
     {
-        "idPool":5,
+        "idPool":12,
         "sections":
         [
             {
@@ -9,7 +9,7 @@
                 "id":0
             },
             {
-                "name":"station_reactor",
+                "name":"station_industrial",
                 "id":1,
                 "parent":0,
                 "slot":1
@@ -21,15 +21,63 @@
                 "slot":0
             },
             {
-                "name":"station_habitat",
+                "name":"station_reactor",
                 "id":3,
+                "parent":2,
+                "slot":0
+            },
+            {
+                "name":"station_habitat_large",
+                "id":4,
                 "parent":0,
                 "slot":0
             },
             {
                 "name":"station_dock",
-                "id":4,
-                "parent":3,
+                "id":5,
+                "parent":4,
+                "slot":0
+            },
+            {
+                "name":"expansion_bay",
+                "id":6,
+                "parent":0,
+                "slot":4
+            },
+            {
+                "name":"expansion_bay_extension",
+                "id":7,
+                "parent":6,
+                "slot":1
+            },
+            {
+                "name":"expansion_bay_extension",
+                "id":8,
+                "parent":7,
+                "slot":0
+            },
+            {
+                "name":"expansion_bay_extension",
+                "id":9,
+                "parent":6,
+                "slot":0
+            },
+            {
+                "name":"expansion_bay",
+                "id":10,
+                "parent":0,
+                "slot":5
+            },
+            {
+                "name":"expansion_bay_extension",
+                "id":11,
+                "parent":10,
+                "slot":0
+            },
+            {
+                "name":"expansion_bay_extension",
+                "id":12,
+                "parent":11,
                 "slot":0
             }
         ]

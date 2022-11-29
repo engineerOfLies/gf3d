@@ -1,0 +1,35 @@
+{
+    "facilities":
+    [
+        {
+            "name":"command_and_control",
+            "displayName":"Command and Control",
+            "type":"operations",
+            "cost":
+            {   
+                "credits":1000
+            },
+            "staff":10,
+            "upkeep":
+            {
+                "energy":10,
+                "credits":150
+            }
+        },
+        {
+            "name":"command_and_control",
+            "displayName":"Command and Control",
+            "type":"operations",
+            "cost":
+            {   
+                "credits":1000
+            },
+            "staff":10,
+            "upkeep":
+            {
+                "energy":10,
+                "credits":150
+            }
+        }
+    ]
+}

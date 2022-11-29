@@ -19,12 +19,14 @@ typedef struct StaionSection_S
     ModelMat mat;
     float rotates;//if it rotates
     struct StaionSection_S *parent;// if not null, this is the parent
+    Uint8 slot;                      // where the section is mounted on the parent
     List *children;
 }StationSection;
 
 typedef struct
 {
     Uint32 idPool;      /**<keeps track of unique station IDs*/
+    int    sectionHighlight;
     float  sectionRotation;
     List *sections;     /**<list of staiton sections*/
 }StationData;
@@ -51,10 +53,50 @@ StationSection *station_get_section_by_id(StationData *data,int id)
     return NULL;
 }
 
+SJson *station_section_to_json(StationSection *section)
+{
+    SJson *json;
+    if (!section)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    sj_object_insert(json,"name",sj_new_str(section->name));
+    sj_object_insert(json,"id",sj_new_uint32(section->id));
+    if (section->parent)
+    {
+        sj_object_insert(json,"parent",sj_new_uint32(section->parent->id));
+        sj_object_insert(json,"slot",sj_new_uint8(section->slot));
+    }
+    return json;
+}
+
+void station_save_data(StationData *data,const char *filename)
+{
+    int i,c;
+    StationSection *section;
+    SJson *json,*station,*sections;
+    if ((!data)||(!filename))return;
+    json = sj_object_new();
+    if (!json)return;
+    station = sj_object_new();
+    sj_object_insert(station,"idPool",sj_new_uint32(data->idPool));
+    sections = sj_array_new();
+    c = gfc_list_get_count(data->sections);
+    for (i = 0;i < c; i++)
+    {
+        section = gfc_list_get_nth(data->sections,i);
+        if (!section)continue;
+        sj_array_append(sections,station_section_to_json(section));
+    }
+    sj_object_insert(station,"sections",sections);
+    sj_object_insert(json,"station",station);
+    sj_save(json,filename);
+    sj_free(json);
+}
+
 StationData *station_load_data(const char *filename)
 {
     const char *name;
-    int id;
+    Uint32 id;
     int parentId;
     StationSection *parent;
     int slot;
@@ -77,7 +119,7 @@ StationData *station_load_data(const char *filename)
         return NULL;
     }
     data->sections = gfc_list_new();
-    sj_get_integer_value(sj_object_get_value(station,"idPool"),(int *)&data->idPool);
+    sj_object_get_value_as_int(station,"idPool",(int *)&data->idPool);
     list = sj_object_get_value(station,"sections");
     c = sj_array_get_count(list);
     for (i = 0; i < c;i++)
@@ -85,12 +127,10 @@ StationData *station_load_data(const char *filename)
         item = sj_array_get_nth(list,i);
         if (!item)continue;
         name = sj_object_get_value_as_string(item,"name");
-        sj_get_integer_value(sj_object_get_value(item,"id"),&id);
-        slog("section id: %i",id);
+        sj_object_get_value_as_uint32(item,"id",&id);
         if (sj_object_get_value(item,"parent"))
         {
             sj_get_integer_value(sj_object_get_value(item,"parent"),&parentId);
-            slog("parentId: %i",parentId);
             parent = station_get_section_by_id(data,parentId);
             if (!parent)
             {
@@ -107,6 +147,7 @@ StationData *station_load_data(const char *filename)
 
 StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot)
 {
+    Matrix4 mat;
     const char *str;
     Vector3D offsetPosition = {0},offsetRotation = {0};
     StationSection *section;
@@ -120,11 +161,13 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     }
     section = gfc_allocate_array(sizeof(StationSection),1);
     if (!section)return NULL;
-    
+    gfc_matrix_identity(mat);
+
     section->children = gfc_list_new();
     data->sections = gfc_list_append(data->sections,section);// add us to the station sections list
     if (parent)
     {
+        section->slot = slot;
         //get offset from parent
         parentDef = station_def_get_by_name(parent->name);
         if (parentDef)
@@ -132,10 +175,13 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
             extension = station_def_get_extension_by_index(parentDef,slot);
             if (extension)
             {
+                //get the offset for the extension
+                vector3d_set(offsetPosition,0,0,0);
                 sj_value_as_vector3d(sj_object_get_value(extension,"offset"),&offsetPosition);
+                vector3d_set(offsetRotation,0,0,0);
                 sj_value_as_vector3d(sj_object_get_value(extension,"rotation"),&offsetRotation);
                 vector3d_scale(offsetRotation,offsetRotation,GFC_DEGTORAD);
-
+                gfc_matrix4_from_vectors(mat,offsetPosition,offsetRotation,vector3d(1,1,1));
             }
             else
             {
@@ -146,24 +192,15 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
         section->parent = parent;
         parent->children = gfc_list_append(parent->children,section);
         
-        vector3d_scale_by(offsetPosition,offsetPosition,parent->mat.scale);
-    
-        vector3d_rotate_about_z(&offsetPosition,parent->mat.rotation.z);
-        vector3d_rotate_about_y(&offsetPosition,parent->mat.rotation.y);
-        vector3d_rotate_about_x(&offsetPosition,parent->mat.rotation.x);
-
-        vector3d_add(offsetPosition,offsetPosition,parent->mat.position);
-        vector3d_add(offsetRotation,offsetRotation,parent->mat.rotation);
+        gfc_matrix_multiply(mat,mat,parent->mat.mat);
+        
     }
     gf3d_model_mat_reset(&section->mat);
     gf3d_model_mat_parse(&section->mat,sectionDef);
+    gf3d_model_mat_set_matrix(&section->mat);
+    gfc_matrix_multiply(section->mat.mat,section->mat.mat,mat);
     
-    vector3d_scale_by(section->mat.position,section->mat.position,section->mat.scale);
-    vector3d_add(section->mat.position,offsetPosition,section->mat.position);
-    
-    vector3d_add(section->mat.rotation,offsetRotation,section->mat.rotation);
-    slog("section rotation: %f,%f,%f",section->mat.rotation.x,section->mat.rotation.y,section->mat.rotation.z);
-    sj_get_float_value(sj_object_get_value(sectionDef,"rotates"),&section->rotates);
+    sj_object_get_value_as_float(sectionDef,"rotates",&section->rotates);
     str = sj_object_get_value_as_string(sectionDef,"name");
     if (id >= 0)
     {
@@ -208,7 +245,10 @@ Entity *station_new(Vector3D position,const char *stationFile)
         section = station_add_section(data,"station_dock",-1,section,0);
     }
     
+    station_save_data(data,"saves/testsave.save");
+
     ent->mat.scale.x = ent->mat.scale.y = ent->mat.scale.z = 100;
+//    ent->mat.rotation.y = -GFC_HALF_PI;
     ent->data = data;
     ent->selectedColor = gfc_color(0.9,0.7,0.1,1);
     ent->color = gfc_color(1,1,1,1);
@@ -261,7 +301,7 @@ void station_draw(Entity *self)
     Matrix4 mat;
     StationSection *section;
     StationData *data;
-    Vector3D position,rotation,scale;
+    Vector3D rotation;
     if ((!self)||(!self->data))return;
     data = (StationData *)self->data;
     
@@ -271,20 +311,22 @@ void station_draw(Entity *self)
         section = gfc_list_get_nth(data->sections,i);
         if (!section)continue;
         
-        vector3d_scale_by(position,section->mat.position,self->mat.scale);
-        vector3d_add(position,self->mat.position,position);
-        
-        vector3d_add(rotation,self->mat.rotation,section->mat.rotation);
+        vector3d_copy(rotation,self->mat.rotation);
         rotation.x += (data->sectionRotation * section->rotates);
-        scale = vector3d_multiply(self->mat.scale,section->mat.scale);
-        
+
         gfc_matrix4_from_vectors(
             mat,
-            position,
+            self->mat.position,
             rotation,
-            scale);
+            self->mat.scale);
+        
+        gfc_matrix_multiply(mat,section->mat.mat,mat);
+
         gf3d_model_draw(section->mat.model,0,mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
-        gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(0,1,0,1));
+        if (data->sectionHighlight == section->id)
+        {
+            gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(0,1,0,1));
+        }
         
     }
 }

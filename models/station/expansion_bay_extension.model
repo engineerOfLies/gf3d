@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "obj":"models/station/expansion_bay_extension.obj",
+        "texture":"models/station/expansion_bay.png"
+    }
+}

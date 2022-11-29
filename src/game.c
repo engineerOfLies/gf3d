@@ -104,7 +104,7 @@ int main(int argc,char *argv[])
         
     w = world_load("config/world.json");
     
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+//    SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     station_def_load("config/station_def.cfg");    
