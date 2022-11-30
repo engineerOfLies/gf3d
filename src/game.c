@@ -107,7 +107,7 @@ int main(int argc,char *argv[])
 //    SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    station_def_load("config/station_def.cfg");    
+    station_def_load("config/station.def");    
     hud_window();    
         
     // main game loop

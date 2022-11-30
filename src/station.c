@@ -17,10 +17,12 @@ typedef struct StaionSection_S
     TextLine name;  //its name identifier
     Uint32 id;      //unique ID for the station section
     ModelMat mat;
+    float hull,hullmax;
     float rotates;//if it rotates
     struct StaionSection_S *parent;// if not null, this is the parent
     Uint8 slot;                      // where the section is mounted on the parent
     List *children;
+    List *facilities;
 }StationSection;
 
 typedef struct
@@ -28,6 +30,8 @@ typedef struct
     Uint32 idPool;      /**<keeps track of unique station IDs*/
     int    sectionHighlight;
     float  sectionRotation;
+    float  hull,hullMax;
+    float  energyOutput,energyReserves;
     List *sections;     /**<list of staiton sections*/
 }StationData;
 

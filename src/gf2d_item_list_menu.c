@@ -135,8 +135,9 @@ void item_list_menu_add_all_options(Window *win,List *options)
 }
 
 
-Window *item_list_menu(Window *parent,Vector2D position,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result)
+Window *item_list_menu(Window *parent,Vector2D position,float width,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result)
 {
+    Element *e;
     Window *win;
     ItemListMenuData* data;
     win = gf2d_window_load("menus/item_list_menu.json");
@@ -155,10 +156,16 @@ Window *item_list_menu(Window *parent,Vector2D position,char *question,List *opt
     }
     win->data = data;
     win->parent = parent;
+    win->dimensions.w = width;
     data->result = result;
     data->callback.data = callbackData;
     data->callback.callback = onSelect;
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),question);
+    e = gf2d_window_get_element_by_name(win,"title");
+    if (e)
+    {
+        e->bounds.w = width;
+        gf2d_element_label_set_text(e,question);
+    }
     gf2d_window_set_position(win,position);
     item_list_menu_add_all_options(win,options);
     return win;

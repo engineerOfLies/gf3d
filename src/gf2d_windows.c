@@ -53,7 +53,7 @@ void gf2d_draw_window_border_generic(Rect rect,Color color)
 void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color color)
 {
     int i;
-    Vector4D clip = {0,0,1,1};
+    Vector4D clip = {0,0,0,0};
     Vector2D count = {0};
     Vector2D fraction = {0};
     Vector2D scale = {0};
@@ -105,8 +105,8 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     }
     if (fraction.x > 0)
     {
-        clip.z = fraction.x;
-        clip.w = 1;
+        clip.z = (1.0 - fraction.x)*border->frameWidth;
+        clip.w = 0;
         gf2d_sprite_draw(
             border,
             vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y - border->frameWidth/2),
@@ -157,8 +157,8 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     {
         clip.x = 0;
         clip.y = 0;
-        clip.z = 1;
-        clip.w = fraction.y;
+        clip.z = 0;
+        clip.w = (1- fraction.y)*border->frameHeight;
         gf2d_sprite_draw(
             border,
             vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),

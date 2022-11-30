@@ -9,6 +9,7 @@
 #include "gf2d_element_label.h"
 #include "gf2d_element_entry.h"
 #include "gf2d_item_list_menu.h"
+#include "gf2d_message_buffer.h"
 
 #include "entity.h"
 #include "camera_entity.h"
@@ -22,6 +23,7 @@ typedef struct
     Entity  *player;
     List    *station_list;
     int     selection;
+    Window  *messages;
 }HUDWindowData;
 
 int hud_free(Window *win)
@@ -41,6 +43,17 @@ void hud_station_selected(void *Data)
     data = (HUDWindowData*)win->data;
     win->child = NULL;
     if (data->selection < 0)return;// nothing selected
+    
+    switch(data->selection)
+    {
+        case 2:
+            message_new("4");
+            message_new("3");
+            message_new("2");
+            message_new("1");
+            message_new("BOOM");
+            break;
+    }
 }
 
 int hud_update(Window *win,List *updateList)
@@ -64,7 +77,7 @@ int hud_update(Window *win,List *updateList)
             data->station_list = gfc_list_append(data->station_list,"Status");
             data->station_list = gfc_list_append(data->station_list,"Structure");
             data->station_list = gfc_list_append(data->station_list,"Self Destruct");
-            win->child = item_list_menu(win,vector2d(10,64),"Station",data->station_list,hud_station_selected,win,&data->selection);
+            win->child = item_list_menu(win,vector2d(10,64),200,"Station",data->station_list,hud_station_selected,win,&data->selection);
             gfc_list_delete(data->station_list);
         }
         if (strcmp(e->name,"freelook")==0)
@@ -99,6 +112,7 @@ Window *hud_window()
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
+    data->messages = window_message_buffer(8, 500, gfc_color8(0,255,100,255));
     data->player = player_new("config/playerData.cfg");
     camera_entity_enable_free_look(1);
     

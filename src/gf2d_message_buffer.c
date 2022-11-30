@@ -55,6 +55,7 @@ int message_buffer_free(Window *win)
     }
 
     gfc_list_delete(data->messages);
+    MessageWindow = NULL;
     return 0;
 }
 
@@ -175,6 +176,12 @@ void message_printf(const char *newMessage,...)
     vsprintf(msg,newMessage,ap);
     va_end(ap);
     message_new(msg);
+}
+
+void message_buffer_set_position(Vector2D position)
+{
+    if (!MessageWindow)return;
+    gf2d_window_set_position(MessageWindow,position);
 }
 
 void message_buffer_bubble()
