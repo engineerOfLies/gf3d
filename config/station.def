@@ -73,7 +73,7 @@
             "stats":
             {
                 "hull":1000,
-                "energy":1000
+                "fuel":1000
             },
             "cost":
             [
@@ -233,13 +233,14 @@
             "upkeep":
             [
                 {
-                    "name":"heavy_metals",
+                    "name":"fuel",
                     "amount":1
                 }
             ],
             "stats":
             {
-                "hull":1000
+                "hull":1000,
+                "energy":1000
             },
             "cost":
             [

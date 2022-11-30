@@ -27,6 +27,7 @@
 #include "gf2d_windows.h"
 #include "gf2d_windows_common.h"
 
+#include "config_def.h"
 #include "station_def.h"
 #include "entity.h"
 #include "gate.h"
@@ -98,6 +99,7 @@ int main(int argc,char *argv[])
     gf2d_actor_init(1024);
     gf2d_windows_init(128,"config/windows.cfg");
     gf2d_mouse_load("actors/mouse.actor");
+    config_def_init();
     entity_system_init(1024);
     
     slog_sync();
@@ -107,6 +109,8 @@ int main(int argc,char *argv[])
 //    SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
+    config_def_load("config/resources.def");
+    
     station_def_load("config/station.def");    
     hud_window();    
         

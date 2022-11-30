@@ -1,0 +1,113 @@
+{
+    "resources":
+    [
+        {
+            "name":"credits",
+            "displayName":"Credits",
+            "description":"Credits are the standard currency of interstellar commerce.  A digital currency whose ledgers are maintained by an independent bank staffed by the major galactic super powers.",
+            "precision":2,
+            "negative":true,
+            "value":1,
+            "units":"Cr"
+        },
+        {
+            "name":"energy",
+            "DisplayName":"Energy",
+            "description":"regardless of technology type, the amount of power needed to run it is measured simply as 'energy'",
+            "precision":2,
+            "negative":true,
+            "value":0.001,
+            "units":"e"
+        },
+        {
+            "name":"fuel",
+            "DisplayName":"Fuel",
+            "description":"High Density Gluons are the fuel source used for interstellar travel.  They are also the principle fuel for most fusion reactors to produce the energy needed to run everything.",
+            "precision":0,
+            "negative":false,
+            "value":100,
+            "units":"HDG"
+        },
+        {
+            "name":"food",
+            "DisplayName":"Food Supply",
+            "description":"Sentient beings need to eat.  Machine life needs complex matter to maintain their systems as well.  In order to keep the people living and working on the station healthy, you need enough to feed them all.",
+            "precision":0,
+            "negative":false,
+            "value":10,
+            "units":"T"
+        },
+        {
+            "name":"ores",
+            "DisplayName":"Metallic Ores",
+            "description":"The raw meterials needed in the refinement of more specific and useful metals and alloys.  Can be traded as is or refined into other materials",
+            "precision":0,
+            "negative":false,
+            "value":100,
+            "units":"T"
+        },
+        {
+            "name":"minerals",
+            "DisplayName":"Minerals",
+            "description":"The raw meterials needed for the crafting of more advances materials and electronics.  Can be traded as is or refined into other materials",
+            "precision":0,
+            "negative":false,
+            "value":100,
+            "units":"T"
+        },
+        {
+            "name":"alloys",
+            "DisplayName":"Alloys",
+            "description":"Refined metals needed to build the structures of advanced technologies.",
+            "precision":0,
+            "negative":false,
+            "value":500,
+            "units":"T"
+        },
+        {
+            "name":"heavy_metals",
+            "DisplayName":"Heavy Metals",
+            "description":"Enriched metals that can be used in advanced technologies",
+            "precision":0,
+            "negative":false,
+            "value":2000,
+            "units":"T"
+        },
+        {
+            "name":"meta_materials",
+            "DisplayName":"Meta Materials",
+            "description":"Advanced materials that cannot be created through mundane means.  Many have properties that enable more advanced technologies.  Including FTL propulsion systems and energy weapons.",
+            "precision":0,
+            "negative":false,
+            "value":4000,
+            "units":"T"
+        },
+        {
+            "name":"luxury_food",
+            "DisplayName":"Luxury Food",
+            "description":"Rare and enhanced food items.  The results are highly sought after and can demand a higher price.  Use of it will improve moral.",
+            "precision":0,
+            "negative":false,
+            "value":1000,
+            "units":"T"
+        },
+        {
+            "name":"illicit_items",
+            "DisplayName":"Illicit Items",
+            "description":"Very valuable, but questionably legal depending on the faction.  Could be due to risk in consuming it, could be the harm that comes from harvesting it.",
+            "precision":0,
+            "negative":false,
+            "value":2000,
+            "units":"T"
+        },
+        {
+            "name":"narcotics",
+            "DisplayName":"Narcotics",
+            "description":" Definitely illegal everywhere, but demands a high price.  If available in your station it could degrade the workforce, but keep them complacent.",
+            "precision":0,
+            "negative":false,
+            "value":4000,
+            "units":"T"
+        }
+    ]
+}

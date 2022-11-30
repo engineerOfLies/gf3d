@@ -17,7 +17,8 @@ typedef struct StaionSection_S
     TextLine name;  //its name identifier
     Uint32 id;      //unique ID for the station section
     ModelMat mat;
-    float hull,hullmax;
+    float hull,hullMax;
+    float energyOutput,energyInput;
     float rotates;//if it rotates
     struct StaionSection_S *parent;// if not null, this is the parent
     Uint8 slot;                      // where the section is mounted on the parent
@@ -31,7 +32,7 @@ typedef struct
     int    sectionHighlight;
     float  sectionRotation;
     float  hull,hullMax;
-    float  energyOutput,energyReserves;
+    float  energyOutput,energyInput;
     List *sections;     /**<list of staiton sections*/
 }StationData;
 
@@ -65,6 +66,7 @@ SJson *station_section_to_json(StationSection *section)
     if (!json)return NULL;
     sj_object_insert(json,"name",sj_new_str(section->name));
     sj_object_insert(json,"id",sj_new_uint32(section->id));
+    sj_object_insert(json,"hull",sj_new_uint32(section->hull));
     if (section->parent)
     {
         sj_object_insert(json,"parent",sj_new_uint32(section->parent->id));
@@ -83,6 +85,7 @@ void station_save_data(StationData *data,const char *filename)
     if (!json)return;
     station = sj_object_new();
     sj_object_insert(station,"idPool",sj_new_uint32(data->idPool));
+    sj_object_insert(station,"hull",sj_new_float(data->hull));
     sections = sj_array_new();
     c = gfc_list_get_count(data->sections);
     for (i = 0;i < c; i++)
@@ -102,6 +105,7 @@ StationData *station_load_data(const char *filename)
     const char *name;
     Uint32 id;
     int parentId;
+    StationSection *section;
     StationSection *parent;
     int slot;
     StationData *data;
@@ -122,8 +126,8 @@ StationData *station_load_data(const char *filename)
         sj_free(json);
         return NULL;
     }
-    data->sections = gfc_list_new();
     sj_object_get_value_as_int(station,"idPool",(int *)&data->idPool);
+    
     list = sj_object_get_value(station,"sections");
     c = sj_array_get_count(list);
     for (i = 0; i < c;i++)
@@ -143,7 +147,15 @@ StationData *station_load_data(const char *filename)
             sj_get_integer_value(sj_object_get_value(item,"slot"),&slot);
         }
         else parent = NULL;
-        station_add_section(data,name,id,parent,slot);
+        section = station_add_section(data,name,id,parent,slot);
+        if (section)
+        {
+            sj_object_get_value_as_float(item,"hull",&section->hull);
+        }
+    }
+    if (!sj_object_get_value_as_float(station,"hull",&data->hull))
+    {
+        data->hull = data->hullMax;
     }
     sj_free(json);
     return data;
@@ -152,10 +164,11 @@ StationData *station_load_data(const char *filename)
 StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot)
 {
     Matrix4 mat;
+    float tempf;
     const char *str;
     Vector3D offsetPosition = {0},offsetRotation = {0};
     StationSection *section;
-    SJson *sectionDef,*parentDef,*extension;
+    SJson *sectionDef,*parentDef,*extension,*stats;
     if (!sectionName)return NULL;
     sectionDef = station_def_get_by_name(sectionName);
     if (!sectionDef)
@@ -205,6 +218,16 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     gfc_matrix_multiply(section->mat.mat,section->mat.mat,mat);
     
     sj_object_get_value_as_float(sectionDef,"rotates",&section->rotates);
+    
+    stats = sj_object_get_value(sectionDef,"stats");
+    if (stats)
+    {
+        if (sj_object_get_value_as_float(stats,"hull",&tempf))
+        {
+            section->hull = section->hullMax = tempf;
+            data->hullMax += tempf;
+        }
+    }
     str = sj_object_get_value_as_string(sectionDef,"name");
     if (id >= 0)
     {
@@ -250,7 +273,7 @@ Entity *station_new(Vector3D position,const char *stationFile)
     }
     
     station_save_data(data,"saves/testsave.save");
-
+    data->sectionHighlight = -1;
     ent->mat.scale.x = ent->mat.scale.y = ent->mat.scale.z = 100;
 //    ent->mat.rotation.y = -GFC_HALF_PI;
     ent->data = data;
