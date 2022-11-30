@@ -23,7 +23,6 @@ void entity_system_close()
     }
     free(entity_manager.entity_list);
     memset(&entity_manager,0,sizeof(EntityManager));
-    slog("entity_system closed");
 }
 
 void entity_system_init(Uint32 maxEntities)
@@ -36,7 +35,6 @@ void entity_system_init(Uint32 maxEntities)
     }
     entity_manager.entity_count = maxEntities;
     atexit(entity_system_close);
-    slog("entity_system initialized");
 }
 
 Entity *entity_new()

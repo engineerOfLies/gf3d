@@ -8,7 +8,7 @@
 #include "gf3d_particle.h"
 
 #define PARTICLE_ATTRIBUTE_COUNT 1
-
+extern int __DEBUG;
 typedef struct
 {
     Matrix4     model;
@@ -76,7 +76,7 @@ void gf3d_particle_manager_init(Uint32 max_particles)
         PARTICLE_ATTRIBUTE_COUNT,
         sizeof(ParticleUBO)
     );
-    slog("particle manager initiliazed");
+    if(__DEBUG)slog("particle manager initiliazed");
     atexit(gf3d_particles_manager_close);
 }
 

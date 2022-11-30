@@ -5,6 +5,7 @@
 
 #include "gf3d_draw.h"
 
+#include "config_def.h"
 #include "station_def.h"
 #include "station.h"
 
@@ -170,7 +171,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     StationSection *section;
     SJson *sectionDef,*parentDef,*extension,*stats;
     if (!sectionName)return NULL;
-    sectionDef = station_def_get_by_name(sectionName);
+    sectionDef = config_def_get_by_name("sections",sectionName);
     if (!sectionDef)
     {
         slog("could not load section named %s",sectionName);
@@ -186,7 +187,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     {
         section->slot = slot;
         //get offset from parent
-        parentDef = station_def_get_by_name(parent->name);
+        parentDef = config_def_get_by_name("sections",parent->name);
         if (parentDef)
         {
             extension = station_def_get_extension_by_index(parentDef,slot);

@@ -2,6 +2,13 @@
     "station":
     {
         "idPool":12,
+        "resources":
+        [
+            {
+                "name":"credits",
+                "count":10000
+            }
+        ],
         "sections":
         [
             {

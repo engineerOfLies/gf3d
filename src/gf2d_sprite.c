@@ -11,6 +11,8 @@
 
 #define SPRITE_ATTRIBUTE_COUNT 2
 
+extern int __DEBUG;
+
 typedef struct
 {
     Matrix4 rotation;
@@ -88,7 +90,7 @@ void gf2d_sprite_manager_close()
     }
 
     memset(&gf2d_sprite,0,sizeof(SpriteManager));
-    slog("sprite manager closed");
+    if(__DEBUG)slog("sprite manager closed");
 }
 
 void gf2d_sprite_manager_init(Uint32 max_sprites)
@@ -145,7 +147,7 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
         sizeof(SpriteUBO)
     );     
     
-    slog("sprite manager initiliazed");
+    if(__DEBUG)slog("sprite manager initiliazed");
     atexit(gf2d_sprite_manager_close);
 }
 

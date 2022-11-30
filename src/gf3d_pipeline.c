@@ -43,7 +43,7 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
     gf3d_pipeline.maxPipelines = max_pipelines;
     gf3d_pipeline.chainLength = gf3d_swapchain_get_chain_length();
     atexit(gf3d_pipeline_close);
-    slog("pipeline system initialized");
+    if (__DEBUG)slog("pipeline system initialized");
 }
 
 void gf3d_pipeline_close()
@@ -58,7 +58,7 @@ void gf3d_pipeline_close()
         free(gf3d_pipeline.pipelineList);
     }
     memset(&gf3d_pipeline,0,sizeof(PipelineManager));
-    slog("pipeline system closed");
+    if (__DEBUG)slog("pipeline system closed");
 }
 
 Pipeline *gf3d_pipeline_new()

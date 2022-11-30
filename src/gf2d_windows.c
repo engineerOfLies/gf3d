@@ -351,7 +351,6 @@ void gf2d_windows_close()
         }
     }
     gfc_list_delete(window_manager.window_deque);
-    slog("window system closed");
 }
 
 void gf2d_windows_init(int max_windows,const char *config)
@@ -412,7 +411,6 @@ void gf2d_windows_init(int max_windows,const char *config)
     window_manager.generic_background = gf2d_sprite_load_image(background);
     window_manager.generic_border = gf2d_sprite_load(border,borderSize.x,borderSize.y,borderFPL);
     window_manager.drawbounds = 0;
-    slog("window system initilized");
     atexit(gf2d_windows_close);
 }
 

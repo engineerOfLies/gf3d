@@ -13,6 +13,7 @@ typedef struct
     VkDevice        device;
 }TextureManager;
 
+extern int __DEBUG;
 static TextureManager gf3d_texture = {0};
 
 void gf3d_texture_close();
@@ -21,7 +22,6 @@ void gf3d_texture_delete_all();
 
 void gf3d_texture_init(Uint32 max_textures)
 {
-    slog("initializing texture system");
     if (!max_textures)
     {
         slog("cannot initialize texture system for 0 textures");
@@ -36,12 +36,12 @@ void gf3d_texture_init(Uint32 max_textures)
     gf3d_texture.max_textures = max_textures;
     gf3d_texture.device = gf3d_vgraphics_get_default_logical_device();
     atexit(gf3d_texture_close);
-    slog("texture system initialized");
+    if (__DEBUG)slog("texture system initialized");
 }
 
 void gf3d_texture_close()
 {
-    slog("cleaning up textures");
+    if (__DEBUG)slog("cleaning up textures");
     gf3d_texture_delete_all();
     if (gf3d_texture.texture_list != NULL)
     {

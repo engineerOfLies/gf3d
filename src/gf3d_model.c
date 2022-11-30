@@ -16,6 +16,8 @@
 #include "gf3d_gltf_parse.h"
 #include "gf3d_model.h"
 
+extern int __DEBUG;
+
 typedef struct
 {
     Model               *   model_list;
@@ -77,7 +79,7 @@ void gf3d_model_manager_close()
         free(gf3d_model.model_list);
     }
     memset(&gf3d_model,0,sizeof(ModelManager));
-    slog("model manager closed");
+    if(__DEBUG)slog("model manager closed");
 }
 
 void gf3d_model_manager_init(Uint32 max_models)
@@ -94,7 +96,7 @@ void gf3d_model_manager_init(Uint32 max_models)
     gf3d_model.pipe = gf3d_mesh_get_pipeline();
     gf3d_model.defaultTexture = gf3d_texture_load("images/default.png");
     
-    slog("model manager initiliazed");
+    if(__DEBUG)slog("model manager initiliazed");
     atexit(gf3d_model_manager_close);
 }
 

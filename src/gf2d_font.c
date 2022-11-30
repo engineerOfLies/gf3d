@@ -54,7 +54,6 @@ void gf2d_font_close()
     }
     gfc_list_delete(font_manager.font_images);
     TTF_Quit();
-    slog("text system closed");
 }
 
 void gf2d_font_image_new(
@@ -112,7 +111,6 @@ void gf2d_font_init(const char *configFile)
     gf2d_fonts_load_json(configFile);
     font_manager.font_images = gfc_list_new();
     font_manager.ttl = 1000;// 100 milliseconds
-    slog("text system initialized");
     atexit(gf2d_font_close);
 }
 

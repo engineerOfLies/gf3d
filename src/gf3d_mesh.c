@@ -12,6 +12,7 @@
 
 
 #define ATTRIBUTE_COUNT 3
+extern int __DEBUG;
 
 typedef struct
 {
@@ -97,7 +98,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         sizeof(HighlightUBO)
     );
 
-    slog("mesh system initialized");
+    if (__DEBUG)slog("mesh system initialized");
 }
 
 Pipeline *gf3d_mesh_get_pipeline()
@@ -219,7 +220,6 @@ void gf3d_mesh_free_all()
 
 void gf3d_mesh_close()
 {
-    slog("cleaning up mesh data");
     if (gf3d_mesh.mesh_list)
     {
         gf3d_mesh_free_all();
@@ -227,7 +227,7 @@ void gf3d_mesh_close()
         free(gf3d_mesh.mesh_list);
         gf3d_mesh.mesh_list = NULL;
     }
-    slog("mesh system closed");
+    if (__DEBUG)slog("mesh system closed");
 }
 
 void gf3d_mesh_delete(Mesh *mesh)

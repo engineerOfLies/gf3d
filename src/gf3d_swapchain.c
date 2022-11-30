@@ -250,7 +250,6 @@ int gf3d_swapchain_choose_format()
 void gf3d_swapchain_close()
 {
     int i;
-    slog("cleaning up swapchain");
     
     if (gf3d_swapchain.depthImageView != VK_NULL_HANDLE)
     {

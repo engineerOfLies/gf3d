@@ -269,7 +269,7 @@ void gf3d_vgraphics_setup(
         SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), gf3d_vgraphics.sdl_extension_names);
         for (i = 0; i < gf3d_vgraphics.sdl_extension_count;i++)
         {
-            slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
+            if (__DEBUG)slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
             gf3d_extensions_enable(ET_Instance, gf3d_vgraphics.sdl_extension_names[i]);
         }
     }
@@ -362,8 +362,6 @@ void gf3d_vgraphics_setup(
 
 void gf3d_vgraphics_close()
 {
-    slog("cleaning up vulkan graphics");
-    
     if (gf3d_vgraphics.sdl_extension_names)
     {
         free(gf3d_vgraphics.sdl_extension_names);
@@ -562,7 +560,6 @@ void gf3d_vgraphics_semaphores_create()
     {
         slog("failed to create semaphores!");
     }
-	else slog("created semaphores");
     atexit(gf3d_vgraphics_semaphores_close);
 }
 

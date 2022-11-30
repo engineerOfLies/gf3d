@@ -226,7 +226,7 @@ void gf3d_vqueues_init(VkPhysicalDevice device,VkSurfaceKHR surface)
     }
     
     atexit(gf3d_vqueues_close);
-    slog("vqueues initialized");
+    if (__DEBUG)slog("vqueues initialized");
 }
 
 const VkDeviceQueueCreateInfo *gf3d_vqueues_get_queue_create_info(Uint32 *count)
@@ -292,7 +292,7 @@ void gf3d_vqueues_close()
         free(gf3d_vqueues.queue_family_properties);
     }
     memset(&gf3d_vqueues,0,sizeof(vQueues));
-    slog("vqueues closed");
+    if (__DEBUG)slog("vqueues closed");
 }
 
 Sint32 gf3d_vqueues_get_graphics_queue_family()

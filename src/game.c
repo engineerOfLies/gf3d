@@ -32,6 +32,7 @@
 #include "entity.h"
 #include "gate.h"
 #include "world.h"
+#include "resources.h"
 
 #include "hud_window.h"
 
@@ -109,13 +110,11 @@ int main(int argc,char *argv[])
 //    SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    config_def_load("config/resources.def");
-    
+    resources_list_load();    
     station_def_load("config/station.def");    
     hud_window();    
         
     // main game loop
-    slog("gf3d main loop begin");
     while(!_done)
     {
         gfc_input_update();
