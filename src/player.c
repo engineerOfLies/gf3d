@@ -104,21 +104,23 @@ Entity *player_new(const char *file)
     }
     else
     {
-        ent = player_entity;
-        if (ent->data)
+        entity_free(player_entity);
+        ent = entity_new();
+        if (!ent)
         {
-            player_free(ent);
+            slog("UGH OHHHH, no player for you!");
+            return NULL;
         }
-        ent->data = NULL;
+        player_entity = ent;
     }
-    ent->data = player_data_parse(sj_object_get_value(json,"player"));
-    if (!ent->data)
+    data = player_data_parse(sj_object_get_value(json,"player"));
+    if (!data)
     {
         slog("failed to parse player data");
-        player_free(ent);
+        entity_free(ent);
         return NULL;
     }
-    data = ent->data;
+    ent->data = data;
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
 
     sj_free(json);
@@ -135,21 +137,14 @@ Entity *player_new(const char *file)
 
 void player_free(Entity *self)
 {
-    int i,c;
-    Resource *resource;
     PlayerData *data;
     if ((!self)||(!self->data))return;
     data = self->data;
-    c = gfc_list_get_count(data->resources);
-    for (i = 0; i < c; i++)
-    {
-        resource = gfc_list_get_nth(data->resources,i);
-        if (!resource)continue;
-        free(resource);
-    }
-    gfc_list_delete(data->resources);
+    resources_list_free(data->resources);
     entity_free(data->station);
     free(data);
+    player_entity = NULL;
+    self->data= NULL;
 }
 
 void player_draw(Entity *self)
@@ -171,4 +166,13 @@ PlayerData *player_get_data()
     return player_entity->data;
 }
 
+StationData *player_get_station_data()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    if (!data->station)return NULL;
+    return data->station->data;
+}
 /*eol@eof*/

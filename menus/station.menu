@@ -1,0 +1,22 @@
+{
+    "window":{
+        "name":"station_menu",
+        "color" : [255,255,255,255],
+        "dimensions" : [-200,84,200,1],
+        "elements":
+        [
+        {
+            "type": "list",
+            "name": "list",
+            "bounds": [32,0,1,1],
+            "style": "horizontal",
+            "item_size" : [128,40],
+            "packed":true,
+            "elements":
+            [
+
+            ]
+        }
+        ]
+    }
+}

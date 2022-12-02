@@ -351,6 +351,11 @@ void gf2d_windows_close()
         }
     }
     gfc_list_delete(window_manager.window_deque);
+    
+    gf2d_sprite_free(window_manager.generic_border);
+    gf2d_sprite_free(window_manager.generic_background);
+    gfc_sound_pack_free(window_manager.sounds);
+    memset(&window_manager,0,sizeof(WindowManager));
 }
 
 void gf2d_windows_init(int max_windows,const char *config)
@@ -439,8 +444,6 @@ void gf2d_window_free(Window *win)
     }
     gfc_list_delete(win->elements);
     gfc_list_delete(win->focus_elements);// only delete the list, the data is handled by the other list
-    gf2d_sprite_free(win->background);
-    gf2d_sprite_free(win->border);
     memset(win,0,sizeof(Window));
 }
 
@@ -801,8 +804,20 @@ Window *gf2d_window_load(char *filename)
     json = sj_load(filename);
     win = gf2d_window_load_from_json(json);
     sj_free(json);
-    if (win)gf2d_window_make_focus_list(win);
+    if (win)
+    {
+        if (!strlen(win->name))gfc_line_cpy(win->name,filename);
+        gf2d_window_make_focus_list(win);
+    }
     return win;
+}
+
+int gf2d_window_named(Window *win,const char *name)
+{
+    if (!win)return 0;
+    if (!name)return 0;
+    if (strcmp(win->name,name)==0)return 1;
+    return 0;
 }
 
 Window *gf2d_window_load_from_json(SJson *json)
@@ -831,7 +846,8 @@ Window *gf2d_window_load_from_json(SJson *json)
         return NULL;
     }
     
-    
+    buffer = sj_object_get_value_as_string(json,"name");
+    if (buffer)gfc_line_cpy(win->name,buffer);
     sj_get_bool_value(sj_object_get_value(json,"no_draw_generic"),&buul);
     if (buul)win->no_draw_generic = 1;
     sj_value_as_vector4d(sj_object_get_value(json,"color"),&vector);

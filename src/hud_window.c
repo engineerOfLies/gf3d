@@ -14,8 +14,9 @@
 #include "entity.h"
 #include "camera_entity.h"
 #include "station.h"
-#include "fighter.h"
+#include "world.h"
 #include "player.h"
+#include "station_menu.h"
 #include "hud_window.h"
 
 typedef struct
@@ -24,13 +25,18 @@ typedef struct
     List    *station_list;
     int     selection;
     Window  *messages;
+    World   *w;
 }HUDWindowData;
 
 int hud_free(Window *win)
 {
+    HUDWindowData *data;
     if (!win)return 0;
     if (!win->data)return 0;
-
+    data = win->data;
+    world_delete(data->w);
+    gf2d_window_free(data->messages);
+    free(data);
     return 0;
 }
 
@@ -64,21 +70,21 @@ int hud_update(Window *win,List *updateList)
     if (!win)return 0;
     if (!updateList)return 0;
     data = (HUDWindowData*)win->data;
-    
+    world_run_updates(data->w);
+
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if ((strcmp(e->name,"station")==0)||(!win->child))
+        if (strcmp(e->name,"station")==0)
         {
-            data->selection = -1;
-            data->station_list = gfc_list_new();
-            data->station_list = gfc_list_append(data->station_list,"Status");
-            data->station_list = gfc_list_append(data->station_list,"Structure");
-            data->station_list = gfc_list_append(data->station_list,"Self Destruct");
-            win->child = item_list_menu(win,vector2d(10,64),200,"Station",data->station_list,hud_station_selected,win,&data->selection);
-            gfc_list_delete(data->station_list);
+            if ((!win->child)||(!gf2d_window_named(win->child,"station_menu")))
+            {
+                if (win->child)gf2d_window_free(win->child);
+                win->child = station_menu_window(win,player_get_station_data());
+            }
+            return 1;
         }
         if (strcmp(e->name,"freelook")==0)
         {
@@ -92,7 +98,10 @@ int hud_update(Window *win,List *updateList)
 
 int hud_draw(Window *win)
 {
-    if (!win)return 0;
+    HUDWindowData *data;
+    if ((!win)||(!win->data))return 0;
+    data = win->data;
+    world_draw(data->w);
     return 0;
 }
 
@@ -115,6 +124,8 @@ Window *hud_window()
     data->messages = window_message_buffer(8, 500, gfc_color8(0,255,100,255));
     data->player = player_new("saves/default.save");
     camera_entity_enable_free_look(1);
+    data->w = world_load("config/world.json");
+
     
     return win;
 }

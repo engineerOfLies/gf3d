@@ -2,7 +2,7 @@
 #define __PLAYER_H__
 
 #include "entity.h"
-
+#include "station.h"
 
 typedef struct
 {
@@ -25,5 +25,7 @@ Entity *player_new(const char *file);
  * @return NULL if no player loaded, or the playerdata for the player
  */
 PlayerData *player_get_data();
+
+StationData *player_get_station_data();
 
 #endif

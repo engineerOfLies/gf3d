@@ -235,7 +235,7 @@ void gf3d_model_free(Model *model)
 {
     if (!model)return;
     model->refCount--;
-    if (!model->refCount)
+    if (model->refCount<=0)
     {
         gf3d_model_delete(model);
     }

@@ -31,10 +31,9 @@
 #include "station_def.h"
 #include "entity.h"
 #include "gate.h"
-#include "world.h"
 #include "resources.h"
 
-#include "hud_window.h"
+#include "main_menu.h"
 
 extern int __DEBUG;
 
@@ -79,7 +78,6 @@ void draw_origin()
 int main(int argc,char *argv[])
 {
     int a;
-    World *w;
 
     for (a = 1; a < argc;a++)
     {
@@ -105,8 +103,6 @@ int main(int argc,char *argv[])
     
     slog_sync();
         
-    w = world_load("config/world.json");
-    
 //    SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
@@ -116,14 +112,13 @@ int main(int argc,char *argv[])
     station_def_load("config/station.def");    
         
     // main game loop
-    hud_window();    
+    main_menu();
     while(!_done)
     {
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
         gf2d_windows_update_all();
-        world_run_updates(w);
         entity_think_all();
         entity_update_all();
         gf3d_camera_update_view();
@@ -133,7 +128,6 @@ int main(int argc,char *argv[])
 
             //3D draws
                 draw_origin();
-                world_draw(w);
                 entity_draw_all();
                 //2D draws
                 gf2d_windows_draw_all();
@@ -146,9 +140,7 @@ int main(int argc,char *argv[])
             exitCheck();
         }
     }    
-    
-    world_delete(w);
-    
+        
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup
     slog("gf3d program end");

@@ -1,0 +1,140 @@
+{
+"window":{
+    "dimensions" : [-367,0,355,320],
+    "align" : "middle",
+    "elements":
+    [
+      {
+        "type": "button",
+        "name" : "item_down",
+        "hotkey":"item_down"
+      },
+      {
+        "type": "button",
+        "name" : "item_up",
+        "hotkey":"item_up"
+      },
+      {
+        "type": "list",
+        "bounds": [0,10,1,1],
+        "style": "vertical",
+        "item_size" : [100,36],
+        "elements":
+        [
+            {
+            "type": "label",
+            "bounds": [0,0,1,40],
+            "text":"Antioch Station",
+            "justify" : "center",
+            "align" : "middle",
+            "style":"H1"
+            },
+            {
+            "type": "list",
+            "name": "buttons",
+            "bounds": [90,10,160,1],
+            "style": "vertical",
+            "item_size" : [1,64],
+            "elements":
+            [
+                {
+                "type": "button",
+                "name":"newgame",
+                "id" : 1,
+                "canHasFocus":true,
+                "sound":"confirm",
+                "bounds": [0,0,160,64],
+                "hotkey":"newgame",
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"New Game",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                "type": "button",
+                "id":2,
+                "name" : "continue",
+                "canHasFocus":true,
+                "sound":"confirm",
+                "bounds": [0,0,160,64],
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Continue",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                "type": "button",
+                "name":"loadgame",
+                "id" : 3,
+                "canHasFocus":true,
+                "bounds": [0,0,160,64],
+                "sound":"confirm",
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Load Game",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                "type": "button",
+                "name":"quit",
+                "id" : 4,
+                "canHasFocus":true,
+                "bounds": [0,0,160,64],
+                "hotkey":"quit",
+                "sound":"cancel",
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,160,64],
+                    "text":"Quit",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "bounds": [0,0,160,64],
+                    "actor" : "actors/button.actor"
+                    }
+                }
+            ]
+            }
+        ]
+      }
+    ]
+    }
+}

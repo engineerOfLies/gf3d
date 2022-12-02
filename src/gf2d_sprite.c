@@ -326,6 +326,21 @@ void gf2d_sprite_draw_full(
        frame);
 }
 
+void gf2d_sprite_draw_image(
+    Sprite   * sprite,
+    Vector2D   position)
+{
+    gf2d_sprite_draw(
+        sprite,
+        position,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,0);
+}
+
 void gf2d_sprite_draw_simple(
     Sprite   * sprite,
     Vector2D   position,

@@ -31,8 +31,6 @@ typedef struct Window_S
     List *elements;         /**<all the components of the window*/
     List *focus_elements;   /**<pointers to all of the elements that can have focus*/
     Element *focus;         /**<this element has the focus*/
-    Sprite *background;     /**<background image*/
-    Sprite *border;         /**<border sprites*/
     Rect dimensions;        /**<where on the screen*/
     Rect canvas;            /**<Where within the window we draw things*/
     Color color;         /**<color to draw the window with*/
@@ -110,6 +108,14 @@ void gf2d_window_make_focus_list(Window *win);
  * @return 1 if the window in question should block input to windows below it
  */
 int gf2d_window_update(Window *win);
+
+/**
+ * @brief check if the name of the window is the name in question
+ * @param win the window to check
+ * @param name the name to check against
+ * @return 0 if no match or error, 1 if match
+ */
+int gf2d_window_named(Window *win,const char *name);
 
 /**
  * @brief play one of the windows sounds by name

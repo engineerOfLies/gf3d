@@ -69,7 +69,6 @@ List *resources_list_parse(SJson *config)
         res = sj_object_get_value(config,name);
         if (!res)continue;
         sj_get_float_value(res,&count);
-        slog("parsed %f of %s from resources",count,name);
         resources = resources_list_give(resources,name,count);
     }
     return resources;
