@@ -46,4 +46,12 @@ SJson *config_def_get_by_index(const char *resource,Uint8 index);
  * @return NULL if not found or error, the JSON otherwise.  DO NOT FREE IT, you do not own it.
  */
 SJson *config_def_get_by_name(const char *resource,const char *name);
+
+/**
+ * @brief get the number of a resources that has been loaded
+ * @param resource the resource type to check
+ * @return 0 if not loaded or error, the count otherwise
+ */
+Uint32 config_def_get_resource_count(const char *resource);
+
 #endif

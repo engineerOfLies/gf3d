@@ -10,6 +10,7 @@
 
 #include "gf2d_mouse.h"
 
+#include "resources.h"
 #include "station.h"
 #include "player.h"
 
@@ -20,38 +21,60 @@ void player_free(Entity *self);
 void player_think(Entity *self);
 void player_update(Entity *self);
 
+SJson *player_data_save(PlayerData *data)
+{
+    SJson *json;
+    if (!data)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+ 
+    sj_object_insert(json,"wages",sj_new_float(data->wages));
+    sj_object_insert(json,"taxRate",sj_new_float(data->taxRate));
+    sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));
+    sj_object_insert(json,"resources",resources_list_save(data->resources));
+    return json;
+}
+
+void player_save(const char *filename)
+{
+    SJson *json;
+    PlayerData *data;
+    if (!filename)return;
+    if (!player_entity)return;
+    data = player_entity->data;
+    if (!data)return;
+    json = sj_object_new();
+    
+    sj_object_insert(json,"player",player_data_save(data));
+    if (data->station)
+    {
+        sj_object_insert(json,"station",station_save_data(data->station->data));
+    }
+
+    sj_save(json,filename);
+    sj_free(json);
+}
+
 PlayerData *player_data_parse(SJson *json)
 {
-    int i,c;
-    const char *str;
-    Resource *resource;
-    SJson *list,*item;
+    SJson *res;
     PlayerData *data;
     if (!json)return NULL;
     data = gfc_allocate_array(sizeof(PlayerData),1);
     if (!data)return NULL;
     data->resources = gfc_list_new();
-    sj_get_float_value(sj_object_get_value(json,"credits"),&data->credits);
-    sj_get_integer_value(sj_object_get_value(json,"population"),(int *)&data->population);
-    sj_get_integer_value(sj_object_get_value(json,"staff"),(int *)&data->staff);
     sj_get_float_value(sj_object_get_value(json,"wages"),&data->wages);
     sj_get_float_value(sj_object_get_value(json,"taxRate"),&data->taxRate);
     sj_get_float_value(sj_object_get_value(json,"salesTaxRate"),&data->salesTaxRate);
-    list = sj_object_get_value(json,"resources");
-    c = sj_array_get_count(list);
-    for (i = 0;i < c; i++)
+    res = sj_object_get_value(json,"resources");
+    if (res)
     {
-        item = sj_array_get_nth(list,i);
-        if (!item)continue;
-        resource = gfc_allocate_array(sizeof(Resource),1);
-        if (!resource)continue;
-        sj_get_integer_value(sj_object_get_value(item,"amount"),(int *)&resource->amount);
-        sj_get_float_value(sj_object_get_value(item,"value"),&resource->value);
-        str = sj_get_string_value(sj_object_get_value(item,"name"));
-        if (str)gfc_line_cpy(resource->name,str);
-        data->resources = gfc_list_append(data->resources,resource);
+        data->resources = resources_list_parse(res);
     }
-    data->station = station_new(vector3d(0,0,0),"saves/default.save");
+    else 
+    {
+        slog("no player resources");
+    }
     return data;
 }
 
@@ -59,6 +82,7 @@ Entity *player_new(const char *file)
 {
     SJson *json;
     Entity *ent = NULL;
+    PlayerData *data;
     
     if (!file)
     {
@@ -87,9 +111,19 @@ Entity *player_new(const char *file)
         }
         ent->data = NULL;
     }
-    ent->data = player_data_parse(json);
+    ent->data = player_data_parse(sj_object_get_value(json,"player"));
+    if (!ent->data)
+    {
+        slog("failed to parse player data");
+        player_free(ent);
+        return NULL;
+    }
+    data = ent->data;
+    data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
+
     sj_free(json);
     
+    player_save("saves/testsave.save");
     
     ent->think = player_think;
     ent->update = player_update;

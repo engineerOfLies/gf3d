@@ -113,7 +113,7 @@ Window *hud_window()
     win->draw = hud_draw;
     win->data = data;
     data->messages = window_message_buffer(8, 500, gfc_color8(0,255,100,255));
-    data->player = player_new("config/playerData.cfg");
+    data->player = player_new("saves/default.save");
     camera_entity_enable_free_look(1);
     
     return win;

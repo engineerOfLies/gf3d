@@ -75,6 +75,15 @@ SJson *config_def_get_by_index(const char *resource,Uint8 index)
     return sj_array_get_nth(list,index);
 }
 
+Uint32 config_def_get_resource_count(const char *resource)
+{
+    SJson *list;
+    if (!config_manager.defs)return 0;
+    list = config_def_get_resource_by_name(resource);
+    if (!list)return 0;
+    return sj_array_get_count(list);
+}
+
 SJson *config_def_get_by_name(const char *resource,const char *name)
 {
     const char *str;
@@ -92,6 +101,7 @@ SJson *config_def_get_by_name(const char *resource,const char *name)
         if (!str)continue;
         if (strcmp(name,str)==0)return item;
     }
+    slog("no resource of %s found by name of %s",resource,name);
     return NULL;
 }
 

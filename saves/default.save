@@ -1,19 +1,33 @@
 {
+    "player":{
+        "wages":15,
+        "taxRate":0.09,
+        "salesTaxRate":0.09,
+        "resources":
+        {
+            "population":800,
+            "staff":100,
+            "credits":10000
+        }
+    },
     "station":
     {
         "idPool":12,
-        "resources":
-        [
-            {
-                "name":"credits",
-                "count":10000
-            }
-        ],
         "sections":
         [
             {
                 "name":"station_core",
-                "id":0
+                "id":0,
+                "facilities":
+                [
+                    {
+                        "name":"command_and_control",
+                        "staff":10,
+                        "inactive":false,
+                        "disabled":false,
+                        "officer":"player"
+                    }
+                ]
             },
             {
                 "name":"station_industrial",
@@ -25,13 +39,27 @@
                 "name":"solar_collector",
                 "id":2,
                 "parent":1,
-                "slot":0
+                "slot":0,
+                "facilities":
+                [
+                    {
+                        "name":"solar_processor1",
+                        "staff":10
+                    }
+                ]
             },
             {
                 "name":"station_reactor",
                 "id":3,
                 "parent":2,
-                "slot":0
+                "slot":0,
+                "facilities":
+                [
+                    {
+                        "name":"hdg_reactor1",
+                        "staff":10
+                    }
+                ]
             },
             {
                 "name":"station_habitat_large",

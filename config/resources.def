@@ -11,6 +11,22 @@
             "units":"Cr"
         },
         {
+            "name":"population",
+            "DisplayName":"Population",
+            "description":"The number of sentient beings living and working here",
+            "precision":0,
+            "negative":false,
+            "value":0
+        },
+        {
+            "name":"staff",
+            "DisplayName":"Staff",
+            "description":"The number of people working directly for the station",
+            "precision":0,
+            "negative":false,
+            "value":0
+        },
+        {
             "name":"energy",
             "DisplayName":"Energy",
             "description":"regardless of technology type, the amount of power needed to run it is measured simply as 'energy'",
@@ -59,6 +75,15 @@
             "name":"alloys",
             "DisplayName":"Alloys",
             "description":"Refined metals needed to build the structures of advanced technologies.",
+            "precision":0,
+            "negative":false,
+            "value":500,
+            "units":"T"
+        },
+        {
+            "name":"common_materials",
+            "DisplayName":"Common Materials",
+            "description":"Refined from minerals. These are non-metallic materials used for everything from textiles to construction materials.",
             "precision":0,
             "negative":false,
             "value":500,

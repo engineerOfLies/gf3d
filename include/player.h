@@ -6,16 +6,6 @@
 
 typedef struct
 {
-    TextLine    name;
-    Uint32      amount;
-    float       value;
-}Resource;
-
-typedef struct
-{
-    float   credits;            /**<cash on hand*/
-    Uint32  population;         /**<people living on the station*/
-    Uint32  staff;              /**<number of people employed by the station*/
     float   wages;              /**<how much you pay employees*/
     float   taxRate;            /**<how much locals provide for the system*/
     float   salesTaxRate;       /**<rate of income for commerce*/

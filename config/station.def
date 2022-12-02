@@ -4,28 +4,15 @@
             "name":"station_core",
             "display_name":"Station Core",
             "model":"models/station/station_core.model",
-            "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":100
-                }
-            ],
             "stats":
             {
                 "hull":1000
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":10000
-                },
-                {
-                    "name":"alloys",
-                    "amount":1000
-                }
-            ],
+            {
+                "credits":10000,
+                "alloys":1000
+            },
             "position":[0,0,0],
             "rotates":0,
             "scale":[1,1,1],
@@ -34,6 +21,10 @@
             [
                 "industrial",
                 "operations"
+            ],
+            "default_facilities":
+            [
+                "command_and_control"
             ],
             "extensions":[
                 {
@@ -72,21 +63,22 @@
             "rotates":0.25,
             "stats":
             {
-                "hull":1000,
-                "fuel":1000
+                "hull":1000
             },
             "cost":
+            {
+                "credits":10000,
+                "meta_materials":1000
+            },
+            "facilities":1,
+            "facility_types":
             [
-                {
-                    "name":"credits",
-                    "amount":10000
-                },
-                {
-                    "name":"meta_materials",
-                    "amount":1000
-                }
+                "solar_processor"
             ],
-            "facilities":0,
+            "default_facilities":
+            [
+                "solar_processor1"
+            ],
             "extensions":[
                 {
                     "offset":[0,-2,0],
@@ -102,27 +94,18 @@
             "rotates":1,
             "scale":[1,1,1],
             "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":200
-                }
-            ],
+            {
+                "energy":200
+            },
             "stats":
             {
                 "hull":1000
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":1000
-                },
-                {
-                    "name":"alloys",
-                    "amount":100
-                }
-            ],
+            {
+                "credits":1000,
+                "alloys":100
+            },
             "facilities":6,
             "facility_types":
             [
@@ -146,27 +129,18 @@
             "rotates":1,
             "scale":[1,1,1],
             "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":400
-                }
-            ],
+            {
+                "energy":400
+            },
             "stats":
             {
                 "hull":2000
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":2500
-                },
-                {
-                    "name":"alloys",
-                    "amount":250
-                }
-            ],
+            {
+                "credits":2500,
+                "alloys":250
+            },
             "facilities":12,
             "facility_types":
             [
@@ -191,27 +165,18 @@
             "scale":[1,1,1],
             "rotates":1,
             "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":200
-                }
-            ],
+            {
+                "energy":200
+            },
             "stats":
             {
                 "hull":1500
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":2000
-                },
-                {
-                    "name":"alloys",
-                    "amount":200
-                }
-            ],
+            {
+                "credits":2000,
+                "alloys":200
+            },
             "facilities":12,
             "facility_types":
             [
@@ -229,30 +194,28 @@
             "model":"models/station/station_reactor.model",
             "position":[0,0,0],
             "rotates":0,
-            "facilities":0,
-            "upkeep":
+            "facilities":3,
+            "facility_types":
             [
-                {
-                    "name":"fuel",
-                    "amount":1
-                }
+                "reactor"
             ],
+            "default_facilities":
+            [
+                "hdg_reactor1"
+            ],
+            "upkeep":
+            {
+                "fuel":1
+            },
             "stats":
             {
-                "hull":1000,
-                "energy":1000
+                "hull":1000
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":1000
-                },
-                {
-                    "name":"alloys",
-                    "amount":100
-                }
-            ],
+            {
+                "credits":1000,
+                "alloys":100
+            },
             "scale":[1,1,1],
             "extensions":[
                 {
@@ -268,28 +231,15 @@
             "position":[0,0,0],
             "rotates":0,
             "facilities":4,
-            "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":20
-                }
-            ],
             "stats":
             {
                 "hull":100
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":250
-                },
-                {
-                    "name":"alloys",
-                    "amount":25
-                }
-            ],
+            {
+                "credits":250,
+                "alloys":25
+            },
             "facility_types":
             [
                 "docking",
@@ -314,28 +264,15 @@
             "model":"models/station/expansion_bay_extension.model",
             "position":[0,0,0],
             "rotates":0,
-            "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":20
-                }
-            ],
             "stats":
             {
                 "hull":100
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":250
-                },
-                {
-                    "name":"alloys",
-                    "amount":25
-                }
-            ],
+            {
+                "credits":250,
+                "alloys":25
+            },
             "facilities":4,
             "facility_types":
             [
@@ -358,27 +295,18 @@
             "position":[0,0,0],
             "rotates":0.5,
             "upkeep":
-            [
-                {
-                    "name":"energy",
-                    "amount":400
-                }
-            ],
+            {
+                "energy":100
+            },
             "stats":
             {
                 "hull":3000
             },
             "cost":
-            [
-                {
-                    "name":"credits",
-                    "amount":4000
-                },
-                {
-                    "name":"alloys",
-                    "amount":400
-                }
-            ],
+            {
+                "credits":4000,
+                "alloys":400
+            },
             "facilities":4,
             "facility_types":
             [
@@ -396,3 +324,4 @@
         }
     ]
 }
+    

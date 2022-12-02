@@ -7,40 +7,22 @@
 
 #include "config_def.h"
 #include "station_def.h"
+#include "resources.h"
 #include "station.h"
 
-
-// there is going to be a station section definition json to describe what sections will be
-// there is going to be the instance of the station sections
-
-typedef struct StaionSection_S
-{
-    TextLine name;  //its name identifier
-    Uint32 id;      //unique ID for the station section
-    ModelMat mat;
-    float hull,hullMax;
-    float energyOutput,energyInput;
-    float rotates;//if it rotates
-    struct StaionSection_S *parent;// if not null, this is the parent
-    Uint8 slot;                      // where the section is mounted on the parent
-    List *children;
-    List *facilities;
-}StationSection;
-
-typedef struct
-{
-    Uint32 idPool;      /**<keeps track of unique station IDs*/
-    int    sectionHighlight;
-    float  sectionRotation;
-    float  hull,hullMax;
-    float  energyOutput,energyInput;
-    List *sections;     /**<list of staiton sections*/
-}StationData;
 
 void station_update(Entity *self);
 void station_draw(Entity *self);
 void station_think(Entity *self);
 void station_free(Entity *self);
+
+void station_facility_free(StationFacility *facility);
+StationFacility *station_facility_new();
+StationFacility *station_facility_load(SJson *config);
+SJson *station_facility_save(StationFacility *facility);
+void station_facility_free_list(List *list);
+StationFacility *station_facility_new_by_name(const char *name);
+
 
 StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot);
 
@@ -61,7 +43,9 @@ StationSection *station_get_section_by_id(StationData *data,int id)
 
 SJson *station_section_to_json(StationSection *section)
 {
-    SJson *json;
+    int i,c;
+    SJson *json,*facilities;
+    StationFacility *facility;
     if (!section)return NULL;
     json = sj_object_new();
     if (!json)return NULL;
@@ -73,17 +57,29 @@ SJson *station_section_to_json(StationSection *section)
         sj_object_insert(json,"parent",sj_new_uint32(section->parent->id));
         sj_object_insert(json,"slot",sj_new_uint8(section->slot));
     }
+    c = gfc_list_get_count(section->facilities);
+    if (c)
+    {
+        facilities = sj_array_new();
+        for (i = 0; i < c; i++)
+        {
+            facility = gfc_list_get_nth(section->facilities,i);
+            if (!facility)continue;
+            sj_array_append(facilities,station_facility_save(facility));
+        }
+        sj_object_insert(json,"facilities",facilities);
+    }
     return json;
 }
 
-void station_save_data(StationData *data,const char *filename)
+SJson *station_save_data(StationData *data)
 {
     int i,c;
     StationSection *section;
     SJson *json,*station,*sections;
-    if ((!data)||(!filename))return;
+    if (!data)return NULL;
     json = sj_object_new();
-    if (!json)return;
+    if (!json)return NULL;
     station = sj_object_new();
     sj_object_insert(station,"idPool",sj_new_uint32(data->idPool));
     sj_object_insert(station,"hull",sj_new_float(data->hull));
@@ -97,34 +93,32 @@ void station_save_data(StationData *data,const char *filename)
     }
     sj_object_insert(station,"sections",sections);
     sj_object_insert(json,"station",station);
-    sj_save(json,filename);
-    sj_free(json);
+    return json;
 }
 
-StationData *station_load_data(const char *filename)
+StationData *station_load_data(SJson *station)
 {
     const char *name;
     Uint32 id;
     int parentId;
     StationSection *section;
     StationSection *parent;
+    StationFacility *stationFacility;
     int slot;
     StationData *data;
     int i,c;
-    SJson *json,*station,*list,*item;
-    json = sj_load(filename);
-    if (!json)return NULL;
-    station = sj_object_get_value(json,"station");
+    int j,d;
+    SJson *list,*item;
+    SJson *facilities,*facility;
+    
     if (!station)
     {
-        slog("no station object in %f",filename);
-        sj_free(json);
+        slog("no station object provided");
         return NULL;
     }
     data = gfc_allocate_array(sizeof(StationData),1);
     if (!data)
     {
-        sj_free(json);
         return NULL;
     }
     sj_object_get_value_as_int(station,"idPool",(int *)&data->idPool);
@@ -151,6 +145,22 @@ StationData *station_load_data(const char *filename)
         section = station_add_section(data,name,id,parent,slot);
         if (section)
         {
+            //here is where we parse out specific stats
+            facilities = sj_object_get_value(item,"facilities");
+            if (facilities)
+            {
+                station_facility_free_list(section->facilities);
+                section->facilities = gfc_list_new();
+                d = sj_array_get_count(facilities);
+                for (j = 0;j < d; j++)
+                {
+                    facility = sj_array_get_nth(facilities,j);
+                    if (!facility)continue;
+                    stationFacility = station_facility_load(facility);
+                    if (!stationFacility)continue;
+                    section->facilities = gfc_list_append(section->facilities,stationFacility);
+                }
+            }
             sj_object_get_value_as_float(item,"hull",&section->hull);
         }
     }
@@ -158,18 +168,19 @@ StationData *station_load_data(const char *filename)
     {
         data->hull = data->hullMax;
     }
-    sj_free(json);
     return data;
 }
 
 StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot)
 {
     Matrix4 mat;
+    int i,c;
     float tempf;
     const char *str;
+    StationFacility *facility;
     Vector3D offsetPosition = {0},offsetRotation = {0};
     StationSection *section;
-    SJson *sectionDef,*parentDef,*extension,*stats;
+    SJson *sectionDef,*parentDef,*extension,*stats,*list,*item;
     if (!sectionName)return NULL;
     sectionDef = config_def_get_by_name("sections",sectionName);
     if (!sectionDef)
@@ -220,6 +231,21 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     
     sj_object_get_value_as_float(sectionDef,"rotates",&section->rotates);
     
+    list = sj_object_get_value(sectionDef,"default_facilities");
+    if (list)
+    {
+        c = sj_array_get_count(list);
+        for (i = 0; i < c; i++)
+        {
+            item = sj_array_get_nth(list,i);
+            if (!item)continue;
+            str = sj_get_string_value(item);
+            if (!str)continue;
+            facility = station_facility_new_by_name(str);
+            if (!facility)continue;
+            section->facilities = gfc_list_append(section->facilities,facility);
+        }
+    }
     stats = sj_object_get_value(sectionDef,"stats");
     if (stats)
     {
@@ -244,7 +270,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
 
 
 
-Entity *station_new(Vector3D position,const char *stationFile)
+Entity *station_new(Vector3D position,SJson *config)
 {
     Entity *ent = NULL;
     StationData *data = NULL;
@@ -256,9 +282,9 @@ Entity *station_new(Vector3D position,const char *stationFile)
         return NULL;
     }
     
-    if (stationFile)
+    if (config)
     {
-        data = station_load_data(stationFile);
+        data = station_load_data(config);
     }
     
     if (!data)
@@ -273,7 +299,6 @@ Entity *station_new(Vector3D position,const char *stationFile)
         section = station_add_section(data,"station_dock",-1,section,0);
     }
     
-    station_save_data(data,"saves/testsave.save");
     data->sectionHighlight = -1;
     ent->mat.scale.x = ent->mat.scale.y = ent->mat.scale.z = 100;
 //    ent->mat.rotation.y = -GFC_HALF_PI;
@@ -365,4 +390,106 @@ void station_think(Entity *self)
     // do maintenance
 }
 
+void station_facility_free(StationFacility *facility)
+{
+    if (!facility)return;
+    resources_list_free(facility->upkeep);
+    resources_list_free(facility->produces);
+    free(facility);
+}
+
+SJson *station_facility_save(StationFacility *facility)
+{
+    SJson *json;
+    if (!facility)return NULL;
+    json = sj_object_new();
+    sj_object_insert(json,"name",sj_new_str(facility->name));
+    sj_object_insert(json,"staff",sj_new_int(facility->staffAssigned));
+    sj_object_insert(json,"inactive",sj_new_bool(facility->inactive));
+    sj_object_insert(json,"disabled",sj_new_bool(facility->disabled));
+    if (strlen(facility->officer))
+    {
+        sj_object_insert(json,"officer",sj_new_str(facility->officer));
+    }
+    return json;
+}
+
+StationFacility *station_facility_load(SJson *config)
+{
+    const char *str;
+    StationFacility *facility;
+    if (!config)
+    {
+        slog("no config provided");
+        return NULL;
+    }
+    str = sj_object_get_value_as_string(config,"name");
+    if (!str)
+    {
+        slog("facility has no name");
+        return NULL;
+    }
+    facility = station_facility_new_by_name(str);
+    if (!facility)
+    {
+        slog("failed to make facility %s",str);
+        return NULL;
+    }
+    sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);
+    sj_object_get_value_as_bool(config,"inactive",(short int*)&facility->inactive);
+    sj_object_get_value_as_bool(config,"disabled",(short int*)&facility->disabled);
+    str = sj_object_get_value_as_string(config,"officer");
+    if (str)gfc_line_cpy(facility->officer,str);
+    return facility;
+}
+
+StationFacility *station_facility_new_by_name(const char *name)
+{
+    const char *str;
+    StationFacility *facility;
+    SJson *facilityDef,*res;
+    if (!name)
+    {
+        slog("no name provided");
+        return NULL;
+    }
+    facilityDef = config_def_get_by_name("facilities",name);
+    if (!facilityDef)
+    {
+        slog("facility %s not found",name);
+        return NULL;
+    }
+    facility = station_facility_new();
+    if (!facility)
+    {
+        return NULL;
+    }
+    str = sj_object_get_value_as_string(facilityDef,"name");
+    if (str)gfc_line_cpy(facility->name,str);
+    str = sj_object_get_value_as_string(facilityDef,"type");
+    if (str)gfc_line_cpy(facility->facilityType,str);
+    res = sj_object_get_value(facilityDef,"produces");
+    if (res)facility->produces = resources_list_parse(res);
+    res = sj_object_get_value(facilityDef,"upkeep");
+    if (res)facility->upkeep = resources_list_parse(res);
+    sj_object_get_value_as_int(facilityDef,"staff",&facility->staffRequired);
+    return facility;
+}
+
+void station_facility_free_list(List *list)
+{
+    if (!list)return;
+    gfc_list_foreach(list,(void (*)(void *))station_facility_free);
+    gfc_list_delete(list);
+}
+
+StationFacility *station_facility_new()
+{
+    StationFacility *facility;
+    facility = gfc_allocate_array(sizeof(StationFacility),1);
+    if (!facility)return NULL;
+    facility->upkeep = resources_list_new();
+    facility->produces = resources_list_new();
+    return facility;
+}
 /*eol@eof*/

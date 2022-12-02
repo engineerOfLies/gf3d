@@ -17,9 +17,24 @@
             }
         },
         {
-            "name":"command_and_control",
-            "displayName":"Command and Control",
+            "name":"security",
+            "displayName":"Security",
             "type":"operations",
+            "cost":
+            {   
+                "credits":500
+            },
+            "staff":20,
+            "upkeep":
+            {
+                "energy":10,
+                "credits":300
+            }
+        },
+        {
+            "name":"solar_processor1",
+            "displayName":"Solar Processor Mark I",
+            "type":"solar_processor",
             "cost":
             {   
                 "credits":1000
@@ -27,8 +42,29 @@
             "staff":10,
             "upkeep":
             {
-                "energy":10,
-                "credits":150
+                "credits":10
+            },
+            "produces":
+            {
+                "fuel":100
+            }
+        },
+        {
+            "name":"hdg_reactor1",
+            "displayName":"HDG Reactor Mark I",
+            "type":"reactor",
+            "cost":
+            {   
+                "credits":1000
+            },
+            "staff":10,
+            "upkeep":
+            {
+                "credits":10
+            },
+            "produces":
+            {
+                "fuel":100
             }
         }
     ]
