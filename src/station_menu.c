@@ -21,9 +21,13 @@
 
 typedef struct
 {
+    Matrix4 stationMat;
     Vector3D oldPosition;
     StationData *station;
+    StationSection *selection;
 }StationMenuData;
+
+void station_menu_select_segment(Window *win,StationMenuData *data,int segment);
 
 int station_menu_free(Window *win)
 {
@@ -32,6 +36,11 @@ int station_menu_free(Window *win)
     gf2d_window_close_child(win->parent,win);
     if (!win->data)return 0;
     data = win->data;
+    if (data->station)
+    {
+        data->station->sectionHighlight = -1;
+    }
+
     gf3d_camera_set_position(data->oldPosition);
     free(data);
     return 0;
@@ -51,6 +60,30 @@ int station_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"parent")==0)
+        {
+            if ((data->selection)&&(data->selection->parent))
+            {
+                station_menu_select_segment(win,data,data->selection->parent->id);
+            }
+            return 1;
+        }
+        if (strcmp(e->name,"prev")==0)
+        {
+            if ((data->selection)&&(data->selection->id > 0))
+            {
+                station_menu_select_segment(win,data,data->selection->id - 1);
+            }
+            return 1;
+        }
+        if (strcmp(e->name,"next")==0)
+        {
+            if (data->selection)
+            {
+                station_menu_select_segment(win,data,data->selection->id + 1);
+            }
+            return 1;
+        }
     }
     if (gfc_input_command_released("cancel"))
     {
@@ -69,9 +102,40 @@ int station_menu_draw(Window *win)
     return 0;
 }
 
+void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
+{
+    Matrix4 mat;
+    StationData *station;
+    StationSection *section;
+    Vector3D camera = {-672.546875,-584.498535,151.30999};
+    Vector3D offset = {0};
+    
+    if ((!win)||(!data)||(!data->station))return;
+    
+    station = data->station;
+    section = station_get_section_by_id(data->station,segment);
+    
+    if ((!section)||(!station))
+    {
+        return;
+    }
+    data->selection = section;
+    station->sectionHighlight = segment;
+    
+    gfc_matrix4_from_vectors(
+            mat,
+            station->mat->position,
+            station->mat->rotation,
+            station->mat->scale);
+    gfc_matrix_multiply(mat,section->mat.mat,mat);    
+    gfc_matrix4_to_vectors(mat,&offset,NULL,NULL);
+
+    vector3d_add(camera,camera,offset);
+    camera_look_at(offset,&camera);
+}
+
 Window *station_menu_window(Window *parent,StationData *station)
 {
-    Vector3D camera = {-672.546875,-584.498535,151.30999};
     Window *win;
     StationMenuData *data;
     win = gf2d_window_load("menus/station.menu");
@@ -91,8 +155,8 @@ Window *station_menu_window(Window *parent,StationData *station)
     win->update = station_menu_update;
     win->free_data = station_menu_free;
     win->draw = station_menu_draw;
+    data->station = station;
     data->oldPosition = gf3d_camera_get_position();
-    camera_look_at(vector3d(0,0,0),&camera);
-    
+    station_menu_select_segment(win,data,5);
     return win;
 }

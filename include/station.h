@@ -38,6 +38,7 @@ typedef struct StaionSection_S
 typedef struct
 {
     Uint32 idPool;      /**<keeps track of unique station IDs*/
+    ModelMat *mat;
     int    sectionHighlight;
     float  sectionRotation;
     float  hull,hullMax;
@@ -59,6 +60,14 @@ Entity *station_new(Vector3D position,SJson *config);
  * @return NULL on error, or a valid json object to save
  */
 SJson *station_save_data(StationData *data);
+
+/**
+ * @brief get a station section by it's unique ID
+ * @param data the station to poll
+ * @param id the searcch item
+ * @return NULL if not not found, or a pointer to the station section
+ */
+StationSection *station_get_section_by_id(StationData *data,int id);
 
 
 #endif

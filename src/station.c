@@ -310,6 +310,7 @@ Entity *station_new(Vector3D position,SJson *config)
     ent->update = station_update;
     ent->free = station_free;
     vector3d_copy(ent->mat.position,position);
+    data->mat = &ent->mat;
     return ent;
 }
 
@@ -351,6 +352,7 @@ void station_update(Entity *self)
 void station_draw(Entity *self)
 {
     int i,c;
+    float alpha = 1;
     Matrix4 mat;
     StationSection *section;
     StationData *data;
@@ -375,7 +377,11 @@ void station_draw(Entity *self)
         
         gfc_matrix_multiply(mat,section->mat.mat,mat);
 
-        gf3d_model_draw(section->mat.model,0,mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
+        if ((data->sectionHighlight != -1)&&(data->sectionHighlight != section->id))
+        {
+            alpha = 0.5;
+        }
+        gf3d_model_draw(section->mat.model,0,mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,alpha));
         if (data->sectionHighlight == section->id)
         {
             gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(0,1,0,1));
