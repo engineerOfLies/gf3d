@@ -1,13 +1,12 @@
 {
     "actor":
     {
-        "sprite": "images/ui/com_button.png",
-        "frameWidth": 256,
-        "frameHeight": 64,
+        "sprite": "images/ui/arrow_buttons_up.png",
+        "frameWidth": 64,
+        "frameHeight": 40,
         "framesPerLine": 1,
-        "scale": [0.62,0.65],
-        "drawOffset":[2,2],
-        "color": [64,200,255,200],
+        "scale": [1,1],
+        "color": [20,200,255,255],
         "actionList":
         [
             {

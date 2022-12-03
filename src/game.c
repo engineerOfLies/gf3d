@@ -96,10 +96,13 @@ int main(int argc,char *argv[])
     gf3d_draw_init();//3D
     gf2d_draw_manager_init(1000);//2D
     gf2d_actor_init(1024);
-    gf2d_windows_init(128,"config/windows.cfg");
     gf2d_mouse_load("actors/mouse.actor");
-    config_def_init();
     entity_system_init(1024);
+    gf2d_windows_init(128,"config/windows.cfg");
+    config_def_init();
+    resources_list_load();  
+    config_def_load("config/facilities.def");
+    station_def_load("config/station.def");    
     
     slog_sync();
         
@@ -107,9 +110,6 @@ int main(int argc,char *argv[])
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     //load game definitions
-    resources_list_load();  
-    config_def_load("config/facilities.def");
-    station_def_load("config/station.def");    
         
     // main game loop
     main_menu();

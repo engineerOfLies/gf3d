@@ -36,6 +36,7 @@ int hud_free(Window *win)
     data = win->data;
     world_delete(data->w);
     gf2d_window_free(data->messages);
+    entity_free(data->player);
     free(data);
     return 0;
 }
@@ -77,8 +78,18 @@ int hud_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"personnel")==0)
+        {
+            message_new("the beautiful people");
+            return 1;
+        }
         if (strcmp(e->name,"station")==0)
         {
+            if ((win->child)&&(gf2d_window_named(win->child,"station_menu")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
             if ((!win->child)||(!gf2d_window_named(win->child,"station_menu")))
             {
                 if (win->child)gf2d_window_free(win->child);
@@ -121,7 +132,7 @@ Window *hud_window()
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
-    data->messages = window_message_buffer(8, 500, gfc_color8(0,255,100,255));
+    data->messages = window_message_buffer(5, 500, gfc_color8(0,255,100,255));
     data->player = player_new("saves/default.save");
     camera_entity_enable_free_look(1);
     data->w = world_load("config/world.json");

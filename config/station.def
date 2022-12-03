@@ -57,9 +57,6 @@
             "name":"solar_collector",
             "display_name":"Solar collector",
             "model":"models/station/solar_collector.model",
-            "position":[0,0,0],
-            "rotation":[0,0,0],
-            "scale":[1,1,1],
             "rotates":0.25,
             "stats":
             {

@@ -1,20 +1,173 @@
 {
     "window":{
         "name":"station_menu",
-        "color" : [255,255,255,255],
-        "dimensions" : [-200,84,200,1],
+        "dimensions" : [0,68,200,516],
         "elements":
         [
         {
             "type": "list",
             "name": "list",
-            "bounds": [32,0,1,1],
-            "style": "horizontal",
-            "item_size" : [128,40],
+            "bounds": [0,0,1,1],
+            "style": "vertical",
+            "item_size" : [1,40],
             "packed":true,
             "elements":
             [
-
+                {
+                    "type": "label",
+                    "bounds": [0,0,1,48],
+                    "text":"Sections",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H3"
+                },
+                {
+                    "type": "label",
+                    "bounds": [0,0,1,30],
+                    "text":"Station Core",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H4"
+                },
+                {
+                    "type": "button",
+                    "name":"parent",
+                    "bounds": [10,0,160,42],
+                    "hotkey":"parent",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"parent",
+                        "bounds": [0,0,160,48],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H5"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                    "type": "list",
+                    "name": "list",
+                    "bounds": [0,8,1,38],
+                    "style": "horizontal",
+                    "item_size" : [1,40],
+                    "packed":true,
+                    "elements":[
+                        {
+                            "type":"button",
+                            "name":"prev",
+                            "bounds":[ 5, 0, 90, 32 ],
+                            "hotkey":"prev",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"prev",
+                                "bounds":[ 8, 0, 90, 32 ],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            "actor":{
+                            "type":"actor",
+                            "scale":[ 0.5, 0.5 ],
+                            "actor":"actors/arrow_button.json"
+                            }
+                        },
+                        {
+                            "type":"button",
+                            "name":"next",
+                            "bounds":[ 8, 0, 82, 32 ],
+                            "hotkey":"next",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"next",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            "actor":{
+                            "type":"actor",
+                            "scale":[ -0.5, 0.5 ],
+                            "bounds":[ 70, 0, 140, 32 ],
+                            "actor":"actors/arrow_button.json"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "button",
+                    "name":"children",
+                    "bounds": [10,0,160,42],
+                    "hotkey":"children",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"children",
+                        "bounds": [0,0,160,48],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H5"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                    "type": "label",
+                    "name":"hull",
+                    "bounds": [0,0,1,40],
+                    "text":"Hull: 1000/1000",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                {
+                    "type": "button",
+                    "name":"facilities",
+                    "bounds": [10,0,160,42],
+                    "hotkey":"facilities",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"Facilities",
+                        "bounds": [0,0,160,48],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H5"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                    "type": "label",
+                    "bounds": [0,0,1,40],
+                    "text":"Upkeep",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                {
+                    "type": "list",
+                    "name": "upkeep",
+                    "bounds": [6,10,160,1],
+                    "style": "vertical",
+                    "item_size" : [0.8,36],
+                    "elements":[
+                    ]
+                }
             ]
         }
         ]

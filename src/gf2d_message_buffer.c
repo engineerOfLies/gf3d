@@ -114,7 +114,7 @@ Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor)
     }
     win->update = message_buffer_update;
     win->free_data = message_buffer_free;
-    win->no_draw_generic = 1;
+    //win->no_draw_generic = 1;
     
     data = gfc_allocate_array(sizeof(MessageBufferData),1);
     data->messages = gfc_list_new();
@@ -129,7 +129,7 @@ Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor)
             p,
             50 + i,
             NULL,
-            gfc_rect(0,0,1,24),
+            gfc_rect(0,0,1,19),
             gfc_color8(255,255,255,255),
             0,
             gfc_color8(255,255,255,255),

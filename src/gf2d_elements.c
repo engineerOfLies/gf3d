@@ -191,8 +191,15 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     sj_get_bool_value(sj_object_get_value(json,"canHasFocus"),(short int *)&e->canHasFocus);
 
     value = sj_object_get_value(json,"bounds");
-    sj_value_as_vector4d(value,&vector);
-    gfc_rect_set(e->bounds,vector.x,vector.y,vector.z,vector.w);
+    if (value)
+    {
+        sj_value_as_vector4d(value,&vector);
+        gfc_rect_set(e->bounds,vector.x,vector.y,vector.z,vector.w);
+    }
+    else if (parent)
+    {
+        gfc_rect_copy(e->bounds,parent->bounds);
+    }
     gf2d_element_calibrate(e,parent, win);
     
     value = sj_object_get_value(json,"type");

@@ -1,7 +1,6 @@
 {
     "window":{
-        "color" : [255,255,255,255],
-        "dimensions" : [-1300,0,1320,64],
+        "dimensions" : [-1300,0,1320,48],
         "elements":
         [
         {
@@ -16,14 +15,14 @@
             {
                 "type": "button",
                 "name":"station",
-                "bounds": [0,0,160,64],
+                "bounds": [0,0,160,42],
                 "hotkey":"station",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
                     "text":"Station",
+                    "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -31,21 +30,20 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             }, 
             {
                 "type": "button",
                 "name":"personnel",
-                "bounds": [0,0,160,64],
+                "bounds": [0,0,160,42],
                 "hotkey":"personnel",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
                     "text":"Personnel",
+                    "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -53,21 +51,20 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             }, 
             {
                 "type": "button",
                 "name":"research",
-                "bounds": [0,0,160,64],
+                "bounds": [0,0,160,42],
                 "hotkey":"research",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
                     "text":"Research",
+                    "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -75,21 +72,20 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             },
             {
                 "type": "button",
                 "name":"governance",
-                "bounds": [0,0,160,64],
+                "bounds": [0,0,160,42],
                 "hotkey":"governance",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
                     "text":"Governance",
+                    "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -97,20 +93,19 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             },
             {
                 "type": "button",
                 "name":"planet",
-                "bounds": [0,0,160,64],
+                "bounds": [0,0,160,42],
                 "hotkey":"planet",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
                     "text":"Planet",
+                    "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -118,21 +113,20 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             },
             {
                 "type": "button",
                 "name":"galaxy",
-                "bounds": [0,0,160,64],
+                "bounds": [0,0,160,42],
                 "hotkey":"galaxy",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
                     "text":"Galaxy",
+                    "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -140,20 +134,19 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             },
             {
                 "type": "button",
                 "name":"options",
-                "bounds": [140,0,160,64],
+                "bounds": [60,0,160,42],
                 "hotkey":"options",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "bounds": [0,0,160,64],
+                    "bounds": [60,0,160,48],
                     "text":"options",
                     "justify" : "center",
                     "align" : "middle",
@@ -162,7 +155,6 @@
                 "actor" :
                 {
                     "type": "actor",
-                    "bounds": [0,0,160,64],
                     "actor" : "actors/button.actor"
                 }
             }
