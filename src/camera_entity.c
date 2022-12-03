@@ -87,12 +87,15 @@ void camera_entity_think(Entity *self)
     if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.005);
     if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.005);
     
-    if (keys[SDL_SCANCODE_O])
+    if (keys[SDL_SCANCODE_R])
+    {
+        rotation = gf3d_camera_get_angles();
+        slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
+    }
+    if (keys[SDL_SCANCODE_P])
     {
         position = gf3d_camera_get_position();
-        rotation = gf3d_camera_get_angles();
         slog("position: %f,%f,%f",position.x,position.y,position.z);
-        slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
     }
 }
 

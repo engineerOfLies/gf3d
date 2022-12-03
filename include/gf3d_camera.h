@@ -30,16 +30,11 @@ void gf3d_camera_get_view_mat4(Matrix4 *view);
 void gf3d_camera_set_view_mat4(Matrix4 *view);
 
 /**
- * @brief set the camera properties based on position and direction that the camera should be looking
- * @param position the location for the camera
- * @param target the point the camera should be looking at
- * @param up the direction considered to be "up"
+ * @brief have the camera point towards a point in space
+ * @param target the point to look at
+ * @param position [optional] if provided this will move the camera here first
  */
-void gf3d_camera_look_at(
-    Vector3D position,
-    Vector3D target,
-    Vector3D up
-);
+void camera_look_at(Vector3D target,const Vector3D *position);
 
 /**
  * @brief move the camera "FORWARD" relative to the view angles of the camera

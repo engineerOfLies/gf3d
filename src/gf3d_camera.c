@@ -18,18 +18,24 @@ void gf3d_camera_set_view_mat4(Matrix4 *view)
     memcpy(gf3d_camera.cameraMat,view,sizeof(Matrix4));
 }
 
-void gf3d_camera_look_at(
-    Vector3D position,
-    Vector3D target,
-    Vector3D up
-)
+void camera_look_at(Vector3D target,const Vector3D *position)
 {
-    gfc_matrix_view(
-        gf3d_camera.cameraMat,
-        position,
-        target,
-        up
-    );
+    Vector3D angles,pos;
+    Vector3D delta;
+    if (position)
+    {
+        vector3d_copy(pos,(*position));
+        gf3d_camera_set_position(pos);
+    }
+    else
+    {
+        pos = gf3d_camera_get_position();
+    }
+    vector3d_sub(delta,target,pos);
+    vector3d_angles (delta, &angles);
+    angles.z -= GFC_HALF_PI;
+    angles.x -= GFC_PI;
+    gf3d_camera_set_rotation(angles);
 }
 
 void gf3d_camera_update_view()
@@ -128,6 +134,14 @@ void gf3d_camera_yaw(float magnitude)
 void gf3d_camera_pitch(float magnitude)
 {
     gf3d_camera.rotation.x -= magnitude;
+    if (gf3d_camera.rotation.x >= -GFC_HALF_PI)
+    {
+        gf3d_camera.rotation.x = -GFC_HALF_PI - GFC_EPSILON;
+    }
+    if (gf3d_camera.rotation.x  <= -GFC_PI_HALFPI)
+    {
+        gf3d_camera.rotation.x = -GFC_PI_HALFPI + GFC_EPSILON;
+    }
 }
 
 void gf3d_camera_roll(float magnitude)

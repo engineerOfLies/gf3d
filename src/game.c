@@ -66,13 +66,13 @@ void draw_origin()
 {
     gf3d_draw_edge_3d(
         gfc_edge3d_from_vectors(vector3d(-100,0,0),vector3d(100,0,0)),
-        vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(1,0,0,1));
+        vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),3,gfc_color(1,0,0,1));
     gf3d_draw_edge_3d(
         gfc_edge3d_from_vectors(vector3d(0,-100,0),vector3d(0,100,0)),
-        vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(0,1,0,1));
+        vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),3,gfc_color(0,1,0,1));
     gf3d_draw_edge_3d(
         gfc_edge3d_from_vectors(vector3d(0,0,-100),vector3d(0,0,100)),
-        vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),1,gfc_color(0,0,1,1));
+        vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),3,gfc_color(0,0,1,1));
 }
 
 int main(int argc,char *argv[])

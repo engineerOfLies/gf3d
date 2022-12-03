@@ -4,6 +4,8 @@
 #include "gfc_input.h"
 #include "gfc_callbacks.h"
 
+#include "gf3d_camera.h"
+
 #include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_label.h"
@@ -12,12 +14,14 @@
 #include "gf2d_message_buffer.h"
 
 #include "entity.h"
+#include "camera_entity.h"
 #include "station.h"
 #include "player.h"
 #include "station_menu.h"
 
 typedef struct
 {
+    Vector3D oldPosition;
     StationData *station;
 }StationMenuData;
 
@@ -28,6 +32,7 @@ int station_menu_free(Window *win)
     gf2d_window_close_child(win->parent,win);
     if (!win->data)return 0;
     data = win->data;
+    gf3d_camera_set_position(data->oldPosition);
     free(data);
     return 0;
 }
@@ -66,6 +71,7 @@ int station_menu_draw(Window *win)
 
 Window *station_menu_window(Window *parent,StationData *station)
 {
+    Vector3D camera = {-672.546875,-584.498535,151.30999};
     Window *win;
     StationMenuData *data;
     win = gf2d_window_load("menus/station.menu");
@@ -85,7 +91,8 @@ Window *station_menu_window(Window *parent,StationData *station)
     win->update = station_menu_update;
     win->free_data = station_menu_free;
     win->draw = station_menu_draw;
-
+    data->oldPosition = gf3d_camera_get_position();
+    camera_look_at(vector3d(0,0,0),&camera);
     
     return win;
 }
