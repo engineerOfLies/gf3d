@@ -352,7 +352,7 @@ void station_update(Entity *self)
 void station_draw(Entity *self)
 {
     int i,c;
-    float alpha = 1;
+    Vector4D color;
     Matrix4 mat;
     StationSection *section;
     StationData *data;
@@ -376,12 +376,14 @@ void station_draw(Entity *self)
             self->mat.scale);
         
         gfc_matrix_multiply(mat,section->mat.mat,mat);
+        
+        color = gfc_color_to_vector4f(self->color);
 
         if ((data->sectionHighlight != -1)&&(data->sectionHighlight != section->id))
         {
-            alpha = 0.5;
+            color.w = 0.5;
         }
-        gf3d_model_draw(section->mat.model,0,mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,alpha));
+        gf3d_model_draw(section->mat.model,0,mat,color,vector4d(1,1,1,1));
         if (data->sectionHighlight == section->id)
         {
             gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(0,1,0,1));

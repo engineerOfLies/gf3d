@@ -292,8 +292,7 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
     return model;
 }
 
-
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambientLight)
+void gf3d_model_draw_generic(Model *model,Pipeline *pipe,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambientLight)
 {
     Mesh *mesh;
     VkDescriptorSet *descriptorSet = NULL;
@@ -304,9 +303,9 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
         slog("no model provided to draw");
         return;
     }
-    commandBuffer = gf3d_mesh_get_model_command_buffer();
+    commandBuffer = pipe->commandBuffer;
     bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
-    descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_model.pipe, bufferFrame);
+    descriptorSet = gf3d_pipeline_get_descriptor_set(pipe, bufferFrame);
     if (descriptorSet == NULL)
     {
         slog("failed to get a free descriptor Set for model rendering");
@@ -319,7 +318,14 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
         slog("no mesh for index %i for model %s",index,model->filename);
         return;
     }
-    gf3d_mesh_render(mesh,commandBuffer,descriptorSet);
+    gf3d_mesh_render_generic(mesh,pipe,commandBuffer, descriptorSet);
+}
+
+
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambientLight)
+{
+    gf3d_model_draw_generic(model,gf3d_model.pipe,index,modelMat,colorMod,ambientLight);
+    gf3d_model_draw_generic(model,gf3d_mesh_get_alpha_pipeline(),index,modelMat,colorMod,ambientLight);
 }
 
 void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector4D highlight)
@@ -684,12 +690,10 @@ void gf3d_model_update_uniform_buffer(
     
     vector4d_copy(modelUBO.color,colorMod);
     
-    
     cameraPosition = gf3d_camera_get_position();
     vector3d_copy(modelUBO.cameraPosition,cameraPosition);
     modelUBO.cameraPosition.w = 1;
     
-
     gf3d_lights_get_global_light(&modelUBO.ambientColor, &modelUBO.ambientDir);
     
     vector4d_scale_by(modelUBO.ambientColor,modelUBO.ambientColor,ambient);

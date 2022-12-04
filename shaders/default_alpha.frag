@@ -22,8 +22,8 @@ void main()
     float cosTheta = dot( normal,lightDir);
     
     vec4 baseColor = texture(texSampler, fragTexCoord);
-    if ((baseColor.w *colorMod.w) < 0.9)discard;
-
+    if ((baseColor.w * colorMod.w) >=  0.9)discard;
+    
     vec4 ambient = clamp(vec4(fragAmbient.xyz * cosTheta * fragAmbient.w,0),0,1) +clamp(vec4(baseColor.xyz * cosTheta * fragAmbient.w,0),-1,0);;
     
     vec3 h = normalize(lightDir + eyeDir);
