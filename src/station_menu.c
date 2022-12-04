@@ -15,6 +15,7 @@
 
 #include "entity.h"
 #include "camera_entity.h"
+#include "station_def.h"
 #include "station.h"
 #include "player.h"
 #include "station_menu.h"
@@ -105,6 +106,7 @@ int station_menu_draw(Window *win)
 void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
 {
     Matrix4 mat;
+    const char *display_name;
     StationData *station;
     StationSection *section;
     Vector3D camera = {-672.546875,-584.498535,151.30999};
@@ -132,6 +134,12 @@ void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
 
     vector3d_add(camera,camera,offset);
     camera_look_at(offset,&camera);
+    
+    display_name = station_def_get_display_name(section->name);
+    if (display_name)
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_name"),display_name);
+    }
 }
 
 Window *station_menu_window(Window *parent,StationData *station)

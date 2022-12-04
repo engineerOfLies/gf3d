@@ -186,6 +186,7 @@ Vector3D gf3d_camera_get_angles()
 
 void gf3d_camera_set_rotation(Vector3D rotation)
 {
+    angle_clamp_radians(&rotation.x);
     gf3d_camera.rotation.x = -rotation.x;
     gf3d_camera.rotation.y = -rotation.y;
     gf3d_camera.rotation.z = -rotation.z;

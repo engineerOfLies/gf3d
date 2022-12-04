@@ -26,4 +26,11 @@ SJson *station_def_get_by_name(const char *name);
  */
 SJson *station_def_get_extension_by_index(SJson *section,Uint8 index);
 
+/**
+ * @brief given a section name, get its display name
+ * @param section the name of the section
+ * @return NULL if not found, or the str otherwise.
+ */
+const char *station_def_get_display_name(const char *section);
+
 #endif

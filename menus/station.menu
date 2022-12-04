@@ -1,13 +1,13 @@
 {
     "window":{
         "name":"station_menu",
-        "dimensions" : [0,68,200,516],
+        "dimensions" : [0,68,220,530],
         "elements":
         [
         {
             "type": "list",
             "name": "list",
-            "bounds": [0,0,1,1],
+            "bounds": [10,0,1,1],
             "style": "vertical",
             "item_size" : [1,40],
             "packed":true,
@@ -23,6 +23,7 @@
                 },
                 {
                     "type": "label",
+                    "name":"section_name",
                     "bounds": [0,0,1,30],
                     "text":"Station Core",
                     "justify" : "center",
@@ -162,11 +163,53 @@
                 {
                     "type": "list",
                     "name": "upkeep",
-                    "bounds": [6,10,160,1],
+                    "bounds": [6,0,160,110],
                     "style": "vertical",
                     "item_size" : [0.8,36],
                     "elements":[
                     ]
+                },
+                {
+                    "type": "button",
+                    "name":"move",
+                    "bounds": [10,0,160,42],
+                    "hotkey":"move",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"Move",
+                        "bounds": [0,0,160,48],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H5"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                    "type": "button",
+                    "name":"delete",
+                    "bounds": [10,0,160,42],
+                    "hotkey":"delet",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"Delete",
+                        "bounds": [0,0,160,48],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H5"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "actor" : "actors/red_button.actor"
+                    }
                 }
             ]
         }
