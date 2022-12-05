@@ -383,6 +383,10 @@ void station_draw(Entity *self)
         {
             color.w = 0.5;
         }
+        else
+        {
+            color.w = 1.0;
+        }
         gf3d_model_draw(section->mat.model,0,mat,color,vector4d(1,1,1,1));
         if (data->sectionHighlight == section->id)
         {

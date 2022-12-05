@@ -689,7 +689,6 @@ void gf3d_model_update_uniform_buffer(
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     
     vector4d_copy(modelUBO.color,colorMod);
-    
     cameraPosition = gf3d_camera_get_position();
     vector3d_copy(modelUBO.cameraPosition,cameraPosition);
     modelUBO.cameraPosition.w = 1;

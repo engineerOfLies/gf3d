@@ -11,9 +11,9 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-    vec4 color;
     vec4 ambientColor;
     vec4 ambientDir;
+    vec4 color;
     vec4 cameraPostion;
     dynamicLight dynamicLights[8];
     float dynamicLightCount;

@@ -25,9 +25,9 @@ typedef struct
     Matrix4 model;
     Matrix4 view;
     Matrix4 proj;
-    Vector4D color; //color mod
     Vector4D ambientColor;
     Vector4D ambientDir;
+    Vector4D color; //color mod
     Vector4D cameraPosition;
     MeshLights dynamicLights[MESH_LIGHTS_MAX];
     float    dynamicLightCount;//how many
