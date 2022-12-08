@@ -177,12 +177,35 @@
             "facilities":12,
             "facility_types":
             [
-                "residential",
-                "luxury",
-                "entertainment",
-                "commercial",
                 "operations",
-                "docking"
+                "passenger_docking"
+            ]
+        },
+        {
+            "name":"expansion_bay_dock",
+            "display_name":"Expansion Dock",
+            "model":"models/station/expansion_bay_dock.model",
+            "position":[0,0,0],
+            "scale":[1,1,1],
+            "rotates":0,
+            "upkeep":
+            {
+                "energy":200
+            },
+            "stats":
+            {
+                "hull":200
+            },
+            "cost":
+            {
+                "credits":300,
+                "alloys":30
+            },
+            "facilities":12,
+            "facility_types":
+            [
+                "cargo_dock",
+                "cargo_dock_large"
             ]
         },
         {
@@ -239,7 +262,7 @@
             },
             "facility_types":
             [
-                "docking",
+                "cargo_dock",
                 "storage",
                 "defenses"
             ],
@@ -273,7 +296,7 @@
             "facilities":4,
             "facility_types":
             [
-                "docking",
+                "cargo_dock",
                 "storage",
                 "defenses"
             ],

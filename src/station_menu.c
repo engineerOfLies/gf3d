@@ -18,6 +18,7 @@
 #include "station_def.h"
 #include "station.h"
 #include "player.h"
+#include "station_extension_menu.h"
 #include "station_menu.h"
 
 typedef struct
@@ -26,6 +27,7 @@ typedef struct
     Vector3D oldPosition;
     StationData *station;
     StationSection *selection;
+    int choice;
 }StationMenuData;
 
 void station_menu_select_segment(Window *win,StationMenuData *data,int segment);
@@ -45,6 +47,22 @@ int station_menu_free(Window *win)
     gf3d_camera_set_position(data->oldPosition);
     free(data);
     return 0;
+}
+
+void station_menu_child_select(void *Data)
+{
+    Window *win;
+    StationMenuData *data;
+    StationSection *section;
+    win = Data;
+    if (!win)return;
+    data = win->data;
+    if ((!data)||(!data->selection))return;
+    win->child = NULL;
+    if (data->choice == -1)return;
+    section = station_section_get_child_by_slot(data->selection,data->choice);
+    if (!section)return;
+    station_menu_select_segment(win,data,section->id);
 }
 
 int station_menu_update(Window *win,List *updateList)
@@ -85,6 +103,22 @@ int station_menu_update(Window *win,List *updateList)
             }
             return 1;
         }
+        if (strcmp(e->name,"children")==0)
+        {
+            if ((data->selection)&&(data->selection->children))
+            {
+                if (win->child)return 1;
+                win->child = station_extension_menu(
+                    win,
+                    vector2d(e->lastDrawPosition.x + e->bounds.w,e->lastDrawPosition.y),
+                    data->selection,
+                    station_menu_child_select,
+                    win,
+                    &data->choice);
+
+            }
+            return 1;
+        }
     }
     if (gfc_input_command_released("cancel"))
     {
@@ -97,9 +131,9 @@ int station_menu_update(Window *win,List *updateList)
 
 int station_menu_draw(Window *win)
 {
-    StationMenuData *data;
+//    StationMenuData *data;
     if ((!win)||(!win->data))return 0;
-    data = win->data;
+  //  data = win->data;
     return 0;
 }
 
@@ -133,7 +167,7 @@ void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
     gfc_matrix4_to_vectors(mat,&offset,NULL,NULL);
 
     vector3d_add(camera,camera,offset);
-    camera_look_at(offset,&camera);
+    gf3d_camera_look_at(offset,&camera);
     
     display_name = station_def_get_display_name(section->name);
     if (display_name)

@@ -171,6 +171,21 @@ StationData *station_load_data(SJson *station)
     return data;
 }
 
+StationSection *station_section_get_child_by_slot(StationSection *section,Uint8 slot)
+{
+    int i,c;
+    StationSection *child;
+    if (!section)return NULL;
+    c = gfc_list_get_count(section->children);
+    for (i = 0; i < c;i++)
+    {
+        child = gfc_list_get_nth(section->children,i);
+        if (!child)continue;
+        if (child->slot == slot)return child;
+    }
+    return NULL;
+}
+
 StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot)
 {
     Matrix4 mat;

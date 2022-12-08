@@ -27,6 +27,13 @@ SJson *station_def_get_by_name(const char *name);
 SJson *station_def_get_extension_by_index(SJson *section,Uint8 index);
 
 /**
+ * @brief get the number of extension points by section name
+ * @param name the name to search for
+ * @return the number of extensions
+ */
+int station_def_get_extension_count_by_name(const char *name);
+
+/**
  * @brief given a section name, get its display name
  * @param section the name of the section
  * @return NULL if not found, or the str otherwise.

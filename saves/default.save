@@ -12,7 +12,7 @@
     },
     "station":
     {
-        "idPool":12,
+        "idPool":7,
         "sections":
         [
             {
@@ -30,16 +30,10 @@
                 ]
             },
             {
-                "name":"station_industrial",
+                "name":"solar_collector",
                 "id":1,
                 "parent":0,
-                "slot":1
-            },
-            {
-                "name":"solar_collector",
-                "id":2,
-                "parent":1,
-                "slot":0,
+                "slot":1,
                 "facilities":
                 [
                     {
@@ -50,8 +44,8 @@
             },
             {
                 "name":"station_reactor",
-                "id":3,
-                "parent":2,
+                "id":2,
+                "parent":1,
                 "slot":0,
                 "facilities":
                 [
@@ -63,38 +57,26 @@
             },
             {
                 "name":"station_habitat_large",
-                "id":4,
+                "id":3,
                 "parent":0,
                 "slot":0
             },
             {
                 "name":"station_dock",
-                "id":5,
-                "parent":4,
+                "id":4,
+                "parent":3,
                 "slot":0
             },
             {
                 "name":"expansion_bay",
-                "id":6,
+                "id":5,
                 "parent":0,
                 "slot":4
             },
             {
-                "name":"expansion_bay_extension",
-                "id":7,
-                "parent":6,
-                "slot":1
-            },
-            {
-                "name":"expansion_bay_extension",
-                "id":8,
-                "parent":7,
-                "slot":0
-            },
-            {
-                "name":"expansion_bay_extension",
-                "id":9,
-                "parent":6,
+                "name":"expansion_bay_dock",
+                "id":6,
+                "parent":5,
                 "slot":0
             }
         ]

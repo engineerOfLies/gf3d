@@ -11,6 +11,8 @@
 #include "gf2d_item_list_menu.h"
 #include "gf2d_message_buffer.h"
 
+#include "gf3d_camera.h"
+
 #include "entity.h"
 #include "camera_entity.h"
 #include "station.h"
@@ -136,7 +138,7 @@ Window *hud_window()
     data->player = player_new("saves/default.save");
     camera_entity_enable_free_look(1);
     data->w = world_load("config/world.json");
-
+    gf3d_camera_look_at(vector3d(0,0,0),NULL);
     
     return win;
 }

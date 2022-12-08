@@ -18,7 +18,7 @@ void gf3d_camera_set_view_mat4(Matrix4 *view)
     memcpy(gf3d_camera.cameraMat,view,sizeof(Matrix4));
 }
 
-void camera_look_at(Vector3D target,const Vector3D *position)
+void gf3d_camera_look_at(Vector3D target,const Vector3D *position)
 {
     Vector3D angles,pos;
     Vector3D delta;

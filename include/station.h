@@ -69,5 +69,12 @@ SJson *station_save_data(StationData *data);
  */
 StationSection *station_get_section_by_id(StationData *data,int id);
 
+/**
+ * @brief get a station section's child by its mounting slot
+ * @param section the station section to query
+ * @param slot the slot to check
+ * @return NULL on error or no child at that slot
+ */
+StationSection *station_section_get_child_by_slot(StationSection *section,Uint8 slot);
 
 #endif

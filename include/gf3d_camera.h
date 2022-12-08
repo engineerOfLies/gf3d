@@ -34,7 +34,7 @@ void gf3d_camera_set_view_mat4(Matrix4 *view);
  * @param target the point to look at
  * @param position [optional] if provided this will move the camera here first
  */
-void camera_look_at(Vector3D target,const Vector3D *position);
+void gf3d_camera_look_at(Vector3D target,const Vector3D *position);
 
 /**
  * @brief move the camera "FORWARD" relative to the view angles of the camera
