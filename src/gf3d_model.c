@@ -498,11 +498,15 @@ void gf3d_model_update_basic_model_descriptor_set(
     if (model->texture)texture = model->texture;
     else texture = gf3d_model.defaultTexture;
     
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = texture->textureImageView;
-    imageInfo.sampler = texture->textureSampler;
+    if (texture)
+    {
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = texture->textureImageView;
+        imageInfo.sampler = texture->textureSampler;
+    }
 
     gf3d_model_update_uniform_buffer(model,ubo,modelMat,colorMod,ambientLight);
+    
     bufferInfo.buffer = ubo->uniformBuffer;
     bufferInfo.offset = 0;
     bufferInfo.range = sizeof(MeshUBO);        

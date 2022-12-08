@@ -13,6 +13,20 @@
 VkDescriptorType gf3d_config_descriptor_type_from_str(const char *str);
 
 /**
+ * @brief parse an array of strings into a VkShaderStageFlagBits
+ * @param flags the json array containing strings
+ * @return 0 if none specified or error
+ */
+VkShaderStageFlagBits gf3d_config_shader_stage_flags(SJson *flags);
+
+/**
+ * @brief parse a string into a VkShaderStageFlagBits
+ * @param str the string to parse
+ * @return 0 if none specified or NULL str, the bit otherwise
+ */
+VkShaderStageFlagBits gf3d_config_shader_stage_flag_from_str(const char *str);
+
+/**
  * @brief parse a VkPipelineBindPoint from a str
  * @param str the string to parse
  * @return 0 on error or the VkPipelineBindPoint

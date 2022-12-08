@@ -22,8 +22,9 @@ typedef struct
 static PipelineManager gf3d_pipeline = {0};
 
 void gf3d_pipeline_close();
-void gf3d_pipeline_create_basic_model_descriptor_pool(Pipeline *pipe);
-void gf3d_pipeline_create_basic_model_descriptor_set_layout(Pipeline *pipe);
+void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolSize *poolSize,int poolSizeCount);
+void gf3d_pipeline_create_basic_descriptor_pool_from_config(Pipeline *pipe,SJson *config);
+void gf3d_pipeline_create_basic_descriptor_set_layout_from_config(Pipeline *pipe,SJson *config);
 void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe);
 VkFormat gf3d_pipeline_find_depth_format();
 
@@ -354,10 +355,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     colorBlending.blendConstants[2] = 0.0f; // Optional
     colorBlending.blendConstants[3] = 0.0f; // Optional
     
-    //NOTE: Really gonna have to look closer at these to see how they can be driven from config, or passed the
-    // the information needed to make this work generically
-    gf3d_pipeline_create_basic_model_descriptor_pool(pipe);
-    gf3d_pipeline_create_basic_model_descriptor_set_layout(pipe);
+    gf3d_pipeline_create_basic_descriptor_pool_from_config(pipe,config);
+    gf3d_pipeline_create_basic_descriptor_set_layout_from_config(pipe,config);
     gf3d_pipeline_create_descriptor_sets(pipe);
     
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -484,12 +483,46 @@ void gf3d_pipeline_free(Pipeline *pipe)
     memset(pipe,0,sizeof(Pipeline));
 }
 
-// TODO move descriptor sets to this section
+void gf3d_pipeline_create_basic_descriptor_pool_from_config(Pipeline *pipe,SJson *config)
+{
+    const char *str;
+    int i,c,pools = 0;
+    VkDescriptorPoolSize *poolSize;
+    SJson *list,*item;
+    
+    if ((!pipe)||(!config))
+    {
+        slog("no pipeline or config provided");
+        return;
+    }
+    list = sj_object_get_value(config,"descriptorPools");
+    if (!list)
+    {
+        slog("no descriptorPools found in config");
+        return;
+    }
+    c = sj_array_get_count(list);
+    if (!c)return;// no descriptorPools
+    poolSize = gfc_allocate_array(sizeof(VkDescriptorPoolSize),c);
+    for (i = 0,pools = 0;i < c;i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_get_string_value(item);
+        if (!str)continue;
+        poolSize[pools].type = gf3d_config_descriptor_type_from_str(str);
+        poolSize[pools].descriptorCount = pipe->descriptorSetCount;
+        pools++;
+    }
+    
+    gf3d_pipeline_create_basic_descriptor_pool(pipe,poolSize,pools);
+    free(poolSize);
+}
 
-void gf3d_pipeline_create_basic_model_descriptor_pool(Pipeline *pipe)
+
+void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolSize *poolSize,int poolSizeCount)
 {
     int i;
-    VkDescriptorPoolSize poolSize[2] = {0};
     VkDescriptorPoolCreateInfo poolInfo = {0};
     
     if (!pipe)
@@ -503,7 +536,7 @@ void gf3d_pipeline_create_basic_model_descriptor_pool(Pipeline *pipe)
     poolSize[1].descriptorCount = pipe->descriptorSetCount;
     
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = 2;
+    poolInfo.poolSizeCount = poolSizeCount;
     poolInfo.pPoolSizes = poolSize;
     poolInfo.maxSets = pipe->descriptorSetCount;
     pipe->descriptorPool = (VkDescriptorPool *)gfc_allocate_array(sizeof(VkDescriptorPool),gf3d_pipeline.chainLength);
@@ -518,6 +551,7 @@ void gf3d_pipeline_create_basic_model_descriptor_pool(Pipeline *pipe)
     }
     pipe->descriptorPoolCount = gf3d_pipeline.chainLength;
 }
+
 
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame)
 {
@@ -575,38 +609,54 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
     }
 }
 
-void gf3d_pipeline_create_basic_model_descriptor_set_layout(Pipeline *pipe)
+void gf3d_pipeline_create_basic_descriptor_set_layout_from_config(Pipeline *pipe,SJson *config)
 {
-    VkDescriptorSetLayoutCreateInfo layoutInfo = {0};
-    VkDescriptorSetLayoutBinding uboLayoutBinding = {0};
-    VkDescriptorSetLayoutBinding samplerLayoutBinding = {0};
-    
-    VkDescriptorSetLayoutBinding bindings[2];
-    
-    samplerLayoutBinding.binding = 1;
-    samplerLayoutBinding.descriptorCount = 1;
-    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerLayoutBinding.pImmutableSamplers = NULL;
-    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    
-    memcpy(&bindings[1],&samplerLayoutBinding,sizeof(VkDescriptorSetLayoutBinding));
-
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    uboLayoutBinding.descriptorCount = 1;
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    uboLayoutBinding.pImmutableSamplers = NULL; // Optional
-
-    memcpy(&bindings[0],&uboLayoutBinding,sizeof(VkDescriptorSetLayoutBinding));
+    VkDescriptorSetLayoutCreateInfo layoutInfo = {0};    
+    VkDescriptorSetLayoutBinding *bindings;
+    SJson *list,*item;
+    int i,c;
+    if (!pipe)
+    {
+        slog("no pipe specified");
+        return;
+    }
+    if (!config)
+    {
+        slog("no config specified");
+        return;
+    }
+    list = sj_object_get_value(config,"descriptorSetLayout");
+    if (!list)
+    {
+        slog("config does not contain descriptorSetLayout");
+        return;
+    }
+    c = sj_array_get_count(list);
+    if (!c)
+    {
+        slog("descriptorSetLayout empty");
+        return;
+    }
+    bindings = gfc_allocate_array(sizeof(VkDescriptorSetLayoutBinding),c);
+    for (i = 0;i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        sj_object_get_value_as_uint32(item,"binding",&bindings[i].binding);
+        sj_object_get_value_as_uint32(item,"descriptorCount",&bindings[i].descriptorCount);
+        bindings[i].descriptorType = gf3d_config_descriptor_type_from_str(sj_object_get_value_as_string(item,"descriptorType"));
+        bindings[i].stageFlags = gf3d_config_shader_stage_flags(sj_object_get_value(item,"stageFlags"));
+    }
 
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = 2;
+    layoutInfo.bindingCount = c;
     layoutInfo.pBindings = bindings;
 
     if (vkCreateDescriptorSetLayout(pipe->device, &layoutInfo, NULL, &pipe->descriptorSetLayout) != VK_SUCCESS)
     {
         slog("failed to create descriptor set layout!");
     }
+    free(bindings);
 }
 
 VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)

@@ -96,24 +96,6 @@
                 "id":9,
                 "parent":6,
                 "slot":0
-            },
-            {
-                "name":"expansion_bay",
-                "id":10,
-                "parent":0,
-                "slot":5
-            },
-            {
-                "name":"expansion_bay_extension",
-                "id":11,
-                "parent":10,
-                "slot":0
-            },
-            {
-                "name":"expansion_bay_extension",
-                "id":12,
-                "parent":11,
-                "slot":0
             }
         ]
     }
