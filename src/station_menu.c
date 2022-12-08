@@ -199,6 +199,6 @@ Window *station_menu_window(Window *parent,StationData *station)
     win->draw = station_menu_draw;
     data->station = station;
     data->oldPosition = gf3d_camera_get_position();
-    station_menu_select_segment(win,data,5);
+    station_menu_select_segment(win,data,0);
     return win;
 }

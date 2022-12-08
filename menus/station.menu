@@ -123,15 +123,6 @@
                     }
                 },
                 {
-                    "type": "label",
-                    "name":"hull",
-                    "bounds": [0,0,1,40],
-                    "text":"Hull: 1000/1000",
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                {
                     "type": "button",
                     "name":"facilities",
                     "bounds": [10,0,160,42],
@@ -154,31 +145,44 @@
                 },
                 {
                     "type": "label",
+                    "name":"hull",
                     "bounds": [0,0,1,40],
-                    "text":"Upkeep",
+                    "text":"Hull: 1000/1000",
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
                 },
                 {
-                    "type": "list",
-                    "name": "upkeep",
-                    "bounds": [6,0,160,110],
-                    "style": "vertical",
-                    "item_size" : [0.8,36],
-                    "elements":[
-                    ]
-                },
-                {
                     "type": "button",
-                    "name":"move",
+                    "name":"repair",
                     "bounds": [10,0,160,42],
-                    "hotkey":"move",
+                    "hotkey":"repair",
                     "sound":"confirm",
                     "label" :
                     {
                         "type": "label",
-                        "text":"Move",
+                        "text":"Repair",
+                        "bounds": [0,0,160,48],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H5"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                    "type": "button",
+                    "name":"build",
+                    "bounds": [10,0,160,42],
+                    "hotkey":"build",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"Build",
                         "bounds": [0,0,160,48],
                         "justify" : "center",
                         "align" : "middle",
@@ -194,7 +198,7 @@
                     "type": "button",
                     "name":"delete",
                     "bounds": [10,0,160,42],
-                    "hotkey":"delet",
+                    "hotkey":"delete",
                     "sound":"confirm",
                     "label" :
                     {
