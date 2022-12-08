@@ -292,7 +292,7 @@ void gf3d_mesh_scene_add(Mesh *mesh)
     if (!mesh)return;
 }
 
-void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
+void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descriptorSet)
 {
     int i,c;
     MeshPrimitive *primitive;
@@ -318,35 +318,35 @@ void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkCommandBuffer commandB
         primitive = gfc_list_get_nth(mesh->primitives,i);
         if (!primitive)continue;
 
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, &primitive->vertexBuffer, offsets);
+        vkCmdBindVertexBuffers(pipe->commandBuffer, 0, 1, &primitive->vertexBuffer, offsets);
         
-        vkCmdBindIndexBuffer(commandBuffer, primitive->faceBuffer, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(pipe->commandBuffer, primitive->faceBuffer, 0, VK_INDEX_TYPE_UINT16);
         
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
+        vkCmdBindDescriptorSets(pipe->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
         
-        vkCmdDrawIndexed(commandBuffer, primitive->faceCount * 3, 1, 0, 0, 0);
+        vkCmdDrawIndexed(pipe->commandBuffer, primitive->faceCount * 3, 1, 0, 0, 0);
     }
 }
 
 
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    gf3d_mesh_render_generic(mesh,gf3d_mesh_get_pipeline(),commandBuffer, descriptorSet);
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.pipe, descriptorSet);
 }
 
 void gf3d_mesh_alpha_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    gf3d_mesh_render_generic(mesh,gf3d_mesh.alpha_pipe,commandBuffer, descriptorSet);
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.alpha_pipe, descriptorSet);
 }
 
 void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    gf3d_mesh_render_generic(mesh,gf3d_mesh.highlight_pipe,commandBuffer, descriptorSet);
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.highlight_pipe, descriptorSet);
 }
 
 void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    gf3d_mesh_render_generic(mesh,gf3d_mesh.sky_pipe,commandBuffer, descriptorSet);
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.sky_pipe,descriptorSet);
 }
 
 

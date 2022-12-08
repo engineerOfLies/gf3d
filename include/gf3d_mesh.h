@@ -165,7 +165,7 @@ void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptor
 /**
  * @brief render a mesh through a given pipeline
  */
-void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkDescriptorSet * descriptorSet);
 
 /**
  * @brief create a mesh's internal buffers based on vertices
