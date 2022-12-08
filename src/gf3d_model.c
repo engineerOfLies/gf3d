@@ -26,7 +26,6 @@ typedef struct
     VkDevice                device;
     Pipeline            *   pipe;           /**<the pipeline associated with model rendering*/
     Texture             *   defaultTexture; /**<if a model has no texture, use this one*/
-
 }ModelManager;
 
 static ModelManager gf3d_model = {0};
@@ -48,14 +47,6 @@ void gf3d_model_update_uniform_buffer(
 HighlightUBO gf3d_model_get_highlight_ubo(
     Matrix4 modelMat,
     Vector4D highlightColor);
-
-void gf3d_model_update_basic_model_descriptor_set(
-    Model *model,
-    VkDescriptorSet descriptorSet,
-    Uint32 chainIndex,
-    Matrix4 modelMat,
-    Vector4D colorMod,
-    Vector4D ambientLight);
 
 
 VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
@@ -124,7 +115,7 @@ Model * gf3d_model_new()
     return NULL;
 }
 
-Model * gf3d_model_load(const char * filename)
+Model *gf3d_model_load(const char * filename)
 {    
     SJson *json,*config;
     Model *model;
@@ -155,7 +146,7 @@ Model * gf3d_model_load(const char * filename)
     return model;
 }
 
-Model * gf3d_model_load_from_config(SJson *json)
+Model *gf3d_model_load_from_config(SJson *json)
 {
     int i,c;
     Mesh *mesh;
@@ -285,187 +276,6 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
     return model;
 }
 
-void gf3d_model_update_sky_uniform_buffer(
-    Model *model,
-    UniformBuffer *ubo,
-    Matrix4 modelMat,
-    Vector4D colorMod)
-{
-    void* data;
-    UniformBufferObject graphics_ubo;
-    SkyUBO modelUBO;
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    
-    gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
-     modelUBO.view[0][3] = 0;
-     modelUBO.view[1][3] = 0;
-     modelUBO.view[2][3] = 0;
-     modelUBO.view[3][0] = 0;
-     modelUBO.view[3][1] = 0;
-     modelUBO.view[3][2] = 0;
-    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
-    vector4d_copy(modelUBO.color,colorMod);
-        
-    vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
-    
-        memcpy(data, &modelUBO, sizeof(SkyUBO));
-
-    vkUnmapMemory(gf3d_model.device, ubo->uniformBufferMemory);
-}
-
-void gf3d_model_update_sky_model_descriptor_set(
-    Model *model,
-    VkDescriptorSet descriptorSet,
-    Uint32 chainIndex,
-    Matrix4 modelMat,
-    Vector4D colorMod)
-{
-    VkDescriptorImageInfo imageInfo = {0};
-    VkWriteDescriptorSet descriptorWrite[2] = {0};
-    VkDescriptorBufferInfo bufferInfo = {0};
-    Pipeline *pipe;
-    UniformBuffer *ubo = NULL;
-    
-    if (!model)
-    {
-        slog("no model provided for descriptor set update");
-        return;
-    }
-    if (descriptorSet == VK_NULL_HANDLE)
-    {
-        slog("null handle provided for descriptorSet");
-        return;
-    }
-    pipe = gf3d_mesh_get_sky_pipeline();
-    ubo = gf3d_uniform_buffer_list_get_buffer(pipe->uboList, chainIndex);
-    if (!ubo)
-    {
-        slog("failed to get a free uniform buffer for draw call");
-        return;
-    }
-    
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = model->texture->textureImageView;
-    imageInfo.sampler = model->texture->textureSampler;
-
-    gf3d_model_update_sky_uniform_buffer(model,ubo,modelMat,colorMod);
-    bufferInfo.buffer = ubo->uniformBuffer;
-    bufferInfo.offset = 0;
-    bufferInfo.range = sizeof(SkyUBO);        
-    
-    descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[0].dstSet = descriptorSet;
-    descriptorWrite[0].dstBinding = 0;
-    descriptorWrite[0].dstArrayElement = 0;
-    descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptorWrite[0].descriptorCount = 1;
-    descriptorWrite[0].pBufferInfo = &bufferInfo;
-
-    descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[1].dstSet = descriptorSet;
-    descriptorWrite[1].dstBinding = 1;
-    descriptorWrite[1].dstArrayElement = 0;
-    descriptorWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    descriptorWrite[1].descriptorCount = 1;                        
-    descriptorWrite[1].pImageInfo = &imageInfo;
-    descriptorWrite[1].pTexelBufferView = NULL; // Optional
-
-    vkUpdateDescriptorSets(gf3d_model.device, 2, descriptorWrite, 0, NULL);
-}
-
-void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
-{
-    Mesh *mesh;
-    VkDescriptorSet *descriptorSet = NULL;
-    VkCommandBuffer commandBuffer;
-    Uint32 bufferFrame;
-    if (!model)
-    {
-        return;
-    }
-    commandBuffer = gf3d_mesh_get_sky_command_buffer();
-    bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
-    descriptorSet = gf3d_pipeline_get_descriptor_set(gf3d_mesh_get_sky_pipeline(), bufferFrame);
-    if (descriptorSet == NULL)
-    {
-        slog("failed to get a free descriptor Set for model rendering");
-        return;
-    }
-    gf3d_model_update_sky_model_descriptor_set(model,*descriptorSet,bufferFrame,modelMat,gfc_color_to_vector4f(color));
-    mesh = gfc_list_get_nth(model->mesh_list,0);
-    gf3d_mesh_render_sky(mesh,commandBuffer,descriptorSet);
-}
-
-
-void gf3d_model_update_basic_model_descriptor_set(
-    Model *model,
-    VkDescriptorSet descriptorSet,
-    Uint32 chainIndex,
-    Matrix4 modelMat,
-    Vector4D colorMod,
-    Vector4D ambientLight)
-{
-    Texture *texture = NULL;
-    VkDescriptorImageInfo imageInfo = {0};
-    VkWriteDescriptorSet descriptorWrite[2] = {0};
-    VkDescriptorBufferInfo bufferInfo = {0};
-    UniformBuffer *ubo = NULL;
-    
-    if (!model)
-    {
-        slog("no model provided for descriptor set update");
-        return;
-    }
-    if (descriptorSet == VK_NULL_HANDLE)
-    {
-        slog("null handle provided for descriptorSet");
-        return;
-    }
-    ubo = gf3d_uniform_buffer_list_get_buffer(gf3d_model.pipe->uboList, chainIndex);
-    if (!ubo)
-    {
-        slog("failed to get a free uniform buffer for draw call");
-        return;
-    }
-    
-    if (model->texture)texture = model->texture;
-    else texture = gf3d_model.defaultTexture;
-    
-    if (texture)
-    {
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = texture->textureImageView;
-        imageInfo.sampler = texture->textureSampler;
-    }
-
-    gf3d_model_update_uniform_buffer(model,ubo,modelMat,colorMod,ambientLight);
-    
-    bufferInfo.buffer = ubo->uniformBuffer;
-    bufferInfo.offset = 0;
-    bufferInfo.range = sizeof(MeshUBO);        
-    
-    descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[0].dstSet = descriptorSet;
-    descriptorWrite[0].dstBinding = 0;
-    descriptorWrite[0].dstArrayElement = 0;
-    descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptorWrite[0].descriptorCount = 1;
-    descriptorWrite[0].pBufferInfo = &bufferInfo;
-
-    descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[1].dstSet = descriptorSet;
-    descriptorWrite[1].dstBinding = 1;
-    descriptorWrite[1].dstArrayElement = 0;
-    descriptorWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    descriptorWrite[1].descriptorCount = 1;                        
-    descriptorWrite[1].pImageInfo = &imageInfo;
-    descriptorWrite[1].pTexelBufferView = NULL; // Optional
-
-    vkUpdateDescriptorSets(gf3d_model.device, 2, descriptorWrite, 0, NULL);
-}
-
-
 void gf3d_model_mat_set_scale(ModelMat *mat,Vector3D scale)
 {
     if (!mat)return;
@@ -571,6 +381,45 @@ MeshUBO gf3d_model_get_mesh_ubo(
     
     gf3d_lights_get_global_light(&modelUBO.ambientColor, &modelUBO.ambientDir);
 
+    return modelUBO;
+}
+
+SkyUBO gf3d_model_get_sky_ubo(
+    Matrix4 modelMat,
+    Vector4D colorMod)
+{
+    UniformBufferObject graphics_ubo;
+    SkyUBO modelUBO;
+    
+    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    
+    gfc_matrix_copy(modelUBO.model,modelMat);
+    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
+     modelUBO.view[0][3] = 0;
+     modelUBO.view[1][3] = 0;
+     modelUBO.view[2][3] = 0;
+     modelUBO.view[3][0] = 0;
+     modelUBO.view[3][1] = 0;
+     modelUBO.view[3][2] = 0;
+    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    vector4d_copy(modelUBO.color,colorMod);
+    return modelUBO;
+}
+
+HighlightUBO gf3d_model_get_highlight_ubo(
+    Matrix4 modelMat,
+    Vector4D highlightColor)
+{
+    UniformBufferObject graphics_ubo;
+    HighlightUBO modelUBO = {0};
+    
+    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    
+    gfc_matrix_copy(modelUBO.model,modelMat);
+    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
+    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    
+    vector4d_copy(modelUBO.color,highlightColor);
     return modelUBO;
 }
 
@@ -704,53 +553,15 @@ void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector
     gf3d_model_draw_generic(model,index,gf3d_mesh_get_highlight_pipeline(),ubo);
 }
 
-
-void gf3d_model_update_uniform_buffer(
-    Model *model,
-    UniformBuffer *ubo,
-    Matrix4 modelMat,
-    Vector4D colorMod,
-    Vector4D ambient)
+void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
 {
-    void* data;
-    Vector3D cameraPosition;
-    UniformBufferObject graphics_ubo;
-    MeshUBO modelUBO;
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    SkyUBO uboData = {0};
+    UniformBuffer *ubo;
     
-    gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
-    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    uboData = gf3d_model_get_sky_ubo(modelMat,gfc_color_to_vector4f(color));
     
-    vector4d_copy(modelUBO.color,colorMod);
-    cameraPosition = gf3d_camera_get_position();
-    vector3d_copy(modelUBO.cameraPosition,cameraPosition);
-    modelUBO.cameraPosition.w = 1;
-    
-    gf3d_lights_get_global_light(&modelUBO.ambientColor, &modelUBO.ambientDir);
-            
-    vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, sizeof(MeshUBO), 0, &data);
-    
-        memcpy(data, &modelUBO, sizeof(MeshUBO));
-
-    vkUnmapMemory(gf3d_model.device, ubo->uniformBufferMemory);
-}
-
-HighlightUBO gf3d_model_get_highlight_ubo(
-    Matrix4 modelMat,
-    Vector4D highlightColor)
-{
-    UniformBufferObject graphics_ubo;
-    HighlightUBO modelUBO = {0};
-    
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    
-    gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
-    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
-    
-    vector4d_copy(modelUBO.color,highlightColor);
-    return modelUBO;
+    ubo = gf3d_model_get_uniform_buffer(gf3d_mesh_get_sky_pipeline(),&uboData,sizeof(SkyUBO));
+    gf3d_model_draw_generic(model,0,gf3d_mesh_get_sky_pipeline(),ubo);
 }
 
 /*eol@eof*/
