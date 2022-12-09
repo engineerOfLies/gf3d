@@ -2,8 +2,10 @@
 
 #include "gfc_input.h"
 
+#include "gf2d_font.h"
 #include "gf2d_element_button.h"
 #include "gf2d_element_actor.h"
+#include "gf2d_element_label.h"
 #include "gf2d_draw.h"
 #include "gf2d_mouse.h"
 
@@ -274,5 +276,37 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
     }
 }
 
+
+Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,Color color)
+{
+    Element *be,*le;
+    
+    LabelElement *label;
+
+    if (!text)return NULL;
+    
+    label = gf2d_element_label_new_full(text,color,FT_Small,LJ_Left,LA_Middle,0);
+
+    be = gf2d_element_new_full(
+        NULL,
+        index,
+        (char *)text,
+        gfc_rect(0,0,336,30),
+        gfc_color(0.9,0.9,0.5,1),
+        0,
+        gfc_color(.5,.5,.5,1),0,win);
+    le = gf2d_element_new_full(
+        be,
+        0,
+        (char *)text,
+        gfc_rect(0,0,336,30),
+        gfc_color(1,1,1,1),
+        0,
+        gfc_color(1,1,1,1),0,win);
+    
+    gf2d_element_make_label(le,label);
+    gf2d_element_make_button(be,gf2d_element_button_new_full(le,NULL,gfc_color(1,1,1,1),gfc_color(0.9,0.9,0.9,1),0));
+    return be;
+}
 
 /*eol@eof*/

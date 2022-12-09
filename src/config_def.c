@@ -84,6 +84,27 @@ Uint32 config_def_get_resource_count(const char *resource)
     return sj_array_get_count(list);
 }
 
+SJson *config_def_get_by_parameter(const char *resource,const char *parameter,const char *name)
+{
+    const char *str;
+    int i,c;
+    SJson *item,*list;
+    if (!config_manager.defs)return NULL;
+    list = config_def_get_resource_by_name(resource);
+    if (!list)return NULL;
+    c = sj_array_get_count(list);
+    for (i = 0; i < c;i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"parameter");
+        if (!str)continue;
+        if (strcmp(name,str)==0)return item;
+    }
+    slog("no resource of %s found by parameter of %s and name of %s",resource,parameter,name);
+    return NULL;
+}
+
 SJson *config_def_get_by_name(const char *resource,const char *name)
 {
     const char *str;

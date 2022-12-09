@@ -19,6 +19,7 @@
 #include "station.h"
 #include "player.h"
 #include "station_extension_menu.h"
+#include "station_buy_menu.h"
 #include "station_menu.h"
 
 typedef struct
@@ -105,9 +106,15 @@ int station_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"children")==0)
         {
+            if (win->child)//if already open now close it
+            {
+                if (!gf2d_window_named(win->child,"station_extension_menu"))return 1;
+                gf2d_window_free(win->child);
+                win->child = NULL;
+                return 1;
+            }
             if ((data->selection)&&(data->selection->children))
             {
-                if (win->child)return 1;
                 win->child = station_extension_menu(
                     win,
                     vector2d(e->lastDrawPosition.x + e->bounds.w,e->lastDrawPosition.y),
@@ -116,6 +123,21 @@ int station_menu_update(Window *win,List *updateList)
                     win,
                     &data->choice);
 
+            }
+            return 1;
+        }
+        if (strcmp(e->name,"build")==0)
+        {
+            if (win->child)
+            {
+                if (!gf2d_window_named(win->child,"station_buy_menu"))return 1;
+                gf2d_window_free(win->child);
+                win->child = NULL;
+                return 1;
+            }
+            if ((data->selection)&&(data->selection->expansionSlots))
+            {
+                win->child = station_buy_menu(win,data->selection,station_def_get_section_list());
             }
             return 1;
         }

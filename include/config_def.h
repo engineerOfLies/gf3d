@@ -48,6 +48,15 @@ SJson *config_def_get_by_index(const char *resource,Uint8 index);
 SJson *config_def_get_by_name(const char *resource,const char *name);
 
 /**
+ * @brief get definition information for a given resource by the parameter key and name value
+ * @param resource the name of the resource list
+ * @param parameter the field to match with
+ * @param name the search item
+ * @return NULL if not found or error, the JSON otherwise.  DO NOT FREE IT, you do not own it.
+ */
+SJson *config_def_get_by_parameter(const char *resource,const char *parameter,const char *name);
+
+/**
  * @brief get the number of a resources that has been loaded
  * @param resource the resource type to check
  * @return 0 if not loaded or error, the count otherwise

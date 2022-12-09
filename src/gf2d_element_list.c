@@ -343,6 +343,7 @@ void gf2d_element_list_add_item(Element *e,Element *item)
     ListElement *list;
     if ((!e)||(!item))return;// no op
     list = (ListElement *)e->data;
+    item->parent = e;
     list->list = gfc_list_append(list->list,(void*)item);
 }
 

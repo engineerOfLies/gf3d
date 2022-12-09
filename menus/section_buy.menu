@@ -1,0 +1,154 @@
+{
+    "window":
+    {
+        "dimensions" : [0,0,900,500],
+        "name":"station_buy_menu",
+        "justify" : "center",
+        "align" : "middle",
+        "elements":
+        [
+            {
+                "type": "label",
+                "bounds": [8,8,200,40],
+                "text":"Sections",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
+                "type": "button",
+                "name":"buy",
+                "bounds": [580,450,160,42],
+                "hotkey":"buy",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Buy",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"cancel",
+                "bounds": [740,450,160,42],
+                "hotkey":"cancel",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Cancel",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/red_button.actor"
+                }
+            },
+            {
+                "type": "list",
+                "bounds": [0,0,1,1],
+                "style": "horizontal",
+                "item_size" : [200,1],
+                "elements":
+                [
+                    {
+                        "type": "list",
+                        "name":"item_list",
+                        "bounds": [8,43,200,450],
+                        "style": "vertical",
+                        "backgroundColor":[0,0,0,250],
+                        "backgroundDraw":1,
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,0,200,1],
+                        "style": "vertical",
+                        "item_size" : [1,45],
+                        "packed":true,
+                        "elements":
+                        [
+                            {
+                                "type":"actor",
+                                "name":"item_picture",
+                                "justify":"center",
+                                "align":"middle",
+                                "center":[65,65],
+                                "bounds":[35,40,130,130],
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,50,1,40],
+                                "text":"Price",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H4"
+                            },
+                            {
+                                "type": "list",
+                                "name":"resource_cost",
+                                "bounds": [0,0,200,300],
+                                "style": "vertical",
+                                "packed":true,
+                                "item_size" : [1,45],
+                                "elements":
+                                [
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,20,200,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "name":"item_name",
+                                "bounds": [0,0,1,40],
+                                "text":"Display Item Name",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H4"
+                            },
+                            {
+                                "type": "label",
+                                "name":"item_description",
+                                "wraps":true,
+                                "bounds": [0,0,1,40],
+                                "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
+                                "justify" : "left",
+                                "align" : "top",
+                                "style":"H5"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

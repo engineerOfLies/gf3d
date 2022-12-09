@@ -245,6 +245,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     gfc_matrix_multiply(section->mat.mat,section->mat.mat,mat);
     
     sj_object_get_value_as_float(sectionDef,"rotates",&section->rotates);
+    section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     
     list = sj_object_get_value(sectionDef,"default_facilities");
     if (list)

@@ -11,6 +11,26 @@ void station_def_load(const char *filename)
     config_def_load(filename);
 }
 
+List *station_def_get_section_list()
+{
+    int i,c;
+    const char *str;
+    SJson *item;
+    List *list;
+    c = config_def_get_resource_count("sections");
+    if (!c)return NULL;
+    list = gfc_list_new();
+    for (i = 0; i < c;i++)
+    {
+        item = config_def_get_by_index("sections",i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"name");
+        if (!str)continue;
+        list = gfc_list_append(list,(void *)str);
+    }
+    return list;
+}
+
 const char *station_def_get_display_name(const char *section)
 {
     SJson *def;

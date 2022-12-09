@@ -2,6 +2,7 @@
 #define __STATION_DEF_H__
 
 #include "simple_json.h"
+#include "gfc_list.h"
 
 /**
  * @brief load config definitions for the station sections
@@ -39,5 +40,11 @@ int station_def_get_extension_count_by_name(const char *name);
  * @return NULL if not found, or the str otherwise.
  */
 const char *station_def_get_display_name(const char *section);
+
+/**
+ * @brief get a list of section names
+ * @return NULL if none loaded, or a list (the list should be deleted, but the items should not)
+ */
+List *station_def_get_section_list();
 
 #endif

@@ -31,6 +31,7 @@ typedef struct StaionSection_S
     float rotates;//if it rotates
     struct StaionSection_S *parent;// if not null, this is the parent
     Uint8 slot;                      // where the section is mounted on the parent
+    Uint8 expansionSlots;            // how many sections can link off of this
     List *children;
     List *facilities;
 }StationSection;

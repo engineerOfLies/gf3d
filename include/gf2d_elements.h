@@ -63,6 +63,7 @@ struct Element_S
     void (*free_data)   (struct Element_S *element);    /**<free function for the element to clean up any loaded custom data*/
     struct Element_S *(*get_by_name)(struct Element_S *element,const char *name);/**<get element by name, searches sub elements as well*/
     Window *win;                /**<my parent window*/
+    struct Element_S *parent;   /**<my parent element*/
     void *data;                 /**<custom element data*/
 };
 
