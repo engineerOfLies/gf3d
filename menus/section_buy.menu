@@ -1,7 +1,7 @@
 {
     "window":
     {
-        "dimensions" : [0,0,900,500],
+        "dimensions" : [0,0,900,490],
         "name":"station_buy_menu",
         "justify" : "center",
         "align" : "middle",
@@ -18,7 +18,7 @@
             {
                 "type": "button",
                 "name":"buy",
-                "bounds": [580,450,160,42],
+                "bounds": [580,440,160,42],
                 "hotkey":"buy",
                 "sound":"confirm",
                 "label" :
@@ -40,7 +40,7 @@
             {
                 "type": "button",
                 "name":"cancel",
-                "bounds": [740,450,160,42],
+                "bounds": [740,440,160,42],
                 "hotkey":"cancel",
                 "sound":"confirm",
                 "label" :
@@ -139,11 +139,11 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,1,40],
+                                "bounds": [0,0,450,40],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
-                                "style":"H5"
+                                "style":"H6"
                             }
                         ]
                     }

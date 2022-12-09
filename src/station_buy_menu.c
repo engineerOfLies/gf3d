@@ -15,6 +15,7 @@
 #include "gf2d_windows_common.h"
 #include "gf2d_message_buffer.h"
 
+#include "config_def.h"
 #include "station_def.h"
 #include "station.h"
 #include "station_buy_menu.h"
@@ -22,14 +23,14 @@
 typedef struct
 {
     StationSection *parent;
+    const char *selected;
     List *list;
 }StationBuyMenuData;
 
 int station_buy_menu_free(Window *win)
 {
     StationBuyMenuData *data;
-    if (!win)return 0;
-    if (!win->data)return 0;
+    if ((!win)||(!win->data))return 0;
     data = win->data;
     gf2d_window_close_child(win->parent,win);
     free(data);
@@ -39,10 +40,25 @@ int station_buy_menu_free(Window *win)
 int station_buy_menu_draw(Window *win)
 {
 //    StationBuyMenuData *data;
-    if (!win)return 0;
-    if (!win->data)return 0;
+    if ((!win)||(!win->data))return 0;
 //    data = win->data;
     return 0;
+}
+
+void station_buy_menu_select_item(Window *win,const char *name)
+{
+    SJson *def;
+    const char *str;
+    StationBuyMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    if (!name)return;
+    if (data->selected == name)return;//nothing to do
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
+    def = config_def_get_by_parameter("sections","display_name",name);
+    if (!def)return;
+    str = sj_object_get_value_as_string(def,"description");
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),str);
 }
 
 int station_buy_menu_update(Window *win,List *updateList)
@@ -50,7 +66,7 @@ int station_buy_menu_update(Window *win,List *updateList)
     int i,count;
     Element *e;
     StationBuyMenuData* data;
-    if (!win)return 0;
+    if ((!win)||(!win->data))return 0;
     if (!updateList)return 0;
     data = (StationBuyMenuData*)win->data;
     if (!data)return 0;
@@ -60,16 +76,21 @@ int station_buy_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"cancel")==0)
+        {
+            gf2d_window_free(win);
+            return 1;
+        }
         if (e->index >= 1000)
         {
-            message_printf("selecting item %s",e->name);
-            return 0;
+            station_buy_menu_select_item(win,e->name);
+            return 1;
         }
     }
     if (gfc_input_command_released("cancel"))
     {
-            gf2d_window_free(win);
-            return 1;
+        gf2d_window_free(win);
+        return 1;
     }
     if ((gf2d_mouse_button_state(0))||(gf2d_mouse_button_state(1)))
     {
@@ -89,8 +110,7 @@ void station_buy_menu_set_list(Window *win)
     Element *item_list;
     int i,c;
     StationBuyMenuData *data;
-    if (!win)return;
-    if (!win->data)return;
+    if ((!win)||(!win->data))return;
     data = win->data;
     c = gfc_list_get_count(data->list);
     item_list = gf2d_window_get_element_by_name(win,"item_list");
@@ -99,6 +119,10 @@ void station_buy_menu_set_list(Window *win)
         str = gfc_list_get_nth(data->list,i);
         if (!str)continue;
         str = station_def_get_display_name(str);
+        if (i == 0)
+        {
+            station_buy_menu_select_item(win,str);
+        }
         button = gf2d_button_new_label_simple(win,1000+1,str,gfc_color8(255,255,255,255));
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
@@ -123,6 +147,7 @@ Window *station_buy_menu(Window *parent,StationSection *parentSection,List *list
     win->parent = parent;
     data->list = list;
     station_buy_menu_set_list(win);
+    message_buffer_bubble();
     return win;
 }
 

@@ -24,6 +24,7 @@ typedef struct
     Font *font_list;
     Font *font_tags[FT_MAX];
     Uint32 font_max;
+    int row_padding;
     List *font_images;
     Uint32 ttl;         //time to live for font re-use
 }FontManager;
@@ -239,6 +240,7 @@ void gf2d_fonts_load_json(const char *filename)
     SJson *file,*fonts,*item;
     file = sj_load(filename);
     if (!file)return;
+    sj_object_get_value_as_int(file,"row_padding",&font_manager.row_padding);
     fonts = sj_object_get_value(file,"fonts");
     if (!fonts)
     {
@@ -533,6 +535,7 @@ Rect gf2d_font_get_text_wrap_bounds(
         gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
         gfc_block_cpy(temptextline,tempBuffer);
         TTF_SizeText(font->font, temptextline, &tw, &th); /*see how big it is now*/
+        th += font_manager.row_padding;
         lindex += strlen(word);
         if(tw > w)         /*see if we have gone over*/
         {
@@ -637,6 +640,7 @@ void gf2d_font_draw_text_wrap(
         gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
         gfc_block_cpy(temptextline,tempBuffer);
         TTF_SizeText(font->font, temptextline, &w, &h); /*see how big it is now*/
+        h += font_manager.row_padding;
         lindex += strlen(word);
         if(w > block.w)         /*see if we have gone over*/
         {

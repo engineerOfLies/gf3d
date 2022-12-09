@@ -4,6 +4,7 @@
             "name":"station_core",
             "display_name":"Station Core",
             "model":"models/station/station_core.model",
+            "description":"A core station section with a lot of hull armor.  Has many extension slots to build more station off of, including rotating sections.  It does not support gravity.  It can support Industrial or Operations facilities.",
             "stats":
             {
                 "hull":1000
@@ -57,6 +58,7 @@
             "name":"solar_collector",
             "display_name":"Solar collector",
             "model":"models/station/solar_collector.model",
+            "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.",
             "rotates":0.25,
             "stats":
             {
@@ -87,6 +89,7 @@
             "name":"station_habitat",
             "display_name":"Habitat Section",
             "model":"models/station/station_habitat.model",
+            "description":"A rotating station section that supports gravity.  Designed to be idea for a range of facilities that require standard gravity such as residential, commercial, entertainment, and operations",
             "position":[0,0,0],
             "rotates":1,
             "scale":[1,1,1],
@@ -122,6 +125,7 @@
             "name":"station_habitat_large",
             "display_name":"Large Habitat",
             "model":"models/station/station_habitat_large.model",
+            "description":"This large rotating habitat is best suited for facilities where personnel are going to work and live.   The gravity here allows for residential, commercial, and entertainment facilities.  The greater space allows for luxury facilities as well.",
             "position":[0,0,0],
             "rotates":1,
             "scale":[1,1,1],
@@ -158,6 +162,7 @@
             "name":"station_dock",
             "display_name":"Docking Port",
             "model":"models/station/station_dock.model",
+            "description":"A rotating section with an open port for small and medium ship sizes.  The gravity provided makes this type of dock section suitable for passengers.",
             "position":[0,0,0],
             "scale":[1,1,1],
             "rotates":1,
@@ -178,6 +183,7 @@
             "facility_types":
             [
                 "operations",
+                "cargo_dock",
                 "passenger_docking"
             ]
         },
@@ -185,6 +191,7 @@
             "name":"expansion_bay_dock",
             "display_name":"Expansion Dock",
             "model":"models/station/expansion_bay_dock.model",
+            "description":"This industrial style docking section does not support gravity, however the docking platforms can support larger ships.  Best suited for cargo and ship service.",
             "position":[0,0,0],
             "scale":[1,1,1],
             "rotates":0,
@@ -212,6 +219,7 @@
             "name":"station_reactor",
             "display_name":"Reactor Core",
             "model":"models/station/station_reactor.model",
+            "description":"Special shielding in the Reactor Core section allows for reactors to operate safely.  Additional Hull armor also helps to keep reactors working in spite of damage the section may sustain.",
             "position":[0,0,0],
             "rotates":0,
             "facilities":3,
@@ -248,6 +256,7 @@
             "name":"expansion_bay",
             "display_name":"Expansion Bay",
             "model":"models/station/expansion_bay.model",
+            "description":"A small, all purpose zero G expansion bay.  Great for storage and medium size craft docking.  Can be equipped with defensive systems.",
             "position":[0,0,0],
             "rotates":0,
             "facilities":4,
@@ -282,6 +291,7 @@
             "name":"expansion_bay_extension",
             "display_name":"Expansion Bay Ext",
             "model":"models/station/expansion_bay_extension.model",
+            "description":"A small, all purpose zero G expansion bay.  Great for storage and medium size craft docking.  Can be equipped with defensive systems.  This one is limited in mounting options",
             "position":[0,0,0],
             "rotates":0,
             "stats":
@@ -312,6 +322,7 @@
             "name":"station_industrial",
             "display_name":"Industrial Section",
             "model":"models/station/station_industrial.model",
+            "description":"Rotating section allows for working personnel to work more comfortably.  Section is designed to support the flow of energy, materials, and goods ideal for industrial activities.",
             "position":[0,0,0],
             "rotates":0.5,
             "upkeep":

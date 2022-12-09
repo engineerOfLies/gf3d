@@ -97,7 +97,7 @@ SJson *config_def_get_by_parameter(const char *resource,const char *parameter,co
     {
         item = sj_array_get_nth(list,i);
         if (!item)continue;
-        str = sj_object_get_value_as_string(item,"parameter");
+        str = sj_object_get_value_as_string(item,parameter);
         if (!str)continue;
         if (strcmp(name,str)==0)return item;
     }

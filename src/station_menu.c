@@ -222,5 +222,6 @@ Window *station_menu_window(Window *parent,StationData *station)
     data->station = station;
     data->oldPosition = gf3d_camera_get_position();
     station_menu_select_segment(win,data,0);
+    message_buffer_bubble();
     return win;
 }
