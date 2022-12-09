@@ -78,4 +78,22 @@ StationSection *station_get_section_by_id(StationData *data,int id);
  */
 StationSection *station_section_get_child_by_slot(StationSection *section,Uint8 slot);
 
+/**
+ * @brief add a new section to the station
+ * @param data the station to add to
+ * @param sectionName the sectionName to add
+ * @param id the id of the section
+ * @param parent the parent of this section
+ * @param slot the extension slot of the parent to mount to
+ */
+StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot);
+
+/**
+ * @brief removes a section from the station
+ * @note this will NOT remove any children of the section.  those should be removed first
+ * @param station the station to remove from
+ * @param section the section to remove
+ */
+void station_remove_section(StationData *station,StationSection *section);
+
 #endif

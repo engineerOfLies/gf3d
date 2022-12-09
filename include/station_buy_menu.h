@@ -4,6 +4,6 @@
 #include "gf2d_windows.h"
 #include "station.h"
 
-Window *station_buy_menu(Window *parent,StationSection *parentSection,List *list);
+Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,List *list);
 
 #endif

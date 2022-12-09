@@ -12,6 +12,7 @@
 #include "gf2d_element_entry.h"
 #include "gf2d_item_list_menu.h"
 #include "gf2d_message_buffer.h"
+#include "gf2d_windows_common.h"
 
 #include "entity.h"
 #include "camera_entity.h"
@@ -66,6 +67,33 @@ void station_menu_child_select(void *Data)
     station_menu_select_segment(win,data,section->id);
 }
 
+void station_menu_yes(void *Data)
+{
+    int parent;
+    Window *win;
+    StationMenuData *data;
+    win = Data;
+    if (!win)return;
+    win->child = NULL;
+    data = win->data;
+    if (!data)return;
+    if ((data->selection)&&(data->selection->parent))
+    {
+        parent = data->selection->parent->id;
+    }else parent = 0;
+    station_remove_section(data->station,data->selection);
+    station_menu_select_segment(win,data,parent);
+}
+
+void station_menu_no(void *Data)
+{
+    Window *win;
+    win = Data;
+    if (!win)return;
+    win->child = NULL;
+}
+
+
 int station_menu_update(Window *win,List *updateList)
 {
     int i,count;
@@ -104,6 +132,25 @@ int station_menu_update(Window *win,List *updateList)
             }
             return 1;
         }
+        if (strcmp(e->name,"delete")==0)
+        {
+            if (win->child)return 1;
+            if (data->selection)
+            {
+                if (data->selection->id == 0)
+                {
+                    message_new("cannot delete the base core of the station!");
+                    return 1;
+                }
+                if (gfc_list_get_count(data->selection->children) > 0)
+                {
+                    message_new("cannot delete section, it has extensions!");
+                    return 1;
+                }
+                win->child = window_yes_no("delete selected Section?", station_menu_yes,station_menu_no,win);
+            }
+            return 1;
+        }
         if (strcmp(e->name,"children")==0)
         {
             if (win->child)//if already open now close it
@@ -137,7 +184,7 @@ int station_menu_update(Window *win,List *updateList)
             }
             if ((data->selection)&&(data->selection->expansionSlots))
             {
-                win->child = station_buy_menu(win,data->selection,station_def_get_section_list());
+                win->child = station_buy_menu(win,data->station,data->selection,station_def_get_section_list());
             }
             return 1;
         }

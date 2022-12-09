@@ -16,15 +16,15 @@ void station_draw(Entity *self);
 void station_think(Entity *self);
 void station_free(Entity *self);
 
+void station_section_free(StationSection *section);
+StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot);
+
 void station_facility_free(StationFacility *facility);
 StationFacility *station_facility_new();
 StationFacility *station_facility_load(SJson *config);
 SJson *station_facility_save(StationFacility *facility);
 void station_facility_free_list(List *list);
 StationFacility *station_facility_new_by_name(const char *name);
-
-
-StationSection *station_add_section(StationData *data,const char *sectionName,int id,StationSection *parent,Uint8 slot);
 
 StationSection *station_get_section_by_id(StationData *data,int id)
 {
@@ -330,6 +330,27 @@ Entity *station_new(Vector3D position,SJson *config)
     return ent;
 }
 
+void station_remove_section(StationData *station,StationSection *section)
+{
+    if ((!station)||(!section))return;
+    if (section->parent)
+    {
+        gfc_list_delete_data(section->parent->children,section);
+    }
+    gfc_list_delete_data(station->sections,section);
+    station_section_free(section);
+}
+
+void station_section_free(StationSection *section)
+{
+    if (!section)return;
+    gf3d_model_free(section->mat.model);
+    gfc_list_delete(section->children);
+    gfc_list_foreach(section->facilities,(void (*)(void *))station_facility_free);
+    gfc_list_delete(section->facilities);
+    free(section);
+}
+
 void station_free(Entity *self)
 {
     int i,c;
@@ -344,9 +365,7 @@ void station_free(Entity *self)
         {
             section = gfc_list_get_nth(data->sections,i);
             if (!section)continue;
-            gfc_list_delete(section->children);
-            gf3d_model_free(section->mat.model);
-            free(section);
+            station_section_free(section);
         }
         free(data);
     }
@@ -369,7 +388,7 @@ void station_draw(Entity *self)
 {
     int i,c;
     Vector4D color;
-    Matrix4 mat;
+    Matrix4 mat,mat1;
     StationSection *section;
     StationData *data;
     Vector3D rotation;
@@ -386,12 +405,20 @@ void station_draw(Entity *self)
         rotation.x += (data->sectionRotation * section->rotates);
 
         gfc_matrix4_from_vectors(
+            mat1,
+            vector3d(0,0,0),
+            rotation,
+            vector3d(1,1,1));
+
+        gfc_matrix4_from_vectors(
             mat,
             self->mat.position,
-            rotation,
+            self->mat.rotation,
             self->mat.scale);
+
+        gfc_matrix_multiply(mat1,mat1,section->mat.mat);
         
-        gfc_matrix_multiply(mat,section->mat.mat,mat);
+        gfc_matrix_multiply(mat,mat1,mat);
         
         color = gfc_color_to_vector4f(self->color);
 
