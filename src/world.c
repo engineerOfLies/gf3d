@@ -7,6 +7,7 @@
 #include "gf3d_lights.h"
 
 #include "camera_entity.h"
+#include "fighter.h"
 #include "world.h"
 
 World *world_load(char *filename)
@@ -117,7 +118,7 @@ World *world_load(char *filename)
     sj_free(json);
     
     
-    fighter_new(vector3d(0,-1000,0));
+    fighter_new(vector3d(0,-900,0));
 
     return w;
 }
