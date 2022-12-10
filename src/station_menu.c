@@ -96,8 +96,10 @@ void station_menu_no(void *Data)
 
 int station_menu_update(Window *win,List *updateList)
 {
+    int index;
     int i,count;
     Element *e;
+    StationSection *section;
     StationMenuData *data;
     if (!win)return 0;
     if (!updateList)return 0;
@@ -118,9 +120,17 @@ int station_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"prev")==0)
         {
-            if ((data->selection)&&(data->selection->id > 0))
+            if (data->selection)
             {
-                station_menu_select_segment(win,data,data->selection->id - 1);
+                index = gfc_list_get_item_index(data->station->sections,data->selection);
+                if (index > 0)
+                {
+                    section = gfc_list_get_nth(data->station->sections,index - 1);
+                    if (section)
+                    {
+                        station_menu_select_segment(win,data,section->id);
+                    }
+                }
             }
             return 1;
         }
@@ -128,7 +138,15 @@ int station_menu_update(Window *win,List *updateList)
         {
             if (data->selection)
             {
-                station_menu_select_segment(win,data,data->selection->id + 1);
+                index = gfc_list_get_item_index(data->station->sections,data->selection);
+                if (index > -1)
+                {
+                    section = gfc_list_get_nth(data->station->sections,index + 1);
+                    if (section)
+                    {
+                        station_menu_select_segment(win,data,section->id);
+                    }
+                }
             }
             return 1;
         }
@@ -182,8 +200,13 @@ int station_menu_update(Window *win,List *updateList)
                 win->child = NULL;
                 return 1;
             }
-            if ((data->selection)&&(data->selection->expansionSlots))
+            if (data->selection)
             {
+                if (gfc_list_get_count(data->selection->children) >= data->selection->expansionSlots)
+                {
+                    message_new("no free expansion slots for this section");
+                    return 1;
+                }
                 win->child = station_buy_menu(win,data->station,data->selection,station_def_get_section_list());
             }
             return 1;

@@ -52,6 +52,7 @@ void player_save(const char *filename)
     }
 
     sj_save(json,filename);
+    slog("saved game %s",filename);
     sj_free(json);
 }
 
@@ -124,8 +125,6 @@ Entity *player_new(const char *file)
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
 
     sj_free(json);
-    
-    player_save("saves/testsave.save");
     
     ent->think = player_think;
     ent->update = player_update;

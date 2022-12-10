@@ -55,10 +55,35 @@
             ]
         },
         {
-            "name":"solar_collector",
-            "display_name":"Solar collector",
-            "model":"models/station/solar_collector.model",
+            "name":"solar_collector_single",
+            "display_name":"Solar Collector Mk1",
+            "model":"models/station/solar_collector_single.model",
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.",
+            "rotates":0,
+            "stats":
+            {
+                "hull":300
+            },
+            "cost":
+            {
+                "credits":3000,
+                "meta_materials":300
+            },
+            "facilities":1,
+            "facility_types":
+            [
+                "solar_processor"
+            ],
+            "default_facilities":
+            [
+                "solar_processor1"
+            ]
+        },
+        {
+            "name":"solar_collector",
+            "display_name":"Solar Collector MkR3",
+            "model":"models/station/solar_collector.model",
+            "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.  Its rotating collectors are more efficient than static models",
             "rotates":-0.25,
             "stats":
             {
@@ -69,7 +94,7 @@
                 "credits":10000,
                 "meta_materials":1000
             },
-            "facilities":1,
+            "facilities":4,
             "facility_types":
             [
                 "solar_processor"

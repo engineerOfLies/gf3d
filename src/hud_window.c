@@ -104,6 +104,12 @@ int hud_update(Window *win,List *updateList)
             camera_entity_toggle_free_look();
             return 1;
         }
+        if (strcmp(e->name,"quick_save")==0)
+        {
+            player_save("saves/quick.save");
+            return 1;
+        }
+
     }
     return 1;
 }

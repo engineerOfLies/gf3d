@@ -28,4 +28,11 @@ PlayerData *player_get_data();
 
 StationData *player_get_station_data();
 
+/**
+ * @brief save the player data to file
+ * @param filename the file to save as
+ */
+void player_save(const char *filename);
+
+
 #endif

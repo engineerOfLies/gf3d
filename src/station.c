@@ -76,10 +76,8 @@ SJson *station_save_data(StationData *data)
 {
     int i,c;
     StationSection *section;
-    SJson *json,*station,*sections;
+    SJson *station,*sections;
     if (!data)return NULL;
-    json = sj_object_new();
-    if (!json)return NULL;
     station = sj_object_new();
     sj_object_insert(station,"idPool",sj_new_uint32(data->idPool));
     sj_object_insert(station,"hull",sj_new_float(data->hull));
@@ -92,8 +90,7 @@ SJson *station_save_data(StationData *data)
         sj_array_append(sections,station_section_to_json(section));
     }
     sj_object_insert(station,"sections",sections);
-    sj_object_insert(json,"station",station);
-    return json;
+    return station;
 }
 
 StationData *station_load_data(SJson *station)

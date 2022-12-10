@@ -115,6 +115,10 @@ World *world_load(char *filename)
         camera_entity_new(position,rotation);
     }
     sj_free(json);
+    
+    
+    fighter_new(vector3d(0,-1000,0));
+
     return w;
 }
 

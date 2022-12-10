@@ -56,55 +56,55 @@
             }, 
             {
                 "type": "button",
+                "name":"resources",
+                "bounds": [0,0,160,42],
+                "hotkey":"resources",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Resources",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"fleet",
+                "bounds": [0,0,160,42],
+                "hotkey":"fleet",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Fleet",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
                 "name":"research",
                 "bounds": [0,0,160,42],
                 "hotkey":"research",
-                "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
                     "text":"Research",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "actor" : "actors/button.actor"
-                }
-            },
-            {
-                "type": "button",
-                "name":"governance",
-                "bounds": [0,0,160,42],
-                "hotkey":"governance",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Governance",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "actor" : "actors/button.actor"
-                }
-            },
-            {
-                "type": "button",
-                "name":"planet",
-                "bounds": [0,0,160,42],
-                "hotkey":"planet",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Planet",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
@@ -164,6 +164,11 @@
             "type": "button",
             "name": "freelook",
             "hotkey":"freelook"
+        },
+        {
+            "type": "button",
+            "name": "quick_save",
+            "hotkey":"quick_save"
         }
         ]
     }

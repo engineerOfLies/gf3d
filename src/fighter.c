@@ -21,11 +21,13 @@ Entity *fighter_new(Vector3D position)
         return NULL;
     }
     gfc_line_cpy(ent->name,"FIGHTER");
-    ent->model = gf3d_model_load("models/fighter/fighter.model");
+//    ent->model = gf3d_model_load("models/fighter/fighter.model");
+    ent->model = gf3d_model_load("models/ships/passenger_transport.model");
     if (!ent->model)
     {
         slog("FIGHTER MODEL DID NOT LOAD");
     }
+    ent->mat.scale = vector3d(10,10,10);
     ent->selectedColor = gfc_color(0.9,0.7,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->think = fighter_think;
