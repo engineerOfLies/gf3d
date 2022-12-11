@@ -67,6 +67,27 @@ void station_menu_child_select(void *Data)
     station_menu_select_segment(win,data,section->id);
 }
 
+void station_menu_child_build(void *Data)
+{
+    Window *win;
+    StationMenuData *data;
+    StationSection *section;
+    win = Data;
+    if (!win)return;
+    data = win->data;
+    if ((!data)||(!data->selection))return;
+    win->child = NULL;
+    if (data->choice == -1)return;
+    section = station_section_get_child_by_slot(data->selection,data->choice);
+    if (section)
+    {
+        message_new("cannot build on that extension slot, it is already in use");
+        return;
+    }
+    win->child = station_buy_menu(win,data->station,data->selection,data->choice,station_def_get_section_list());
+}
+
+
 void station_menu_yes(void *Data)
 {
     int parent;
@@ -173,9 +194,6 @@ int station_menu_update(Window *win,List *updateList)
         {
             if (win->child)//if already open now close it
             {
-                if (!gf2d_window_named(win->child,"station_extension_menu"))return 1;
-                gf2d_window_free(win->child);
-                win->child = NULL;
                 return 1;
             }
             if ((data->selection)&&(data->selection->children))
@@ -187,7 +205,6 @@ int station_menu_update(Window *win,List *updateList)
                     station_menu_child_select,
                     win,
                     &data->choice);
-
             }
             return 1;
         }
@@ -195,9 +212,6 @@ int station_menu_update(Window *win,List *updateList)
         {
             if (win->child)
             {
-                if (!gf2d_window_named(win->child,"station_buy_menu"))return 1;
-                gf2d_window_free(win->child);
-                win->child = NULL;
                 return 1;
             }
             if (data->selection)
@@ -207,7 +221,13 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("no free expansion slots for this section");
                     return 1;
                 }
-                win->child = station_buy_menu(win,data->station,data->selection,station_def_get_section_list());
+                win->child = station_extension_menu(
+                    win,
+                    vector2d(e->lastDrawPosition.x + e->bounds.w,e->lastDrawPosition.y),
+                    data->selection,
+                    station_menu_child_build,
+                    win,
+                    &data->choice);
             }
             return 1;
         }

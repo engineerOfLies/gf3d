@@ -7,6 +7,7 @@
 
 #include "gf2d_windows.h"
 #include "gf2d_elements.h"
+#include "gf2d_element_actor.h"
 #include "gf2d_element_list.h"
 #include "gf2d_element_label.h"
 #include "gf2d_element_button.h"
@@ -26,6 +27,7 @@ typedef struct
     StationSection *parent;
     StationData *station;
     const char *selected;
+    Uint8 slot;
     int choice;
     List *list;
 }StationBuyMenuData;
@@ -64,28 +66,12 @@ void station_buy_menu_select_item(Window *win,const char *name)
     str = sj_object_get_value_as_string(def,"description");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),str);
     data->selected = name;
-}
-
-
-void station_buy_menu_buy(void *Data)
-{
-    Window *win;
-    StationBuyMenuData *data;
-    StationSection *section;
-    win = Data;
-    if (!win)return;
-    win->child = NULL;
-    data = win->data;
-    if ((!data)||(!data->parent))return;
-    if (data->choice == -1)return;
-    section = station_section_get_child_by_slot(data->parent,data->choice);
-    if (section)
+    str = sj_object_get_value_as_string(def,"icon");
+    if (str)
     {
-        message_new("cannot build new section in that slot,  it is already in use.");
-        return;
+        gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     }
-    station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->choice);
-    gf2d_window_free(win);
+
 }
 
 int station_buy_menu_update(Window *win,List *updateList)
@@ -112,14 +98,9 @@ int station_buy_menu_update(Window *win,List *updateList)
         {
             if (win->child)return 1;
             
-            win->child = station_extension_menu(
-                win,
-                vector2d(e->lastDrawPosition.x + 160,e->lastDrawPosition.y - 200),
-                data->parent,
-                station_buy_menu_buy,
-                win,
-                &data->choice);
-
+            station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
+            gf2d_window_free(win);
+            return 1;
         }
         if (e->index >= 1000)
         {
@@ -169,7 +150,7 @@ void station_buy_menu_set_list(Window *win)
     }
 }
 
-Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,List *list)
+Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,Uint8 slot,List *list)
 {
     Window *win;
     StationBuyMenuData* data;
@@ -188,6 +169,7 @@ Window *station_buy_menu(Window *parent,StationData *station, StationSection *pa
     data->list = list;
     data->station = station;
     data->parent = parentSection;
+    data->slot = slot;
     station_buy_menu_set_list(win);
     message_buffer_bubble();
     return win;

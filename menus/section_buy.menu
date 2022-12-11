@@ -63,13 +63,13 @@
                 "type": "list",
                 "bounds": [0,0,1,1],
                 "style": "horizontal",
-                "item_size" : [200,1],
+                "item_size" : [220,1],
                 "elements":
                 [
                     {
                         "type": "list",
                         "name":"item_list",
-                        "bounds": [8,43,200,450],
+                        "bounds": [8,43,230,450],
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],
                         "backgroundDraw":1,
@@ -92,8 +92,7 @@
                                 "name":"item_picture",
                                 "justify":"center",
                                 "align":"middle",
-                                "center":[65,65],
-                                "bounds":[35,40,130,130],
+                                "bounds":[35,40,128,128],
                                 "backgroundColor":[0,0,0,250],
                                 "backgroundDraw":1
                             },
