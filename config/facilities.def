@@ -4,7 +4,10 @@
         {
             "name":"command_and_control",
             "displayName":"Command and Control",
+            "icon":"",
+            "description":"The bridge of the space station.  All intelligence and decisions are routed through here.  Here is where the station Commander sits.  Every station must have one somewhere.",
             "type":"operations",
+            "hull":1000,
             "cost":
             {   
                 "credits":1000
@@ -19,6 +22,9 @@
         {
             "name":"security",
             "displayName":"Security",
+            "icon":"",
+            "hull":500,
+            "description":"The base of operations for station security.  Where the officers in charge of security are assigned, where holding cells are located.",
             "type":"operations",
             "cost":
             {   
@@ -34,7 +40,10 @@
         {
             "name":"solar_processor1",
             "displayName":"Solar Processor Mark I",
+            "icon":"",
+            "description":"This a processing plant that will turn the solar radiation collected into High Density Gluon plasma.  HDGs are the fuel source for interstellar ships, as well as the fual for the energy reactors that power the station.",
             "type":"solar_processor",
+            "hull":1000,
             "cost":
             {   
                 "credits":1000
@@ -52,7 +61,10 @@
         {
             "name":"hdg_reactor1",
             "displayName":"HDG Reactor Mark I",
+            "icon":"",
+            "description":"This facility processes High Density Gluon plasms (HDGs) into raw energy that powers the rest of the station.",
             "type":"reactor",
+            "hull":1000,
             "cost":
             {   
                 "credits":1000

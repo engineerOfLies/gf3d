@@ -21,6 +21,7 @@
 #include "player.h"
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
+#include "facility_menu.h"
 #include "station_menu.h"
 
 typedef struct
@@ -207,6 +208,21 @@ int station_menu_update(Window *win,List *updateList)
                     &data->choice);
             }
             return 1;
+        }
+        if (strcmp(e->name,"facilities")==0)
+        {
+            if (win->child)//if already open now close it
+            {
+                return 1;
+            }
+            if ((data->selection)&&(data->selection->facilitySlots > 0))
+            {
+                win->child = facility_menu(win,data->station, data->selection);
+            }
+            else
+            {
+                message_new("Station section cannot support facilities");
+            }
         }
         if (strcmp(e->name,"build")==0)
         {

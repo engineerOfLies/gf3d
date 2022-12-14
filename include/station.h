@@ -8,19 +8,6 @@
 
 #include "entity.h"
 
-typedef struct
-{
-    TextLine    name;  //its name identifier
-    TextLine    facilityType;
-    int         staffRequired;  //how many people are needed to run the facility
-    int         staffAssigned;     //how many people are actually hired to do so
-    int         inactive;//if the facility cannot run
-    int         disabled;//if the player has chosen to turn it off
-    TextLine    officer;//if there is an officer assigned to help run this facility
-    List        *upkeep;    //what resources are needed to keep this running every update
-    List        *produces;  //what this produces every update cycle
-}StationFacility;
-
 typedef struct StaionSection_S
 {
     TextLine name;  //its name identifier
@@ -33,6 +20,7 @@ typedef struct StaionSection_S
     Uint8 slot;                      // where the section is mounted on the parent
     Uint8 expansionSlots;            // how many sections can link off of this
     List *children;
+    Uint8 facilitySlots;             // how many facilities can be installed in this section
     List *facilities;
 }StationSection;
 
