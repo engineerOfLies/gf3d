@@ -18,7 +18,7 @@
             "position":[0,0,0],
             "rotates":0,
             "scale":[1,1,1],
-            "facilities":4,
+            "facility_slots":4,
             "facility_types":
             [
                 "industrial",
@@ -71,7 +71,7 @@
                 "credits":3000,
                 "meta_materials":300
             },
-            "facilities":1,
+            "facility_slots":1,
             "facility_types":
             [
                 "solar_processor"
@@ -97,7 +97,7 @@
                 "credits":10000,
                 "meta_materials":1000
             },
-            "facilities":4,
+            "facility_slots":4,
             "facility_types":
             [
                 "solar_processor"
@@ -135,7 +135,7 @@
                 "credits":1000,
                 "alloys":100
             },
-            "facilities":6,
+            "facility_slots":6,
             "facility_types":
             [
                 "residential",
@@ -172,7 +172,7 @@
                 "credits":2500,
                 "alloys":250
             },
-            "facilities":12,
+            "facility_slots":12,
             "facility_types":
             [
                 "residential",
@@ -210,7 +210,7 @@
                 "credits":2000,
                 "alloys":200
             },
-            "facilities":12,
+            "facility_slots":12,
             "facility_types":
             [
                 "operations",
@@ -226,7 +226,7 @@
             "description":"Special shielding in the Reactor Core section allows for reactors to operate safely.  Additional Hull armor also helps to keep reactors working in spite of damage the section may sustain.",
             "position":[0,0,0],
             "rotates":0,
-            "facilities":3,
+            "facility_slots":3,
             "facility_types":
             [
                 "reactor"
@@ -277,7 +277,7 @@
                 "credits":4000,
                 "alloys":400
             },
-            "facilities":4,
+            "facility_slots":4,
             "facility_types":
             [
                 "industrial",
@@ -300,7 +300,7 @@
             "description":"A small, all purpose zero G expansion bay.  Great for storage and medium size craft docking.  Can be equipped with defensive systems.",
             "position":[0,0,0],
             "rotates":0,
-            "facilities":4,
+            "facility_slots":4,
             "stats":
             {
                 "hull":100
@@ -345,7 +345,7 @@
                 "credits":250,
                 "alloys":25
             },
-            "facilities":4,
+            "facility_slots":4,
             "facility_types":
             [
                 "cargo_dock",
@@ -382,7 +382,7 @@
                 "credits":300,
                 "alloys":30
             },
-            "facilities":12,
+            "facility_slots":12,
             "facility_types":
             [
                 "cargo_dock",

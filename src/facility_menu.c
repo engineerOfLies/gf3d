@@ -58,8 +58,13 @@ void facility_menu_select_item(Window *win,const char *name)
     data = win->data;
     if (!name)return;
     if (data->selected == name)return;//nothing to do
+    if (strcmp(name,"<Empty>")==0)
+    {
+        message_new("no facility installed to this slot.  Buy menu pending");
+        return;
+    }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
-    def = config_def_get_by_parameter("facilities","display_name",name);
+    def = config_def_get_by_parameter("facilities","displayName",name);
     if (!def)return;
     str = sj_object_get_value_as_string(def,"description");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),str);
@@ -126,6 +131,7 @@ void facility_menu_set_list(Window *win)
     data = win->data;
     if (!data->parent)return;
     c = data->parent->facilitySlots;
+    slog("facility sots: %i",c);
     item_list = gf2d_window_get_element_by_name(win,"item_list");
     if (!item_list)return;
     for (i = 0; i < c; i++)
@@ -138,7 +144,7 @@ void facility_menu_set_list(Window *win)
             gf2d_element_list_add_item(item_list,button);
             continue;
         }
-        str = station_def_get_display_name(facility->name);
+        str = station_facility_get_display_name(facility->name);
         if (i == 0)
         {
             facility_menu_select_item(win,str);

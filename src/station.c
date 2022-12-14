@@ -262,7 +262,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
             data->hullMax += tempf;
         }
     }
-    sj_object_get_value_as_uint8(sectionDef,"facilities",&section->facilitySlots);
+    sj_object_get_value_as_uint8(sectionDef,"facility_slots",&section->facilitySlots);
     
     str = sj_object_get_value_as_string(sectionDef,"name");
     if (id >= 0)

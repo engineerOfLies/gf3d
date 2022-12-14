@@ -86,12 +86,13 @@
                 "bounds": [0,0,1,1],
                 "style": "horizontal",
                 "item_size" : [220,1],
+                "packed":true,
                 "elements":
                 [
                     {
                         "type": "list",
                         "name":"item_list",
-                        "bounds": [8,43,230,450],
+                        "bounds": [8,43,250,450],
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],
                         "backgroundDraw":1,
