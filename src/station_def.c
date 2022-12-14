@@ -1,7 +1,9 @@
 #include "simple_logger.h"
+#include "simple_json.h"
 
 #include "gfc_types.h"
 
+#include "resources.h"
 #include "config_def.h"
 #include "station_def.h"
 
@@ -69,6 +71,16 @@ SJson *station_def_get_extension_by_index(SJson *section,Uint8 index)
     list = sj_object_get_value(section,"extensions");
     if (!list)return NULL;
     return sj_array_get_nth(list,index);
+}
+
+List *station_get_resource_cost(const char *name)
+{
+    SJson *stationDef;
+    if (!name)return NULL;
+    stationDef = config_def_get_by_name("sections",name);
+    if (!stationDef)return NULL;
+    return resources_list_parse(sj_object_get_value(stationDef,"cost"));
+
 }
 
 /*eol@eof*/

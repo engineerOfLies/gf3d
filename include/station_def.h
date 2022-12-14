@@ -41,10 +41,20 @@ int station_def_get_extension_count_by_name(const char *name);
  */
 const char *station_def_get_display_name(const char *section);
 
+const char *station_def_name_by_display(const char *display);
+
 /**
  * @brief get a list of section names
  * @return NULL if none loaded, or a list (the list should be deleted, but the items should not)
  */
 List *station_def_get_section_list();
+
+/**
+ * @brief get a list of resources that the section in question costs
+ * @note free the list when done with resources_list_free();
+ * @param name the section name to get the cost for
+ * @return NULL on error or a list of resources otherwise.
+ */
+List *station_get_resource_cost(const char *name);
 
 #endif

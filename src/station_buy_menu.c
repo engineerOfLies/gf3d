@@ -17,6 +17,8 @@
 #include "gf2d_message_buffer.h"
 
 #include "config_def.h"
+#include "resources.h"
+#include "resource_list.h"
 #include "station_def.h"
 #include "station.h"
 #include "station_extension_menu.h"
@@ -54,6 +56,9 @@ int station_buy_menu_draw(Window *win)
 void station_buy_menu_select_item(Window *win,const char *name)
 {
     SJson *def;
+    Element *e;
+    Element *cost_list;
+    List *costs; 
     const char *str;
     StationBuyMenuData *data;
     if ((!win)||(!win->data))return;
@@ -71,7 +76,16 @@ void station_buy_menu_select_item(Window *win,const char *name)
     {
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     }
-
+    costs = station_get_resource_cost(sj_object_get_value_as_string(def,"name"));
+    if (costs)
+    {
+        cost_list = resource_list_new(win,"cost_list", vector2d(0,0),costs,NULL);
+        resources_list_free(costs);
+        e = gf2d_window_get_element_by_name(win,"costs");
+        gf2d_element_list_free_items(e);
+        if (!e)return;
+        gf2d_element_list_add_item(e,cost_list);
+    }
 }
 
 int station_buy_menu_update(Window *win,List *updateList)

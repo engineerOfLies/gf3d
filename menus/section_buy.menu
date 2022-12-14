@@ -106,14 +106,13 @@
                             },
                             {
                                 "type": "list",
-                                "name":"resource_cost",
-                                "bounds": [0,0,200,300],
+                                "bounds": [20,50,1,1],
+                                "name":"costs",
                                 "style": "vertical",
-                                "packed":true,
                                 "item_size" : [1,45],
+                                "packed":true,
                                 "elements":
-                                [
-                                ]
+                                []
                             }
                         ]
                     },

@@ -291,7 +291,7 @@ Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,Col
         NULL,
         index,
         (char *)text,
-        gfc_rect(0,0,336,30),
+        gfc_rect(0,0,1,30),
         gfc_color(0.9,0.9,0.5,1),
         0,
         gfc_color(.5,.5,.5,1),0,win);
@@ -299,7 +299,7 @@ Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,Col
         be,
         0,
         (char *)text,
-        gfc_rect(0,0,336,30),
+        gfc_rect(0,0,1,30),
         gfc_color(1,1,1,1),
         0,
         gfc_color(1,1,1,1),0,win);

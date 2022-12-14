@@ -41,7 +41,7 @@ Window *station_extension_menu(
         gfc_list_set_nth(list,child->slot,(void *)name);
     }
     
-    win = item_list_menu(parent,position,200,"Sections",list,onSelect,callbackData,result);
+    win = item_list_menu(parent,position,250,"Sections",list,onSelect,callbackData,result);
     gfc_line_cpy(win->name,"station_extension_menu");
     
     gfc_list_delete(list);
