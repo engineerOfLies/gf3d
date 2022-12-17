@@ -199,8 +199,8 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
     gf3d_model_manager_init(1024);
-    gf2d_sprite_manager_init(1024);
     gf3d_particle_manager_init(4096);
+    gf2d_sprite_manager_init(1024);
 
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(gf3d_mesh_get_pipeline());
@@ -483,11 +483,7 @@ Uint32 gf3d_vgraphics_render_begin()
 void gf3d_vgraphics_render_start()
 {
     gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
-    
-    
-    gf3d_mesh_reset_pipes();
-    gf3d_particle_reset_pipes();
-    gf3d_sprite_reset_pipes();
+    gf3d_pipeline_reset_all_pipes();
 }
 
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
@@ -504,9 +500,7 @@ void gf3d_vgraphics_render_end()
     VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     
-    gf3d_mesh_submit_pipe_commands();
-    gf3d_particle_submit_pipe_commands();
-    gf3d_sprite_submit_pipe_commands();
+    gf3d_pipeline_submit_all_pipe_commands();
     
     swapChains[0] = gf3d_swapchain_get();
 

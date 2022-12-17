@@ -107,7 +107,7 @@ void camera_entity_think(Entity *self)
         }
         return;
     }
-    gf3d_camera_walk_right(moveSpeed/10);
+    gf3d_camera_walk_right(moveSpeed/5);
     gf3d_camera_look_at(vector3d(0,0,0),NULL);
 }
 

@@ -102,11 +102,21 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame);
 
 /**
+ * @brief resets ALL pipelines currently in use
+ */
+void gf3d_pipeline_reset_all_pipes();
+
+/**
  * @brief submit the render calls to the pipeline for this frame.  Called after reset_frame and all draw calls
  * @param pipe for the pipe in question
  */
 void gf3d_pipeline_submit_commands(Pipeline *pipe);
 
+/**
+ * @brief submit the commands for ALL pipelines in the order in which they were created
+ * @note order might be messed up if any were destroyed and recreated during the life of the program
+ */
+void gf3d_pipeline_submit_all_pipe_commands();
 
 VkFormat gf3d_pipeline_find_depth_format();
 
