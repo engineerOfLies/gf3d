@@ -105,7 +105,8 @@ World *world_load(char *filename)
         sj_value_as_vector3d(sj_object_get_value(item,"position"),&position);
         if (strcmp(str,"global")==0)
         {
-            gf3d_lights_set_global_light(globalColor,vector4d(globalDir.x,globalDir.y,globalDir.z,1));
+            gf3d_lights_set_global_light(globalColor,vector4d(globalDir.x,globalDir.y,globalDir.z,1));;
+            w->theSun = gf3d_particle(vector3d(-10000,-10000,0), gfc_color_from_vector4f(globalColor), 10000);
         }
     }
     item = sj_object_get_value(wjson,"camera");
@@ -136,6 +137,7 @@ void world_draw(World *world)
         if (!m)continue;
         gf3d_model_draw(m->model,0,m->mat,vector4d(1,1,1,1),vector4d(1,1,1,0.5));
     }
+    gf3d_particle_draw(world->theSun);
 }
 
 void world_delete(World *world)

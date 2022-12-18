@@ -9,6 +9,7 @@
 #include "gfc_audio.h"
 
 #include "gf3d_vgraphics.h"
+#include "gf3d_particle.h"
 #include "gf3d_model.h"
 
 #include "entity.h"
@@ -17,6 +18,7 @@ typedef struct
 {
     List    *model_list;
     Matrix4 skyMat;
+    Particle theSun;
     Model *sky;
     Mix_Music *backgroundMusic;
 }World;
