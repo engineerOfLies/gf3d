@@ -84,4 +84,12 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
  */
 void station_remove_section(StationData *station,StationSection *section);
 
+/**
+ * @brief given a station section, get a list of possible facilities that can be installed.
+ * @param parent the station section to query
+ * @returns NULL if there are not valid types, or a list of names
+ * @note the list should be freed, not the strings
+ */
+List *station_facility_get_possible_list(StationSection *parent);
+
 #endif

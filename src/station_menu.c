@@ -92,7 +92,6 @@ void station_menu_child_build(void *Data)
     win->child = station_buy_menu(win,data->station,data->selection,data->choice,station_def_get_section_list());
 }
 
-
 void station_menu_yes(void *Data)
 {
     int parent;
@@ -123,7 +122,6 @@ void station_menu_no(void *Data)
     if (!win)return;
     win->child = NULL;
 }
-
 
 int station_menu_update(Window *win,List *updateList)
 {

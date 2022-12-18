@@ -11,6 +11,50 @@
 #include "station.h"
 #include "station_facility.h"
 
+int station_facility_types_valid(SJson *array,const char *check)
+{
+    int i,c;
+    const char *str;
+    SJson *item;
+    c = sj_array_get_count(array);
+    for (i = 0; i < c;i++)
+    {
+        item = sj_array_get_nth(array,i);
+        if (!item)continue;
+        str = sj_get_string_value(item);
+        if (strcmp(str,check)==0)return 1;// yes this is valid
+    }
+    return 0;
+}
+
+List *station_facility_get_possible_list(StationSection *parent)
+{
+    int i,c;
+    List *list;
+    const char *name;
+    const char *facility_type;
+    SJson *facility_types,*def;
+    if (!parent)return NULL;
+    def = config_def_get_by_name("sections",parent->name);
+    if (!def)return NULL;
+    facility_types = sj_object_get_value(def,"facility_types");
+    if (!facility_types)return NULL;
+    list = gfc_list_new();
+    c = config_def_get_resource_count("facilities");
+    for (i = 0; i < c; i++)
+    {
+        def = config_def_get_by_index("facilities",i);
+        if (!def)continue;
+        facility_type = sj_object_get_value_as_string(def,"type");
+        if (station_facility_types_valid(facility_types,facility_type))
+        {
+            name = sj_object_get_value_as_string(def,"name");
+            list = gfc_list_append(list,(void *)name);
+        }
+    }
+    return list;
+}
+
 void station_facility_free(StationFacility *facility)
 {
     if (!facility)return;
@@ -114,12 +158,29 @@ StationFacility *station_facility_new()
     return facility;
 }
 
+const char *station_facility_get_name_from_display(const char *display)
+{
+    SJson *facilityDef;
+    facilityDef = config_def_get_by_parameter("facilities","displayName",display);
+    if (!facilityDef)return NULL;
+    return sj_object_get_value_as_string(facilityDef,"name");
+}
+
 const char *station_facility_get_display_name(const char *name)
 {
     SJson *facilityDef;
     facilityDef = config_def_get_by_name("facilities",name);
     if (!facilityDef)return NULL;
     return sj_object_get_value_as_string(facilityDef,"displayName");
+}
+
+List *station_facility_get_resource_cost(const char *name)
+{
+    SJson *stationDef;
+    if (!name)return NULL;
+    stationDef = config_def_get_by_name("facilities",name);
+    if (!stationDef)return NULL;
+    return resources_list_parse(sj_object_get_value(stationDef,"cost"));
 }
 
 

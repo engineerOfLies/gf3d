@@ -6,4 +6,6 @@
 
 Window *facility_menu(Window *parent,StationData *station, StationSection *parentSection);
 
+void facility_menu_set_list(Window *win);
+
 #endif

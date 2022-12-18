@@ -2,7 +2,7 @@
     "window":
     {
         "dimensions" : [0,0,900,490],
-        "name":"station_facility_menu",
+        "name":"facility_buy_menu",
         "justify" : "center",
         "align" : "middle",
         "elements":
@@ -10,7 +10,7 @@
             {
                 "type": "label",
                 "bounds": [8,8,200,40],
-                "text":"Facilities",
+                "text":"Buy Facility",
                 "justify" : "center",
                 "align" : "middle",
                 "style":"H4"
@@ -18,57 +18,13 @@
             {
                 "type": "button",
                 "name":"buy",
-                "bounds": [260,440,160,42],
-                "hotkey":"buy",
-                "sound":"cancel",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"New",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,160,48],
-                    "actor" : "actors/button.actor"
-                }
-            },
-            {
-                "type": "button",
-                "name":"sell",
-                "bounds": [420,440,160,42],
-                "hotkey":"sell",
-                "sound":"cancel",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Sell",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,160,48],
-                    "actor" : "actors/red_button.actor"
-                }
-            },
-            {
-                "type": "button",
-                "name":"repair",
                 "bounds": [580,440,160,42],
                 "hotkey":"repair",
-                "sound":"confirm",
+                "sound":"buy",
                 "label" :
                 {
                     "type": "label",
-                    "text":"Repair",
+                    "text":"Buy",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
@@ -169,6 +125,24 @@
                                 "justify" : "left",
                                 "align" : "top",
                                 "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,55,1,40],
+                                "text":"Price",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H4"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [20,50,1,1],
+                                "name":"costs",
+                                "style": "vertical",
+                                "item_size" : [1,200],
+                                "packed":true,
+                                "elements":
+                                []
                             }
                         ]
                     }
