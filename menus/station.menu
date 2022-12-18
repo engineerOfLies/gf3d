@@ -196,14 +196,14 @@
                 },
                 {
                     "type": "button",
-                    "name":"delete",
+                    "name":"sell",
                     "bounds": [10,0,160,42],
-                    "hotkey":"delete",
+                    "hotkey":"sell",
                     "sound":"confirm",
                     "label" :
                     {
                         "type": "label",
-                        "text":"Delete",
+                        "text":"Sell",
                         "bounds": [0,0,160,48],
                         "justify" : "center",
                         "align" : "middle",

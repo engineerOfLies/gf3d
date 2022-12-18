@@ -139,7 +139,7 @@ Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,
         0,
         (char *)text,
         gfc_rect(0,0,1,30),
-        gfc_color(1,1,1,1),
+        color,
         0,
         gfc_color(1,1,1,1),0,win);
     gf2d_element_make_label(le,label);

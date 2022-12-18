@@ -16,9 +16,9 @@
 #include "gf2d_windows_common.h"
 #include "gf2d_message_buffer.h"
 
+#include "player.h"
 #include "config_def.h"
 #include "resources.h"
-#include "resource_list.h"
 #include "station_def.h"
 #include "station.h"
 #include "station_extension_menu.h"
@@ -29,6 +29,7 @@ typedef struct
     StationSection *parent;
     StationData *station;
     const char *selected;
+    List *cost;
     Uint8 slot;
     int choice;
     List *list;
@@ -58,7 +59,6 @@ void station_buy_menu_select_item(Window *win,const char *name)
     SJson *def;
     Element *e;
     Element *cost_list;
-    List *costs; 
     const char *str;
     StationBuyMenuData *data;
     if ((!win)||(!win->data))return;
@@ -76,11 +76,12 @@ void station_buy_menu_select_item(Window *win,const char *name)
     {
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     }
-    costs = station_get_resource_cost(sj_object_get_value_as_string(def,"name"));
-    if (costs)
+    resources_list_free(data->cost);
+    data->cost = station_get_resource_cost(sj_object_get_value_as_string(def,"name"));
+    if (data->cost)
     {
-        cost_list = resource_list_new(win,"cost_list", vector2d(0,0),costs,NULL);
-        resources_list_free(costs);
+        cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost);
+        
         e = gf2d_window_get_element_by_name(win,"costs");
         gf2d_element_list_free_items(e);
         if (!e)return;
@@ -111,9 +112,16 @@ int station_buy_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"buy")==0)
         {
             if (win->child)return 1;
-            
-            station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
-            gf2d_window_free(win);
+            if (resources_list_afford(player_get_resources(),data->cost))
+            {
+                resource_list_buy(player_get_resources(), data->cost);
+                station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
+                gf2d_window_free(win);
+            }
+            else
+            {
+                message_new("We require more resources");
+            }
             return 1;
         }
         if (e->index >= 1000)

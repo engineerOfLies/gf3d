@@ -21,4 +21,16 @@ void camera_entity_enable_free_look(Uint8 enable);
  */
 void camera_entity_toggle_free_look();
 
+/**
+ * @brief set this position as the target to look at during auto pan mode
+ * @param target the point to look at
+ */
+void camera_entity_set_look_target(Vector3D target);
+
+/**
+ * @brief get the current look target location
+ * @return the target position
+ */
+Vector3D camera_entity_get_look_target();
+
 #endif

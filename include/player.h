@@ -26,7 +26,17 @@ Entity *player_new(const char *file);
  */
 PlayerData *player_get_data();
 
+/**
+ * @brief get the player's space station data
+ * @return NULL if no player, the station data otherwise
+ */
 StationData *player_get_station_data();
+
+/**
+ * @brief get the player's list of resoures
+ * @return NULL if no player data, the resource list otherwise
+ */
+List * player_get_resources();
 
 /**
  * @brief save the player data to file

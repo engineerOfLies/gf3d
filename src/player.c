@@ -159,6 +159,15 @@ void player_update(Entity *self)
     // this will be where I run the economy upkeep for the player.
 }
 
+List * player_get_resources()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->resources;
+}
+
 PlayerData *player_get_data()
 {
     if (!player_entity)return NULL;

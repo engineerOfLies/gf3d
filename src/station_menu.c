@@ -16,6 +16,7 @@
 
 #include "entity.h"
 #include "camera_entity.h"
+#include "resources.h"
 #include "station_def.h"
 #include "station.h"
 #include "player.h"
@@ -28,6 +29,7 @@ typedef struct
 {
     Matrix4 stationMat;
     Vector3D oldPosition;
+    Vector3D oldTarget;
     StationData *station;
     StationSection *selection;
     int choice;
@@ -48,6 +50,7 @@ int station_menu_free(Window *win)
     }
 
     gf3d_camera_set_position(data->oldPosition);
+    camera_entity_set_look_target(data->oldTarget);
     free(data);
     return 0;
 }
@@ -94,15 +97,20 @@ void station_menu_yes(void *Data)
     int parent;
     Window *win;
     StationMenuData *data;
+    List *cost;
     win = Data;
     if (!win)return;
     win->child = NULL;
     data = win->data;
     if (!data)return;
-    if ((data->selection)&&(data->selection->parent))
+    if (!data->selection)return;
+    cost = station_get_resource_cost(data->selection->name);
+    if (data->selection->parent)
     {
         parent = data->selection->parent->id;
     }else parent = 0;
+    resource_list_sell(player_get_resources(), cost,0.9);
+    resources_list_free(cost);
     station_remove_section(data->station,data->selection);
     station_menu_select_segment(win,data,parent);
 }
@@ -172,22 +180,22 @@ int station_menu_update(Window *win,List *updateList)
             }
             return 1;
         }
-        if (strcmp(e->name,"delete")==0)
+        if (strcmp(e->name,"sell")==0)
         {
             if (win->child)return 1;
             if (data->selection)
             {
                 if (data->selection->id == 0)
                 {
-                    message_new("cannot delete the base core of the station!");
+                    message_new("cannot sell the base core of the station!");
                     return 1;
                 }
                 if (gfc_list_get_count(data->selection->children) > 0)
                 {
-                    message_new("cannot delete section, it has extensions!");
+                    message_new("cannot sell section, it has child extensions!");
                     return 1;
                 }
-                win->child = window_yes_no("delete selected Section?", station_menu_yes,station_menu_no,win);
+                win->child = window_yes_no("Sell selected Section?", station_menu_yes,station_menu_no,win);
             }
             return 1;
         }
@@ -296,6 +304,7 @@ void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
 
     vector3d_add(camera,camera,offset);
     gf3d_camera_look_at(offset,&camera);
+    camera_entity_set_look_target(offset);
     
     display_name = station_def_get_display_name(section->name);
     if (display_name)
@@ -327,6 +336,7 @@ Window *station_menu_window(Window *parent,StationData *station)
     win->draw = station_menu_draw;
     data->station = station;
     data->oldPosition = gf3d_camera_get_position();
+    data->oldTarget = camera_entity_get_look_target();
     station_menu_select_segment(win,data,0);
     message_buffer_bubble();
     return win;

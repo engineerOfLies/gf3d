@@ -42,6 +42,20 @@ Entity *camera_entity_new(Vector3D position,Vector3D rotation)
     return ent;
 }
 
+void camera_entity_set_look_target(Vector3D target)
+{
+    if (!camera_entity)return;
+    vector3d_copy(camera_entity->velocity,target);
+}
+
+Vector3D camera_entity_get_look_target()
+{
+    Vector3D target = {0};
+    if (!camera_entity)return target;
+    return camera_entity->velocity;
+}
+
+
 void camera_entity_toggle_free_look()
 {
     camera_entity_enable_free_look(!camera_entity->hidden);
@@ -108,7 +122,7 @@ void camera_entity_think(Entity *self)
         return;
     }
     gf3d_camera_walk_right(moveSpeed/5);
-    gf3d_camera_look_at(vector3d(0,0,0),NULL);
+    gf3d_camera_look_at(camera_entity->velocity,NULL);
 }
 
 /*eol@eof*/
