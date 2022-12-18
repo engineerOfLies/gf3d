@@ -83,8 +83,8 @@ void station_buy_menu_select_item(Window *win,const char *name)
         cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost);
         
         e = gf2d_window_get_element_by_name(win,"costs");
-        gf2d_element_list_free_items(e);
         if (!e)return;
+        gf2d_element_list_free_items(e);
         gf2d_element_list_add_item(e,cost_list);
     }
 }

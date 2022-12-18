@@ -76,6 +76,14 @@ List *resources_list_parse(SJson *config)
     return resources;
 }
 
+const char *resources_get_display_name(const char *name)
+{
+    SJson *def;
+    def = config_def_get_by_name("resources",name);
+    if (!def)return NULL;
+    return sj_object_get_value_as_string(def,"displayName");
+}
+
 SJson *resources_list_save(List *list)
 {
     int i,c;
@@ -203,8 +211,8 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
         LS_Vertical,
         0,
         0,
-        1,
-        1);
+        0,
+        0);
     e = gf2d_element_new_full(
         NULL,
         0,
@@ -212,7 +220,7 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
         gfc_rect(offset.x,offset.y,1,1),
         gfc_color(1,1,1,1),
         0,
-        gfc_color(1,1,1,1),0,win);
+        gfc_color(0,0,0,1),1,win);
     gf2d_element_make_list(e,le);
     
     
@@ -223,8 +231,8 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
         {
             resource = gfc_list_get_nth(supply,i);
             if (!resource)continue;
-            gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resource->name);
-            gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H5,gfc_color(1,1,1,1)));
+            gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resources_get_display_name(resource->name));
+            gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,gfc_color(1,1,1,1)));
         }
     }
     else 
@@ -237,8 +245,8 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
             amount = resources_list_get_amount(supply,resource->name);
             if (amount >= resource->amount)color = gfc_color(0,1,0,1);
             else color = gfc_color(0.9,0.2,0.2,1);
-            gfc_line_sprintf(buffer,"%.2f / %.2f: %s",amount, resource->amount,resource->name);
-            gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H5,color));
+            gfc_line_sprintf(buffer,"%.2f / %.2f: %s",amount, resource->amount,resources_get_display_name(resource->name));
+            gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,color));
         }
     }
     return e;

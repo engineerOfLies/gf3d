@@ -1,0 +1,36 @@
+{
+    "window":{
+        "name":"resources_menu",
+        "dimensions" : [0,68,220,530],
+        "elements":
+        [
+        {
+            "type": "list",
+            "name": "list",
+            "bounds": [10,0,1,1],
+            "style": "vertical",
+            "item_size" : [1,40],
+            "elements":
+            [
+                {
+                    "type": "label",
+                    "bounds": [0,0,1,48],
+                    "text":"Resources",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H3"
+                },
+                {
+                    "type": "list",
+                    "bounds": [0,10,208,1],
+                    "name":"resources",
+                    "style": "vertical",
+                    "item_size" : [1,500],
+                    "elements":
+                    []
+                }
+            ]
+        }
+        ]
+    }
+}

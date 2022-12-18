@@ -42,6 +42,7 @@ int station_menu_free(Window *win)
     StationMenuData *data;
     if (!win)return 0;
     gf2d_window_close_child(win->parent,win);
+    gf2d_window_free(win->child);
     if (!win->data)return 0;
     data = win->data;
     if (data->station)

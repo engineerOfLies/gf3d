@@ -19,6 +19,7 @@
 #include "world.h"
 #include "player.h"
 #include "station_menu.h"
+#include "resources_menu.h"
 #include "hud_window.h"
 
 typedef struct
@@ -92,13 +93,28 @@ int hud_update(Window *win,List *updateList)
                 gf2d_window_free(win->child);
                 return 1;
             }
-            if ((!win->child)||(!gf2d_window_named(win->child,"station_menu")))
+            if (win->child)
             {
-                if (win->child)gf2d_window_free(win->child);
-                win->child = station_menu_window(win,player_get_station_data());
+                gf2d_window_free(win->child);
             }
+            win->child = station_menu_window(win,player_get_station_data());
             return 1;
         }
+        if (strcmp(e->name,"resources")==0)
+        {
+            if ((win->child)&&(gf2d_window_named(win->child,"resources_menu")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
+            if (win->child)
+            {
+                gf2d_window_free(win->child);
+            }
+            win->child = resources_menu(win);
+            return 1;
+        }
+        
         if (strcmp(e->name,"freelook")==0)
         {
             camera_entity_toggle_free_look();

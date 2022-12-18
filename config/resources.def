@@ -12,7 +12,7 @@
         },
         {
             "name":"population",
-            "DisplayName":"Population",
+            "displayName":"Population",
             "description":"The number of sentient beings living and working here",
             "precision":0,
             "negative":false,
@@ -20,7 +20,7 @@
         },
         {
             "name":"staff",
-            "DisplayName":"Staff",
+            "displayName":"Staff",
             "description":"The number of people working directly for the station",
             "precision":0,
             "negative":false,
@@ -28,7 +28,7 @@
         },
         {
             "name":"energy",
-            "DisplayName":"Energy",
+            "displayName":"Energy",
             "description":"regardless of technology type, the amount of power needed to run it is measured simply as 'energy'",
             "precision":2,
             "negative":true,
@@ -37,7 +37,7 @@
         },
         {
             "name":"fuel",
-            "DisplayName":"Fuel",
+            "displayName":"Fuel",
             "description":"High Density Gluons are the fuel source used for interstellar travel.  They are also the principle fuel for most fusion reactors to produce the energy needed to run everything.",
             "precision":0,
             "negative":false,
@@ -46,7 +46,7 @@
         },
         {
             "name":"food",
-            "DisplayName":"Food Supply",
+            "displayName":"Food Supply",
             "description":"Sentient beings need to eat.  Machine life needs complex matter to maintain their systems as well.  In order to keep the people living and working on the station healthy, you need enough to feed them all.",
             "precision":0,
             "negative":false,
@@ -55,7 +55,7 @@
         },
         {
             "name":"ores",
-            "DisplayName":"Metallic Ores",
+            "displayName":"Metallic Ores",
             "description":"The raw meterials needed in the refinement of more specific and useful metals and alloys.  Can be traded as is or refined into other materials",
             "precision":0,
             "negative":false,
@@ -64,7 +64,7 @@
         },
         {
             "name":"minerals",
-            "DisplayName":"Minerals",
+            "displayName":"Minerals",
             "description":"The raw meterials needed for the crafting of more advances materials and electronics.  Can be traded as is or refined into other materials",
             "precision":0,
             "negative":false,
@@ -73,7 +73,7 @@
         },
         {
             "name":"alloys",
-            "DisplayName":"Alloys",
+            "displayName":"Alloys",
             "description":"Refined metals needed to build the structures of advanced technologies.",
             "precision":0,
             "negative":false,
@@ -82,7 +82,7 @@
         },
         {
             "name":"common_materials",
-            "DisplayName":"Common Materials",
+            "displayName":"Common Materials",
             "description":"Refined from minerals. These are non-metallic materials used for everything from textiles to construction materials.",
             "precision":0,
             "negative":false,
@@ -91,7 +91,7 @@
         },
         {
             "name":"heavy_metals",
-            "DisplayName":"Heavy Metals",
+            "displayName":"Heavy Metals",
             "description":"Enriched metals that can be used in advanced technologies",
             "precision":0,
             "negative":false,
@@ -100,7 +100,7 @@
         },
         {
             "name":"meta_materials",
-            "DisplayName":"Meta Materials",
+            "displayName":"Meta Materials",
             "description":"Advanced materials that cannot be created through mundane means.  Many have properties that enable more advanced technologies.  Including FTL propulsion systems and energy weapons.",
             "precision":0,
             "negative":false,
@@ -109,7 +109,7 @@
         },
         {
             "name":"luxury_food",
-            "DisplayName":"Luxury Food",
+            "displayName":"Luxury Food",
             "description":"Rare and enhanced food items.  The results are highly sought after and can demand a higher price.  Use of it will improve moral.",
             "precision":0,
             "negative":false,
@@ -118,7 +118,7 @@
         },
         {
             "name":"illicit_items",
-            "DisplayName":"Illicit Items",
+            "displayName":"Illicit Items",
             "description":"Very valuable, but questionably legal depending on the faction.  Could be due to risk in consuming it, could be the harm that comes from harvesting it.",
             "precision":0,
             "negative":false,
@@ -127,7 +127,7 @@
         },
         {
             "name":"narcotics",
-            "DisplayName":"Narcotics",
+            "displayName":"Narcotics",
             "description":" Definitely illegal everywhere, but demands a high price.  If available in your station it could degrade the workforce, but keep them complacent.",
             "precision":0,
             "negative":false,

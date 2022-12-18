@@ -6,8 +6,8 @@
     "resources":{
       "credits":"10000.000000",
       "population":"800.000000",
-      "alloys":"1000.000000",
-      "staff":"100.000000"
+      "staff":"100.000000",
+      "alloys":"1000.000000"
     }
   },
   "station":{

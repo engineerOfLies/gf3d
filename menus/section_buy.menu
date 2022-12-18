@@ -95,32 +95,13 @@
                                 "bounds":[35,40,128,128],
                                 "backgroundColor":[0,0,0,250],
                                 "backgroundDraw":1
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [0,50,1,40],
-                                "text":"Price",
-                                "justify" : "center",
-                                "align" : "middle",
-                                "style":"H4"
-                            },
-                            {
-                                "type": "list",
-                                "bounds": [20,50,1,1],
-                                "name":"costs",
-                                "style": "vertical",
-                                "item_size" : [1,45],
-                                "packed":true,
-                                "elements":
-                                []
                             }
                         ]
                     },
                     {
                         "type": "list",
-                        "bounds": [0,20,200,1],
+                        "bounds": [0,20,400,1],
                         "style": "vertical",
-                        "packed":true,
                         "item_size" : [1,45],
                         "elements":
                         [
@@ -137,11 +118,29 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,40],
+                                "bounds": [0,0,450,100],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
                                 "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,55,1,40],
+                                "text":"Price",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H4"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [20,50,1,1],
+                                "name":"costs",
+                                "style": "vertical",
+                                "item_size" : [1,200],
+                                "packed":true,
+                                "elements":
+                                []
                             }
                         ]
                     }
