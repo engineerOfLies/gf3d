@@ -58,9 +58,14 @@ int facility_buy_menu_draw(Window *win)
 
 void facility_buy_menu_select_item(Window *win,const char *name)
 {
+    TextLine buffer;
     SJson *def;
     Element *e;
     Element *cost_list;
+    List *resources;
+    int staff = 0;
+    Bool officer = 0;
+    int storage = 0;
     const char *str;
     FacilityBuyMenuData *data;
     if ((!win)||(!win->data))return;
@@ -79,16 +84,51 @@ void facility_buy_menu_select_item(Window *win,const char *name)
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     }
     
+    sj_object_get_value_as_int(def,"staff",&staff);
+    gfc_line_sprintf(buffer,"Staff Required:  %i",staff);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
+
+    sj_object_get_value_as_bool(def,"officerSlot",(short int *)&officer);
+    if (officer)
+    {
+        gfc_line_sprintf(buffer,"Officer Position: Yes");
+    }
+    else gfc_line_sprintf(buffer,"Officer Position:  No");
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"officer"),buffer);
+
+    sj_object_get_value_as_int(def,"storage",&storage);
+    gfc_line_sprintf(buffer,"Storage Provided:  %iT",storage);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
+    
     resources_list_free(data->cost);
-    data->cost = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"));
+    data->cost = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"cost");
+    e = gf2d_window_get_element_by_name(win,"costs");
+    if (!e)return;
+    gf2d_element_list_free_items(e);
     if (data->cost)
     {
         cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost);
-        
-        e = gf2d_window_get_element_by_name(win,"costs");
-        if (!e)return;
-        gf2d_element_list_free_items(e);
         gf2d_element_list_add_item(e,cost_list);
+    }
+    resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"upkeep");
+    e = gf2d_window_get_element_by_name(win,"upkeep");
+    if (!e)return;
+    gf2d_element_list_free_items(e);
+    if (resources)
+    {
+        cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),resources,NULL);
+        gf2d_element_list_add_item(e,cost_list);
+        resources_list_free(resources);
+    }
+    resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"produces");
+    e = gf2d_window_get_element_by_name(win,"produces");
+    if (!e)return;
+    gf2d_element_list_free_items(e);
+    if (resources)
+    {
+        cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),resources,NULL);        
+        gf2d_element_list_add_item(e,cost_list);
+        resources_list_free(resources);
     }
 }
 

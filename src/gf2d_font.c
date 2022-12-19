@@ -109,9 +109,9 @@ void gf2d_font_init(const char *configFile)
         slog("TTF_Init: %s\n", TTF_GetError());
         return;
     }
+    font_manager.ttl = 100;
     gf2d_fonts_load_json(configFile);
     font_manager.font_images = gfc_list_new();
-    font_manager.ttl = 5000;// 100 milliseconds
     atexit(gf2d_font_close);
 }
 
@@ -240,6 +240,7 @@ void gf2d_fonts_load_json(const char *filename)
     SJson *file,*fonts,*item;
     file = sj_load(filename);
     if (!file)return;
+    sj_object_get_value_as_uint32(file,"ttl",&font_manager.ttl);
     sj_object_get_value_as_int(file,"row_padding",&font_manager.row_padding);
     fonts = sj_object_get_value(file,"fonts");
     if (!fonts)

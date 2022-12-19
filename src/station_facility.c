@@ -175,14 +175,15 @@ const char *station_facility_get_display_name(const char *name)
     return sj_object_get_value_as_string(facilityDef,"displayName");
 }
 
-List *station_facility_get_resource_cost(const char *name)
+List *station_facility_get_resource_cost(const char *name,const char *resource_type)
 {
     SJson *stationDef;
     if (!name)return NULL;
     stationDef = config_def_get_by_name("facilities",name);
     if (!stationDef)return NULL;
-    return resources_list_parse(sj_object_get_value(stationDef,"cost"));
+    return resources_list_parse(sj_object_get_value(stationDef,resource_type));
 }
+
 
 
 /*eol@eof*/

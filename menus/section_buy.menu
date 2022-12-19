@@ -1,10 +1,9 @@
 {
     "window":
     {
-        "dimensions" : [0,0,900,490],
+        "dimensions" : [0,80,900,490],
         "name":"station_buy_menu",
         "justify" : "center",
-        "align" : "middle",
         "elements":
         [
             {
@@ -69,7 +68,7 @@
                     {
                         "type": "list",
                         "name":"item_list",
-                        "bounds": [8,43,230,450],
+                        "bounds": [8,43,230,440],
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],
                         "backgroundDraw":1,
@@ -118,7 +117,7 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,100],
+                                "bounds": [0,0,450,120],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",

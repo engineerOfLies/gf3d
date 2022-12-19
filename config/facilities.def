@@ -4,10 +4,10 @@
         {
             "name":"command_and_control",
             "displayName":"Command and Control",
+            "unique":true,
             "icon":"",
             "description":"The bridge of the space station.  All intelligence and decisions are routed through here.  Here is where the station Commander sits.  Every station must have one somewhere.",
             "type":"operations",
-            "hull":1000,
             "cost":
             {   
                 "credits":1000
@@ -22,8 +22,8 @@
         {
             "name":"security",
             "displayName":"Security",
+            "unique":true,
             "icon":"",
-            "hull":500,
             "description":"The base of operations for station security.  Where the officers in charge of security are assigned, where holding cells are located.",
             "type":"operations",
             "cost":
@@ -31,6 +31,7 @@
                 "credits":500
             },
             "staff":20,
+            "officerSlot":true,
             "upkeep":
             {
                 "energy":10,
@@ -43,12 +44,12 @@
             "icon":"",
             "description":"This a processing plant that will turn the solar radiation collected into High Density Gluon plasma.  HDGs are the fuel source for interstellar ships, as well as the fual for the energy reactors that power the station.",
             "type":"solar_processor",
-            "hull":1000,
             "cost":
             {   
                 "credits":1000
             },
             "staff":10,
+            "officerSlot":true,
             "produces":
             {
                 "fuel":100
@@ -60,7 +61,6 @@
             "icon":"",
             "description":"This facility processes High Density Gluon plasms (HDGs) into raw energy that powers the rest of the station.",
             "type":"reactor",
-            "hull":1000,
             "cost":
             {   
                 "credits":1000,
@@ -68,6 +68,7 @@
                 "meta_materials":50
             },
             "staff":10,
+            "officerSlot":true,
             "upkeep":
             {
                 "fuel":100
@@ -83,13 +84,13 @@
             "icon":"",
             "description":"This facility processes raw minerals into common useful materials that can be used for a variety of applications.",
             "type":"industrial",
-            "hull":1000,
             "cost":
             {   
                 "credits":1000,
                 "common_materials":50
             },
             "staff":20,
+            "officerSlot":true,
             "upkeep":
             {
                 "energy":100,
@@ -106,13 +107,13 @@
             "icon":"",
             "description":"This facility processes raw ores into alloys that can be used for most technologies.",
             "type":"industrial",
-            "hull":1000,
             "cost":
             {   
                 "credits":2000,
                 "common_materials":50
             },
             "staff":20,
+            "officerSlot":true,
             "upkeep":
             {
                 "energy":100,
@@ -129,7 +130,6 @@
             "icon":"",
             "description":"This facility is equipped to store and make available commodities.  It's capacity",
             "type":"storage",
-            "hull":250,
             "cost":
             {   
                 "credits":1000,

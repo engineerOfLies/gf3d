@@ -54,22 +54,36 @@ int facility_menu_draw(Window *win)
     return 0;
 }
 
-void facility_menu_select_item(Window *win,const char *name)
+void facility_menu_select_item(Window *win,const char *name,int choice)
 {
     SJson *def;
+    TextLine buffer;
     const char *str;
+    Element *e;
+    Element *cost_list;
+    StationFacility *facility;
+    List *resources;
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
     if (!name)return;
     if (data->selected == name)return;//nothing to do
-    if (strcmp(name,"<Empty>")==0)
+    facility = gfc_list_get_nth(data->parent->facilities,choice);
+    if ((!facility)||(strcmp(name,"<Empty>")==0))
     {
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),"Empty Slot");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),"This slot is free for new facility installation");
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),NULL);
+        gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"produces"));
+        gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"upkeep"));
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
         return;
     }
+    
+    gfc_line_sprintf(buffer,"Staff: %i / %i",facility->staffAssigned,facility->staffRequired);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
+
+    
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
     def = config_def_get_by_parameter("facilities","displayName",name);
     if (!def)return;
@@ -82,6 +96,24 @@ void facility_menu_select_item(Window *win,const char *name)
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     }
 
+    resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"upkeep");
+    e = gf2d_window_get_element_by_name(win,"upkeep");
+    gf2d_element_list_free_items(e);
+    if (resources)
+    {
+        cost_list = resource_list_element_new(win,"upkeep_list", vector2d(0,0),resources,NULL);
+        gf2d_element_list_add_item(e,cost_list);
+        resources_list_free(resources);
+    }
+    resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"produces");
+    e = gf2d_window_get_element_by_name(win,"produces");
+    gf2d_element_list_free_items(e);
+    if (resources)
+    {
+        cost_list = resource_list_element_new(win,"produces_list", vector2d(0,0),resources,NULL);        
+        gf2d_element_list_add_item(e,cost_list);
+        resources_list_free(resources);
+    }
 }
 
 void facility_menu_yes(void *Data)
@@ -96,7 +128,7 @@ void facility_menu_yes(void *Data)
     data = win->data;
     if (!data)return;
     if (!data->selected)return;
-    cost = station_facility_get_resource_cost(station_facility_get_name_from_display(data->selected));
+    cost = station_facility_get_resource_cost(station_facility_get_name_from_display(data->selected),"cost");
     resource_list_sell(player_get_resources(), cost,0.9);
     resources_list_free(cost);
     
@@ -146,7 +178,7 @@ int facility_menu_update(Window *win,List *updateList)
         if (e->index >= 1000)
         {
             data->choice = e->index - 1000;
-            facility_menu_select_item(win,e->name);
+            facility_menu_select_item(win,e->name,data->choice);
             return 1;
         }
     }
@@ -194,7 +226,7 @@ void facility_menu_set_list(Window *win)
         str = station_facility_get_display_name(facility->name);
         if (i == 0)
         {
-            facility_menu_select_item(win,str);
+            facility_menu_select_item(win,str,0);
         }
         button = gf2d_button_new_label_simple(win,1000+i,str,gfc_color8(255,255,255,255));
         if (!button)continue;

@@ -70,6 +70,6 @@ const char *station_facility_get_display_name(const char *name);
 const char *station_facility_get_name_from_display(const char *display);
 
 
-List *station_facility_get_resource_cost(const char *name);
+List *station_facility_get_resource_cost(const char *name,const char *resource_type);
 
 #endif

@@ -57,7 +57,6 @@ List *resources_list_parse(SJson *config)
     int i,c;
     if (!config)
     {
-        slog("no config provided");
         return NULL;
     }
     resources = gfc_list_new();

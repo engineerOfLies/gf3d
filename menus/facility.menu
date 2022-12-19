@@ -1,10 +1,9 @@
 {
     "window":
     {
-        "dimensions" : [0,0,900,490],
+        "dimensions" : [0,80,900,490],
         "name":"station_facility_menu",
         "justify" : "center",
-        "align" : "middle",
         "elements":
         [
             {
@@ -114,7 +113,7 @@
                     {
                         "type": "list",
                         "name":"item_list",
-                        "bounds": [8,43,250,450],
+                        "bounds": [8,43,250,440],
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],
                         "backgroundDraw":1,
@@ -126,9 +125,9 @@
                     },
                     {
                         "type": "list",
-                        "bounds": [0,0,200,1],
+                        "bounds": [0,40,200,1],
                         "style": "vertical",
-                        "item_size" : [1,45],
+                        "item_size" : [1,30],
                         "packed":true,
                         "elements":
                         [
@@ -137,15 +136,60 @@
                                 "name":"item_picture",
                                 "justify":"center",
                                 "align":"middle",
-                                "bounds":[35,40,128,128],
+                                "bounds":[35,0,128,128],
                                 "backgroundColor":[0,0,0,250],
                                 "backgroundDraw":1
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [20,0,1,30],
+                                "name":"storage",
+                                "text":"Storage: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [20,0,1,40],
+                                "text":"Produces",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [20,0,200,80],
+                                "name":"produces",
+                                "style": "vertical",
+                                "item_size" : [250,80],
+                                "packed":true,
+                                "elements":
+                                []
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [20,0,1,40],
+                                "text":"Upkeep",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [20,0,200,80],
+                                "name":"upkeep",
+                                "style": "vertical",
+                                "item_size" : [250,80],
+                                "packed":true,
+                                "elements":
+                                []
                             }
                         ]
                     },
                     {
                         "type": "list",
-                        "bounds": [0,20,200,1],
+                        "bounds": [0,20,230,1],
                         "style": "vertical",
                         "packed":true,
                         "item_size" : [1,45],
@@ -164,11 +208,160 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,40],
+                                "bounds": [0,0,450,120],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
                                 "style":"H6"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [80,0,1,40],
+                                "style": "horizontal",
+                                "packed":true,
+                                "item_size" : [100,1],
+                                "elements":
+                                [
+                                    {
+                                        "type": "button",
+                                        "name":"office_hire",
+                                        "bounds": [0,0,80,21],
+                                        "hotkey":"none",
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"Assign",
+                                            "bounds": [0,0,80,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H6"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,80,24],
+                                            "scale":[0.5,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "label",
+                                        "bounds": [10,0,1,30],
+                                        "name":"officer",
+                                        "text":"Officer: <none>",
+                                        "justify" : "left",
+                                        "align" : "middle",
+                                        "style":"H5"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [80,0,1,40],
+                                "style": "horizontal",
+                                "packed":true,
+                                "item_size" : [80,1],
+                                "elements":
+                                [
+                                    {
+                                        "type": "button",
+                                        "name":"staff_assign",
+                                        "bounds": [0,0,40,21],
+                                        "hotkey":"none",
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"+",
+                                            "bounds": [0,0,40,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H5"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,40,24],
+                                            "scale":[0.25,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "button",
+                                        "name":"staff_remove",
+                                        "bounds": [0,0,40,21],
+                                        "hotkey":"none",
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"-",
+                                            "bounds": [0,0,40,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H5"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,40,24],
+                                            "scale":[0.25,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "label",
+                                        "bounds": [10,0,1,30],
+                                        "name":"staff",
+                                        "text":"Staff: 0 / 0",
+                                        "justify" : "left",
+                                        "align" : "middle",
+                                        "style":"H5"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [80,0,1,40],
+                                "style": "horizontal",
+                                "packed":true,
+                                "item_size" : [80,1],
+                                "elements":
+                                [
+                                    {
+                                        "type": "button",
+                                        "name":"disable",
+                                        "bounds": [0,0,80,21],
+                                        "hotkey":"none",
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"Disable",
+                                            "bounds": [0,0,80,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H6"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,80,24],
+                                            "scale":[0.5,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "label",
+                                        "bounds": [10,0,1,30],
+                                        "name":"active",
+                                        "text":"Active: Yes",
+                                        "justify" : "left",
+                                        "align" : "middle",
+                                        "style":"H5"
+                                    }
+                                ]
                             }
                         ]
                     }

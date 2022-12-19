@@ -1,10 +1,9 @@
 {
     "window":
     {
-        "dimensions" : [0,0,900,490],
+        "dimensions" : [0,80,900,490],
         "name":"facility_buy_menu",
         "justify" : "center",
-        "align" : "middle",
         "elements":
         [
             {
@@ -70,7 +69,7 @@
                     {
                         "type": "list",
                         "name":"item_list",
-                        "bounds": [8,43,250,450],
+                        "bounds": [8,43,250,440],
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],
                         "backgroundDraw":1,
@@ -96,6 +95,42 @@
                                 "bounds":[35,40,128,128],
                                 "backgroundColor":[0,0,0,250],
                                 "backgroundDraw":1
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [20,40,1,40],
+                                "text":"Produces",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H4"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [20,40,200,100],
+                                "name":"produces",
+                                "style": "vertical",
+                                "item_size" : [250,100],
+                                "packed":true,
+                                "elements":
+                                []
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [20,60,1,40],
+                                "text":"Upkeep",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H4"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [20,60,200,100],
+                                "name":"upkeep",
+                                "style": "vertical",
+                                "item_size" : [250,100],
+                                "packed":true,
+                                "elements":
+                                []
                             }
                         ]
                     },
@@ -120,7 +155,7 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,40],
+                                "bounds": [0,0,450,120],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
@@ -128,18 +163,45 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [0,55,1,40],
-                                "text":"Price",
-                                "justify" : "center",
+                                "bounds": [80,0,1,30],
+                                "name":"officer",
+                                "text":"Officer Needed: No",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,0,1,30],
+                                "name":"staff",
+                                "text":"Staff Required: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,0,1,30],
+                                "name":"storage",
+                                "text":"Storage Provided: No",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,20,1,40],
+                                "text":"Install Price",
+                                "justify" : "left",
                                 "align" : "middle",
                                 "style":"H4"
                             },
                             {
                                 "type": "list",
-                                "bounds": [20,50,1,1],
+                                "bounds": [80,20,300,200],
                                 "name":"costs",
                                 "style": "vertical",
-                                "item_size" : [1,200],
+                                "item_size" : [320,100],
                                 "packed":true,
                                 "elements":
                                 []
