@@ -122,10 +122,6 @@
             "position":[0,0,0],
             "rotates":1,
             "scale":[1,1,1],
-            "upkeep":
-            {
-                "energy":200
-            },
             "stats":
             {
                 "hull":1000
@@ -159,10 +155,6 @@
             "position":[0,0,0],
             "rotates":1,
             "scale":[1,1,1],
-            "upkeep":
-            {
-                "energy":400
-            },
             "stats":
             {
                 "hull":2000
@@ -197,10 +189,6 @@
             "position":[0,0,0],
             "scale":[1,1,1],
             "rotates":1,
-            "upkeep":
-            {
-                "energy":200
-            },
             "stats":
             {
                 "hull":1500
@@ -235,10 +223,6 @@
             [
                 "hdg_reactor1"
             ],
-            "upkeep":
-            {
-                "fuel":1
-            },
             "stats":
             {
                 "hull":1000
@@ -264,10 +248,6 @@
             "description":"Rotating section allows for working personnel to work more comfortably.  Section is designed to support the flow of energy, materials, and goods ideal for industrial activities.",
             "position":[0,0,0],
             "rotates":0.5,
-            "upkeep":
-            {
-                "energy":100
-            },
             "stats":
             {
                 "hull":3000
@@ -369,10 +349,6 @@
             "position":[0,0,0],
             "scale":[1,1,1],
             "rotates":0,
-            "upkeep":
-            {
-                "energy":200
-            },
             "stats":
             {
                 "hull":200

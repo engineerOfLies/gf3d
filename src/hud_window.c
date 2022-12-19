@@ -4,6 +4,7 @@
 #include "gfc_input.h"
 #include "gfc_callbacks.h"
 
+#include "gf2d_font.h"
 #include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_label.h"
@@ -17,7 +18,9 @@
 #include "camera_entity.h"
 #include "station.h"
 #include "world.h"
+#include "resources.h"
 #include "player.h"
+#include "station.h"
 #include "station_menu.h"
 #include "resources_menu.h"
 #include "hud_window.h"
@@ -25,7 +28,6 @@
 typedef struct
 {
     Entity  *player;
-    List    *station_list;
     int     selection;
     Window  *messages;
     World   *w;
@@ -133,10 +135,37 @@ int hud_update(Window *win,List *updateList)
 
 int hud_draw(Window *win)
 {
+    TextLine buffer;
+    List *resources;
+    Vector2D res, position;
     HUDWindowData *data;
+    StationData *station;
+
     if ((!win)||(!win->data))return 0;
+    res = gf3d_vgraphics_get_resolution();
     data = win->data;
     world_draw(data->w);
+    
+    position.x = res.x *0.75;
+    position.y = res.y - 100;
+    gf2d_draw_window_border_generic(gfc_rect(position.x,position.y,res.x *0.25,100),gfc_color8(255,255,255,255));
+    
+    station = player_get_station_data();
+    if (!station)return 0;
+    position.y += 10;
+    position.x += 20;
+    gfc_line_sprintf(buffer,"Station HULL: %i / %i",(int)station->hull,(int)station->hullMax);
+    gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
+
+    position.y += 28;
+    gfc_line_sprintf(buffer,"Energy Supply: %i / %i",(int)station->energyDraw,(int)station->energyOutput);
+    gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
+
+    resources = player_get_resources();
+    if (!resources)return 0;
+    position.y += 28;
+    gfc_line_sprintf(buffer,"Credits: %iCr",(int)resources_list_get_amount(resources,"credits"));
+    gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
     return 0;
 }
 

@@ -10,11 +10,12 @@ typedef struct
 {
     TextLine    name;  //its name identifier
     TextLine    facilityType;
-    int         hull,hullmax;   //keeps track of damage.  Damaged facilities lave lower output
+    float       damage;   //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
     int         staffRequired;  //how many people are needed to run the facility
     int         staffAssigned;     //how many people are actually hired to do so
     int         inactive;//if the facility cannot run
     int         disabled;//if the player has chosen to turn it off
+    int         storage;// how many commodities can be stored here
     TextLine    officer;//if there is an officer assigned to help run this facility
     List        *upkeep;    //what resources are needed to keep this running every update
     List        *produces;  //what this produces every update cycle

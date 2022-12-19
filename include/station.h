@@ -10,29 +10,31 @@
 
 typedef struct StaionSection_S
 {
-    TextLine name;  //its name identifier
-    Uint32 id;      //unique ID for the station section
-    ModelMat mat;
-    float hull,hullMax;
-    float energyOutput,energyInput;
-    float rotates;//if it rotates
     struct StaionSection_S *parent;// if not null, this is the parent
-    Uint8 slot;                      // where the section is mounted on the parent
-    Uint8 expansionSlots;            // how many sections can link off of this
-    List *children;
-    Uint8 facilitySlots;             // how many facilities can be installed in this section
-    List *facilities;
+    TextLine    name;  //its name identifier
+    Uint32      id;      //unique ID for the station section
+    ModelMat    mat;
+    float       hull,hullMax;
+    float       energyOutput,energyDraw;
+    float       rotates;//if it rotates
+    int         storageCapacity;
+    Uint8       slot;                      // where the section is mounted on the parent
+    Uint8       expansionSlots;            // how many sections can link off of this
+    List       *children;
+    Uint8       facilitySlots;             // how many facilities can be installed in this section
+    List       *facilities;
 }StationSection;
 
 typedef struct
 {
-    Uint32 idPool;      /**<keeps track of unique station IDs*/
-    ModelMat *mat;
-    int    sectionHighlight;
-    float  sectionRotation;
-    float  hull,hullMax;
-    float  energyOutput,energyInput;
-    List *sections;     /**<list of staiton sections*/
+    Uint32      idPool;      /**<keeps track of unique station IDs*/
+    ModelMat   *mat;
+    int         sectionHighlight;
+    float       sectionRotation;
+    float       hull,hullMax;
+    float       energyOutput,energyDraw;
+    int         storageCapacity;
+    List       *sections;     /**<list of staiton sections*/
 }StationData;
 
 /**
@@ -42,6 +44,13 @@ typedef struct
  * @return NULL on error, or an agumon entity pointer on success
  */
 Entity *station_new(Vector3D position,SJson *config);
+
+/**
+ * @brief update the global station values based on its sections and facilities.
+ * @note should be called every time there is an update
+ * @param station the station to recalc for
+ */
+void station_recalc_values(StationData *station);
 
 /**
  * @brief convert station data into a saveable json object

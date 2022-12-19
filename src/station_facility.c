@@ -101,6 +101,7 @@ StationFacility *station_facility_load(SJson *config)
         return NULL;
     }
     sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);
+    sj_object_get_value_as_int(config,"storage",&facility->storage);
     sj_object_get_value_as_bool(config,"inactive",(short int*)&facility->inactive);
     sj_object_get_value_as_bool(config,"disabled",(short int*)&facility->disabled);
     str = sj_object_get_value_as_string(config,"officer");

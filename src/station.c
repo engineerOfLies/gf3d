@@ -277,6 +277,49 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     return section;
 }
 
+void station_section_recalc_values(StationSection *section)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!section)return;
+    c = gfc_list_get_count(section->facilities);
+    section->storageCapacity = 0;
+    section->energyOutput = 0;
+    section->energyDraw = 0;
+    for (i = 0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(section->facilities,i);
+        if (!facility)continue;
+        if ((facility->disabled)||(facility->inactive))continue;//skip the ones inactive for whatever reason
+        section->energyDraw += resources_list_get_amount(facility->upkeep,"energy");
+        section->energyOutput += resources_list_get_amount(facility->produces,"energy");
+        section->storageCapacity += facility->storage;
+    }
+}
+
+void station_recalc_values(StationData *station)
+{
+    int i,c;
+    StationSection *section;
+    if (!station)return;
+    station->hull = 0;
+    station->hullMax = 0;
+    station->storageCapacity = 0;
+    station->energyOutput = 0;
+    station->energyDraw = 0;
+    c = gfc_list_get_count(station->sections);
+    for (i = 0; i < c; i++)
+    {
+        section = gfc_list_get_nth(station->sections,i);
+        if (!section)continue;
+        station_section_recalc_values(section);
+        station->hull += section->hull;
+        station->hullMax += section->hullMax;
+        station->storageCapacity += section->storageCapacity;
+        station->energyOutput += section->energyOutput;
+        station->energyDraw += section->energyDraw;
+    }
+}
 
 
 Entity *station_new(Vector3D position,SJson *config)
@@ -374,6 +417,7 @@ void station_update(Entity *self)
     }
     if (!self->data)return;
     data = self->data;
+    station_recalc_values(data);
     data->sectionRotation += 0.0005;
 }
 

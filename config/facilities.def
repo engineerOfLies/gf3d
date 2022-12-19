@@ -49,10 +49,6 @@
                 "credits":1000
             },
             "staff":10,
-            "upkeep":
-            {
-                "credits":10
-            },
             "produces":
             {
                 "fuel":100
@@ -67,16 +63,88 @@
             "hull":1000,
             "cost":
             {   
-                "credits":1000
+                "credits":1000,
+                "alloys":50,
+                "meta_materials":50
             },
             "staff":10,
             "upkeep":
             {
-                "credits":10
+                "fuel":100
             },
             "produces":
             {
-                "fuel":100
+                "energy":1000
+            }
+        },
+        {
+            "name":"material_processor1",
+            "displayName":"Material Processor Mk1",
+            "icon":"",
+            "description":"This facility processes raw minerals into common useful materials that can be used for a variety of applications.",
+            "type":"industrial",
+            "hull":1000,
+            "cost":
+            {   
+                "credits":1000,
+                "common_materials":50
+            },
+            "staff":20,
+            "upkeep":
+            {
+                "energy":100,
+                "minerals":100
+            },
+            "produces":
+            {
+                "common_materials":50
+            }
+        },
+        {
+            "name":"alloy_processor1",
+            "displayName":"Alloy Processor Mk1",
+            "icon":"",
+            "description":"This facility processes raw ores into alloys that can be used for most technologies.",
+            "type":"industrial",
+            "hull":1000,
+            "cost":
+            {   
+                "credits":2000,
+                "common_materials":50
+            },
+            "staff":20,
+            "upkeep":
+            {
+                "energy":100,
+                "ores":100
+            },
+            "produces":
+            {
+                "alloys":50
+            }
+        },
+        {
+            "name":"cargo_hold",
+            "displayName":"Cargo Hold",
+            "icon":"",
+            "description":"This facility is equipped to store and make available commodities.  It's capacity",
+            "type":"storage",
+            "hull":250,
+            "cost":
+            {   
+                "credits":1000,
+                "alloys":100
+            },
+            "staff":20,
+            "storage":1000,
+            "upkeep":
+            {
+                "energy":100,
+                "ores":100
+            },
+            "produces":
+            {
+                "alloys":50
             }
         }
     ]
