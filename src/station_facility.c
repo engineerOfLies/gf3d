@@ -55,6 +55,12 @@ List *station_facility_get_possible_list(StationSection *parent)
     return list;
 }
 
+void station_facility_update(StationFacility *facility)
+{
+    if (!facility)return;
+    
+}
+
 void station_facility_free(StationFacility *facility)
 {
     if (!facility)return;
@@ -139,6 +145,8 @@ StationFacility *station_facility_new_by_name(const char *name)
     res = sj_object_get_value(facilityDef,"upkeep");
     if (res)facility->upkeep = resources_list_parse(res);
     sj_object_get_value_as_int(facilityDef,"staff",&facility->staffRequired);
+    sj_object_get_value_as_int(facilityDef,"energyDraw",&facility->energyDraw);
+    sj_object_get_value_as_int(facilityDef,"energyOutput",&facility->energyOutput);
     return facility;
 }
 

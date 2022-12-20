@@ -63,6 +63,7 @@ void facility_buy_menu_select_item(Window *win,const char *name)
     Element *e;
     Element *cost_list;
     List *resources;
+    int energyOutput = 0,energyDraw = 0;
     int staff = 0;
     Bool officer = 0;
     int storage = 0;
@@ -100,6 +101,16 @@ void facility_buy_menu_select_item(Window *win,const char *name)
     gfc_line_sprintf(buffer,"Storage Provided:  %iT",storage);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
     
+    sj_object_get_value_as_int(def,"energyOutput",&energyOutput);
+    sj_object_get_value_as_int(def,"energyDraw",&energyDraw);
+    if (energyOutput > 0 )
+        gfc_line_sprintf(buffer,"Energy Ouput: %i",energyOutput);
+    else if (energyDraw > 0 )
+        gfc_line_sprintf(buffer,"Energy Draw: %i",energyDraw);
+    else
+        gfc_line_sprintf(buffer,"Energy Use: 0");
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
+
     resources_list_free(data->cost);
     data->cost = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"cost");
     e = gf2d_window_get_element_by_name(win,"costs");

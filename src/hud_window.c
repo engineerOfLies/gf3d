@@ -158,7 +158,7 @@ int hud_draw(Window *win)
     gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
 
     position.y += 28;
-    gfc_line_sprintf(buffer,"Energy Supply: %i / %i",(int)station->energyDraw,(int)station->energyOutput);
+    gfc_line_sprintf(buffer,"Energy Supply: %i",(int)(station->energyOutput - station->energyDraw));
     gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
 
     resources = player_get_resources();

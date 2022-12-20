@@ -77,12 +77,20 @@ void facility_menu_select_item(Window *win,const char *name,int choice)
         gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"produces"));
         gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"upkeep"));
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
         return;
     }
     
     gfc_line_sprintf(buffer,"Staff: %i / %i",facility->staffAssigned,facility->staffRequired);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
+    if (facility->energyOutput > 0 )
+        gfc_line_sprintf(buffer,"Energy Ouput: %i",facility->energyOutput);
+    else if (facility->energyDraw > 0 )
+        gfc_line_sprintf(buffer,"Energy Draw: %i",facility->energyDraw);
+    else
+        gfc_line_sprintf(buffer,"Energy Use: 0");
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
     
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
     def = config_def_get_by_parameter("facilities","displayName",name);

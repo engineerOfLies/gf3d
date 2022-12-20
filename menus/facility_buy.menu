@@ -182,6 +182,15 @@
                             {
                                 "type": "label",
                                 "bounds": [80,0,1,30],
+                                "name":"energy",
+                                "text":"Energy Draw: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,0,1,30],
                                 "name":"storage",
                                 "text":"Storage Provided: No",
                                 "justify" : "left",
@@ -190,7 +199,7 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,20,1,40],
+                                "bounds": [80,0,1,40],
                                 "text":"Install Price",
                                 "justify" : "left",
                                 "align" : "middle",
@@ -198,10 +207,10 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,20,300,200],
+                                "bounds": [80,0,300,180],
                                 "name":"costs",
                                 "style": "vertical",
-                                "item_size" : [320,100],
+                                "item_size" : [320,90],
                                 "packed":true,
                                 "elements":
                                 []

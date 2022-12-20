@@ -13,9 +13,9 @@
                 "credits":1000
             },
             "staff":10,
+            "energyDraw":10,
             "upkeep":
             {
-                "energy":10,
                 "credits":150
             }
         },
@@ -31,10 +31,10 @@
                 "credits":500
             },
             "staff":20,
+            "energyDraw":10,
             "officerSlot":true,
             "upkeep":
             {
-                "energy":10,
                 "credits":300
             }
         },
@@ -49,6 +49,7 @@
                 "credits":1000
             },
             "staff":10,
+            "energyDraw":10,
             "officerSlot":true,
             "produces":
             {
@@ -68,14 +69,11 @@
                 "meta_materials":50
             },
             "staff":10,
+            "energyOutput":1000,
             "officerSlot":true,
             "upkeep":
             {
                 "fuel":100
-            },
-            "produces":
-            {
-                "energy":1000
             }
         },
         {
@@ -90,10 +88,10 @@
                 "common_materials":50
             },
             "staff":20,
+            "energyDraw":100,
             "officerSlot":true,
             "upkeep":
             {
-                "energy":100,
                 "minerals":100
             },
             "produces":
@@ -113,10 +111,10 @@
                 "common_materials":50
             },
             "staff":20,
+            "energyDraw":100,
             "officerSlot":true,
             "upkeep":
             {
-                "energy":100,
                 "ores":100
             },
             "produces":
@@ -136,10 +134,10 @@
                 "alloys":100
             },
             "staff":20,
+            "energyDraw":100,
             "storage":1000,
             "upkeep":
             {
-                "energy":100,
                 "ores":100
             },
             "produces":

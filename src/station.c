@@ -291,8 +291,8 @@ void station_section_recalc_values(StationSection *section)
         facility = gfc_list_get_nth(section->facilities,i);
         if (!facility)continue;
         if ((facility->disabled)||(facility->inactive))continue;//skip the ones inactive for whatever reason
-        section->energyDraw += resources_list_get_amount(facility->upkeep,"energy");
-        section->energyOutput += resources_list_get_amount(facility->produces,"energy");
+        section->energyDraw += facility->energyDraw;
+        section->energyOutput += facility->energyOutput;
         section->storageCapacity += facility->storage;
     }
 }
