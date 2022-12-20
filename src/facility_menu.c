@@ -157,11 +157,12 @@ int facility_menu_update(Window *win,List *updateList)
     int i,count;
     Element *e;
     FacilityMenuData* data;
+    PlayerData *player;
     if ((!win)||(!win->data))return 0;
     if (!updateList)return 0;
     data = (FacilityMenuData*)win->data;
     if (!data)return 0;
-        
+    player = player_get_data();
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
@@ -175,14 +176,27 @@ int facility_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"staff_assign")==0)
         {
             if (!data->facility)return 1;//nothing selected
-            if (data->facility->staffAssigned < data->facility->staffRequired)data->facility->staffAssigned++;
+            if (data->facility->staffAssigned < data->facility->staffRequired)
+            {
+                if (player->staff <= 0)
+                {
+                    message_new("Cannot assign any more staff.  Please hire more.");
+                    return 1;
+                }
+                data->facility->staffAssigned++;
+                player->staff--;
+            }
             facility_menu_select_item(win,data->choice);//this will redraw
             return 1;
         }
         if (strcmp(e->name,"staff_remove")==0)
         {
             if (!data->facility)return 1;//nothing selected
-            if (data->facility->staffAssigned > 0)data->facility->staffAssigned--;
+            if (data->facility->staffAssigned > 0)
+            {
+                data->facility->staffAssigned--;
+                player->staff++;
+            }
             facility_menu_select_item(win,data->choice);//this will redraw
             return 1;
         }
