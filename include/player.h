@@ -9,6 +9,8 @@ typedef struct
     float   wages;              /**<how much you pay employees*/
     float   taxRate;            /**<how much locals provide for the system*/
     float   salesTaxRate;       /**<rate of income for commerce*/
+    int     population;         /**<how many people live in on the station.  This is for taing purposes*/
+    int     staff;              /**<people hired by the station to work for the station*/
     List   *resources;          /**<list of resources of the station*/
     Entity *station;            /**<the station of the player*/
 }PlayerData;

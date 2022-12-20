@@ -3,11 +3,14 @@
 #include "gfc_list.h"
 #include "gfc_config.h"
 
+#include "gf2d_message_buffer.h"
+
 #include "gf3d_draw.h"
 
 #include "config_def.h"
 #include "station_def.h"
 #include "resources.h"
+#include "player.h"
 #include "station.h"
 #include "station_facility.h"
 
@@ -57,8 +60,43 @@ List *station_facility_get_possible_list(StationSection *parent)
 
 void station_facility_update(StationFacility *facility)
 {
-    if (!facility)return;
-    
+    List *supply;
+    float productivity = 1;
+    if ((!facility)||(facility->disabled))return;
+    supply = player_get_resources();
+    if (!supply)return;
+    if (facility->damage >= 50)
+    {
+        if (!facility->inactive)message_printf("Facility %s is too damaged to function.",facility->name);
+        facility->inactive = 1;
+        return;
+    }
+    productivity *= (50.0 - facility->damage)/50.0;//factor based on damage
+    if (facility->staffRequired)
+    {
+        if (!facility->staffAssigned)
+        {
+            if (!facility->inactive)message_printf("Facility %s requires staff to function.",facility->name);
+            facility->inactive = 1;
+            return;
+        }
+        productivity *= (facility->staffAssigned/facility->staffRequired);
+    }
+    if (facility->upkeep)
+    {
+        if (!resources_list_afford(supply, facility->upkeep))
+        {
+            if (!facility->inactive)message_printf("Facility %s: not enough resources to run",facility->name);
+            facility->inactive = 1;
+            return;
+        }
+        facility->inactive = 0;
+        resource_list_buy(supply, facility->upkeep);
+    }
+    if (facility->produces)
+    {
+        resource_list_sell(supply, facility->produces,productivity);
+    }
 }
 
 void station_facility_free(StationFacility *facility)

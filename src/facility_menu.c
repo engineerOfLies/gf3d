@@ -29,6 +29,7 @@ typedef struct
 {
     StationSection *parent;
     StationData *station;
+    StationFacility *facility;
     const char *selected;
     int choice;
 }FacilityMenuData;
@@ -54,22 +55,19 @@ int facility_menu_draw(Window *win)
     return 0;
 }
 
-void facility_menu_select_item(Window *win,const char *name,int choice)
+void facility_menu_select_item(Window *win,int choice)
 {
     SJson *def;
     TextLine buffer;
-    const char *str;
+    const char *str,*name;
     Element *e;
     Element *cost_list;
-    StationFacility *facility;
     List *resources;
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
-    if (!name)return;
-    if (data->selected == name)return;//nothing to do
-    facility = gfc_list_get_nth(data->parent->facilities,choice);
-    if ((!facility)||(strcmp(name,"<Empty>")==0))
+    data->facility = gfc_list_get_nth(data->parent->facilities,choice);
+    if (!data->facility)
     {
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),"Empty Slot");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),"This slot is free for new facility installation");
@@ -80,14 +78,14 @@ void facility_menu_select_item(Window *win,const char *name,int choice)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
         return;
     }
-    
-    gfc_line_sprintf(buffer,"Staff: %i / %i",facility->staffAssigned,facility->staffRequired);
+    name = data->selected = station_facility_get_display_name(data->facility->name);
+    gfc_line_sprintf(buffer,"Staff: %i / %i",data->facility->staffAssigned,data->facility->staffRequired);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
-    if (facility->energyOutput > 0 )
-        gfc_line_sprintf(buffer,"Energy Ouput: %i",facility->energyOutput);
-    else if (facility->energyDraw > 0 )
-        gfc_line_sprintf(buffer,"Energy Draw: %i",facility->energyDraw);
+    if (data->facility->energyOutput > 0 )
+        gfc_line_sprintf(buffer,"Energy Ouput: %i",data->facility->energyOutput);
+    else if (data->facility->energyDraw > 0 )
+        gfc_line_sprintf(buffer,"Energy Draw: %i",data->facility->energyDraw);
     else
         gfc_line_sprintf(buffer,"Energy Use: 0");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
@@ -174,9 +172,24 @@ int facility_menu_update(Window *win,List *updateList)
             gf2d_window_free(win);
             return 1;
         }
+        if (strcmp(e->name,"staff_assign")==0)
+        {
+            if (!data->facility)return 1;//nothing selected
+            if (data->facility->staffAssigned < data->facility->staffRequired)data->facility->staffAssigned++;
+            facility_menu_select_item(win,data->choice);//this will redraw
+            return 1;
+        }
+        if (strcmp(e->name,"staff_remove")==0)
+        {
+            if (!data->facility)return 1;//nothing selected
+            if (data->facility->staffAssigned > 0)data->facility->staffAssigned--;
+            facility_menu_select_item(win,data->choice);//this will redraw
+            return 1;
+        }
         if (strcmp(e->name,"buy")==0)
         {
             win->child = facility_buy_menu(win,data->parent,data->choice);
+            return 1;
         }
         if (strcmp(e->name,"sell")==0)
         {
@@ -186,7 +199,7 @@ int facility_menu_update(Window *win,List *updateList)
         if (e->index >= 1000)
         {
             data->choice = e->index - 1000;
-            facility_menu_select_item(win,e->name,data->choice);
+            facility_menu_select_item(win,data->choice);
             return 1;
         }
     }
@@ -232,14 +245,11 @@ void facility_menu_set_list(Window *win)
             continue;
         }
         str = station_facility_get_display_name(facility->name);
-        if (i == 0)
-        {
-            facility_menu_select_item(win,str,0);
-        }
         button = gf2d_button_new_label_simple(win,1000+i,str,gfc_color8(255,255,255,255));
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }
+    facility_menu_select_item(win,0);
 }
 
 Window *facility_menu(Window *parent,StationData *station, StationSection *parentSection)
