@@ -31,6 +31,9 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"wages",sj_new_float(data->wages));
     sj_object_insert(json,"taxRate",sj_new_float(data->taxRate));
     sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));
+    sj_object_insert(json,"staff",sj_new_int(data->staff));
+    sj_object_insert(json,"population",sj_new_int(data->population));
+    sj_object_insert(json,"day",sj_new_int(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
     return json;
 }
@@ -64,6 +67,9 @@ PlayerData *player_data_parse(SJson *json)
     data = gfc_allocate_array(sizeof(PlayerData),1);
     if (!data)return NULL;
     data->resources = gfc_list_new();
+    sj_get_integer_value(sj_object_get_value(json,"day"),&data->day);
+    sj_get_integer_value(sj_object_get_value(json,"staff"),&data->staff);
+    sj_get_integer_value(sj_object_get_value(json,"population"),&data->population);
     sj_get_float_value(sj_object_get_value(json,"wages"),&data->wages);
     sj_get_float_value(sj_object_get_value(json,"taxRate"),&data->taxRate);
     sj_get_float_value(sj_object_get_value(json,"salesTaxRate"),&data->salesTaxRate);

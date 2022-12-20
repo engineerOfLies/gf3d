@@ -79,9 +79,19 @@ int resources_menu_draw(Window *win)
 
 void resource_menu_update_resources(Window *win)
 {
+    TextLine buffer;
     Element *e;
     Element *resource_list;
+    PlayerData *player;
     if (!win)return;
+    player = player_get_data();
+    if (!player)return;
+
+    gfc_line_sprintf(buffer,"Population : %i",player->population);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"population"),buffer);
+
+    gfc_line_sprintf(buffer,"Staff Hired : %i",player->staff);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
     
     resource_list = resource_list_element_new(win,"resource_list", vector2d(0,0),player_get_resources(),NULL);
     e = gf2d_window_get_element_by_name(win,"resources");

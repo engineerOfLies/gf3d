@@ -1,11 +1,13 @@
 {
   "player":{
+    "day":0,
     "wages":"15.000000",
     "taxRate":"0.090000",
+    "population":"800",
+    "staff":"20",
     "salesTaxRate":"0.090000",
     "resources":{
       "credits":"10000.000000",
-      "population":"800.000000",
       "ore":"1000.000000",
       "minerals":"2000.000000",
       "common_materials":"100.000000",
@@ -90,7 +92,7 @@
         "facilities":[
           {
             "name":"hdg_reactor1",
-            "staff":"0",
+            "staff":"10",
             "inactive":"false",
             "disabled":"false"
           }

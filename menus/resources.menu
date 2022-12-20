@@ -9,7 +9,8 @@
             "name": "list",
             "bounds": [10,0,1,1],
             "style": "vertical",
-            "item_size" : [1,40],
+            "item_size" : [1,30],
+            "packed":true,
             "elements":
             [
                 {
@@ -21,8 +22,34 @@
                     "style":"H3"
                 },
                 {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "text":"Population : 0",
+                    "name":"population",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "name":"staff",
+                    "text":"Staff Unassigned: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [0,20,1,30],
+                    "text":"Commodities:",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                {
                     "type": "list",
-                    "bounds": [0,10,208,1],
+                    "bounds": [0,20,208,1],
                     "name":"resources",
                     "style": "vertical",
                     "item_size" : [1,500],
