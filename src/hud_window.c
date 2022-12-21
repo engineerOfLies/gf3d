@@ -46,28 +46,6 @@ int hud_free(Window *win)
     return 0;
 }
 
-void hud_station_selected(void *Data)
-{
-    Window *win;
-    HUDWindowData *data;
-    win = Data;
-    if ((!win)||(!win->data))return;
-    data = (HUDWindowData*)win->data;
-    win->child = NULL;
-    if (data->selection < 0)return;// nothing selected
-    
-    switch(data->selection)
-    {
-        case 2:
-            message_new("4");
-            message_new("3");
-            message_new("2");
-            message_new("1");
-            message_new("BOOM");
-            break;
-    }
-}
-
 int hud_update(Window *win,List *updateList)
 {
     int i,count;
@@ -146,9 +124,9 @@ int hud_draw(Window *win)
     data = win->data;
     world_draw(data->w);
     
-    position.x = res.x *0.75;
+    position.x = res.x * 0.74;
     position.y = res.y - 100;
-    gf2d_draw_window_border_generic(gfc_rect(position.x,position.y,res.x *0.25,100),gfc_color8(255,255,255,255));
+    gf2d_draw_window_border_generic(gfc_rect(position.x,position.y,res.x *0.255,100),gfc_color8(255,255,255,255));
     
     station = player_get_station_data();
     if (!station)return 0;

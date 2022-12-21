@@ -1,7 +1,7 @@
 {
     "window":{
         "name":"resources_menu",
-        "dimensions" : [0,68,220,530],
+        "dimensions" : [0,58,222,540],
         "elements":
         [
         {
@@ -52,7 +52,7 @@
                     "bounds": [0,20,208,1],
                     "name":"resources",
                     "style": "vertical",
-                    "item_size" : [1,500],
+                    "item_size" : [1,380],
                     "elements":
                     []
                 }
