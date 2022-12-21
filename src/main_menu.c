@@ -26,30 +26,31 @@ typedef struct
     Window *win;
 }MainMenuData;
 
+void main_menu_start_new_game(const char *savefile)
+{
+    hud_window(savefile);    
+}
 
 void onFileLoadCancel(void *Data)
 {
     MainMenuData* data;
     if (!Data)return;
     data = Data;
-    gfc_line_cpy(data->filename,"saves/");
+    gfc_line_cpy(data->filename,"newgame1");
     return;
 }
 
 void onFileLoadOk(void *Data)
 {
+    TextLine filepath;
     MainMenuData* data;
     if (!Data)return;
     data = Data;
+    gfc_line_sprintf(filepath,"saves/%s.save",data->filename);
 
+    main_menu_start_new_game(filepath);
     gf2d_window_free(data->win);
     return;
-}
-
-
-void main_menu_start_new_game(const char *savefile)
-{
-    hud_window(savefile);    
 }
 
 int main_menu_free(Window *win)
@@ -60,7 +61,6 @@ int main_menu_free(Window *win)
     data = win->data;
     gf2d_sprite_free(data->background);
     free(data);
-
     return 0;
 }
 
@@ -107,7 +107,7 @@ int main_menu_update(Window *win,List *updateList)
             gf2d_window_free(win);
             return 1;
         }
-        else if (strcmp(e->name,"load")==0)
+        else if (strcmp(e->name,"loadgame")==0)
         {
             window_text_entry("Enter Save Game to Load", data->filename, win->data, GFCLINELEN, onFileLoadOk,onFileLoadCancel);
             return 1;
@@ -152,7 +152,7 @@ Window *main_menu()
     win->draw = main_menu_draw;
     data = (MainMenuData*)gfc_allocate_array(sizeof(MainMenuData),1);
     data->background = gf2d_sprite_load_image("images/ui/title_screen.png");
-    gfc_line_cpy(data->filename,"saves/");
+    gfc_line_cpy(data->filename,"newgame1");
     gf2d_window_set_focus_to(win,gf2d_window_get_element_by_name(win,"newgame"));
     win->data = data;
     data->win = win;

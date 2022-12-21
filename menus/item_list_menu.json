@@ -1,6 +1,7 @@
 {
 "window":{
     "dimensions" : [0,0,500,60],
+    "name":"item_list_menu",
     "align" : "middle",
     "justify" : "center",
     "elements":

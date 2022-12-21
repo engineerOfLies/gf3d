@@ -10,6 +10,7 @@
 #include "gf2d_element_label.h"
 #include "gf2d_element_entry.h"
 #include "gf2d_item_list_menu.h"
+#include "gf2d_windows_common.h"
 #include "gf2d_message_buffer.h"
 
 #include "gf3d_camera.h"
@@ -23,15 +24,107 @@
 #include "station.h"
 #include "station_menu.h"
 #include "resources_menu.h"
+#include "main_menu.h"
 #include "hud_window.h"
 
 typedef struct
 {
+    TextLine filename;
     Entity  *player;
     int     selection;
     Window  *messages;
     World   *w;
 }HUDWindowData;
+
+const char *options[] = 
+{
+    "Save Game",
+    "Audio Settings",
+    "Exit to Main Menu",
+    NULL
+};
+
+void onFileSaveCancel(void *Data)
+{
+    Window *win;
+    if (!Data)return;
+    win = Data;
+    win->child = NULL;
+}
+
+void onFileSaveOk(void *Data)
+{
+    TextLine filepath;
+    Window *win;
+    HUDWindowData *data;
+    win = Data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    win->child = NULL;
+    if (strlen(data->filename) <= 0)return;
+    gfc_line_sprintf(filepath,"saves/%s.save",data->filename);
+    message_printf("saving game to %s",filepath);
+    player_save(filepath);
+}
+
+
+void hud_options_select(void *Data)
+{
+    char *c;
+    Window *win;
+    PlayerData *player;
+    HUDWindowData *data;
+    win = Data;
+    if ((!win)||(!win->data))return;
+    win->child = NULL;
+    data = win->data;
+    if (data->selection < 0)return;
+    switch(data->selection)
+    {
+        case 0:
+            player = player_get_data();
+            if (!player)return;
+            c = strchr(player->filename,'/');
+            if (c != NULL)
+            {
+                c++;
+            }
+            else c = player->filename;
+            gfc_line_cpy(data->filename,c);
+            c = strchr(data->filename,'.');
+            if (c != NULL)
+            {
+                *c = '\0';//terminate it here
+            }
+            win->child = window_text_entry("Enter filename to Save", data->filename, win, GFCLINELEN, onFileSaveOk,onFileSaveCancel);
+            break;
+        case 2:
+            //exit to main menu
+            gf2d_window_free(win);
+            main_menu();
+            break;
+    }
+}
+
+void hud_open_options_menu(Window *win)
+{
+    int i;
+    List *list;
+    HUDWindowData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    if (win->child != NULL)
+    {
+        gf2d_window_free(win->child);
+        return;
+    }
+    list = gfc_list_new();
+    for (i = 0; options[i] != NULL; i++)list = gfc_list_append(list,(void *)options[i]);
+    
+    win->child = item_list_menu(win,vector2d(1050,58),200,"Options",list,hud_options_select,(void *)win,&data->selection);
+    
+    gfc_list_delete(list);
+}
 
 int hud_free(Window *win)
 {
@@ -61,6 +154,11 @@ int hud_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"options")==0)
+        {
+            hud_open_options_menu(win);
+            return 1;
+        }
         if (strcmp(e->name,"personnel")==0)
         {
             message_new("the beautiful people");
@@ -164,8 +262,14 @@ Window *hud_window(const char *savefile)
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
-    data->messages = window_message_buffer(5, 500, gfc_color8(0,255,100,255));
     data->player = player_new(savefile);
+    if (!data->player)
+    {
+        gf2d_window_free(win);
+        main_menu();
+        return NULL;
+    }
+    data->messages = window_message_buffer(5, 500, gfc_color8(0,255,100,255));
     camera_entity_enable_free_look(1);
     data->w = world_load("config/world.json");
     gf3d_camera_look_at(vector3d(0,0,0),NULL);

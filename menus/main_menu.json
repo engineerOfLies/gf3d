@@ -1,6 +1,6 @@
 {
 "window":{
-    "dimensions" : [-367,0,355,320],
+    "dimensions" : [-317,0,305,320],
     "align" : "middle",
     "elements":
     [
@@ -32,7 +32,7 @@
             {
             "type": "list",
             "name": "buttons",
-            "bounds": [90,10,160,1],
+            "bounds": [70,10,160,1],
             "style": "vertical",
             "item_size" : [1,64],
             "elements":

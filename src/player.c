@@ -28,6 +28,8 @@ SJson *player_data_save(PlayerData *data)
     json = sj_object_new();
     if (!json)return NULL;
  
+    sj_object_insert(json,"filename",sj_new_str(data->filename));
+    sj_object_insert(json,"name",sj_new_str(data->name));
     sj_object_insert(json,"wages",sj_new_float(data->wages));
     sj_object_insert(json,"taxRate",sj_new_float(data->taxRate));
     sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));
@@ -48,6 +50,8 @@ void player_save(const char *filename)
     if (!data)return;
     json = sj_object_new();
     
+    gfc_line_cpy(data->filename,filename);
+    
     sj_object_insert(json,"player",player_data_save(data));
     if (data->station)
     {
@@ -60,12 +64,19 @@ void player_save(const char *filename)
 
 PlayerData *player_data_parse(SJson *json)
 {
+    const char *str;
     SJson *res;
     PlayerData *data;
     if (!json)return NULL;
     data = gfc_allocate_array(sizeof(PlayerData),1);
     if (!data)return NULL;
     data->resources = gfc_list_new();
+    str = sj_object_get_value_as_string(json,"name");
+    if (str)gfc_line_cpy(data->name,str);
+    
+    str = sj_object_get_value_as_string(json,"filename");
+    if (str)gfc_line_cpy(data->filename,str);
+
     sj_get_integer_value(sj_object_get_value(json,"day"),&data->day);
     sj_get_integer_value(sj_object_get_value(json,"staff"),&data->staff);
     sj_get_integer_value(sj_object_get_value(json,"population"),&data->population);

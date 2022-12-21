@@ -7,6 +7,7 @@
 typedef struct
 {
     TextLine name;              /**<player's name*/
+    TextLine filename;          /**<save game filename*/
     float   wages;              /**<how much you pay employees*/
     float   taxRate;            /**<how much locals provide for the system*/
     float   salesTaxRate;       /**<rate of income for commerce*/

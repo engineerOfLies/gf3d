@@ -1,5 +1,7 @@
 {
   "player":{
+    "filename":"saves/newgame1.save",
+    "name":"[CMDR] O'Hare",
     "day":0,
     "wages":"15.000000",
     "taxRate":"0.090000",
