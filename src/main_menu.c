@@ -47,9 +47,9 @@ void onFileLoadOk(void *Data)
 }
 
 
-void main_menu_start_new_game()
+void main_menu_start_new_game(const char *savefile)
 {
-    hud_window();    
+    hud_window(savefile);    
 }
 
 int main_menu_free(Window *win)
@@ -97,7 +97,13 @@ int main_menu_update(Window *win,List *updateList)
         if (!e)continue;
         if (strcmp(e->name,"newgame")==0)
         {
-            main_menu_start_new_game();
+            main_menu_start_new_game("saves/default.save");
+            gf2d_window_free(win);
+            return 1;
+        }
+        else if (strcmp(e->name,"continue")==0)
+        {
+            main_menu_start_new_game("saves/quick.save");
             gf2d_window_free(win);
             return 1;
         }

@@ -103,6 +103,7 @@ int hud_update(Window *win,List *updateList)
         if (strcmp(e->name,"quick_save")==0)
         {
             player_save("saves/quick.save");
+            message_new("quick save...");
             return 1;
         }
 
@@ -147,7 +148,7 @@ int hud_draw(Window *win)
     return 0;
 }
 
-Window *hud_window()
+Window *hud_window(const char *savefile)
 {
     Window *win;
     HUDWindowData *data;
@@ -164,7 +165,7 @@ Window *hud_window()
     win->draw = hud_draw;
     win->data = data;
     data->messages = window_message_buffer(5, 500, gfc_color8(0,255,100,255));
-    data->player = player_new("saves/default.save");
+    data->player = player_new(savefile);
     camera_entity_enable_free_look(1);
     data->w = world_load("config/world.json");
     gf3d_camera_look_at(vector3d(0,0,0),NULL);

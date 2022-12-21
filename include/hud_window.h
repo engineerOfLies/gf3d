@@ -3,6 +3,6 @@
 
 #include "gf2d_windows.h"
 
-Window *hud_window();
+Window *hud_window(const char *savefile);
 
 #endif

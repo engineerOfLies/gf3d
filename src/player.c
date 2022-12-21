@@ -55,7 +55,6 @@ void player_save(const char *filename)
     }
 
     sj_save(json,filename);
-    slog("saved game %s",filename);
     sj_free(json);
 }
 
