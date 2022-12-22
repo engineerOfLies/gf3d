@@ -1,6 +1,6 @@
 {
     "window":{
-        "name":"resources_menu",
+        "name":"personnel_menu",
         "dimensions" : [0,58,222,540],
         "elements":
         [
@@ -16,24 +16,16 @@
                 {
                     "type": "label",
                     "bounds": [0,0,1,35],
-                    "text":"Resources",
+                    "text":"Personnel",
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H4"
                 },
                 {
                     "type": "label",
-                    "bounds": [0,0,1,30],
-                    "text":"Energy Use:",
-                    "justify" : "left",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                {
-                    "type": "label",
                     "bounds": [10,0,1,25],
-                    "text":"Energy Output : 0",
-                    "name":"energy_output",
+                    "text":"Population : 0",
+                    "name":"population",
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
@@ -41,8 +33,8 @@
                 {
                     "type": "label",
                     "bounds": [10,0,1,25],
-                    "name":"energy_use",
-                    "text":"Energy Draw : 0",
+                    "text":"Housing : 0",
+                    "name":"housing",
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
@@ -50,39 +42,38 @@
                 {
                     "type": "label",
                     "bounds": [10,0,1,25],
-                    "name":"energy_surplus",
-                    "text":"Energy Surplus: 0",
+                    "name":"officers",
+                    "text":"Officers : 1",
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
-                },
-                {
-                    "type": "label",
-                    "bounds": [0,0,1,30],
-                    "text":"Commodities:",
-                    "justify" : "left",
-                    "align" : "bottom",
-                    "style":"H5"
                 },
                 {
                     "type": "label",
                     "bounds": [10,0,1,25],
-                    "text":"Storage : 0/0 T",
-                    "name":"storage",
+                    "name":"staff_total",
+                    "text":"Total Staff: 0",
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
                 },
                 {
-                    "type": "list",
-                    "bounds": [0,0,208,280],
-                    "name":"resources",
-                    "style": "vertical",
-                    "backgroundColor":[0,0,0,250],
-                    "backgroundDraw":1,
-                    "item_size" : [1,330],
-                    "elements":
-                    []
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "name":"staff",
+                    "text":"Staff Unassigned: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "name":"assigned",
+                    "text":"Assigned: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
                 }
             ]
         }

@@ -247,7 +247,7 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
         gfc_rect(offset.x,offset.y,1,1),
         gfc_color(1,1,1,1),
         0,
-        gfc_color(0,0,0,1),1,win);
+        gfc_color(0,0,0,1),0,win);
     gf2d_element_make_list(e,le);
     
     

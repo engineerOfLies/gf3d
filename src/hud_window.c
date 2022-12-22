@@ -23,6 +23,7 @@
 #include "player.h"
 #include "station.h"
 #include "station_menu.h"
+#include "personnel_menu.h"
 #include "resources_menu.h"
 #include "main_menu.h"
 #include "hud_window.h"
@@ -30,6 +31,7 @@
 typedef struct
 {
     TextLine filename;
+    int paused;
     Entity  *player;
     int     selection;
     Window  *messages;
@@ -149,13 +151,13 @@ int hud_update(Window *win,List *updateList)
     if (!win)return 0;
     if (!updateList)return 0;
     data = (HUDWindowData*)win->data;
-    world_run_updates(data->w);
+    if (!data->paused)world_run_updates(data->w);
     
     day = player_get_day();
     hour = player_get_hour();
     
     e = gf2d_window_get_element_by_name(win,"time");
-    gfc_line_sprintf(buffer,"Day %i %i:00 %i",day,hour,2280 + (day / 365));
+    gfc_line_sprintf(buffer,"Day: %i  Time: %i:00  Year: %i",day,hour,2280 + (day / 365));
     gf2d_element_label_set_text(e,buffer);
 
     count = gfc_list_get_count(updateList);
@@ -170,7 +172,16 @@ int hud_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"personnel")==0)
         {
-            message_new("the beautiful people");
+            if ((win->child)&&(gf2d_window_named(win->child,"personnel_menu")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
+            if (win->child)
+            {
+                gf2d_window_free(win->child);
+            }
+            win->child = personnel_menu(win);
             return 1;
         }
         if (strcmp(e->name,"station")==0)
@@ -205,6 +216,11 @@ int hud_update(Window *win,List *updateList)
         if (strcmp(e->name,"freelook")==0)
         {
             camera_entity_toggle_free_look();
+            return 1;
+        }
+        if (strcmp(e->name,"pause")==0)
+        {
+            data->paused = !data->paused;
             return 1;
         }
         if (strcmp(e->name,"quick_save")==0)

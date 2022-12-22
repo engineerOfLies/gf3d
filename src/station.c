@@ -198,6 +198,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     if (!section)return NULL;
     gfc_matrix_identity(mat);
 
+    section->facilities = gfc_list_new();
     section->children = gfc_list_new();
     data->sections = gfc_list_append(data->sections,section);// add us to the station sections list
     if (parent)
@@ -329,7 +330,7 @@ void station_recalc_values(StationData *station)
     }
 }
 
-void station_section_upkeep(StationSection *section)
+void station_section_upkeep(StationSection *section,float *energySupply)
 {
     int i,c;
     StationFacility *facility;
@@ -340,7 +341,7 @@ void station_section_upkeep(StationSection *section)
         facility = gfc_list_get_nth(section->facilities,i);
         if (!facility)continue;
         if (facility->disabled)continue;
-        station_facility_update(facility);
+        station_facility_update(facility,energySupply);
     }
 }
 
@@ -350,11 +351,12 @@ void station_upkeep(StationData *station)
     StationSection *section;
     if (!station)return;
     c = gfc_list_get_count(station->sections);
+    station->energySupply = station->energyOutput;
     for (i = 0; i < c; i++)
     {
         section = gfc_list_get_nth(station->sections,i);
         if (!section)continue;
-        station_section_upkeep(section);
+        station_section_upkeep(section,&station->energySupply);
     }
 }
 

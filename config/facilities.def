@@ -12,12 +12,9 @@
             {   
                 "credits":1000
             },
-            "staff":10,
-            "energyDraw":10,
-            "upkeep":
-            {
-                "credits":150
-            }
+            "staffPositions":10,
+            "staffRequired":10,
+            "energyDraw":10
         },
         {
             "name":"security",
@@ -30,13 +27,10 @@
             {   
                 "credits":500
             },
-            "staff":20,
+            "staffPositions":50,
+            "staffRequired":10,
             "energyDraw":10,
-            "officerSlot":true,
-            "upkeep":
-            {
-                "credits":300
-            }
+            "officerSlot":true
         },
         {
             "name":"solar_processor1",
@@ -48,8 +42,8 @@
             {   
                 "credits":1000
             },
-            "staff":10,
-            "energyDraw":10,
+            "staffPositions":10,
+            "staffRequired":10,
             "officerSlot":true,
             "produces":
             {
@@ -68,7 +62,8 @@
                 "alloys":50,
                 "meta_materials":50
             },
-            "staff":10,
+            "staffPositions":10,
+            "staffRequired":10,
             "energyOutput":1000,
             "officerSlot":true,
             "upkeep":
@@ -87,7 +82,8 @@
                 "credits":1000,
                 "common_materials":50
             },
-            "staff":20,
+            "staffPositions":20,
+            "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
             "upkeep":
@@ -110,7 +106,8 @@
                 "credits":2000,
                 "common_materials":50
             },
-            "staff":20,
+            "staffPositions":20,
+            "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
             "upkeep":
@@ -133,10 +130,28 @@
                 "credits":2000,
                 "common_materials":100
             },
-            "staff":10,
+            "staffPositions":10,
+            "staffRequired":5,
             "housing":200,
             "energyDraw":200,
             "officerSlot":true
+        },
+        {
+            "name":"quarters_command",
+            "displayName":"Command Quarters",
+            "icon":"",
+            "description":"This facility is where the command staff live on the station",
+            "type":"residential_c",
+            "cost":
+            {   
+                "credits":2000,
+                "common_materials":100
+            },
+            "staffPositions":10,
+            "staffRequired":5,
+            "housing":10,
+            "energyDraw":200,
+            "officerSlot":false
         },
         {
             "name":"aggriculture1",
@@ -149,7 +164,8 @@
                 "credits":2000,
                 "common_materials":50
             },
-            "staff":20,
+            "staffPositions":20,
+            "staffRequired":10,
             "energyDraw":200,
             "officerSlot":true,
             "upkeep":
@@ -172,9 +188,11 @@
                 "credits":500,
                 "alloys":50
             },
-            "staff":5,
+            "staffPositions":5,
+            "staffRequired":2,
             "energyDraw":50,
-            "storage":500
+            "storage":500,
+            "officerSlot":false
         },
         {
             "name":"cargo_hold_large",
@@ -187,9 +205,55 @@
                 "credits":2000,
                 "alloys":200
             },
-            "staff":20,
+            "staffPositions":20,
+            "staffRequired":8,
             "energyDraw":200,
             "storage":2000
+        },
+        {
+            "name":"docking_bay_small",
+            "displayName":"Small Docking Bay",
+            "icon":"",
+            "description":"This facility allows for the docking and short term storage of small space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
+            "type":"",
+            "cost":
+            {   
+                "credits":1500,
+                "alloys":100
+            },
+            "staffPositions":20,
+            "staffRequired":8,
+            "energyDraw":200
+        },
+        {
+            "name":"docking_bay",
+            "displayName":"Docking Bay",
+            "icon":"",
+            "description":"This facility allows for the docking and short term storage of small and medium sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
+            "type":"",
+            "cost":
+            {   
+                "credits":3000,
+                "alloys":200
+            },
+            "staffPositions":30,
+            "staffRequired":15,
+            "energyDraw":400
+        },
+        {
+            "name":"docking_bay_large",
+            "displayName":"Docking Bay",
+            "icon":"",
+            "description":"This facility allows for the docking and short term storage of large sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
+            "type":"",
+            "cost":
+            {   
+                "credits":6000,
+                "alloys":400
+            },
+            "staffPositions":60,
+            "staffRequired":35,
+            "energyDraw":800
         }
     ]
 }

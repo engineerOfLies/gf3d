@@ -58,6 +58,28 @@
                     }, 
                     {
                         "type": "button",
+                        "name":"personnel",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"personnel",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Personnel",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    }, 
+                    {
+                        "type": "button",
                         "name":"planet",
                         "bounds": [0,0,120,34],
                         "hotkey":"planet",
@@ -164,6 +186,11 @@
                 "type": "button",
                 "name": "quick_save",
                 "hotkey":"quick_save"
+            },
+            {
+                "type": "button",
+                "name": "pause",
+                "hotkey":"pause"
             },
             {
                 "type": "button",

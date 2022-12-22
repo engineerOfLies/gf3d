@@ -152,6 +152,8 @@
                                 "type": "list",
                                 "bounds": [20,0,200,80],
                                 "name":"produces",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
                                 "style": "vertical",
                                 "item_size" : [250,80],
                                 "packed":true,
@@ -171,6 +173,8 @@
                                 "bounds": [20,0,200,80],
                                 "name":"upkeep",
                                 "style": "vertical",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
                                 "item_size" : [250,80],
                                 "packed":true,
                                 "elements":
@@ -329,6 +333,7 @@
                                         "label" :
                                         {
                                             "type": "label",
+                                            "name":"disable_label",
                                             "text":"Disable",
                                             "bounds": [0,0,80,24],
                                             "justify" : "center",

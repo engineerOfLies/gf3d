@@ -143,7 +143,7 @@ int station_buy_menu_update(Window *win,List *updateList)
             return 1;
         }
     }
-    return gf2d_window_mouse_in(win);
+    return 0;
 }
 
 void station_buy_menu_set_list(Window *win)

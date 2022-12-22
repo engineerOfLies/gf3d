@@ -18,7 +18,7 @@ typedef struct StaionSection_S
     int         staffAssigned;  //how many staff are assigned to facilities in this section
 
     float       hull,hullMax;
-    float       energyOutput,energyDraw;
+    float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
     float       rotates;//if it rotates
     int         storageCapacity;
     Uint8       slot;                      // where the section is mounted on the parent
@@ -37,7 +37,7 @@ typedef struct
     int         sectionHighlight;
     float       sectionRotation;
     float       hull,hullMax;
-    float       energyOutput,energyDraw;
+    float       energyOutput,energyDraw,energySupply;//how much is produced, how much is needed, how much we have
     int         storageCapacity;
     List       *sections;     /**<list of staiton sections*/
 }StationData;

@@ -15,17 +15,20 @@
                 "credits":10000,
                 "alloys":1000
             },
+            "unique":true,
             "position":[0,0,0],
             "rotates":0,
             "scale":[1,1,1],
             "facility_slots":4,
             "facility_types":
             [
-                "operations"
+                "operations",
+                "residential_c"
             ],
             "default_facilities":
             [
-                "command_and_control"
+                "command_and_control",
+                "security"
             ],
             "extensions":[
                 {
@@ -208,8 +211,14 @@
             "facility_types":
             [
                 "operations",
+                "small_cargo_dock",
                 "cargo_dock",
+                "cargo_dock_large",
                 "passenger_docking"
+            ],
+            "default_facilities":
+            [
+                "docking_bay"
             ]
         },
         {
@@ -302,7 +311,7 @@
             },
             "facility_types":
             [
-                "cargo_dock",
+                "small_cargo_dock",
                 "small_storage",
                 "defenses"
             ],
@@ -342,7 +351,7 @@
             "facility_slots":4,
             "facility_types":
             [
-                "cargo_dock",
+                "small_cargo_dock",
                 "small_storage",
                 "defenses"
             ],
@@ -376,11 +385,15 @@
                 "credits":300,
                 "alloys":30
             },
-            "facility_slots":12,
+            "facility_slots":3,
             "facility_types":
             [
                 "cargo_dock",
                 "cargo_dock_large"
+            ],
+            "default_facilities":
+            [
+                "docking_bay_small"
             ]
         }
     ]

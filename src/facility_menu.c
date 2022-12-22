@@ -76,10 +76,33 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"upkeep"));
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
         return;
     }
+    
+    if ((!data->facility->inactive)&&(!data->facility->disabled))
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_WHITE);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: Yes");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"disable_label"),"Disable");
+    }
+    else
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_RED);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"disable_label"),"Enable");
+    }
+    
     name = data->selected = station_facility_get_display_name(data->facility->name);
-    gfc_line_sprintf(buffer,"Staff: %i / %i",data->facility->staffAssigned,data->facility->staffRequired);
+    gfc_line_sprintf(buffer,"Staff: %i / %i",data->facility->staffAssigned,data->facility->staffPositions);
+    if (data->facility->staffAssigned < data->facility->staffRequired)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
+    }
+    else
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+    }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
     if (data->facility->energyOutput > 0 )
@@ -176,17 +199,19 @@ int facility_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"staff_assign")==0)
         {
             if (!data->facility)return 1;//nothing selected
-            if (data->facility->staffAssigned < data->facility->staffRequired)
+            if (data->facility->staffAssigned < data->facility->staffPositions)
             {
                 if (player->staff <= 0)
                 {
                     message_new("Cannot assign any more staff.  Please hire more.");
                     return 1;
                 }
-                data->facility->staffAssigned++;
-                player->staff--;
+                if (station_facility_change_staff(data->facility,1) == 0)
+                {
+                    player->staff--;
+                    facility_menu_select_item(win,data->choice);//this will redraw
+                }
             }
-            facility_menu_select_item(win,data->choice);//this will redraw
             return 1;
         }
         if (strcmp(e->name,"staff_remove")==0)
@@ -194,9 +219,23 @@ int facility_menu_update(Window *win,List *updateList)
             if (!data->facility)return 1;//nothing selected
             if (data->facility->staffAssigned > 0)
             {
-                data->facility->staffAssigned--;
-                player->staff++;
+                if (station_facility_change_staff(data->facility,-1) == 0)
+                {
+                    player->staff++;
+                    facility_menu_select_item(win,data->choice);//this will redraw
+                }
             }
+            return 1;
+        }
+        if (strcmp(e->name,"disable")==0)
+        {
+            station_facility_check(data->facility);
+            if (data->facility->inactive)
+            {
+                message_new("Cannot Enable Facility");
+                return 1;
+            }
+            data->facility->disabled = !data->facility->disabled;
             facility_menu_select_item(win,data->choice);//this will redraw
             return 1;
         }
@@ -230,7 +269,7 @@ int facility_menu_update(Window *win,List *updateList)
             return 1;
         }
     }
-    return gf2d_window_mouse_in(win);
+    return 0;
 }
 
 void facility_menu_set_list(Window *win)
