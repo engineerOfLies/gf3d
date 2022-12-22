@@ -209,7 +209,7 @@ void player_upkeep(PlayerData *player)
     wages = totalStaff * player->wages;
     resources_list_withdraw(player->resources,"credits",wages);
     message_printf("Paid out %.2fCr to station staff",wages);
-    taxes = player->population * player->salesTaxRate;
+    taxes = player->population * player->taxRate;
     player->resources = resources_list_give(player->resources,"credits",taxes);
     message_printf("Collected %.2fCr in taxes from the people living on the station.",taxes);
     food = (player->population/12);

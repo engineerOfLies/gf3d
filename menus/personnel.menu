@@ -40,13 +40,111 @@
                     "style":"H6"
                 },
                 {
-                    "type": "label",
-                    "bounds": [10,0,1,25],
-                    "name":"officers",
-                    "text":"Officers : 1",
-                    "justify" : "left",
-                    "align" : "middle",
-                    "style":"H6"
+                    "type": "list",
+                    "bounds": [0,0,1,30],
+                    "style": "horizontal",
+                    "packed":true,
+                    "item_size" : [80,1],
+                    "elements":
+                    [
+                        {
+                            "type": "button",
+                            "name":"tax_raise",
+                            "bounds": [0,0,40,21],
+                            "hotkey":"none",
+                            "sound":"confirm",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"+",
+                                "bounds": [0,5,40,24],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            "actor" :
+                            {
+                                "type": "actor",
+                                "bounds": [0,5,40,24],
+                                "scale":[0.25,0.5],
+                                "actor" : "actors/button.actor"
+                            }
+                        },
+                        {
+                            "type": "button",
+                            "name":"tax_lower",
+                            "bounds": [0,0,40,21],
+                            "hotkey":"none",
+                            "sound":"confirm",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"-",
+                                "bounds": [0,5,40,24],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            "actor" :
+                            {
+                                "type": "actor",
+                                "bounds": [0,5,40,24],
+                                "scale":[0.25,0.5],
+                                "actor" : "actors/button.actor"
+                            }
+                        },
+                        {
+                            "type": "label",
+                            "bounds": [10,0,1,30],
+                            "name":"taxes",
+                            "text":"Taxes: 0.0",
+                            "justify" : "left",
+                            "align" : "middle",
+                            "style":"H6"
+                        }
+                    ]
+                },
+                {
+                    "type": "list",
+                    "bounds": [0,0,1,30],
+                    "style": "horizontal",
+                    "packed":true,
+                    "item_size" : [80,1],
+                    "elements":
+                    [
+                        {
+                            "type": "button",
+                            "name":"officers_page",
+                            "bounds": [0,0,80,21],
+                            "hotkey":"none",
+                            "sound":"confirm",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"view",
+                                "bounds": [0,0,80,24],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            "actor" :
+                            {
+                                "type": "actor",
+                                "bounds": [0,0,40,24],
+                                "scale":[0.5,0.5],
+                                "actor" : "actors/button.actor"
+                            }
+                        },
+                        {
+                            "type": "label",
+                            "bounds": [10,0,1,25],
+                            "name":"officers",
+                            "text":"Officers : 1",
+                            "justify" : "left",
+                            "align" : "middle",
+                            "style":"H6"
+                        }
+                    ]
                 },
                 {
                     "type": "label",
@@ -74,6 +172,71 @@
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
+                },
+                {
+                    "type": "list",
+                    "bounds": [0,0,1,30],
+                    "style": "horizontal",
+                    "packed":true,
+                    "item_size" : [80,1],
+                    "elements":
+                    [
+                        {
+                            "type": "button",
+                            "name":"wage_raise",
+                            "bounds": [0,0,40,21],
+                            "hotkey":"none",
+                            "sound":"confirm",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"+",
+                                "bounds": [0,5,40,24],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            "actor" :
+                            {
+                                "type": "actor",
+                                "bounds": [0,5,40,24],
+                                "scale":[0.25,0.5],
+                                "actor" : "actors/button.actor"
+                            }
+                        },
+                        {
+                            "type": "button",
+                            "name":"wage_lower",
+                            "bounds": [0,0,40,21],
+                            "hotkey":"none",
+                            "sound":"confirm",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"-",
+                                "bounds": [0,5,40,24],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            "actor" :
+                            {
+                                "type": "actor",
+                                "bounds": [0,5,40,24],
+                                "scale":[0.25,0.5],
+                                "actor" : "actors/button.actor"
+                            }
+                        },
+                        {
+                            "type": "label",
+                            "bounds": [10,0,1,30],
+                            "name":"wages",
+                            "text":"Wages: 0.0",
+                            "justify" : "left",
+                            "align" : "middle",
+                            "style":"H6"
+                        }
+                    ]
                 }
             ]
         }

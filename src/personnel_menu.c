@@ -48,6 +48,7 @@ int personnel_menu_update(Window *win,List *updateList)
 {
     int i,count;
     Element *e;
+    PlayerData *player;
     PersonnelMenuData *data;
     if (!win)return 0;
     if (!updateList)return 0;
@@ -57,12 +58,39 @@ int personnel_menu_update(Window *win,List *updateList)
     {
         personnel_menu_update_resources(win);
     }
-
+    player = player_get_data();
+    
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"tax_raise")==0)
+        {
+            player->taxRate += 0.01;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"tax_lower")==0)
+        {
+            player->taxRate -= 0.01;
+            if (player->taxRate < 0)player->taxRate = 0;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"wage_raise")==0)
+        {
+            player->wages += 0.5;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"wage_lower")==0)
+        {
+            player->wages -= 0.5;
+            if (player->wages < 1)player->wages = 1;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
     }
     if (gfc_input_command_released("cancel"))
     {
@@ -98,6 +126,12 @@ void personnel_menu_update_resources(Window *win)
 
     gfc_line_sprintf(buffer,"Housing : %i",station->housing);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),buffer);
+
+    gfc_line_sprintf(buffer,"Taxes: %.2f %%",player->taxRate);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"taxes"),buffer);
+
+    gfc_line_sprintf(buffer,"Wages: %.2fCr",player->wages);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"wages"),buffer);
 
     gfc_line_sprintf(buffer,"Total Staff : %i",player->staff + station->staffAssigned);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff_total"),buffer);
