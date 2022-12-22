@@ -31,6 +31,7 @@ typedef struct
     int updated;
 }ResourcesMenuData;
 
+void resource_menu_update_resources(Window *win);
 
 int resources_menu_free(Window *win)
 {
@@ -47,10 +48,15 @@ int resources_menu_update(Window *win,List *updateList)
 {
     int i,count;
     Element *e;
-//    ResourcesMenuData *data;
+    ResourcesMenuData *data;
     if (!win)return 0;
     if (!updateList)return 0;
-//    data = (ResourcesMenuData*)win->data;
+    data = (ResourcesMenuData*)win->data;
+
+    if (data->updated != player_get_day())
+    {
+        resource_menu_update_resources(win);
+    }
 
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
@@ -71,9 +77,7 @@ int resources_menu_draw(Window *win)
 {
 //    ResourcesMenuData *data;
     if ((!win)||(!win->data))return 0;
-  //  data = win->data;
-    
-    
+//    data = win->data;
     return 0;
 }
 
@@ -85,7 +89,9 @@ void resource_menu_update_resources(Window *win)
     PlayerData *player;
     StationData *station;
     int total_mass;
-    if (!win)return;
+    ResourcesMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
     player = player_get_data();
     station = player_get_station_data();
     if ((!player)||(!station))return;
@@ -110,7 +116,7 @@ void resource_menu_update_resources(Window *win)
     if (!e)return;
     gf2d_element_list_free_items(e);
     gf2d_element_list_add_item(e,resource_list);
-
+    data->updated = player_get_day();
 }
 
 Window *resources_menu(Window *parent)

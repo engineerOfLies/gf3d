@@ -3,9 +3,9 @@
     "filename":"saves/newgame1.save",
     "name":"[CMDR] O'Hare",
     "day":0,
-    "wages":"15.000000",
-    "taxRate":"0.090000",
-    "population":"200",
+    "wages":"5.000000",
+    "taxRate":"0.10000",
+    "population":"300",
     "staff":"20",
     "salesTaxRate":"0.090000",
     "resources":{

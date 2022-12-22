@@ -278,7 +278,7 @@ Window *hud_window(const char *savefile)
         main_menu();
         return NULL;
     }
-    data->messages = window_message_buffer(5, 500, gfc_color8(0,255,100,255));
+    data->messages = window_message_buffer(5, 1000, gfc_color8(0,255,100,255));
     camera_entity_enable_free_look(1);
     data->w = world_load("config/world.json");
     gf3d_camera_look_at(vector3d(0,0,0),NULL);

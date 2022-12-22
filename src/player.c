@@ -9,6 +9,7 @@
 #include "gf3d_draw.h"
 
 #include "gf2d_mouse.h"
+#include "gf2d_message_buffer.h"
 
 #include "resources.h"
 #include "station.h"
@@ -195,6 +196,23 @@ Uint32 player_get_hour()
     return data->hour;
 }
 
+void player_upkeep(PlayerData *player)
+{
+    int totalStaff;
+    float wages,taxes;
+    StationData *station;
+    if (!player)return;
+    station = player_get_station_data();
+    if (!station)return;
+    totalStaff = player->staff + station->staffAssigned;
+    wages = totalStaff * player->wages;
+    resources_list_withdraw(player->resources,"credits",wages);
+    message_printf("Paid out %.2fCr to station staff",wages);
+    taxes = player->population * player->salesTaxRate;
+    player->resources = resources_list_give(player->resources,"credits",taxes);
+    message_printf("Collected %.2fCr in taxes from the people living on the station.",taxes);
+}
+
 void player_hour_advance()
 {
     PlayerData *data;
@@ -207,6 +225,7 @@ void player_hour_advance()
         data->hour = 0;
         data->day++;
         station_upkeep(player_get_station_data());
+        player_upkeep(data);
     }
 }
 
