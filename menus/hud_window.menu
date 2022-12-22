@@ -3,158 +3,179 @@
         "dimensions" : [-1300,0,1320,40],
         "elements":
         [
-        {
-            "type": "list",
-            "name": "list",
-            "bounds": [32,0,1,1],
-            "style": "horizontal",
-            "item_size" : [128,40],
-            "packed":true,
-            "elements":
-            [
             {
-                "type": "button",
-                "name":"station",
-                "bounds": [0,0,120,34],
-                "hotkey":"station",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Station",
-                    "bounds": [0,0,120,38],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "scale":[0.75,0.8],
-                    "actor" : "actors/button.actor"
-                }
-            }, 
-            {
-                "type": "button",
-                "name":"personnel",
-                "bounds": [0,0,120,34],
-                "hotkey":"personnel",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Personnel",
-                    "bounds": [0,0,120,38],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "scale":[0.75,0.8],
-                    "actor" : "actors/button.actor"
-                }
-            }, 
-            {
-                "type": "button",
-                "name":"resources",
-                "bounds": [0,0,120,34],
-                "hotkey":"resources",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Resources",
-                    "bounds": [0,0,120,38],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "scale":[0.75,0.8],
-                    "actor" : "actors/button.actor"
-                }
-            }, 
-            {
-                "type": "button",
-                "name":"planet",
-                "bounds": [0,0,120,34],
-                "hotkey":"planet",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Planet",
-                    "bounds": [0,0,120,38],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "scale":[0.75,0.8],
-                    "actor" : "actors/button.actor"
-                }
+                "type": "list",
+                "name": "list",
+                "bounds": [32,0,1,1],
+                "style": "horizontal",
+                "item_size" : [128,40],
+                "packed":true,
+                "elements":
+                [
+                    {
+                        "type": "button",
+                        "name":"station",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"station",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Station",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    }, 
+                    {
+                        "type": "button",
+                        "name":"resources",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"resources",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Resources",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    }, 
+                    {
+                        "type": "button",
+                        "name":"planet",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"planet",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Planet",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    },
+                    {
+                        "type": "button",
+                        "name":"fleet",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"fleet",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Fleet",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    },
+                    {
+                        "type": "button",
+                        "name":"research",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"research",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Research",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    },
+                    {
+                        "type": "button",
+                        "name":"galaxy",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"galaxy",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Galaxy",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [10,0,120,0.8],
+                        "text":"Date Time",
+                        "name":"time",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    }
+                ]
             },
             {
                 "type": "button",
-                "name":"fleet",
-                "bounds": [0,0,120,34],
-                "hotkey":"fleet",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Fleet",
-                    "bounds": [0,0,120,38],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "scale":[0.75,0.8],
-                    "actor" : "actors/button.actor"
-                }
+                "name": "freelook",
+                "hotkey":"freelook"
             },
             {
                 "type": "button",
-                "name":"research",
-                "bounds": [0,0,120,34],
-                "hotkey":"research",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Research",
-                    "bounds": [0,0,120,38],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "scale":[0.75,0.8],
-                    "actor" : "actors/button.actor"
-                }
+                "name": "quick_save",
+                "hotkey":"quick_save"
             },
             {
                 "type": "button",
-                "name":"galaxy",
-                "bounds": [0,0,120,34],
-                "hotkey":"galaxy",
+                "name":"options",
+                "bounds": [1170,0,120,34],
+                "hotkey":"options",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "text":"Galaxy",
                     "bounds": [0,0,120,38],
+                    "text":"options",
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H5"
@@ -162,45 +183,11 @@
                 "actor" :
                 {
                     "type": "actor",
+                    "bounds": [0,0,120,38],
                     "scale":[0.75,0.8],
                     "actor" : "actors/button.actor"
                 }
             }
-            ]
-        },
-        {
-            "type": "button",
-            "name": "freelook",
-            "hotkey":"freelook"
-        },
-        {
-            "type": "button",
-            "name": "quick_save",
-            "hotkey":"quick_save"
-        },
-        {
-            "type": "button",
-            "name":"options",
-            "bounds": [1170,0,120,34],
-            "hotkey":"options",
-            "sound":"confirm",
-            "label" :
-            {
-                "type": "label",
-                "bounds": [0,0,120,38],
-                "text":"options",
-                "justify" : "center",
-                "align" : "middle",
-                "style":"H5"
-            },
-            "actor" :
-            {
-                "type": "actor",
-                "bounds": [0,0,120,38],
-                "scale":[0.75,0.8],
-                "actor" : "actors/button.actor"
-            }
-        }
         ]
     }
 }

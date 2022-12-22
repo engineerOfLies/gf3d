@@ -53,7 +53,7 @@
             "officerSlot":true,
             "produces":
             {
-                "fuel":100
+                "fuel":10
             }
         },
         {
@@ -73,7 +73,7 @@
             "officerSlot":true,
             "upkeep":
             {
-                "fuel":100
+                "fuel":20
             }
         },
         {
@@ -123,27 +123,73 @@
             }
         },
         {
-            "name":"cargo_hold",
-            "displayName":"Cargo Hold",
+            "name":"quarters1",
+            "displayName":"Living Quarters",
             "icon":"",
-            "description":"This facility is equipped to store and make available commodities.  It's capacity",
-            "type":"storage",
+            "description":"This facility is where the population of the station live.  Without places to live the population will degrade as well as morale",
+            "type":"residential",
             "cost":
             {   
-                "credits":1000,
-                "alloys":100
+                "credits":2000,
+                "common_materials":100
+            },
+            "staff":10,
+            "housing":200,
+            "energyDraw":200,
+            "officerSlot":true
+        },
+        {
+            "name":"aggriculture1",
+            "displayName":"Hydroponic Farm",
+            "icon":"",
+            "description":"This farm uses artificial light and circulating water with nutriants to efficiently grow staple crops",
+            "type":"aggriculture",
+            "cost":
+            {   
+                "credits":2000,
+                "common_materials":50
             },
             "staff":20,
-            "energyDraw":100,
-            "storage":1000,
+            "energyDraw":200,
+            "officerSlot":true,
             "upkeep":
             {
-                "ores":100
+                "minerals":10
             },
             "produces":
             {
-                "alloys":50
+                "food":200
             }
+        },
+        {
+            "name":"cargo_hold_small",
+            "displayName":"Small Cargo Hold",
+            "icon":"",
+            "description":"This facility is equipped to store and make available limited amounts of commodities.  It's capacity is merely 500 tons",
+            "type":"small_storage",
+            "cost":
+            {   
+                "credits":500,
+                "alloys":50
+            },
+            "staff":5,
+            "energyDraw":50,
+            "storage":500
+        },
+        {
+            "name":"cargo_hold_large",
+            "displayName":"Large Cargo Hold",
+            "icon":"",
+            "description":"This facility is equipped to store and make available large quantities of commodities.  It's capacity is an impressive 2000 tons",
+            "type":"large_storage",
+            "cost":
+            {   
+                "credits":2000,
+                "alloys":200
+            },
+            "staff":20,
+            "energyDraw":200,
+            "storage":2000
         }
     ]
 }

@@ -33,6 +33,15 @@
                 {
                     "type": "label",
                     "bounds": [10,0,1,25],
+                    "name":"officers",
+                    "text":"Officers : 1",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
                     "name":"staff",
                     "text":"Staff Unassigned: 0",
                     "justify" : "left",
@@ -41,7 +50,34 @@
                 },
                 {
                     "type": "label",
-                    "bounds": [0,20,1,30],
+                    "bounds": [10,0,1,25],
+                    "name":"assigned",
+                    "text":"Assigned: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "text":"Housing : 0",
+                    "name":"housing",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "text":"Storage : 0/0 T",
+                    "name":"storage",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [0,0,1,30],
                     "text":"Commodities:",
                     "justify" : "left",
                     "align" : "middle",
@@ -49,10 +85,10 @@
                 },
                 {
                     "type": "list",
-                    "bounds": [0,20,208,1],
+                    "bounds": [0,0,208,1],
                     "name":"resources",
                     "style": "vertical",
-                    "item_size" : [1,380],
+                    "item_size" : [1,330],
                     "elements":
                     []
                 }

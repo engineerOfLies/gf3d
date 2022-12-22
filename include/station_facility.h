@@ -11,6 +11,7 @@ typedef struct
     TextLine    name;  //its name identifier
     TextLine    facilityType;
     float       damage;   //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
+    int         housing;        //how much housing is provided by this facility
     int         staffRequired;  //how many people are needed to run the facility
     int         staffAssigned;     //how many people are actually hired to do so
     int         energyDraw;
@@ -71,6 +72,10 @@ const char *station_facility_get_display_name(const char *name);
 
 const char *station_facility_get_name_from_display(const char *display);
 
+/**
+ * @brief run the upkeep on the facility
+ */
+void station_facility_update(StationFacility *facility);
 
 List *station_facility_get_resource_cost(const char *name,const char *resource_type);
 

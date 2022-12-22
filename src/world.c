@@ -8,6 +8,7 @@
 
 #include "camera_entity.h"
 #include "fighter.h"
+#include "player.h"
 #include "world.h"
 
 World *world_load(char *filename)
@@ -116,6 +117,9 @@ World *world_load(char *filename)
         sj_value_as_vector3d(sj_object_get_value(item,"rotation"),&rotation);
         camera_entity_new(position,rotation);
     }
+    
+    sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
+    
     sj_free(json);
     
     
@@ -156,10 +160,16 @@ void world_delete(World *world)
     free(world);
 }
 
-void world_run_updates(World *self)
+void world_run_updates(World *w)
 {
-    if (!self)return;
-
+    Uint32 now;
+    if (!w)return;
+    now = SDL_GetTicks();
+    if (now > (w->lastHour + w->hourTime))
+    {
+        w->lastHour = now;
+        player_hour_advance();
+    }
 }
 
 

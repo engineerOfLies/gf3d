@@ -5,15 +5,22 @@
     "day":0,
     "wages":"15.000000",
     "taxRate":"0.090000",
-    "population":"800",
+    "population":"200",
     "staff":"20",
     "salesTaxRate":"0.090000",
     "resources":{
       "credits":"10000.000000",
+      "food":800,
+      "fuel":20,
       "ore":"1000.000000",
-      "minerals":"2000.000000",
+      "minerals":"1000.000000",
       "common_materials":"100.000000",
-      "alloys":"100.000000"
+      "alloys":"100.000000",
+      "heavy_metals":0,
+      "meta_materials":0,
+      "luxury_food":0,
+      "illicit_items":0,
+      "narcotics":0
     }
   },
   "station":{
@@ -39,7 +46,15 @@
         "id":"5",
         "hull":"100",
         "parent":"0",
-        "slot":"4"
+        "slot":"4",
+        "facilities":[
+          {
+            "name":"cargo_hold_small",
+            "staff":"5",
+            "inactive":"false",
+            "disabled":"false"
+          }
+        ]
       },
       {
         "name":"expansion_bay_dock",
@@ -83,7 +98,15 @@
         "id":"11",
         "hull":"3000",
         "parent":"0",
-        "slot":"1"
+        "slot":"1",
+        "facilities":[
+          {
+            "name":"cargo_hold_large",
+            "staff":"20",
+            "inactive":"false",
+            "disabled":"false"
+          }
+        ]
       },
       {
         "name":"station_reactor",
@@ -105,7 +128,27 @@
         "id":"13",
         "hull":"1000",
         "parent":"0",
-        "slot":"0"
+        "slot":"0",
+        "facilities":[
+          {
+            "name":"quarters1",
+            "staff":"10",
+            "inactive":"false",
+            "disabled":"false"
+          },
+          {
+            "name":"quarters1",
+            "staff":"10",
+            "inactive":"false",
+            "disabled":"false"
+          },
+          {
+            "name":"aggriculture1",
+            "staff":"20",
+            "inactive":"false",
+            "disabled":"false"
+          }
+        ]
       },
       {
         "name":"station_dock",

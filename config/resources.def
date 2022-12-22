@@ -11,31 +11,6 @@
             "units":"Cr"
         },
         {
-            "name":"population",
-            "displayName":"Population",
-            "description":"The number of sentient beings living and working here",
-            "precision":0,
-            "negative":false,
-            "value":0
-        },
-        {
-            "name":"staff",
-            "displayName":"Staff",
-            "description":"The number of people working directly for the station",
-            "precision":0,
-            "negative":false,
-            "value":0
-        },
-        {
-            "name":"energy",
-            "displayName":"Energy",
-            "description":"regardless of technology type, the amount of power needed to run it is measured simply as 'energy'",
-            "precision":2,
-            "negative":true,
-            "value":0.001,
-            "units":"e"
-        },
-        {
             "name":"fuel",
             "displayName":"Fuel",
             "description":"High Density Gluons are the fuel source used for interstellar travel.  They are also the principle fuel for most fusion reactors to produce the energy needed to run everything.",
@@ -72,18 +47,18 @@
             "units":"T"
         },
         {
-            "name":"alloys",
-            "displayName":"Alloys",
-            "description":"Refined metals needed to build the structures of advanced technologies.",
+            "name":"common_materials",
+            "displayName":"Common Materials",
+            "description":"Refined from minerals. These are non-metallic materials used for everything from textiles to construction materials.",
             "precision":0,
             "negative":false,
             "value":500,
             "units":"T"
         },
         {
-            "name":"common_materials",
-            "displayName":"Common Materials",
-            "description":"Refined from minerals. These are non-metallic materials used for everything from textiles to construction materials.",
+            "name":"alloys",
+            "displayName":"Alloys",
+            "description":"Refined metals needed to build the structures of advanced technologies.",
             "precision":0,
             "negative":false,
             "value":500,

@@ -14,6 +14,9 @@ typedef struct StaionSection_S
     TextLine    name;  //its name identifier
     Uint32      id;      //unique ID for the station section
     ModelMat    mat;
+    int         housing;        //how much housing is provided by this S
+    int         staffAssigned;  //how many staff are assigned to facilities in this section
+
     float       hull,hullMax;
     float       energyOutput,energyDraw;
     float       rotates;//if it rotates
@@ -29,6 +32,8 @@ typedef struct
 {
     Uint32      idPool;      /**<keeps track of unique station IDs*/
     ModelMat   *mat;
+    int         housing;        //how much housing is provided by this station
+    int         staffAssigned;  //how many staff are assigned to facilities
     int         sectionHighlight;
     float       sectionRotation;
     float       hull,hullMax;
@@ -51,6 +56,12 @@ Entity *station_new(Vector3D position,SJson *config);
  * @param station the station to recalc for
  */
 void station_recalc_values(StationData *station);
+
+/**
+ * @brief run the upkeep on the station, its sections, and facilities
+ * @param station the station to upkeep
+ */
+void station_upkeep(StationData *station);
 
 /**
  * @brief convert station data into a saveable json object

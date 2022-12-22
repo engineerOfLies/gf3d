@@ -71,6 +71,14 @@ void resource_list_sell(List *supply, List *cost,float rate);
 float resources_list_get_amount(List *list,const char *name);
 
 /**
+ * @brief check how much total mass the commodity takes up.
+ * @note this only checks against resources with a T (tonnage) as the units
+ * @param list the resource list to check
+ * @return 0 if none, the amount otherwise
+ */
+int resources_get_total_commodity_mass(List *list);
+
+/**
  * @brief get the resource struct
  * @param list the list to get it from
  * @param name the name to get

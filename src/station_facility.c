@@ -19,6 +19,7 @@ int station_facility_types_valid(SJson *array,const char *check)
     int i,c;
     const char *str;
     SJson *item;
+    if (!check)return 0;
     c = sj_array_get_count(array);
     for (i = 0; i < c;i++)
     {
@@ -145,7 +146,6 @@ StationFacility *station_facility_load(SJson *config)
         return NULL;
     }
     sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);
-    sj_object_get_value_as_int(config,"storage",&facility->storage);
     sj_object_get_value_as_bool(config,"inactive",(short int*)&facility->inactive);
     sj_object_get_value_as_bool(config,"disabled",(short int*)&facility->disabled);
     str = sj_object_get_value_as_string(config,"officer");
@@ -182,6 +182,8 @@ StationFacility *station_facility_new_by_name(const char *name)
     if (res)facility->produces = resources_list_parse(res);
     res = sj_object_get_value(facilityDef,"upkeep");
     if (res)facility->upkeep = resources_list_parse(res);
+    sj_object_get_value_as_int(facilityDef,"housing",&facility->housing);
+    sj_object_get_value_as_int(facilityDef,"storage",&facility->storage);
     sj_object_get_value_as_int(facilityDef,"staff",&facility->staffRequired);
     sj_object_get_value_as_int(facilityDef,"energyDraw",&facility->energyDraw);
     sj_object_get_value_as_int(facilityDef,"energyOutput",&facility->energyOutput);

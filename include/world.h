@@ -17,6 +17,9 @@
 typedef struct
 {
     List    *model_list;
+    Uint32   now;
+    Uint32   hourTime;   //how many ticks must pass before a new day happens
+    Uint32   lastHour;   //when did the last day begin
     Matrix4 skyMat;
     Particle theSun;
     Model *sky;

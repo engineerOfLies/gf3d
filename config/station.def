@@ -21,7 +21,6 @@
             "facility_slots":4,
             "facility_types":
             [
-                "industrial",
                 "operations"
             ],
             "default_facilities":
@@ -135,9 +134,16 @@
             "facility_types":
             [
                 "residential",
+                "aggriculture",
                 "entertainment",
                 "commercial",
                 "operations"
+            ],
+            "default_facilities":
+            [
+                "quarters1",
+                "quarters1",
+                "aggriculture1"
             ],
             "extensions":[
                 {
@@ -262,7 +268,7 @@
             [
                 "industrial",
                 "operations",
-                "storage"
+                "large_storage"
             ],
             "scale":[1,1,1],
             "extensions":[
@@ -270,6 +276,10 @@
                     "offset":[0,-4,0],
                     "rotation":[0,0,0]
                 }
+            ],
+            "default_facilities":
+            [
+                "cargo_hold_large"
             ]
         },
         {
@@ -293,7 +303,7 @@
             "facility_types":
             [
                 "cargo_dock",
-                "storage",
+                "small_storage",
                 "defenses"
             ],
             "scale":[1,1,1],
@@ -306,6 +316,10 @@
                     "offset":[0,-0.7,1],
                     "rotation":[180,-90,0]
                 }
+            ],
+            "default_facilities":
+            [
+                "cargo_hold_small"
             ]
         },
         {
@@ -329,7 +343,7 @@
             "facility_types":
             [
                 "cargo_dock",
-                "storage",
+                "small_storage",
                 "defenses"
             ],
             "scale":[1,1,1],
@@ -338,6 +352,10 @@
                     "offset":[0,-2,0],
                     "rotation":[0,0,0]
                 }
+            ],
+            "default_facilities":
+            [
+                "cargo_hold_small"
             ]
         },
         {

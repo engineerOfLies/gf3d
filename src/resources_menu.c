@@ -83,15 +83,27 @@ void resource_menu_update_resources(Window *win)
     Element *e;
     Element *resource_list;
     PlayerData *player;
+    StationData *station;
+    int total_mass;
     if (!win)return;
     player = player_get_data();
-    if (!player)return;
+    station = player_get_station_data();
+    if ((!player)||(!station))return;
 
     gfc_line_sprintf(buffer,"Population : %i",player->population);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"population"),buffer);
 
-    gfc_line_sprintf(buffer,"Staff Hired : %i",player->staff);
+    gfc_line_sprintf(buffer,"Housing : %i",station->housing);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),buffer);
+
+    total_mass = resources_get_total_commodity_mass(player_get_resources());
+    gfc_line_sprintf(buffer,"Storage : %i /%i T",total_mass,station->storageCapacity);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
+
+    gfc_line_sprintf(buffer,"Staff Unassigned : %i",player->staff);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
+    gfc_line_sprintf(buffer,"Assigned : %i",station->staffAssigned);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"assigned"),buffer);
     
     resource_list = resource_list_element_new(win,"resource_list", vector2d(0,0),player_get_resources(),NULL);
     e = gf2d_window_get_element_by_name(win,"resources");

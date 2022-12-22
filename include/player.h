@@ -13,7 +13,8 @@ typedef struct
     float   salesTaxRate;       /**<rate of income for commerce*/
     int     population;         /**<how many people live in on the station.  This is for taing purposes*/
     int     staff;              /**<people hired by the station to work for the station*/
-    int     day;                /**<incremented periodically to track the passage of game-time*/
+    Uint32  hour;               /**<incremented periodically for timing*/
+    Uint32  day;                /**<incremented every 24 hours to track the passage of game-time*/
     List   *resources;          /**<list of resources of the station*/
     Entity *station;            /**<the station of the player*/
 }PlayerData;
@@ -42,6 +43,21 @@ StationData *player_get_station_data();
  * @return NULL if no player data, the resource list otherwise
  */
 List * player_get_resources();
+
+/**
+ * @brief call to advance the player time by an hour
+ */
+void player_hour_advance();
+
+/**
+ * @brief get the player game day
+ */
+Uint32 player_get_day();
+
+/**
+ * @brief get the player game hour
+ */
+Uint32 player_get_hour();
 
 /**
  * @brief save the player data to file

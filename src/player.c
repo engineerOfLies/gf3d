@@ -35,7 +35,8 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));
     sj_object_insert(json,"staff",sj_new_int(data->staff));
     sj_object_insert(json,"population",sj_new_int(data->population));
-    sj_object_insert(json,"day",sj_new_int(data->day));
+    sj_object_insert(json,"hour",sj_new_uint32(data->hour));
+    sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
     return json;
 }
@@ -77,7 +78,8 @@ PlayerData *player_data_parse(SJson *json)
     str = sj_object_get_value_as_string(json,"filename");
     if (str)gfc_line_cpy(data->filename,str);
 
-    sj_get_integer_value(sj_object_get_value(json,"day"),&data->day);
+    sj_object_get_value_as_uint32(json,"hour",&data->day);
+    sj_object_get_value_as_uint32(json,"day",&data->day);
     sj_get_integer_value(sj_object_get_value(json,"staff"),&data->staff);
     sj_get_integer_value(sj_object_get_value(json,"population"),&data->population);
     sj_get_float_value(sj_object_get_value(json,"wages"),&data->wages);
@@ -173,6 +175,39 @@ void player_think(Entity *self)
 void player_update(Entity *self)
 {
     // this will be where I run the economy upkeep for the player.
+}
+
+Uint32 player_get_day()
+{
+    PlayerData *data;
+    if (!player_entity)return 0;
+    data = player_entity->data;
+    if (!data)return 0;
+    return data->day;
+}
+
+Uint32 player_get_hour()
+{
+    PlayerData *data;
+    if (!player_entity)return 0;
+    data = player_entity->data;
+    if (!data)return 0;
+    return data->hour;
+}
+
+void player_hour_advance()
+{
+    PlayerData *data;
+    if (!player_entity)return;
+    data = player_entity->data;
+    if (!data)return;
+    data->hour++;
+    if (data->hour >= 24)
+    {
+        data->hour = 0;
+        data->day++;
+        station_upkeep(player_get_station_data());
+    }
 }
 
 List * player_get_resources()

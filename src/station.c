@@ -136,11 +136,11 @@ StationData *station_load_data(SJson *station)
         section = station_add_section(data,name,id,parent,slot);
         if (section)
         {
+            station_facility_free_list(section->facilities);//remove defaults
             //here is where we parse out specific stats
             facilities = sj_object_get_value(item,"facilities");
             if (facilities)
             {
-                station_facility_free_list(section->facilities);
                 section->facilities = gfc_list_new();
                 d = sj_array_get_count(facilities);
                 for (j = 0;j < d; j++)
@@ -286,6 +286,8 @@ void station_section_recalc_values(StationSection *section)
     section->storageCapacity = 0;
     section->energyOutput = 0;
     section->energyDraw = 0;
+    section->housing = 0;
+    section->staffAssigned = 0;
     for (i = 0; i < c; i++)
     {
         facility = gfc_list_get_nth(section->facilities,i);
@@ -294,6 +296,8 @@ void station_section_recalc_values(StationSection *section)
         section->energyDraw += facility->energyDraw;
         section->energyOutput += facility->energyOutput;
         section->storageCapacity += facility->storage;
+        section->housing += facility->housing;
+        section->staffAssigned += facility->staffAssigned;
     }
 }
 
@@ -307,20 +311,52 @@ void station_recalc_values(StationData *station)
     station->storageCapacity = 0;
     station->energyOutput = 0;
     station->energyDraw = 0;
+    station->housing = 0;
+    station->staffAssigned = 0;
     c = gfc_list_get_count(station->sections);
     for (i = 0; i < c; i++)
     {
         section = gfc_list_get_nth(station->sections,i);
         if (!section)continue;
         station_section_recalc_values(section);
+        station->housing += section->housing;
         station->hull += section->hull;
         station->hullMax += section->hullMax;
         station->storageCapacity += section->storageCapacity;
         station->energyOutput += section->energyOutput;
         station->energyDraw += section->energyDraw;
+        station->staffAssigned += section->staffAssigned;
     }
 }
 
+void station_section_upkeep(StationSection *section)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!section)return;
+    c = gfc_list_get_count(section->facilities);
+    for (i = 0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(section->facilities,i);
+        if (!facility)continue;
+        if (facility->disabled)continue;
+        station_facility_update(facility);
+    }
+}
+
+void station_upkeep(StationData *station)
+{
+    int i,c;
+    StationSection *section;
+    if (!station)return;
+    c = gfc_list_get_count(station->sections);
+    for (i = 0; i < c; i++)
+    {
+        section = gfc_list_get_nth(station->sections,i);
+        if (!section)continue;
+        station_section_upkeep(section);
+    }
+}
 
 Entity *station_new(Vector3D position,SJson *config)
 {

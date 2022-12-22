@@ -4,6 +4,8 @@
         "PAUSEbackgroundMusic":"music/370801__romariogrande__space-chase.wav",
         "sky":"models/sky.model",
         "skyScale":[1,1,1],
+        "hourTime":500,
+        "hourTime-Backup":3000,
         "camera":
         {
             "position":[-1123.226318,-1096.660156,314.309998],

@@ -142,12 +142,21 @@ int hud_free(Window *win)
 int hud_update(Window *win,List *updateList)
 {
     int i,count;
+    Uint32 day,hour;
     Element *e;
+    TextLine buffer;
     HUDWindowData *data;
     if (!win)return 0;
     if (!updateList)return 0;
     data = (HUDWindowData*)win->data;
     world_run_updates(data->w);
+    
+    day = player_get_day();
+    hour = player_get_hour();
+    
+    e = gf2d_window_get_element_by_name(win,"time");
+    gfc_line_sprintf(buffer,"Day %i %i:00 %i",day,hour,2280 + (day / 365));
+    gf2d_element_label_set_text(e,buffer);
 
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
@@ -235,7 +244,7 @@ int hud_draw(Window *win)
     gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
 
     position.y += 28;
-    gfc_line_sprintf(buffer,"Energy Supply: %i",(int)(station->energyOutput - station->energyDraw));
+    gfc_line_sprintf(buffer,"Energy Surplus: %i",(int)(station->energyOutput - station->energyDraw));
     gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
 
     resources = player_get_resources();
