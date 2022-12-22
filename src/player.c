@@ -200,6 +200,7 @@ void player_upkeep(PlayerData *player)
 {
     int totalStaff;
     float wages,taxes;
+    int food;
     StationData *station;
     if (!player)return;
     station = player_get_station_data();
@@ -211,6 +212,9 @@ void player_upkeep(PlayerData *player)
     taxes = player->population * player->salesTaxRate;
     player->resources = resources_list_give(player->resources,"credits",taxes);
     message_printf("Collected %.2fCr in taxes from the people living on the station.",taxes);
+    food = (player->population/12);
+    resources_list_withdraw(player->resources,"food",food);
+    message_printf("People consumed %i tons of food this month",food);
 }
 
 void player_hour_advance()
@@ -225,7 +229,10 @@ void player_hour_advance()
         data->hour = 0;
         data->day++;
         station_upkeep(player_get_station_data());
-        player_upkeep(data);
+        if ((data->day % 30)== 0)//end of month
+        {
+            player_upkeep(data);
+        }
     }
 }
 

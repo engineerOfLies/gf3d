@@ -154,11 +154,11 @@
             "officerSlot":true,
             "upkeep":
             {
-                "minerals":10
+                "minerals":1
             },
             "produces":
             {
-                "food":200
+                "food":20
             }
         },
         {
