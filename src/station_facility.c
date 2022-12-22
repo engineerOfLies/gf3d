@@ -31,6 +31,17 @@ int station_facility_types_valid(SJson *array,const char *check)
     return 0;
 }
 
+int station_facility_is_unique(StationFacility *facility)
+{
+    Bool unique;
+    SJson *def;
+    if (!facility)return 0;
+    def = config_def_get_by_name("facilities",facility->name);
+    if (!def)return 0;
+    if ((sj_object_get_value_as_bool(def,"unique",&unique))&&(unique))return 1;
+    return 0;
+}
+
 List *station_facility_get_possible_list(StationSection *parent)
 {
     int i,c;

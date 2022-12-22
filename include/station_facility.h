@@ -94,6 +94,14 @@ void station_facility_update(StationFacility *facility,float *energySupply);
 void station_facility_check(StationFacility *facility);
 
 /**
+ * @brief check if a station facility is a unique one
+ * @note unique ones cannot be bought or sold
+ * @param facility the facility to check
+ * @return 0 if not or error, 1 if it is unique
+ */
+int station_facility_is_unique(StationFacility *facility);
+
+/**
  * @brief Assign / Remove staff from a facility
  * @param facility the facility
  * @param amount how many to hire / fire (you should probably do this one at a time)

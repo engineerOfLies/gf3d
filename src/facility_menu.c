@@ -246,7 +246,11 @@ int facility_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"sell")==0)
         {
-            win->child = window_yes_no("Sell selected facility?", facility_menu_yes,facility_menu_no,win);
+            if (station_facility_is_unique(data->facility))
+            {
+                message_new("Cannot sell this facility.");
+            }
+            else win->child = window_yes_no("Sell selected facility?", facility_menu_yes,facility_menu_no,win);
             return 1;
         }
         if (e->index >= 1000)

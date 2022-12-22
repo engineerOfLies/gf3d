@@ -49,7 +49,7 @@ int station_menu_free(Window *win)
     {
         data->station->sectionHighlight = -1;
     }
-
+    
     gf3d_camera_set_position(data->oldPosition);
     camera_entity_set_look_target(data->oldTarget);
     free(data);
