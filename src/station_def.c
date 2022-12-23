@@ -58,6 +58,16 @@ int station_def_get_extension_count(SJson *section)
     return sj_array_get_count(list);
 }
 
+int station_def_is_unique(const char *name)
+{
+    Bool unique;
+    SJson *def;
+    def = config_def_get_by_name("sections",name);
+    if (!def)return 0;
+    if ((sj_object_get_value_as_bool(def,"unique",&unique))&&(unique))return 1;
+    return 0;
+}
+
 int station_def_get_extension_count_by_name(const char *name)
 {
     return station_def_get_extension_count(config_def_get_by_name("sections",name));

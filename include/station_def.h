@@ -44,6 +44,14 @@ const char *station_def_get_display_name(const char *section);
 const char *station_def_name_by_display(const char *display);
 
 /**
+ * @brief check if a station section is a unique one
+ * @note unique ones cannot be bought or sold
+ * @param name the section to check
+ * @return 0 if not or error, 1 if it is unique
+ */
+int station_def_is_unique(const char *name);
+
+/**
  * @brief get a list of section names
  * @return NULL if none loaded, or a list (the list should be deleted, but the items should not)
  */

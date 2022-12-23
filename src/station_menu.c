@@ -192,6 +192,10 @@ int station_menu_update(Window *win,List *updateList)
             {
                 station_menu_select_segment(win,data,data->selection->parent->id);
             }
+            else
+            {
+                message_new("no parent section");
+            }
             return 1;
         }
         if (strcmp(e->name,"prev")==0)

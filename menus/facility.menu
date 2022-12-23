@@ -376,6 +376,15 @@
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,0,1,30],
+                                "name":"housing",
+                                "text":"Housing: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
                             }
                         ]
                     }

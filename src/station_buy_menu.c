@@ -111,7 +111,6 @@ int station_buy_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"buy")==0)
         {
-            if (win->child)return 1;
             if (resources_list_afford(player_get_resources(),data->cost))
             {
                 resource_list_buy(player_get_resources(), data->cost);
@@ -149,6 +148,7 @@ int station_buy_menu_update(Window *win,List *updateList)
 void station_buy_menu_set_list(Window *win)
 {
     const char *str;
+    const char *first = NULL;
     Element *button;
     Element *item_list;
     int i,c;
@@ -161,15 +161,14 @@ void station_buy_menu_set_list(Window *win)
     {
         str = gfc_list_get_nth(data->list,i);
         if (!str)continue;
+        if (station_def_is_unique(str))continue;
         str = station_def_get_display_name(str);
-        if (i == 0)
-        {
-            station_buy_menu_select_item(win,str);
-        }
-        button = gf2d_button_new_label_simple(win,1000+i,str,gfc_color8(255,255,255,255));
+        if (!first)first = str;
+        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_WHITE);
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }
+    station_buy_menu_select_item(win,first);
 }
 
 Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,Uint8 slot,List *list)
