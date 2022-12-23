@@ -3,14 +3,14 @@
     "filename":"saves/newgame1.save",
     "name":"[CMDR] O'Hare",
     "day":0,
-    "wages":"5.000000",
-    "taxRate":"0.15000",
+    "wages":"1.500000",
+    "taxRate":"0.42000",
     "population":"300",
-    "staff":"20",
+    "staff":"0",
     "salesTaxRate":"0.090000",
     "resources":{
       "credits":"10000.000000",
-      "food":800,
+      "food":500,
       "fuel":20,
       "ore":"1000.000000",
       "minerals":"1000.000000",
@@ -57,7 +57,7 @@
         "facilities":[
           {
             "name":"cargo_hold_small",
-            "staff":"5",
+            "staff":"0",
             "damage":"0.000000",
             "disabled":"false"
           }
@@ -117,7 +117,7 @@
         "facilities":[
           {
             "name":"cargo_hold_large",
-            "staff":"20",
+            "staff":"0",
             "damage":"0.000000",
             "disabled":"false"
           }
@@ -159,9 +159,9 @@
           },
           {
             "name":"aggriculture1",
-            "staff":"0",
+            "staff":"10",
             "damage":"0.000000",
-            "disabled":"true"
+            "disabled":"false"
           }
         ]
       },

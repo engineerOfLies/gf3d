@@ -43,11 +43,11 @@
                 "credits":1000
             },
             "staffPositions":10,
-            "staffRequired":10,
+            "staffRequired":5,
             "officerSlot":true,
             "produces":
             {
-                "fuel":10
+                "fuel":30
             }
         },
         {
@@ -59,16 +59,15 @@
             "cost":
             {   
                 "credits":1000,
-                "alloys":50,
-                "meta_materials":50
+                "alloys":50
             },
             "staffPositions":10,
-            "staffRequired":10,
+            "staffRequired":5,
             "energyOutput":1000,
             "officerSlot":true,
             "upkeep":
             {
-                "fuel":20
+                "fuel":50
             }
         },
         {
@@ -174,7 +173,7 @@
             },
             "produces":
             {
-                "food":20
+                "food":50
             }
         },
         {
@@ -189,9 +188,9 @@
                 "alloys":50
             },
             "staffPositions":5,
-            "staffRequired":2,
+            "staffRequired":0,
             "energyDraw":50,
-            "storage":500,
+            "storage":100,
             "officerSlot":false
         },
         {
@@ -206,7 +205,7 @@
                 "alloys":200
             },
             "staffPositions":20,
-            "staffRequired":8,
+            "staffRequired":0,
             "energyDraw":200,
             "storage":2000
         },

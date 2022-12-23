@@ -17,7 +17,7 @@
             "precision":0,
             "negative":false,
             "value":100,
-            "units":"HDG"
+            "units":"T"
         },
         {
             "name":"food",

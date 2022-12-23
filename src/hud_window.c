@@ -157,7 +157,11 @@ int hud_update(Window *win,List *updateList)
     hour = player_get_hour();
     
     e = gf2d_window_get_element_by_name(win,"time");
-    gfc_line_sprintf(buffer,"Day: %i  Time: %i:00  Year: %i",day,hour,2280 + (day / 365));
+    if (data->paused)
+    {
+        gfc_line_sprintf(buffer,"-<PAUSED>-");
+    }
+    else gfc_line_sprintf(buffer,"Day: %i  Time: %i:00  Year: %i",day,hour,2280 + (day / 365));
     gf2d_element_label_set_text(e,buffer);
 
     count = gfc_list_get_count(updateList);

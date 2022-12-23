@@ -131,10 +131,15 @@ void station_facility_check(StationFacility *facility)
 
 void station_facility_update(StationFacility *facility,float *energySupply)
 {
+    int newMass;
+    int space;
+    StationData *station;
     List *supply;
     if (!facility)return;
     if (!energySupply)return;
     if (facility->disabled)return;// not updating what has been turned off by the player
+    station = player_get_station_data();
+    if (!station)return;
     
     if (facility->energyDraw)
     {
@@ -156,8 +161,28 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     {
         resource_list_buy(supply, facility->upkeep);
     }
-    if (facility->produces)
+    if (gfc_list_get_count(facility->produces)>0)
     {
+        newMass = resources_get_total_commodity_mass(facility->produces) * facility->productivity;
+        if (newMass <= 0)
+        {
+            message_printf("Facility %s cannot produce any more, disabling...",facility->name);
+            facility->disabled = 1;
+            return;
+        }
+        space = station->storageCapacity - resources_get_total_commodity_mass(supply);
+        if (space <= 0)
+        {
+            message_printf("Facility %s cannot store any more of its produce, disabling...",facility->name);
+            facility->disabled = 1;
+            return;
+        }
+        if (space < newMass)
+        {
+            message_printf("Facility %s cannot store any more of its produce, disabling...",facility->name);
+            facility->disabled = 1;
+            resource_list_sell(supply, facility->produces,facility->productivity * ((float)space / (float)newMass));
+        }
         resource_list_sell(supply, facility->produces,facility->productivity);
     }
 }
