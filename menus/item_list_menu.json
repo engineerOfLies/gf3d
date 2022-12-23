@@ -1,6 +1,6 @@
 {
 "window":{
-    "dimensions" : [0,0,500,60],
+    "dimensions" : [0,0,500,50],
     "name":"item_list_menu",
     "align" : "middle",
     "justify" : "center",
@@ -10,7 +10,7 @@
         "type": "list",
         "name": "list",
         "id" : 0,
-        "bounds": [0,10,1,1],
+        "bounds": [0,4,1,1],
         "style": "vertical",
         "item_size" : [100,36],
         "elements":
@@ -18,18 +18,18 @@
             {
             "type": "label",
             "name" : "title",
-            "bounds": [0,0,1,36],
+            "bounds": [0,0,1,30],
             "text":"Title",
             "justify" : "center",
             "align" : "middle",
-            "style":"H3"
+            "style":"H4"
             },
             {
             "type": "list",
             "name": "options",
-            "bounds": [6,10,160,1],
+            "bounds": [6,0,160,1],
             "style": "vertical",
-            "item_size" : [0.8,36],
+            "item_size" : [0.8,24],
             "elements":
             [
             ]

@@ -32,6 +32,7 @@ typedef struct
     Vector3D oldTarget;
     StationData *station;
     StationSection *selection;
+    List *selectionList;
     int choice;
 }StationMenuData;
 
@@ -49,11 +50,51 @@ int station_menu_free(Window *win)
     {
         data->station->sectionHighlight = -1;
     }
-    
+    gfc_list_delete(data->selectionList);
     gf3d_camera_set_position(data->oldPosition);
     camera_entity_set_look_target(data->oldTarget);
     free(data);
     return 0;
+}
+
+void station_menu_section_list_choice(void *Data)
+{
+    Window *win;
+    StationMenuData *data;
+    StationSection *selection;
+    if (!Data)return;
+    win = Data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    if (data->choice < 0)return;
+    selection = gfc_list_get_nth(data->station->sections,data->choice);
+    station_menu_select_segment(win,data,selection->id);
+}
+
+void station_menu_section_list(Window *win)
+{
+    int i,c;
+    StationSection *section;
+    StationMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    
+    if (!data->station)return;
+    
+    if (win->child)
+    {
+        gf2d_window_free(win->child);
+    }
+    gfc_list_clear(data->selectionList);
+    c = gfc_list_get_count(data->station->sections);
+    for (i = 0; i < c; i++)
+    {
+        section = gfc_list_get_nth(data->station->sections,i);
+        if (!section)continue;
+        data->selectionList = gfc_list_append(data->selectionList,(void *)station_def_get_display_name(section->name));
+    }
+    
+    win->child = item_list_menu(win,vector2d(230,58),250,"Select Section",data->selectionList,station_menu_section_list_choice,win,&data->choice);
 }
 
 void station_menu_child_select(void *Data)
@@ -139,6 +180,12 @@ int station_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        
+        if (strcmp(e->name,"sections")==0)
+        {
+            station_menu_section_list(win);
+            return 1;
+        }
         if (strcmp(e->name,"parent")==0)
         {
             if ((data->selection)&&(data->selection->parent))
@@ -381,6 +428,7 @@ Window *station_menu_window(Window *parent,StationData *station)
     win->free_data = station_menu_free;
     win->draw = station_menu_draw;
     data->station = station;
+    data->selectionList = gfc_list_new();
     data->oldPosition = gf3d_camera_get_position();
     data->oldTarget = camera_entity_get_look_target();
     station_menu_select_segment(win,data,0);

@@ -125,7 +125,7 @@ void item_list_menu_add_all_options(Window *win,List *options)
     c = gfc_list_get_count(options);
     gf2d_window_set_dimensions(
         win,
-        gfc_rect(win->dimensions.x,win->dimensions.y,win->dimensions.w,win->dimensions.h + c * 36));
+        gfc_rect(win->dimensions.x,win->dimensions.y,win->dimensions.w,win->dimensions.h + c * 24));
     for (i = 0;i < c;i++)
     {
         item = gfc_list_get_nth(options,i);
