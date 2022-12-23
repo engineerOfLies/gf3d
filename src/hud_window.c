@@ -25,8 +25,10 @@
 #include "station_menu.h"
 #include "personnel_menu.h"
 #include "resources_menu.h"
+#include "planet_menu.h"
 #include "main_menu.h"
 #include "hud_window.h"
+
 
 typedef struct
 {
@@ -69,6 +71,17 @@ void onFileSaveOk(void *Data)
     player_save(filepath);
 }
 
+void hud_reset_camera(Window *win)
+{
+    HUDWindowData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    camera_entity_set_look_target(vector3d(0,0,0));
+    camera_entity_set_position(data->w->cameraPosition);
+    camera_entity_set_auto_pan(1);
+    camera_entity_set_look_mode(CTT_Position);
+    camera_entity_enable_free_look(0);
+}
 
 void hud_options_select(void *Data)
 {
@@ -134,7 +147,6 @@ int hud_free(Window *win)
     if (!win)return 0;
     if (!win->data)return 0;
     data = win->data;
-    world_delete(data->w);
     gf2d_window_free(data->messages);
     entity_free(data->player);
     free(data);
@@ -216,10 +228,30 @@ int hud_update(Window *win,List *updateList)
             win->child = resources_menu(win);
             return 1;
         }
+        if (strcmp(e->name,"planet")==0)
+        {
+            if ((win->child)&&(gf2d_window_named(win->child,"planet_menu")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
+            if (win->child)
+            {
+                gf2d_window_free(win->child);
+            }
+            win->child = planet_menu(win);
+            return 1;
+        }
         
         if (strcmp(e->name,"freelook")==0)
         {
-            camera_entity_toggle_free_look();
+            if (win->child)return 1;// skip if a child window is open
+            if (camera_entity_free_look_enabled())
+            {//if free look was already enabled, reset the position
+                hud_reset_camera(win);
+            }
+            else camera_entity_toggle_free_look();
+
             return 1;
         }
         if (strcmp(e->name,"pause")==0)
@@ -299,9 +331,7 @@ Window *hud_window(const char *savefile)
         return NULL;
     }
     data->messages = window_message_buffer(5, 1000, gfc_color8(0,255,100,255));
-    camera_entity_enable_free_look(1);
-    data->w = world_load("config/world.json");
-    gf3d_camera_look_at(vector3d(0,0,0),NULL);
-    
+    data->w = player_get_world();
+    hud_reset_camera(win);
     return win;
 }

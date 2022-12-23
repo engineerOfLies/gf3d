@@ -141,6 +141,7 @@ Entity *player_new(const char *file)
         return NULL;
     }
     ent->data = data;
+    data->world = world_load("config/world.json");
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
 
     sj_free(json);
@@ -160,6 +161,7 @@ void player_free(Entity *self)
     data = self->data;
     resources_list_free(data->resources);
     entity_free(data->station);
+    world_delete(data->world);
     free(data);
     player_entity = NULL;
     self->data= NULL;
@@ -260,6 +262,15 @@ List * player_get_resources()
     data = player_entity->data;
     if (!data)return NULL;
     return data->resources;
+}
+
+World *player_get_world()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->world;
 }
 
 PlayerData *player_get_data()

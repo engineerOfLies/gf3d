@@ -20,6 +20,7 @@
 #include "station_def.h"
 #include "station.h"
 #include "player.h"
+#include "hud_window.h"
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
 #include "facility_menu.h"
@@ -42,7 +43,6 @@ int station_menu_free(Window *win)
 {
     StationMenuData *data;
     if (!win)return 0;
-    gf2d_window_close_child(win->parent,win);
     gf2d_window_free(win->child);
     if (!win->data)return 0;
     data = win->data;
@@ -51,8 +51,8 @@ int station_menu_free(Window *win)
         data->station->sectionHighlight = -1;
     }
     gfc_list_delete(data->selectionList);
-    gf3d_camera_set_position(data->oldPosition);
-    camera_entity_set_look_target(data->oldTarget);
+    hud_reset_camera(win->parent);
+    gf2d_window_close_child(win->parent,win);
     free(data);
     return 0;
 }

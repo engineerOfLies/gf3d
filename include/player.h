@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include "entity.h"
+#include "world.h"
 #include "station.h"
 
 typedef struct
@@ -17,6 +18,7 @@ typedef struct
     Uint32  day;                /**<incremented every 24 hours to track the passage of game-time*/
     List   *resources;          /**<list of resources of the station*/
     Entity *station;            /**<the station of the player*/
+    World  *world;              /**<the world (solar system really*/
 }PlayerData;
 
 /**
@@ -43,6 +45,12 @@ StationData *player_get_station_data();
  * @return NULL if no player data, the resource list otherwise
  */
 List * player_get_resources();
+
+/**
+ * @brief get the player's world
+ * @return NULL if no player data, the world data otherwise
+ */
+World *player_get_world();
 
 /**
  * @brief call to advance the player time by an hour

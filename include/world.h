@@ -17,6 +17,7 @@
 typedef struct
 {
     List    *model_list;
+    Vector3D cameraPosition;
     Uint32   now;
     Uint32   hourTime;   //how many ticks must pass before a new day happens
     Uint32   lastHour;   //when did the last day begin
@@ -35,5 +36,7 @@ void world_delete(World *world);
 void world_run_updates(World *world);
 
 void world_add_entity(World *world,Entity *entity);
+
+ModelMat *world_get_model_mat(World *world,Uint32 index);
 
 #endif

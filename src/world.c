@@ -114,6 +114,7 @@ World *world_load(char *filename)
     if (item)
     {
         sj_value_as_vector3d(sj_object_get_value(item,"position"),&position);
+        vector3d_copy(w->cameraPosition,position);
         sj_value_as_vector3d(sj_object_get_value(item,"rotation"),&rotation);
         camera_entity_new(position,rotation);
     }
@@ -126,6 +127,12 @@ World *world_load(char *filename)
     fighter_new(vector3d(0,-900,0));
 
     return w;
+}
+
+ModelMat *world_get_model_mat(World *world,Uint32 index)
+{
+    if (!world)return NULL;
+    return gfc_list_get_nth(world->model_list,index);
 }
 
 void world_draw(World *world)
