@@ -132,7 +132,7 @@
             "staffPositions":10,
             "staffRequired":5,
             "housing":200,
-            "energyDraw":200,
+            "energyDraw":100,
             "officerSlot":true
         },
         {
@@ -140,6 +140,7 @@
             "displayName":"Command Quarters",
             "icon":"",
             "description":"This facility is where the command staff live on the station",
+            "unique":true,
             "type":"residential_c",
             "cost":
             {   
@@ -149,7 +150,7 @@
             "staffPositions":10,
             "staffRequired":5,
             "housing":10,
-            "energyDraw":200,
+            "energyDraw":100,
             "officerSlot":false
         },
         {
@@ -189,7 +190,7 @@
             },
             "staffPositions":5,
             "staffRequired":0,
-            "energyDraw":50,
+            "energyDraw":10,
             "storage":100,
             "officerSlot":false
         },
@@ -206,7 +207,7 @@
             },
             "staffPositions":20,
             "staffRequired":0,
-            "energyDraw":200,
+            "energyDraw":20,
             "storage":2000
         },
         {
@@ -253,6 +254,59 @@
             "staffPositions":60,
             "staffRequired":35,
             "energyDraw":800
+        },
+        {
+            "name":"survey_site",
+            "displayName":"Survey Site",
+            "icon":"",
+            "description":"This is temporary installation on the planet meant to take samples to determine if a site is suitable for mining or not",
+            "type":"planetary",
+            "cost":
+            {   
+                "credits":200,
+                "alloys":10
+            },
+            "staffPositions":10,
+            "staffRequired":5,
+            "officerSlot":true
+        },
+        {
+            "name":"mineral_mine1",
+            "displayName":"Mineral Mine",
+            "icon":"",
+            "description":"This is a mining site designed to extract useful minerals from the planet surface.",
+            "type":"planetary",
+            "cost":
+            {   
+                "credits":1000,
+                "alloys":100
+            },
+            "staffPositions":20,
+            "staffRequired":10,
+            "officerSlot":true,
+            "produces":
+            {
+                "minerals":100
+            }
+        },
+        {
+            "name":"ore_mine1",
+            "displayName":"Ore Mine",
+            "icon":"",
+            "description":"This is a mining site designed to extract useful ores from deep below the planet surface.",
+            "type":"planetary",
+            "cost":
+            {   
+                "credits":1000,
+                "alloys":100
+            },
+            "staffPositions":20,
+            "staffRequired":10,
+            "officerSlot":true,
+            "produces":
+            {
+                "minerals":100
+            }
         }
     ]
 }

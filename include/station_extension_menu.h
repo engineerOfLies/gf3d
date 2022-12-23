@@ -6,6 +6,7 @@
 
 Window *station_extension_menu(
     Window *parent,
+    const char * title,
     Vector2D position,
     StationSection *section,
     void(*onSelect)(void *),

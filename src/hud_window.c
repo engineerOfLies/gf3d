@@ -161,7 +161,7 @@ int hud_update(Window *win,List *updateList)
     {
         gfc_line_sprintf(buffer,"-<PAUSED>-");
     }
-    else gfc_line_sprintf(buffer,"Day: %i  Time: %i:00  Year: %i",day,hour,2280 + (day / 365));
+    else gfc_line_sprintf(buffer,"Year: %i  Day: %i  Time: %02i:00  ",2280 + (day / 365),day,hour);
     gf2d_element_label_set_text(e,buffer);
 
     count = gfc_list_get_count(updateList);

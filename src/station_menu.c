@@ -208,6 +208,7 @@ int station_menu_update(Window *win,List *updateList)
             {
                 win->child = station_extension_menu(
                     win,
+                    "View Extension",
                     vector2d(e->lastDrawPosition.x + e->bounds.w,e->lastDrawPosition.y),
                     data->selection,
                     station_menu_child_select,
@@ -246,6 +247,7 @@ int station_menu_update(Window *win,List *updateList)
                 }
                 win->child = station_extension_menu(
                     win,
+                    "Build where?",
                     vector2d(e->lastDrawPosition.x + e->bounds.w,e->lastDrawPosition.y),
                     data->selection,
                     station_menu_child_build,
@@ -274,6 +276,7 @@ int station_menu_draw(Window *win)
 
 void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
 {
+    TextLine buffer;
     Matrix4 mat;
     const char *display_name;
     StationData *station;
@@ -308,8 +311,52 @@ void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
     display_name = station_def_get_display_name(section->name);
     if (display_name)
     {
-        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_name"),display_name);
+        gfc_line_sprintf(buffer,"Selected: %s",display_name);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_name"),buffer);
     }
+    else
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_name"),"Selected: <none>");
+    }
+    
+    if (section->parent)
+    {
+        display_name = station_def_get_display_name(section->parent->name);
+        if (display_name)
+        {
+            gfc_line_sprintf(buffer,"Parent: %s",display_name);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"parent_name"),buffer);
+        }
+        else
+        {
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"parent_name"),"Parent: <none>");
+        }
+    }
+    else
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"parent_name"),"Parent: <none>");
+    }
+    
+    gfc_line_sprintf(buffer,"Section Count: %i",gfc_list_get_count(station->sections));
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_count"),buffer);
+
+    gfc_line_sprintf(buffer,"Hull: %i/%i",(int)data->selection->hull,(int)data->selection->hullMax);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
+
+    gfc_line_sprintf(buffer,"Facility Slots: %i",data->selection->facilitySlots);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_slots"),buffer);
+
+    gfc_line_sprintf(buffer,"Facility Count: %i",gfc_list_get_count(data->selection->facilities));
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_count"),buffer);
+
+    gfc_line_sprintf(buffer,"Energy Draw: %i",(int)data->selection->energyDraw);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy_draw"),buffer);
+
+    gfc_line_sprintf(buffer,"Energy Output: %i",(int)data->selection->energyOutput);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy_output"),buffer);
+
+    gfc_line_sprintf(buffer,"Storage Capacity: %i",(int)data->selection->storageCapacity);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
 }
 
 Window *station_menu_window(Window *parent,StationData *station)

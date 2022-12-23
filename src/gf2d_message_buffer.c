@@ -165,6 +165,7 @@ void message_new(const char *newMessage)
     message->ttl = data->ttl;
     gfc_line_cpy(message->text,newMessage);
     data->messages = gfc_list_append(data->messages,message);
+    slog((char *)newMessage);
 }
 
 void message_printf(const char *newMessage,...)

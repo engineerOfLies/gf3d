@@ -45,6 +45,12 @@
             "damage":"0.000000",
             "disabled":"false",
             "officer":"player"
+          },
+          {
+            "name":"quarters_command",
+            "staff":"5",
+            "damage":"0.000000",
+            "disabled":"false"
           }
         ]
       },

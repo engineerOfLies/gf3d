@@ -77,6 +77,7 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),"Storage Capacity: 0");
         return;
     }
     
@@ -105,6 +106,10 @@ void facility_menu_select_item(Window *win,int choice)
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
+    gfc_line_sprintf(buffer,"Storage Capacity: %i",(int)data->facility->storage);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
+
+    
     if (data->facility->energyOutput > 0 )
         gfc_line_sprintf(buffer,"Energy Ouput: %i",data->facility->energyOutput);
     else if (data->facility->energyDraw > 0 )

@@ -19,7 +19,7 @@
             "position":[0,0,0],
             "rotates":0,
             "scale":[1,1,1],
-            "facility_slots":4,
+            "facility_slots":3,
             "facility_types":
             [
                 "operations",
@@ -28,7 +28,8 @@
             "default_facilities":
             [
                 "command_and_control",
-                "security"
+                "security",
+                "quarters_command"
             ],
             "extensions":[
                 {

@@ -198,6 +198,7 @@ Uint32 player_get_hour()
 
 void player_upkeep(PlayerData *player)
 {
+    float amount;
     int totalStaff;
     float wages,taxes;
     int food;
@@ -213,6 +214,14 @@ void player_upkeep(PlayerData *player)
     player->resources = resources_list_give(player->resources,"credits",taxes);
     message_printf("Collected %.2fCr in taxes from the people living on the station.",taxes);
     food = (player->population/12);
+    
+    amount = resources_list_get_amount(player->resources,"food");
+    if (amount < food)
+    {
+        message_new("There is not enough food to feed the people!");
+        food = amount;
+    }
+
     resources_list_withdraw(player->resources,"food",food);
     message_printf("People consumed %i tons of food this month",food);
 }
