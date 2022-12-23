@@ -258,6 +258,7 @@
         {
             "name":"survey_site",
             "displayName":"Survey Site",
+            "model":"models/planet/survey_site.model",
             "icon":"",
             "description":"This is temporary installation on the planet meant to take samples to determine if a site is suitable for mining or not",
             "type":"planetary",

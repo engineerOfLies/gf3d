@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "obj":"models/planet/survey_site.obj",
+        "texture":"models/planet/survey_site.png"
+    }
+}
