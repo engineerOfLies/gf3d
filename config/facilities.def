@@ -169,7 +169,7 @@
             "officerSlot":true,
             "upkeep":
             {
-                "minerals":1
+                "minerals":10
             },
             "produces":
             {

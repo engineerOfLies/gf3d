@@ -48,6 +48,7 @@ int personnel_menu_update(Window *win,List *updateList)
 {
     int i,count;
     Element *e;
+    StationData *station;
     PlayerData *player;
     PersonnelMenuData *data;
     if (!win)return 0;
@@ -59,6 +60,7 @@ int personnel_menu_update(Window *win,List *updateList)
         personnel_menu_update_resources(win);
     }
     player = player_get_data();
+    station = player_get_station_data();
     
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
@@ -75,6 +77,25 @@ int personnel_menu_update(Window *win,List *updateList)
         {
             player->taxRate -= 0.01;
             if (player->taxRate < 0)player->taxRate = 0;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"hire_more")==0)
+        {
+            if ((player->staff + station->staffAssigned) < player->population)
+            {
+                player->staff++;
+            }
+            else
+            {
+                message_new("There is no one left to hire on the station.");
+            }
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"hire_less")==0)
+        {
+            if (player->staff > 0)player->staff--;
             personnel_menu_update_resources(win);
             return 1;
         }
@@ -136,7 +157,7 @@ void personnel_menu_update_resources(Window *win)
     gfc_line_sprintf(buffer,"Total Staff : %i",player->staff + station->staffAssigned);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff_total"),buffer);
 
-    gfc_line_sprintf(buffer,"Staff Unassigned : %i",player->staff);
+    gfc_line_sprintf(buffer,"Free Staff : %i",player->staff);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
     gfc_line_sprintf(buffer,"Assigned : %i",station->staffAssigned);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"assigned"),buffer);
