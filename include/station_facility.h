@@ -6,10 +6,14 @@
 #include "gfc_text.h"
 #include "gfc_list.h"
 
+#include "gf3d_model.h"
+
 typedef struct
 {
     TextLine    name;  //its name identifier
     TextLine    facilityType;
+    Vector2D    position;   //for planet side facilities
+    ModelMat    mat;
     float       damage;   //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
     float       productivity;   //how efficient a facility is at running.  due to factors like damage, energy, and staffing
     int         housing;        //how much housing is provided by this facility
@@ -45,6 +49,11 @@ StationFacility *station_facility_new_by_name(const char *name);
  * @return NULL on error or the facility loaded
  */
 StationFacility *station_facility_load(SJson *config);
+
+/**
+ * @brief get a facility from a list of facilities by its position
+ */
+StationFacility *station_facility_get_by_position(List *list,Vector2D position);
 
 /**
  * @brief free from memory a station facility

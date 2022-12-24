@@ -42,6 +42,22 @@ int station_facility_is_unique(StationFacility *facility)
     return 0;
 }
 
+StationFacility *station_facility_get_by_position(List *list,Vector2D position)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!list)return NULL;
+    c = gfc_list_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(list,i);
+        if (facility)continue;
+        if ((facility->position.x == position.x)&&(facility->position.y == position.y))
+            return facility;
+    }
+    return NULL;
+}
+
 List *station_facility_get_possible_list(StationSection *parent)
 {
     int i,c;
@@ -201,6 +217,7 @@ SJson *station_facility_save(StationFacility *facility)
     if (!facility)return NULL;
     json = sj_object_new();
     sj_object_insert(json,"name",sj_new_str(facility->name));
+    sj_object_insert(json,"position",sj_vector2d_new(facility->position));
     sj_object_insert(json,"damage",sj_new_float(facility->damage));
     sj_object_insert(json,"staff",sj_new_int(facility->staffAssigned));
     sj_object_insert(json,"disabled",sj_new_bool(facility->disabled));
@@ -232,7 +249,8 @@ StationFacility *station_facility_load(SJson *config)
         slog("failed to make facility %s",str);
         return NULL;
     }
-    sj_object_get_value_as_float(config,"damag",&facility->damage);
+    sj_value_as_vector2d(sj_object_get_value(config,"position"),&facility->position);
+    sj_object_get_value_as_float(config,"damage",&facility->damage);
     sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);
     sj_object_get_value_as_bool(config,"disabled",(short int*)&facility->disabled);
     str = sj_object_get_value_as_string(config,"officer");
@@ -261,6 +279,13 @@ StationFacility *station_facility_new_by_name(const char *name)
     {
         return NULL;
     }
+    str = sj_object_get_value_as_string(facilityDef,"model");
+    if (str)
+    {
+        gf3d_model_mat_reset(&facility->mat);
+        facility->mat.model = gf3d_model_load(str);
+    }
+
     str = sj_object_get_value_as_string(facilityDef,"name");
     if (str)gfc_line_cpy(facility->name,str);
     str = sj_object_get_value_as_string(facilityDef,"type");

@@ -3,22 +3,25 @@
 
 #include "entity.h"
 #include "world.h"
+#include "planet.h"
 #include "station.h"
+#include "station_facility.h"
 
 typedef struct
 {
-    TextLine name;              /**<player's name*/
-    TextLine filename;          /**<save game filename*/
-    float   wages;              /**<how much you pay employees*/
-    float   taxRate;            /**<how much locals provide for the system*/
-    float   salesTaxRate;       /**<rate of income for commerce*/
-    int     population;         /**<how many people live in on the station.  This is for taing purposes*/
-    int     staff;              /**<people hired by the station to work for the station*/
-    Uint32  hour;               /**<incremented periodically for timing*/
-    Uint32  day;                /**<incremented every 24 hours to track the passage of game-time*/
-    List   *resources;          /**<list of resources of the station*/
-    Entity *station;            /**<the station of the player*/
-    World  *world;              /**<the world (solar system really*/
+    TextLine    name;               /**<player's name*/
+    TextLine    filename;           /**<save game filename*/
+    float       wages;              /**<how much you pay employees*/
+    float       taxRate;            /**<how much locals provide for the system*/
+    float       salesTaxRate;       /**<rate of income for commerce*/
+    int         population;         /**<how many people live in on the station.  This is for taing purposes*/
+    int         staff;              /**<people hired by the station to work for the station*/
+    Uint32      hour;               /**<incremented periodically for timing*/
+    Uint32      day;                /**<incremented every 24 hours to track the passage of game-time*/
+    List       *resources;          /**<list of resources of the station*/
+    Entity     *station;            /**<the station of the player*/
+    World      *world;              /**<the world (solar system really*/
+    PlanetData *planet;             /**<the planet in the solar system the player controls*/
 }PlayerData;
 
 /**

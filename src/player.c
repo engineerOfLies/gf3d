@@ -39,6 +39,7 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"hour",sj_new_uint32(data->hour));
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
+    sj_object_insert(json,"planet",planet_save_to_config(data->planet));
     return json;
 }
 
@@ -94,6 +95,13 @@ PlayerData *player_data_parse(SJson *json)
     else 
     {
         slog("no player resources");
+    }
+    res = sj_object_get_value(json,"planet");
+    if (res)data->planet = planet_load_from_config(res);
+    if (!data->planet)
+    {
+        data->planet = planet_new();
+        planet_generate_resource_map(data->planet);
     }
     return data;
 }
