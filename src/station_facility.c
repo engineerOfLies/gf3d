@@ -46,16 +46,61 @@ StationFacility *station_facility_get_by_position(List *list,Vector2D position)
 {
     int i,c;
     StationFacility *facility;
-    if (!list)return NULL;
+    if (!list)
+    {
+        slog("no list provided");
+        return NULL;
+    }
     c = gfc_list_get_count(list);
     for (i = 0; i < c; i++)
     {
         facility = gfc_list_get_nth(list,i);
-        if (facility)continue;
-        if ((facility->position.x == position.x)&&(facility->position.y == position.y))
+        if (!facility)continue;
+        if (((int)facility->position.x == (int)position.x)&&((int)facility->position.y == (int)position.y))
             return facility;
     }
     return NULL;
+}
+
+int station_facility_types_in_list(List *list, const char *facility_type)
+{
+    int i,c;
+    const char *str;
+    if ((!list)||(!facility_type))return 0;
+    c = gfc_list_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        str = gfc_list_get_nth(list,i);
+        if (!str)continue;
+        if (strcmp(str,facility_type)==0)return 1;
+    }
+    return 0;
+}
+
+List *station_facility_get_possible_from_list(List *typeList)
+{
+    int i,c;
+    List *list;
+    Bool unique;
+    const char *name;
+    const char *facility_type;
+    SJson *def;
+    if (!typeList)return NULL;
+    list = gfc_list_new();
+    c = config_def_get_resource_count("facilities");
+    for (i = 0; i < c; i++)
+    {
+        def = config_def_get_by_index("facilities",i);
+        if (!def)continue;
+        if ((sj_object_get_value_as_bool(def,"unique",&unique))&&(unique))continue;
+        facility_type = sj_object_get_value_as_string(def,"type");
+        if (station_facility_types_in_list(typeList,facility_type))
+        {
+            name = sj_object_get_value_as_string(def,"name");
+            list = gfc_list_append(list,(void *)name);
+        }
+    }
+    return list;
 }
 
 List *station_facility_get_possible_list(StationSection *parent)

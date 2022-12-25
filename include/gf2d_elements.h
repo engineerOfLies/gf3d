@@ -21,7 +21,6 @@ typedef enum
     ES_idle,        /**<normal*/
     ES_disable,     /**<greyed out*/
     ES_highlight,   /**<selected*/
-    ES_hidden,
     ES_active       /**<pressed or whatever*/
 }ElementState;
 
@@ -55,6 +54,7 @@ struct Element_S
     Color backgroundColor;      /**<color for background of element*/
     int   backgroundDraw;       /**<if true, draw the background*/
     
+    int hidden;                 /**<if true, do not draw or update*/
     int state;                  /**<if true, drawn with highlight*/
     int type;                   /**<which type of element this is*/
     void (*draw)        (struct Element_S *element,Vector2D offset); /**<draw function, offset comes from draw position of window*/
@@ -125,6 +125,13 @@ Vector2D gf2d_element_get_draw_position(Element *e);
  * @return returns 0 if the element can't have focus, 1 otherwise after it was set
  */
 int gf2d_element_set_focus(Element *element,int focus);
+
+/**
+ * @brief set an element to hidden or unhidden
+ * @param element the element to set
+ * @param hidden if true, HIDE, if false UN HIDE
+ */
+void gf2d_element_set_hidden(Element *element, int hidden);
 
 /**
  * @brief set the color for the given element

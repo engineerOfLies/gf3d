@@ -17,6 +17,7 @@ typedef enum
 
 typedef struct
 {
+    int surveyed;
     int resources[SRT_MAX];
     TextLine special;
 }SiteData;
@@ -58,6 +59,14 @@ PlanetData *planet_load_from_config(SJson *config);
  * @brief set random deposits of planetary resources
  */
 void planet_generate_resource_map(PlanetData *planet);
+
+/**
+ * @brief get a siteData by the world position
+ * @param planet the planetData to poll
+ * @param position longitude and latitude position on the planet
+ * @return NULL if out of range or error, the site data otherwise
+ */
+SiteData *planet_get_site_data_by_position(PlanetData *planet,Vector2D position);
 
 /**
  * @brief given a position on a planet surface, translate that into a cartesian coordinates relative the planet's center

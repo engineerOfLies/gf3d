@@ -38,6 +38,12 @@ Entity *player_new(const char *file);
 PlayerData *player_get_data();
 
 /**
+ * @brief get the current player's planet data
+ * @return NULL if no player loaded, or the planetData for the player
+ */
+PlanetData *player_get_planet();
+
+/**
  * @brief get the player's space station data
  * @return NULL if no player, the station data otherwise
  */

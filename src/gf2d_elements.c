@@ -72,10 +72,16 @@ Vector2D gf2d_element_get_draw_position(Element *e)
     return e->lastDrawPosition;
 }
 
+void gf2d_element_set_hidden(Element *element, int hidden)
+{
+    if (!element)return;
+    element->hidden = hidden;
+}
+
 void gf2d_element_draw(Element *e, Vector2D offset)
 {
     Rect rect;
-    if ((!e)||(e->state == ES_hidden))
+    if ((!e)||(e->hidden))
     {
         return;
     }
@@ -95,7 +101,7 @@ void gf2d_element_draw(Element *e, Vector2D offset)
 
 List * gf2d_element_update(Element *e, Vector2D offset)
 {
-    if (!e)
+    if ((!e)||(e->hidden))
     {
         return NULL;
     }

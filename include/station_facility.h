@@ -126,4 +126,11 @@ int station_facility_change_staff(StationFacility *facility,int amount);
  */
 List *station_facility_get_resource_cost(const char *name,const char *resource_type);
 
+/**
+ * @brief get a list of facilities with the types from the list provided
+ * @param list a list of strings to filter by
+ * @return NULL if error, or a list of strings of facility names
+ */
+List *station_facility_get_possible_from_list(List *list);
+
 #endif

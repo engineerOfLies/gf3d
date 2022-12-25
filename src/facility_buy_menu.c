@@ -27,12 +27,12 @@
 
 typedef struct
 {
-    StationSection *parent;
-    int facility_slot;
+    List *facilityList;
     const char *selected;
     List *list;
     List *cost;
     int choice;
+    Vector2D position;
 }FacilityBuyMenuData;
 
 int facility_buy_menu_free(Window *win)
@@ -41,7 +41,6 @@ int facility_buy_menu_free(Window *win)
     if ((!win)||(!win->data))return 0;
     data = win->data;
     resources_list_free(data->cost);
-    gfc_list_delete(data->list);
     gf2d_window_close_child(win,win->child);
     gf2d_window_close_child(win->parent,win);
     free(data);
@@ -166,7 +165,8 @@ int facility_buy_menu_update(Window *win,List *updateList)
             {
                 resource_list_buy(player_get_resources(), data->cost);
                 new_facility = station_facility_new_by_name(station_facility_get_name_from_display(data->selected));
-                data->parent->facilities = gfc_list_append(data->parent->facilities,new_facility);
+                vector2d_copy(new_facility->position,data->position);
+                data->facilityList = gfc_list_append(data->facilityList,new_facility);
                 facility_menu_set_list(win->parent);
                 gf2d_window_free(win);
             }
@@ -213,7 +213,7 @@ void facility_buy_menu_set_list(Window *win)
     FacilityBuyMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
-    if (!data->parent)return;
+    if (!data->facilityList)return;
     item_list = gf2d_window_get_element_by_name(win,"item_list");
     if (!item_list)return;
     c = gfc_list_get_count(data->list);
@@ -231,7 +231,7 @@ void facility_buy_menu_set_list(Window *win)
     }
 }
 
-Window *facility_buy_menu(Window *parent,StationSection *parentSection,int facility_slot)
+Window *facility_buy_menu(Window *parent,List *facility_list, List *type_list,Vector2D position)
 {
     Window *win;
     FacilityBuyMenuData* data;
@@ -247,9 +247,9 @@ Window *facility_buy_menu(Window *parent,StationSection *parentSection,int facil
     data = (FacilityBuyMenuData*)gfc_allocate_array(sizeof(FacilityBuyMenuData),1);
     win->data = data;
     win->parent = parent;
-    data->parent = parentSection;
-    data->facility_slot = facility_slot;
-    data->list = station_facility_get_possible_list(data->parent);
+    vector2d_copy(data->position,position);
+    data->facilityList = facility_list;
+    data->list = type_list;
     facility_buy_menu_set_list(win);
     message_buffer_bubble();
     return win;

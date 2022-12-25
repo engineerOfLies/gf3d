@@ -263,6 +263,15 @@ void player_hour_advance()
     }
 }
 
+PlanetData *player_get_planet()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->planet;
+}
+
 List * player_get_resources()
 {
     PlayerData *data;

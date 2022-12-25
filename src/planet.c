@@ -4,6 +4,13 @@
 #include "station_facility.h"
 #include "planet.h"
 
+SiteData *planet_get_site_data_by_position(PlanetData *planet,Vector2D position)
+{
+    if (!planet)return NULL;
+    if (((int)position.x < 0)||((int)position.x >= MAX_LONGITUDE))return NULL;
+    if (((int)position.y < -8)||((int)position.y > 8 ))return NULL;
+    return &planet->sites[(int)position.x][(int)position.y + 8];
+}
 
 void planet_free(PlanetData *planet)
 {
@@ -28,6 +35,7 @@ void planet_site_data_from_config(SJson *config,SiteData *site)
     if ((!config)||(!site))return;
     str = sj_object_get_value_as_string(config,"special");
     if (str)gfc_line_cpy(site->special,str);
+    sj_object_get_value_as_int(config,"surveyed",&site->surveyed);
     sj_object_get_value_as_int(config,"nutrients",&site->resources[SRT_Nutrients]);
     sj_object_get_value_as_int(config,"minerals",&site->resources[SRT_Minerals]);
     sj_object_get_value_as_int(config,"ores",&site->resources[SRT_Ores]);
@@ -40,6 +48,7 @@ SJson *planet_site_to_config(SiteData *site)
     config = sj_object_new();
     if (!config)return NULL;
     sj_object_insert(config,"special",sj_new_str(site->special));
+    sj_object_insert(config,"surveyed",sj_new_int(site->surveyed));
     sj_object_insert(config,"nutrients",sj_new_int(site->resources[SRT_Nutrients]));
     sj_object_insert(config,"minerals",sj_new_int(site->resources[SRT_Minerals]));
     sj_object_insert(config,"ores",sj_new_int(site->resources[SRT_Ores]));

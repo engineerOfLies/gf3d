@@ -276,7 +276,11 @@ int station_menu_update(Window *win,List *updateList)
             }
             if ((data->selection)&&(data->selection->facilitySlots > 0))
             {
-                win->child = facility_menu(win,data->station, data->selection);
+                win->child = facility_menu(
+                    win,
+                    data->selection->facilities,
+                    data->selection->facilitySlots,
+                    station_facility_get_possible_list(data->selection));
             }
             else
             {

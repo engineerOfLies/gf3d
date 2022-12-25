@@ -18,12 +18,10 @@
 #include "entity.h"
 #include "camera_entity.h"
 #include "resources.h"
-#include "station_def.h"
 #include "station.h"
 #include "player.h"
 #include "hud_window.h"
-#include "station_extension_menu.h"
-#include "station_buy_menu.h"
+#include "facility_buy_menu.h"
 #include "facility_menu.h"
 #include "planet.h"
 #include "planet_menu.h"
@@ -34,7 +32,8 @@ typedef struct
     Vector3D viewPosition; //camera position
     Vector2D worldPosition;//site coordinates longitude, latitude
     World *world;
-    
+    PlanetData *planet;
+    List *typeList;
 }PlanetMenuData;
 
 void planet_menu_set_camera_at_site(Window *win,Vector2D site);
@@ -47,6 +46,11 @@ int planet_menu_free(Window *win)
     if (!win)return 0;
     if (!win->data)return 0;
     data = win->data;
+    if (win->child)
+    {
+        gf2d_window_free(win->child);
+    }
+    gfc_list_delete(data->typeList);
     hud_reset_camera(win->parent);
     gf2d_window_close_child(win->parent,win);
     free(data);
@@ -67,6 +71,22 @@ int planet_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"facilities")==0)
+        {
+            if (win->child)return 1;
+            win->child = facility_menu(
+                win,
+                data->planet->facilities,
+                gfc_list_get_count(data->planet->facilities),
+                NULL);
+            return 1;
+        }
+        if (strcmp(e->name,"build")==0)
+        {
+            if (win->child)return 1;
+            win->child = facility_buy_menu(win,data->planet->facilities, data->typeList,data->worldPosition);
+            return 1;
+        }
         if (strcmp(e->name,"north")==0)
         {
             planet_menu_set_camera_at_site(win,vector2d(data->worldPosition.x,data->worldPosition.y + 1));
@@ -99,14 +119,72 @@ int planet_menu_update(Window *win,List *updateList)
 int planet_menu_draw(Window *win)
 {
     TextLine buffer;
+    StationFacility *facility;
+    SiteData *site;
     PlanetMenuData *data;
     if ((!win)||(!win->data))return 0;
     data = win->data;
     
+    facility = station_facility_get_by_position(data->planet->facilities,data->worldPosition);
+    
+    if (facility)
+    {
+        gfc_line_sprintf(buffer,"Facility: %s",station_facility_get_display_name(facility->name));
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility"),buffer);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"facility_view"), 0);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"), 0);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"build"), 1);        
+    }
+    else
+    {
+        gfc_line_sprintf(buffer,"Facility: <NONE>");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility"),buffer);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"facility_view"), 1);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"), 1);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"build"), 0);
+    }
+
     gfc_line_sprintf(buffer,"Position: %i, %i",(int)data->worldPosition.x,(int)data->worldPosition.y);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"position"),buffer);
 
+    gfc_line_sprintf(buffer,"Facilities: %i",gfc_list_get_count(data->planet->facilities));
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_count"),buffer);
     
+    site = planet_get_site_data_by_position(data->planet,data->worldPosition);
+
+    if (site)
+    {
+        if (site->surveyed)
+        {
+            gfc_line_sprintf(buffer,"Surveyed: Yes");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"survey"),buffer);
+
+            gfc_line_sprintf(buffer,"Nutrient Level: %i",site->resources[SRT_Nutrients]);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"nutrients"),buffer);
+
+            gfc_line_sprintf(buffer,"Mineral Deposits: %i",site->resources[SRT_Minerals]);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"minerals"),buffer);
+
+            gfc_line_sprintf(buffer,"Ore Deposits: %i",site->resources[SRT_Ores]);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"ores"),buffer);
+        }
+        else
+        {
+            gfc_line_sprintf(buffer,"Surveyed: No");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"survey"),buffer);
+
+            gfc_line_sprintf(buffer,"Nutrient Level: unknown");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"nutrients"),buffer);
+
+            gfc_line_sprintf(buffer,"Mineral Deposits: unknown");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"minerals"),buffer);
+
+            gfc_line_sprintf(buffer,"Ore Deposits: unknown");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"ores"),buffer);
+        }
+    }
+    
+
     return 0;
 }
 
@@ -142,6 +220,8 @@ void planet_menu_set_camera_at_site(Window *win,Vector2D site)
 Window *planet_menu(Window *parent)
 {
     Window *win;
+    List *typeList = NULL;
+    static char *list = "planetary";
     PlanetMenuData *data;
     win = gf2d_window_load("menus/planet.menu");
     if (!win)
@@ -160,7 +240,14 @@ Window *planet_menu(Window *parent)
     win->update = planet_menu_update;
     win->free_data = planet_menu_free;
     win->draw = planet_menu_draw;
+    typeList = gfc_list_new();
+    typeList = gfc_list_append(typeList,list);
+    data->typeList = station_facility_get_possible_from_list(typeList);
+    gfc_list_delete(typeList);
+
+    data->planet = player_get_planet();
     data->world = player_get_world();
+    
     planet_menu_set_camera_at_site(win,vector2d(0,0));
     message_buffer_bubble();
     return win;

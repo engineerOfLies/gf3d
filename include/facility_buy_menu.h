@@ -4,6 +4,6 @@
 #include "gf2d_windows.h"
 #include "station_facility.h"
 
-Window *facility_buy_menu(Window *parent,StationSection *parentSection,int facility_slot);
+Window *facility_buy_menu(Window *parent,List *facility_list, List *type_list,Vector2D position);
 
 #endif

@@ -23,7 +23,6 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
     {
         switch(element->state)
         {
-            case ES_hidden:
             case ES_disable:
                 return;
             case ES_idle:
@@ -44,7 +43,6 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
     {
         switch(element->state)
         {
-            case ES_hidden:
             case ES_disable:
                 return;
             case ES_idle:

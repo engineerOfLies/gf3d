@@ -27,8 +27,9 @@
 
 typedef struct
 {
-    StationSection *parent;
-    StationData *station;
+    int   facilityLimit;
+    List *facilityList;
+    List *typeList;
     StationFacility *facility;
     const char *selected;
     int choice;
@@ -41,6 +42,7 @@ int facility_menu_free(Window *win)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return 0;
     data = win->data;
+    if (data->typeList)gfc_list_delete(data->typeList);
     gf2d_window_close_child(win,win->child);
     gf2d_window_close_child(win->parent,win);
     free(data);
@@ -49,9 +51,13 @@ int facility_menu_free(Window *win)
 
 int facility_menu_draw(Window *win)
 {
-//    FacilityMenuData *data;
+    int hidden;
+    FacilityMenuData *data;
     if ((!win)||(!win->data))return 0;
-//    data = win->data;
+    data = win->data;
+    if (gfc_list_get_count(data->facilityList)< data->facilityLimit)hidden = 0;
+    else hidden = 1;
+    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"), hidden);
     return 0;
 }
 
@@ -66,7 +72,7 @@ void facility_menu_select_item(Window *win,int choice)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
-    data->facility = gfc_list_get_nth(data->parent->facilities,choice);
+    data->facility = gfc_list_get_nth(data->facilityList,choice);
     if (!data->facility)
     {
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),"Empty Slot");
@@ -169,9 +175,9 @@ void facility_menu_yes(void *Data)
     resource_list_sell(player_get_resources(), cost,0.9);
     resources_list_free(cost);
     
-    facility = gfc_list_get_nth(data->parent->facilities,data->choice);
+    facility = gfc_list_get_nth(data->facilityList,data->choice);
     station_facility_free(facility);
-    gfc_list_delete_nth(data->parent->facilities,data->choice);
+    gfc_list_delete_nth(data->facilityList,data->choice);
     facility_menu_set_list(win);
 }
 
@@ -249,7 +255,7 @@ int facility_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"buy")==0)
         {
-            win->child = facility_buy_menu(win,data->parent,data->choice);
+            win->child = facility_buy_menu(win,data->facilityList, data->typeList,vector2d(0,0));
             return 1;
         }
         if (strcmp(e->name,"sell")==0)
@@ -293,15 +299,16 @@ void facility_menu_set_list(Window *win)
     int i,c;
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
+    if (strcmp(win->name,"station_facility_menu")!= 0)return;
     data = win->data;
-    if (!data->parent)return;
-    c = data->parent->facilitySlots;
+    if (!data->facilityList)return;
+    c = data->facilityLimit;
     item_list = gf2d_window_get_element_by_name(win,"item_list");
     if (!item_list)return;
     gf2d_element_list_free_items(item_list);
     for (i = 0; i < c; i++)
     {
-        facility = gfc_list_get_nth(data->parent->facilities,i);
+        facility = gfc_list_get_nth(data->facilityList ,i);
         if (!facility)
         {
             button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",gfc_color8(255,255,255,255));
@@ -317,7 +324,7 @@ void facility_menu_set_list(Window *win)
     facility_menu_select_item(win,0);
 }
 
-Window *facility_menu(Window *parent,StationData *station, StationSection *parentSection)
+Window *facility_menu(Window *parent, List *facility_list,int slot_limit, List *type_list)
 {
     Window *win;
     FacilityMenuData* data;
@@ -333,8 +340,9 @@ Window *facility_menu(Window *parent,StationData *station, StationSection *paren
     data = (FacilityMenuData*)gfc_allocate_array(sizeof(FacilityMenuData),1);
     win->data = data;
     win->parent = parent;
-    data->station = station;
-    data->parent = parentSection;
+    data->typeList = type_list;
+    data->facilityList = facility_list;
+    data->facilityLimit = slot_limit;
     facility_menu_set_list(win);
     message_buffer_bubble();
     return win;
