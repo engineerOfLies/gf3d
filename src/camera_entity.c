@@ -129,10 +129,21 @@ void camera_entity_think(Entity *self)
     CameraEntityData *data;
     if (!self)return;
     data = self->data;
+    
+    keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+    if (keys[SDL_SCANCODE_R])
+    {
+        rotation = gf3d_camera_get_angles();
+        slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
+    }
+    if (keys[SDL_SCANCODE_P])
+    {
+        position = gf3d_camera_get_position();
+        slog("position: %f,%f,%f",position.x,position.y,position.z);
+    }
 
     if (data->freeLook)
     {
-        keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         if (keys[SDL_SCANCODE_W])
         {
             gf3d_camera_walk_forward(moveSpeed);
@@ -157,16 +168,6 @@ void camera_entity_think(Entity *self)
         if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.005);
         if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.005);
         
-        if (keys[SDL_SCANCODE_R])
-        {
-            rotation = gf3d_camera_get_angles();
-            slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
-        }
-        if (keys[SDL_SCANCODE_P])
-        {
-            position = gf3d_camera_get_position();
-            slog("position: %f,%f,%f",position.x,position.y,position.z);
-        }
         return;
     }
     if (data->autoPan)

@@ -2,7 +2,22 @@
 #include "simple_json.h"
 
 #include "station_facility.h"
+#include "player.h"
 #include "planet.h"
+
+void planet_draw_facilities(PlanetData *planet)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!planet)return;
+    c = gfc_list_get_count(planet->facilities);
+    for (i = 0;i < c; i++)
+    {
+        facility = gfc_list_get_nth(planet->facilities,i);
+        if (!facility)continue;
+        station_facility_draw(facility);
+    }
+}
 
 void planet_draw(PlanetData *planet)
 {
@@ -10,6 +25,8 @@ void planet_draw(PlanetData *planet)
     
     if (planet->mat.model)
     {
+        vector3d_add(planet->mat.rotation,planet->mat.rotation,planet->mat.rotationDelta);
+        gf3d_model_mat_set_matrix(&planet->mat);
         gf3d_model_draw(planet->mat.model,0,planet->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
     }
 }
@@ -196,10 +213,17 @@ void planet_generate_resource_map(PlanetData *planet)
 
 Vector3D planet_position_to_position(float radius, Vector2D site)
 {
+    PlanetData *planet;
     Vector3D position = {0};
-    position.x = radius;
-    vector3d_rotate_about_y(&position, site.y * -10 * GFC_DEGTORAD);
+    position.y = radius;
+    vector3d_rotate_about_x(&position, site.y * 10 * GFC_DEGTORAD);
     vector3d_rotate_about_z(&position, site.x * 10 * GFC_DEGTORAD);
+    
+    planet = player_get_planet();
+    if (planet)
+    {
+        vector3d_rotate_about_z(&position, planet->mat.rotation.z);
+    }
     return position;
 }
 
@@ -209,6 +233,7 @@ Vector3D planet_position_to_rotation(Vector2D coordinates)
     Vector3D angles = {0};
     position = planet_position_to_position(100, coordinates);
     vector3d_angles (position, &angles);
+    angles.x += GFC_HALF_PI;
     return angles;
 }
 

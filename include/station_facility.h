@@ -37,6 +37,12 @@ typedef struct
 StationFacility *station_facility_new();
 
 /**
+ * @brief draw the facility
+ * @param facility it
+ */
+void station_facility_draw(StationFacility *facility);
+
+/**
  * @brief create a new default facility based on its definition name.
  * @param name the name of the facility in question
  * @return NULL if not found or other error, the newly created facility otherwise

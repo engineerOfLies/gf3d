@@ -14,6 +14,27 @@
 #include "station.h"
 #include "station_facility.h"
 
+
+void station_facility_draw(StationFacility *facility)
+{
+    Matrix4 mat;
+    PlanetData *planet;
+    if (!facility)return;
+    if (!facility->mat.model)return;
+    if (strcmp(facility->facilityType,"planetary")==0)
+    {
+        planet = player_get_planet();
+        if (!planet)return;
+        facility->mat.position = planet_position_to_position(planet->radius + 1, facility->position);
+        facility->mat.rotation = planet_position_to_rotation(facility->position);
+        gf3d_model_mat_set_matrix(&facility->mat);
+        gfc_matrix_multiply(mat,planet->mat.mat,facility->mat.mat);
+
+    }
+    gf3d_model_draw(facility->mat.model,0,mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+}
+
+
 int station_facility_types_valid(SJson *array,const char *check)
 {
     int i,c;
@@ -42,15 +63,6 @@ int station_facility_is_unique(StationFacility *facility)
     return 0;
 }
 
-void station_facility_draw(StationFacility *facility)
-{
-    if (!facility)return;
-    if (strcmp(facility->facilityType,"planetary")==0)
-    {
-        if (!facility->mat.model)return;
-        
-    }
-}
 
 StationFacility *station_facility_get_by_position(List *list,Vector2D position)
 {
@@ -339,6 +351,7 @@ StationFacility *station_facility_new_by_name(const char *name)
     {
         gf3d_model_mat_reset(&facility->mat);
         facility->mat.model = gf3d_model_load(str);
+        vector3d_set(facility->mat.scale,50,50,50);
     }
 
     str = sj_object_get_value_as_string(facilityDef,"name");

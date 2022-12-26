@@ -124,6 +124,8 @@ int planet_menu_draw(Window *win)
     if ((!win)||(!win->data))return 0;
     data = win->data;
     
+    planet_menu_set_camera_at_site(win,data->worldPosition);
+    planet_draw_facilities(data->planet);
     facility = station_facility_get_by_position(data->planet->facilities,data->worldPosition);
     
     if (facility)

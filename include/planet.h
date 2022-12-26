@@ -52,6 +52,12 @@ PlanetData *planet_new();
 void planet_draw(PlanetData *planet);
 
 /**
+ * @brief draw the facilities on the planet
+ * @param planet the thing
+ */
+void planet_draw_facilities(PlanetData *planet);
+
+/**
  * @brief convert a planet data to config
  * @param planet the planet to save
  * @return NULL on error or configured JSON
