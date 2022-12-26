@@ -148,6 +148,7 @@ int planet_menu_draw(Window *win)
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"facility_view"), 0);
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"), 0);
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"build"), 1);        
+        station_facility_draw_highlight(data->facility);
     }
     else
     {
@@ -209,6 +210,7 @@ void planet_menu_set_camera_at_site(Window *win,Vector2D site)
     ModelMat *mat;
     PlanetMenuData *data;
     if ((!win)||(!win->data))return;
+    if (strcmp(win->name,"planet_menu")!=0)return;//skip if we are not who we think we are
     data = win->data;
     mat = &data->planet->mat;
     if (!mat)return;

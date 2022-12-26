@@ -32,6 +32,24 @@ void station_facility_draw(StationFacility *facility)
     gf3d_model_draw(facility->mat.model,0,facility->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
 }
 
+void station_facility_draw_highlight(StationFacility *facility)
+{
+    PlanetData *planet;
+    if (!facility)return;
+    if (!facility->mat.model)return;
+    if (strcmp(facility->facilityType,"planetary")==0)
+    {
+        planet = player_get_planet();
+        if (!planet)return;
+        facility->mat.position = planet_position_to_position(planet->radius + 2, facility->position);
+        vector3d_add(facility->mat.position,facility->mat.position,planet->mat.position);
+        facility->mat.rotation = planet_position_to_rotation(facility->position);
+        gf3d_model_mat_set_matrix(&facility->mat);
+    }
+    gf3d_model_draw_highlight(facility->mat.model,0,facility->mat.mat,vector4d(1,.7,0.1,1));
+}
+
+
 
 int station_facility_types_valid(SJson *array,const char *check)
 {

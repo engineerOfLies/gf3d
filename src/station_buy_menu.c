@@ -54,7 +54,7 @@ int station_buy_menu_draw(Window *win)
     return 0;
 }
 
-void station_buy_menu_select_item(Window *win,const char *name)
+void station_buy_menu_select_item(Window *win,int choice, const char *name)
 {
     SJson *def;
     Element *e;
@@ -63,8 +63,14 @@ void station_buy_menu_select_item(Window *win,const char *name)
     StationBuyMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
-    if (!name)return;
+    if (choice != data->choice)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_YELLOW);
+    }
+    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_CYAN);
+    data->choice = choice;
     if (data->selected == name)return;//nothing to do
+    
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
     def = config_def_get_by_parameter("sections","display_name",name);
     if (!def)return;
@@ -125,7 +131,7 @@ int station_buy_menu_update(Window *win,List *updateList)
         }
         if (e->index >= 1000)
         {
-            station_buy_menu_select_item(win,e->name);
+            station_buy_menu_select_item(win,e->index- 1000, e->name);
             return 1;
         }
     }
@@ -151,6 +157,7 @@ void station_buy_menu_set_list(Window *win)
     const char *first = NULL;
     Element *button;
     Element *item_list;
+    int choice;
     int i,c;
     StationBuyMenuData *data;
     if ((!win)||(!win->data))return;
@@ -163,12 +170,16 @@ void station_buy_menu_set_list(Window *win)
         if (!str)continue;
         if (station_def_is_unique(str))continue;
         str = station_def_get_display_name(str);
-        if (!first)first = str;
-        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_WHITE);
+        if (!first)
+        {
+            choice = i;
+            first = str;
+        }
+        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_YELLOW);
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }
-    station_buy_menu_select_item(win,first);
+    station_buy_menu_select_item(win,choice,first);
 }
 
 Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,Uint8 slot,List *list)

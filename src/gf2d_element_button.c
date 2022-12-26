@@ -290,7 +290,7 @@ Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,Col
         index,
         (char *)text,
         gfc_rect(0,0,1,30),
-        gfc_color(0.9,0.9,0.5,1),
+        color,
         0,
         gfc_color(.5,.5,.5,1),0,win);
     le = gf2d_element_new_full(

@@ -20,6 +20,7 @@
 #include "station_def.h"
 #include "resources.h"
 #include "player.h"
+#include "planet_menu.h"
 #include "station.h"
 #include "station_extension_menu.h"
 #include "facility_buy_menu.h"
@@ -72,6 +73,12 @@ void facility_menu_select_item(Window *win,int choice)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
+    if (choice != data->choice)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_YELLOW);
+        data->choice = choice;
+    }
+    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_CYAN);
     data->facility = gfc_list_get_nth(data->facilityList,choice);
     if (!data->facility)
     {
@@ -87,7 +94,7 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),"Housing: 0");
         return;
     }
-    
+    planet_menu_set_camera_at_site(win->parent,data->facility->position);
     if ((!data->facility->inactive)&&(!data->facility->disabled))
     {
         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_WHITE);
@@ -269,8 +276,7 @@ int facility_menu_update(Window *win,List *updateList)
         }
         if (e->index >= 1000)
         {
-            data->choice = e->index - 1000;
-            facility_menu_select_item(win,data->choice);
+            facility_menu_select_item(win,e->index - 1000);
             return 1;
         }
     }
@@ -311,13 +317,13 @@ void facility_menu_set_list(Window *win)
         facility = gfc_list_get_nth(data->facilityList ,i);
         if (!facility)
         {
-            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",gfc_color8(255,255,255,255));
+            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",GFC_YELLOW);
             if (!button)continue;
             gf2d_element_list_add_item(item_list,button);
             continue;
         }
         str = station_facility_get_display_name(facility->name);
-        button = gf2d_button_new_label_simple(win,1000+i,str,gfc_color8(255,255,255,255));
+        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_YELLOW);
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }

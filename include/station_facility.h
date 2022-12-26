@@ -41,6 +41,8 @@ StationFacility *station_facility_new();
  * @param facility it
  */
 void station_facility_draw(StationFacility *facility);
+void station_facility_draw_highlight(StationFacility *facility);
+
 
 /**
  * @brief create a new default facility based on its definition name.
