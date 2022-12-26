@@ -74,6 +74,7 @@ int planet_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"facilities")==0)
         {
             if (win->child)return 1;
+            if (gfc_list_get_count(data->planet->facilities) <= 0)return 1;
             win->child = facility_menu(
                 win,
                 data->planet->facilities,
@@ -167,7 +168,7 @@ int planet_menu_draw(Window *win)
 
     if (site)
     {
-        if (site->surveyed)
+        if (!site->surveyed)
         {
             gfc_line_sprintf(buffer,"Surveyed: Yes");
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"survey"),buffer);

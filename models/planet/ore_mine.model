@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "obj":"models/planet/ore_mine.obj",
+        "texture":"models/planet/ore_mine.png"
+    }
+}

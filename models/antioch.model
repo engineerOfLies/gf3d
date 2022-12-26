@@ -1,7 +1,9 @@
 {
     "model":
     {
-        "obj":"models/antioch/antioch.obj",
-        "texture":"models/antioch/antioch.png"
+        "obj":"models/planet/planet.obj",
+        "texture":"models/planet/planet.png",
+        "obj2":"models/antioch/antioch.obj",
+        "texture2":"models/antioch/antioch.png"
     }
 }
