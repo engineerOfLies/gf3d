@@ -283,6 +283,7 @@ int hud_draw(Window *win)
     res = gf3d_vgraphics_get_resolution();
     data = win->data;
     world_draw(data->w);
+    planet_draw(player_get_planet());
     
     position.x = res.x * 0.74;
     position.y = res.y - 100;

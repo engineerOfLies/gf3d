@@ -50,15 +50,9 @@ World *world_load(char *filename)
     {
         item = sj_array_get_nth(list,i);
         if (!item)continue;
-        modelName = sj_get_string_value(sj_object_get_value(item,"model"));
-        if (!modelName)continue;
         m = gf3d_model_mat_new();
-        m->model = gf3d_model_load(modelName);
-        sj_value_as_vector3d(sj_object_get_value(item,"scale"),&m->scale);
-        sj_value_as_vector3d(sj_object_get_value(item,"position"),&m->position);
-        sj_value_as_vector3d(sj_object_get_value(item,"rotation"),&m->rotation);
-        sj_value_as_vector3d(sj_object_get_value(item,"positionDelta"),&m->positionDelta);
-        sj_value_as_vector3d(sj_object_get_value(item,"rotationDelta"),&m->rotationDelta);
+        if (!m)continue;
+        gf3d_model_mat_parse(m,item);
         gf3d_model_mat_set_matrix(m);
         w->model_list = gfc_list_append(w->model_list,m);
     }
@@ -122,10 +116,6 @@ World *world_load(char *filename)
     sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
     
     sj_free(json);
-    
-    
-    fighter_new(vector3d(0,-900,0));
-
     return w;
 }
 

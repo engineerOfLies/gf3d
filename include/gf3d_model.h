@@ -134,6 +134,14 @@ void gf3d_model_free(Model *model);
 void gf3d_model_mat_parse(ModelMat *mat,SJson *config);
 
 /**
+ * @brief save a modelMat to config
+ * @param mat the matrix to save
+ * @param updateFirst if true, run the extraction from the matrix4 to the component vectors before making the config
+ * @return NULL on error, or the populated SJson otherwise
+ */
+SJson *gf3d_model_mat_save(ModelMat *mat,Bool updateFirst);
+
+/**
  * @brief allocate an initialize a blank ModelMat
  * @return NULL on memory error, or an initialized modelMat otherwise
  */
@@ -156,6 +164,12 @@ void gf3d_model_mat_reset(ModelMat *mat);
  * @param mat the modelMat that will have its matrix set
  */
 void gf3d_model_mat_set_matrix(ModelMat *mat);
+
+/**
+ * @brief extract the translation, rotation, and scale vectors from the modelMat matrix
+ * @param mat the matrix to extract the vectors from
+ */
+void gf3d_model_mat_extract_vectors(ModelMat *mat);
 
 /**
  * @brief set a model mat scale

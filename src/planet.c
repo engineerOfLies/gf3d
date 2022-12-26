@@ -4,6 +4,16 @@
 #include "station_facility.h"
 #include "planet.h"
 
+void planet_draw(PlanetData *planet)
+{
+    if (!planet)return;
+    
+    if (planet->mat.model)
+    {
+        gf3d_model_draw(planet->mat.model,0,planet->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+    }
+}
+
 SiteData *planet_get_site_data_by_position(PlanetData *planet,Vector2D position)
 {
     if (!planet)return NULL;
@@ -83,7 +93,11 @@ SJson *planet_save_to_config(PlanetData *planet)
             sj_array_append(array,item);
         }
     }
+    
     sj_object_insert(config,"sites",array);
+    sj_object_insert(config,"radius",sj_new_float(planet->radius));
+    sj_object_insert(config,"modelMat",gf3d_model_mat_save(&planet->mat,1));
+
     return config;
 }
 
@@ -111,6 +125,14 @@ PlanetData *planet_load_from_config(SJson *config)
         if (!item)continue;
         planet_site_data_from_config(item,&planet->sites[c%MAX_LONGITUDE][c / MAX_LONGITUDE]);
     }
+    sj_object_get_value_as_float(config,"radius",&planet->radius);
+    item = sj_object_get_value(config,"modelMat");
+    if (item)
+    {
+        gf3d_model_mat_parse(&planet->mat,item);
+        gf3d_model_mat_set_matrix(&planet->mat);
+    }
+    slog("planet parsed");
     return planet;
 }
 
@@ -131,6 +153,12 @@ void planet_seed_area(PlanetData *planet,int lon,int lat,int amount,SiteResource
             planet->sites[i][j].resources[which] += deposit;
         }
     }
+}
+
+void planet_reset_resource_map(PlanetData *planet)
+{
+    if (!planet)return;
+    memset(planet->sites,0,sizeof(SiteData)*MAX_LONGITUDE*MAX_LATITUDE);
 }
 
 void planet_generate_resource_map(PlanetData *planet)

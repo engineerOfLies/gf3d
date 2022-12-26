@@ -42,6 +42,16 @@ int station_facility_is_unique(StationFacility *facility)
     return 0;
 }
 
+void station_facility_draw(StationFacility *facility)
+{
+    if (!facility)return;
+    if (strcmp(facility->facilityType,"planetary")==0)
+    {
+        if (!facility->mat.model)return;
+        
+    }
+}
+
 StationFacility *station_facility_get_by_position(List *list,Vector2D position)
 {
     int i,c;

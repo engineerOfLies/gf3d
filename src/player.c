@@ -96,19 +96,12 @@ PlayerData *player_data_parse(SJson *json)
     {
         slog("no player resources");
     }
-    res = sj_object_get_value(json,"planet");
-    if (res)data->planet = planet_load_from_config(res);
-    if (!data->planet)
-    {
-        data->planet = planet_new();
-        planet_generate_resource_map(data->planet);
-    }
     return data;
 }
 
 Entity *player_new(const char *file)
 {
-    SJson *json;
+    SJson *json,*res;
     Entity *ent = NULL;
     PlayerData *data;
     
@@ -151,7 +144,15 @@ Entity *player_new(const char *file)
     ent->data = data;
     data->world = world_load("config/world.json");
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
+    res = sj_object_get_value(json,"planet");
+    if (res)data->planet = planet_load_from_config(res);
+    if (!data->planet)
+    {
+        data->planet = planet_new();
+        planet_generate_resource_map(data->planet);
+    }
 
+    
     sj_free(json);
     
     ent->think = player_think;

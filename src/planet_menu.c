@@ -31,7 +31,6 @@ typedef struct
     int updated;
     Vector3D viewPosition; //camera position
     Vector2D worldPosition;//site coordinates longitude, latitude
-    World *world;
     PlanetData *planet;
     List *typeList;
 }PlanetMenuData;
@@ -196,7 +195,7 @@ void planet_menu_set_camera_at_site(Window *win,Vector2D site)
     PlanetMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
-    mat = world_get_model_mat(data->world,0);
+    mat = &data->planet->mat;
     if (!mat)return;
     
     if (site.x >= 36)site.x -= 36;// wrapped around the planet
@@ -206,7 +205,7 @@ void planet_menu_set_camera_at_site(Window *win,Vector2D site)
 
     vector2d_copy(data->worldPosition,site);
         
-    position = planet_position_to_position(mat->scale.x + 1000, site);
+    position = planet_position_to_position(data->planet->radius + 1000, site);
     
     vector3d_add(data->viewPosition,position,mat->position);
     
@@ -246,7 +245,6 @@ Window *planet_menu(Window *parent)
     gfc_list_delete(typeList);
 
     data->planet = player_get_planet();
-    data->world = player_get_world();
     
     planet_menu_set_camera_at_site(win,vector2d(0,0));
     message_buffer_bubble();

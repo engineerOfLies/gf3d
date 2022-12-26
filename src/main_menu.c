@@ -12,7 +12,10 @@
 #include "gf2d_mouse.h"
 #include "gf2d_windows_common.h"
 
+#include "player.h"
+#include "planet.h"
 #include "hud_window.h"
+#include "main_menu.h"
 
 extern void exitGame();
 extern void exitCheck();
@@ -28,7 +31,12 @@ typedef struct
 
 void main_menu_start_new_game(const char *savefile)
 {
+    PlanetData *planet;
     hud_window(savefile);    
+    planet = player_get_planet();
+    if (!planet)return;
+    planet_reset_resource_map(planet);
+    planet_generate_resource_map(planet);
 }
 
 void onFileLoadCancel(void *Data)
@@ -48,7 +56,7 @@ void onFileLoadOk(void *Data)
     data = Data;
     gfc_line_sprintf(filepath,"saves/%s.save",data->filename);
 
-    main_menu_start_new_game(filepath);
+    hud_window(filepath);    
     gf2d_window_free(data->win);
     return;
 }
@@ -103,7 +111,7 @@ int main_menu_update(Window *win,List *updateList)
         }
         else if (strcmp(e->name,"continue")==0)
         {
-            main_menu_start_new_game("saves/quick.save");
+            hud_window("saves/quick.save");
             gf2d_window_free(win);
             return 1;
         }

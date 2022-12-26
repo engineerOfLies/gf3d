@@ -7,6 +7,8 @@
 #include "gfc_text.h"
 #include "gfc_list.h"
 
+#include "gf3d_model.h"
+
 typedef enum
 {
     SRT_Nutrients,
@@ -27,6 +29,8 @@ typedef struct
 
 typedef struct
 {
+    ModelMat mat;//Add This next
+    float radius;
     SiteData    sites[MAX_LONGITUDE][MAX_LATITUDE];
     List       *facilities;   /**<facilities installed on the planet*/
 }PlanetData;
@@ -42,6 +46,12 @@ void planet_free(PlanetData *planet);
 PlanetData *planet_new();
 
 /**
+ * @brief draw the planet
+ * @param planet the thing
+ */
+void planet_draw(PlanetData *planet);
+
+/**
  * @brief convert a planet data to config
  * @param planet the planet to save
  * @return NULL on error or configured JSON
@@ -54,6 +64,11 @@ SJson *planet_save_to_config(PlanetData *planet);
  * @return NULL on error, or the loaded planetData otherwise
  */
 PlanetData *planet_load_from_config(SJson *config);
+
+/**
+ * @brief reset a planet's resource map back to zero
+ */
+void planet_reset_resource_map(PlanetData *planet);
 
 /**
  * @brief set random deposits of planetary resources

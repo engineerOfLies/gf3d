@@ -320,6 +320,16 @@ void gf3d_model_mat_reset(ModelMat *mat)
     mat->scale = vector3d(1,1,1);
 }
 
+void gf3d_model_mat_extract_vectors(ModelMat *mat)
+{
+    if (!mat)return;
+    gfc_matrix4_to_vectors(
+        mat->mat,
+        &mat->position,
+        &mat->rotation,
+        &mat->scale);
+}
+
 void gf3d_model_mat_set_matrix(ModelMat *mat)
 {
     if (!mat)return;
@@ -337,6 +347,25 @@ void gf3d_model_mat_free(ModelMat *mat)
     free(mat);
 }
 
+SJson *gf3d_model_mat_save(ModelMat *mat,Bool updateFirst)
+{
+    SJson *json;
+    if (!mat)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    if (updateFirst)
+    {
+        gf3d_model_mat_extract_vectors(mat);
+    }
+    if (mat->model)sj_object_insert(json,"model",sj_new_str(mat->model->filename));
+    sj_object_insert(json,"position",sj_vector3d_new(mat->position));
+    sj_object_insert(json,"rotation",sj_vector3d_new(mat->rotation));
+    sj_object_insert(json,"scale",sj_vector3d_new(mat->scale));
+    sj_object_insert(json,"positionDelta",sj_vector3d_new(mat->positionDelta));
+    sj_object_insert(json,"rotationDelta",sj_vector3d_new(mat->rotationDelta));
+    return json;
+}
+
 void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
 {
     if (!mat)return;
@@ -345,8 +374,10 @@ void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
     mat->model = gf3d_model_load(sj_object_get_value_as_string(config,"model"));
     sj_value_as_vector3d(sj_object_get_value(config,"position"),&mat->position);
     sj_value_as_vector3d(sj_object_get_value(config,"rotation"),&mat->rotation);
+    sj_value_as_vector3d(sj_object_get_value(config,"positionDelta"),&mat->positionDelta);
+    sj_value_as_vector3d(sj_object_get_value(config,"rotationDelta"),&mat->rotationDelta);
     vector3d_scale(mat->rotation,mat->rotation,GFC_DEGTORAD);//config file is in degrees
-
+    vector3d_scale(mat->rotationDelta,mat->rotationDelta,GFC_DEGTORAD);//config file is in degrees
     sj_value_as_vector3d(sj_object_get_value(config,"scale"),&mat->scale);
 }
 

@@ -14,10 +14,16 @@
         "models":
         [
             {
-                "model":"models/antioch.model",
-                "position":[10000,3000,-5000],
-                "scale":[2500,2500,2500],
-                "rotation":[0,0.001,0]
+                "model":"models/tunnel_gate/gate.model",
+                "position":[0,-3000,0],
+                "scale":[100,100,100],
+                "rotation":[0,0,90]
+            },
+            {
+                "model":"models/tunnel_gate/tunnel.model",
+                "position":[0,-3000,0],
+                "scale":[100,100,100],
+                "rotation":[0,0,90]
             }
         ],
         "lights":
