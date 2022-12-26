@@ -57,6 +57,9 @@ void planet_draw(PlanetData *planet);
  */
 void planet_draw_facilities(PlanetData *planet);
 
+void planet_facilities_update(PlanetData *planet);
+
+
 /**
  * @brief convert a planet data to config
  * @param planet the planet to save

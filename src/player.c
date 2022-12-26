@@ -251,6 +251,7 @@ void player_hour_advance()
         if ((data->day % 10)== 0)//every 10 days
         {
             station_upkeep(player_get_station_data());
+            planet_facilities_update(player_get_planet());
             player_upkeep(data);
         }
         if ((data->day % 30)== 0)//every 30 days

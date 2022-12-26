@@ -5,6 +5,20 @@
 #include "player.h"
 #include "planet.h"
 
+void planet_facilities_update(PlanetData *planet)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!planet)return;
+    c = gfc_list_get_count(planet->facilities);
+    for (i = 0;i < c; i++)
+    {
+        facility = gfc_list_get_nth(planet->facilities,i);
+        if (!facility)continue;
+        station_facility_update(facility,NULL);
+    }
+}
+
 void planet_draw_facilities(PlanetData *planet)
 {
     int i,c;

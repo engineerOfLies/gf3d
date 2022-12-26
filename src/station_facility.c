@@ -235,13 +235,13 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     StationData *station;
     List *supply;
     if (!facility)return;
-    if (!energySupply)return;
     if (facility->disabled)return;// not updating what has been turned off by the player
     station = player_get_station_data();
     if (!station)return;
     
     if (facility->energyDraw)
     {
+        if (!energySupply)return;
         if (*energySupply < facility->energyDraw)//do we have energy for this?
         {
             facility->inactive = 1;

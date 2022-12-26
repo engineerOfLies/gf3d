@@ -79,7 +79,7 @@
             "cost":
             {   
                 "credits":1000,
-                "common_materials":50
+                "common_materials":10
             },
             "staffPositions":20,
             "staffRequired":10,
