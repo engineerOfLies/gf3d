@@ -8,4 +8,7 @@ Window *facility_menu(Window *parent, List *facility_list,int slot_limit, List *
 
 void facility_menu_set_list(Window *win);
 
+void facility_menu_select_item(Window *win,int choice);
+
+
 #endif

@@ -17,7 +17,6 @@
 
 void station_facility_draw(StationFacility *facility)
 {
-    Matrix4 mat;
     PlanetData *planet;
     if (!facility)return;
     if (!facility->mat.model)return;
@@ -25,13 +24,12 @@ void station_facility_draw(StationFacility *facility)
     {
         planet = player_get_planet();
         if (!planet)return;
-        facility->mat.position = planet_position_to_position(planet->radius + 1, facility->position);
+        facility->mat.position = planet_position_to_position(planet->radius + 2, facility->position);
+        vector3d_add(facility->mat.position,facility->mat.position,planet->mat.position);
         facility->mat.rotation = planet_position_to_rotation(facility->position);
         gf3d_model_mat_set_matrix(&facility->mat);
-        gfc_matrix_multiply(mat,planet->mat.mat,facility->mat.mat);
-
     }
-    gf3d_model_draw(facility->mat.model,0,mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+    gf3d_model_draw(facility->mat.model,0,facility->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
 }
 
 

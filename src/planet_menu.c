@@ -31,6 +31,7 @@ typedef struct
     int updated;
     Vector3D viewPosition; //camera position
     Vector2D worldPosition;//site coordinates longitude, latitude
+    StationFacility *facility;//if true, the one below the camera
     PlanetData *planet;
     List *typeList;
 }PlanetMenuData;
@@ -80,6 +81,18 @@ int planet_menu_update(Window *win,List *updateList)
                 NULL);
             return 1;
         }
+        if (strcmp(e->name,"facility_view")==0)
+        {
+            if (win->child)return 1;
+            if (!data->facility)return 1;
+            win->child = facility_menu(
+                win,
+                data->planet->facilities,
+                gfc_list_get_count(data->planet->facilities),
+                NULL);
+            facility_menu_select_item(win->child,gfc_list_get_item_index(data->planet->facilities,data->facility));
+            return 1;
+        }
         if (strcmp(e->name,"build")==0)
         {
             if (win->child)return 1;
@@ -118,7 +131,6 @@ int planet_menu_update(Window *win,List *updateList)
 int planet_menu_draw(Window *win)
 {
     TextLine buffer;
-    StationFacility *facility;
     SiteData *site;
     PlanetMenuData *data;
     if ((!win)||(!win->data))return 0;
@@ -126,11 +138,11 @@ int planet_menu_draw(Window *win)
     
     planet_menu_set_camera_at_site(win,data->worldPosition);
     planet_draw_facilities(data->planet);
-    facility = station_facility_get_by_position(data->planet->facilities,data->worldPosition);
+    data->facility = station_facility_get_by_position(data->planet->facilities,data->worldPosition);
     
-    if (facility)
+    if (data->facility)
     {
-        gfc_line_sprintf(buffer,"Facility: %s",station_facility_get_display_name(facility->name));
+        gfc_line_sprintf(buffer,"Facility: %s",station_facility_get_display_name(data->facility->name));
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility"),buffer);
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"facility_view"), 0);
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"), 0);

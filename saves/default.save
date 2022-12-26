@@ -32,7 +32,7 @@
         "position":[10000,3000,-5000],
         "scale":[2500,2500,2500],
         "rotation":[0,0.001,0],
-        "rotationDelta":[0,0,0.005]
+        "rotationDelta":[0,0,0.001]
     }
   },
   "station":{

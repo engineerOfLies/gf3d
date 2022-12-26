@@ -124,29 +124,6 @@
                         "style":"H6"
                     },
                     {
-                        "type": "button",
-                        "name":"facility_view",
-                        "bounds": [5,0,80,21],
-                        "hotkey":"facility",
-                        "sound":"confirm",
-                        "label" :
-                        {
-                            "type": "label",
-                            "text":"view",
-                            "bounds": [0,0,80,24],
-                            "justify" : "center",
-                            "align" : "middle",
-                            "style":"H6"
-                        },
-                        "actor" :
-                        {
-                            "type": "actor",
-                            "bounds": [0,0,40,24],
-                            "scale":[0.5,0.5],
-                            "actor" : "actors/button.actor"
-                        }
-                    },
-                    {
                         "type": "list",
                         "bounds": [0,0,1,25],
                         "style": "horizontal",
@@ -156,14 +133,14 @@
                         [
                             {
                                 "type": "button",
-                                "name":"sell",
-                                "bounds": [5,0,80,21],
-                                "hotkey":"none",
+                                "name":"facility_view",
+                                "bounds": [0,0,80,21],
+                                "hotkey":"facility",
                                 "sound":"confirm",
                                 "label" :
                                 {
                                     "type": "label",
-                                    "text":"sell",
+                                    "text":"view",
                                     "bounds": [0,0,80,24],
                                     "justify" : "center",
                                     "align" : "middle",
@@ -174,7 +151,7 @@
                                     "type": "actor",
                                     "bounds": [0,0,40,24],
                                     "scale":[0.5,0.5],
-                                    "actor" : "actors/red_button.actor"
+                                    "actor" : "actors/button.actor"
                                 }
                             },
                             {
