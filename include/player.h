@@ -22,6 +22,7 @@ typedef struct
     Entity     *station;            /**<the station of the player*/
     World      *world;              /**<the world (solar system really*/
     PlanetData *planet;             /**<the planet in the solar system the player controls*/
+    SJson      *history;            /**<keep track of events that have transpired*/
 }PlayerData;
 
 /**
@@ -42,6 +43,12 @@ PlayerData *player_get_data();
  * @return NULL if no player loaded, or the planetData for the player
  */
 PlanetData *player_get_planet();
+
+/**
+ * @brief get the current player's history data
+ * @return NULL if no player loaded, or no history for the player
+ */
+SJson *player_get_history();
 
 /**
  * @brief get the player's space station data

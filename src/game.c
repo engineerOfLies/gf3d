@@ -102,6 +102,7 @@ int main(int argc,char *argv[])
     config_def_init();
     resources_list_load();  
     config_def_load("config/facilities.def");
+    config_def_load("config/events.def");
     station_def_load("config/station.def");    
     
     slog_sync();

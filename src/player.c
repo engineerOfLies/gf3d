@@ -22,6 +22,15 @@ void player_free(Entity *self);
 void player_think(Entity *self);
 void player_update(Entity *self);
 
+SJson *player_get_history()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->history;
+}
+
 SJson *player_data_save(PlayerData *data)
 {
     SJson *json;
@@ -40,6 +49,7 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
     sj_object_insert(json,"planet",planet_save_to_config(data->planet));
+    sj_object_insert(json,"history",sj_copy(data->history));
     return json;
 }
 
@@ -95,6 +105,15 @@ PlayerData *player_data_parse(SJson *json)
     else 
     {
         slog("no player resources");
+    }
+    res = sj_object_get_value(json,"history");
+    if (!res)
+    {
+        data->history = sj_object_new();
+    }
+    else
+    {
+        data->history = sj_copy(res);
     }
     return data;
 }
@@ -171,6 +190,7 @@ void player_free(Entity *self)
     resources_list_free(data->resources);
     entity_free(data->station);
     world_delete(data->world);
+    sj_free(data->history);
     free(data);
     player_entity = NULL;
     self->data= NULL;
