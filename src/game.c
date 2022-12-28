@@ -37,8 +37,12 @@
 
 extern int __DEBUG;
 
+int freeBuildMode = 0;
+
 static int _done = 0;
 static Window *_quit = NULL;
+
+void parse_arguments(int argc,char *argv[]);
 
 void onCancel(void *data)
 {
@@ -75,18 +79,10 @@ void draw_origin()
         vector3d(0,0,0),vector3d(0,0,0),vector3d(1,1,1),3,gfc_color(0,0,1,1));
 }
 
+
 int main(int argc,char *argv[])
 {
-    int a;
-
-    for (a = 1; a < argc;a++)
-    {
-        if (strcmp(argv[a],"--debug") == 0)
-        {
-            __DEBUG = 1;
-        }
-    }
-    
+    parse_arguments(argc,argv);
     init_logger("gf3d.log",0);    
     gfc_input_init("config/input.cfg");
     slog("gf3d begin");
@@ -147,6 +143,23 @@ int main(int argc,char *argv[])
     slog("gf3d program end");
     slog_sync();
     return 0;
+}
+
+void parse_arguments(int argc,char *argv[])
+{
+    int a;
+
+    for (a = 1; a < argc;a++)
+    {
+        if (strcmp(argv[a],"--debug") == 0)
+        {
+            __DEBUG = 1;
+        }
+        if (strcmp(argv[a],"--freeBuildMode") == 0)
+        {
+            freeBuildMode = 1;
+        }
+    }    
 }
 
 /*eol@eof*/

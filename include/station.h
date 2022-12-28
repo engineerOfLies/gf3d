@@ -30,7 +30,6 @@ typedef struct StaionSection_S
 
 typedef struct
 {
-    Uint32      idPool;      /**<keeps track of unique station IDs*/
     ModelMat   *mat;
     int         housing;        //how much housing is provided by this station
     int         staffAssigned;  //how many staff are assigned to facilities

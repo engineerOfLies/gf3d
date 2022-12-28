@@ -9,6 +9,7 @@
 #include "config_def.h"
 #include "resources.h"
 
+extern int freeBuildMode;
 
 Resource *resource_new()
 {
@@ -128,6 +129,7 @@ void resource_list_sell(List *supply, List *cost,float rate)
     int i,c;
     Resource *resource;
     if ((!cost)||(!supply)||(!rate))return;
+    if (freeBuildMode)return;
     c = gfc_list_get_count(cost);
     for (i = 0; i < c; i++)
     {
@@ -142,6 +144,7 @@ void resource_list_buy(List *supply, List *cost)
     int i,c;
     Resource *resource;
     if ((!cost)||(!supply))return;
+    if (freeBuildMode)return;
     c = gfc_list_get_count(cost);
     for (i = 0; i < c; i++)
     {
@@ -156,6 +159,7 @@ int resources_list_afford(List *supply, List *cost)
     int i,c;
     float amount;
     Resource *resource;
+    if (freeBuildMode)return 1;
     if (!cost)return 1;
     if (!supply)return 0;
     c = gfc_list_get_count(cost);
@@ -178,6 +182,7 @@ SJson *resources_get_def(const char *name)
 void resources_list_withdraw(List *list,const char *name,float count)
 {
     Resource *resource;
+    if (freeBuildMode)return;
     if (!list)
     {
         slog("no resource list provided");

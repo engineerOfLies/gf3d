@@ -11,6 +11,7 @@
 typedef struct
 {
     TextLine    name;  //its name identifier
+    int         id;
     TextLine    facilityType;
     Vector2D    position;   //for planet side facilities
     ModelMat    mat;
@@ -47,9 +48,10 @@ void station_facility_draw_highlight(StationFacility *facility);
 /**
  * @brief create a new default facility based on its definition name.
  * @param name the name of the facility in question
+ * @param id if -1, it will be given a new id automatically, otherwise it will be given the one provided
  * @return NULL if not found or other error, the newly created facility otherwise
  */
-StationFacility *station_facility_new_by_name(const char *name);
+StationFacility *station_facility_new_by_name(const char *name,int id);
 
 /**
  * @brief load a station facility based on config

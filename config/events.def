@@ -90,6 +90,12 @@
                     "color":[200,200,200,255],
                     "effects":
                     [
+                        {
+                            "effect":"set_history",
+                            "event":"tutorial_skip",
+                            "key":"enable",
+                            "value":"true"
+                        }
                     ]
                 },
                 {
@@ -104,6 +110,32 @@
                             "value":"true"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_3",
+            "startDate":0,
+            "endDate":0,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "effect":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                }
+            ],
+            "once":true,
+            "title":"Station Building",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"I have been instructed to show you how all of the station systems work to get you up to speed as fast as possible.  This will only take a few moments if you are interested",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
                 }
             ]
         }

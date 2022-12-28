@@ -300,6 +300,7 @@ SJson *station_facility_save(StationFacility *facility)
     if (!facility)return NULL;
     json = sj_object_new();
     sj_object_insert(json,"name",sj_new_str(facility->name));
+    sj_object_insert(json,"id",sj_new_int(facility->id));
     sj_object_insert(json,"position",sj_vector2d_new(facility->position));
     sj_object_insert(json,"damage",sj_new_float(facility->damage));
     sj_object_insert(json,"staff",sj_new_int(facility->staffAssigned));
@@ -313,6 +314,7 @@ SJson *station_facility_save(StationFacility *facility)
 
 StationFacility *station_facility_load(SJson *config)
 {
+    int id = -1;
     const char *str;
     StationFacility *facility;
     if (!config)
@@ -326,7 +328,8 @@ StationFacility *station_facility_load(SJson *config)
         slog("facility has no name");
         return NULL;
     }
-    facility = station_facility_new_by_name(str);
+    sj_object_get_value_as_int(config,"id",&id);
+    facility = station_facility_new_by_name(str,id);
     if (!facility)
     {
         slog("failed to make facility %s",str);
@@ -341,7 +344,7 @@ StationFacility *station_facility_load(SJson *config)
     return facility;
 }
 
-StationFacility *station_facility_new_by_name(const char *name)
+StationFacility *station_facility_new_by_name(const char *name,int id)
 {
     const char *str;
     StationFacility *facility;
@@ -384,6 +387,11 @@ StationFacility *station_facility_new_by_name(const char *name)
     sj_object_get_value_as_int(facilityDef,"staffPositions",&facility->staffPositions);
     sj_object_get_value_as_int(facilityDef,"energyDraw",&facility->energyDraw);
     sj_object_get_value_as_int(facilityDef,"energyOutput",&facility->energyOutput);
+    if (id < 0)
+    {
+        facility->id = player_get_new_id(name);
+    }
+    else facility->id = id;
     return facility;
 }
 

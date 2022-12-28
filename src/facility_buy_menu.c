@@ -164,7 +164,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
             if (resources_list_afford(player_get_resources(),data->cost))
             {
                 resource_list_buy(player_get_resources(), data->cost);
-                new_facility = station_facility_new_by_name(station_facility_get_name_from_display(data->selected));
+                new_facility = station_facility_new_by_name(station_facility_get_name_from_display(data->selected),-1);
                 vector2d_copy(new_facility->position,data->position);
                 data->facilityList = gfc_list_append(data->facilityList,new_facility);
                 facility_menu_set_list(win->parent);

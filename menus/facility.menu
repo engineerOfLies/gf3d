@@ -113,7 +113,7 @@
                     {
                         "type": "list",
                         "name":"item_list",
-                        "bounds": [8,43,250,440],
+                        "bounds": [8,43,275,440],
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],
                         "backgroundDraw":1,
@@ -203,7 +203,7 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,120],
+                                "bounds": [0,0,432,140],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
@@ -211,7 +211,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,1,40],
+                                "bounds": [80,0,1,30],
                                 "style": "horizontal",
                                 "packed":true,
                                 "item_size" : [100,1],
@@ -247,13 +247,13 @@
                                         "text":"Officer: <none>",
                                         "justify" : "left",
                                         "align" : "middle",
-                                        "style":"H5"
+                                        "style":"H6"
                                     }
                                 ]
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,1,40],
+                                "bounds": [80,0,1,30],
                                 "style": "horizontal",
                                 "packed":true,
                                 "item_size" : [80,1],
@@ -312,13 +312,13 @@
                                         "text":"Staff: 0 / 0",
                                         "justify" : "left",
                                         "align" : "middle",
-                                        "style":"H5"
+                                        "style":"H6"
                                     }
                                 ]
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,1,40],
+                                "bounds": [80,0,1,30],
                                 "style": "horizontal",
                                 "packed":true,
                                 "item_size" : [80,1],
@@ -355,36 +355,45 @@
                                         "text":"Active: Yes",
                                         "justify" : "left",
                                         "align" : "middle",
-                                        "style":"H5"
+                                        "style":"H6"
                                     }
                                 ]
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
+                                "name":"damage",
+                                "text":"Damage: None",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,0,1,25],
                                 "name":"storage",
                                 "text":"Storage: 0",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
                                 "name":"energy",
                                 "text":"Energy Draw: 0",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
                                 "name":"housing",
                                 "text":"Housing: 0",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"H6"
                             }
                         ]
                     }

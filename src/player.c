@@ -23,6 +23,15 @@ void player_free(Entity *self);
 void player_think(Entity *self);
 void player_update(Entity *self);
 
+SJson *player_get_id_pool()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->idPools;
+}
+
 SJson *player_get_history()
 {
     PlayerData *data;
@@ -51,6 +60,7 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
     sj_object_insert(json,"history",sj_copy(data->history));
+    sj_object_insert(json,"idPools",sj_copy(data->idPools));
     return json;
 }
 
@@ -120,6 +130,16 @@ PlayerData *player_data_parse(SJson *json)
     {
         data->history = sj_copy(res);
     }
+    res = sj_object_get_value(json,"idPools");
+    if (!res)
+    {
+        data->idPools = sj_object_new();
+    }
+    else
+    {
+        data->idPools = sj_copy(res);
+    }
+
     return data;
 }
 
@@ -333,4 +353,26 @@ StationData *player_get_station_data()
     if (!data->station)return NULL;
     return data->station->data;
 }
+
+int player_get_new_id(const char *name)
+{
+    SJson *idPools,*idPool;
+    int id = -1;
+    if (!name)return -1;
+    idPools = player_get_id_pool();
+    if (!idPools)return -1;
+    
+    idPool = sj_object_get_value(idPools,name);
+    if (!idPool)
+    {
+        sj_object_insert(idPools,name,sj_new_int(1));
+        return 1;
+    }
+    sj_get_integer_value(idPool,&id);
+    id++;
+    sj_object_delete_key(idPools,name);
+    sj_object_insert(idPools,name,sj_new_int(id));
+    return id;
+}
+
 /*eol@eof*/

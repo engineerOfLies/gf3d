@@ -21,6 +21,7 @@
 #include "resources.h"
 #include "station_def.h"
 #include "station.h"
+#include "station_menu.h"
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
 
@@ -98,6 +99,7 @@ void station_buy_menu_select_item(Window *win,int choice, const char *name)
 int station_buy_menu_update(Window *win,List *updateList)
 {
     int i,count;
+    StationSection *newSection;
     Element *e;
     StationBuyMenuData* data;
     if ((!win)||(!win->data))return 0;
@@ -120,7 +122,8 @@ int station_buy_menu_update(Window *win,List *updateList)
             if (resources_list_afford(player_get_resources(),data->cost))
             {
                 resource_list_buy(player_get_resources(), data->cost);
-                station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
+                newSection = station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
+                station_menu_select_segment(win->parent,newSection->id);
                 gf2d_window_free(win);
             }
             else

@@ -66,8 +66,9 @@
                 {
                     "type": "label",
                     "name":"section_name",
-                    "bounds": [0,0,1,40],
+                    "bounds": [0,0,0.9565,60],
                     "text":"Station Core",
+                    "wraps":true,
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
@@ -90,7 +91,7 @@
                     "label" :
                     {
                         "type": "label",
-                        "text":"view",
+                        "text":"go to",
                         "bounds": [0,0,80,24],
                         "justify" : "center",
                         "align" : "middle",

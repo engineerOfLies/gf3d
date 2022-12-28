@@ -37,8 +37,6 @@ typedef struct
     int choice;
 }StationMenuData;
 
-void station_menu_select_segment(Window *win,StationMenuData *data,int segment);
-
 int station_menu_free(Window *win)
 {
     StationMenuData *data;
@@ -68,7 +66,7 @@ void station_menu_section_list_choice(void *Data)
     data = win->data;
     if (data->choice < 0)return;
     selection = gfc_list_get_nth(data->station->sections,data->choice);
-    station_menu_select_segment(win,data,selection->id);
+    station_menu_select_segment(win,selection->id);
 }
 
 void station_menu_section_list(Window *win)
@@ -110,7 +108,7 @@ void station_menu_child_select(void *Data)
     if (data->choice == -1)return;
     section = station_section_get_child_by_slot(data->selection,data->choice);
     if (!section)return;
-    station_menu_select_segment(win,data,section->id);
+    station_menu_select_segment(win,section->id);
 }
 
 void station_menu_child_build(void *Data)
@@ -153,7 +151,7 @@ void station_menu_yes(void *Data)
     resource_list_sell(player_get_resources(), cost,0.9);
     resources_list_free(cost);
     station_remove_section(data->station,data->selection);
-    station_menu_select_segment(win,data,parent);
+    station_menu_select_segment(win,parent);
 }
 
 void station_menu_no(void *Data)
@@ -190,7 +188,7 @@ int station_menu_update(Window *win,List *updateList)
         {
             if ((data->selection)&&(data->selection->parent))
             {
-                station_menu_select_segment(win,data,data->selection->parent->id);
+                station_menu_select_segment(win,data->selection->parent->id);
             }
             else
             {
@@ -208,7 +206,7 @@ int station_menu_update(Window *win,List *updateList)
                     section = gfc_list_get_nth(data->station->sections,index - 1);
                     if (section)
                     {
-                        station_menu_select_segment(win,data,section->id);
+                        station_menu_select_segment(win,section->id);
                     }
                 }
             }
@@ -224,7 +222,7 @@ int station_menu_update(Window *win,List *updateList)
                     section = gfc_list_get_nth(data->station->sections,index + 1);
                     if (section)
                     {
-                        station_menu_select_segment(win,data,section->id);
+                        station_menu_select_segment(win,section->id);
                     }
                 }
             }
@@ -329,7 +327,7 @@ int station_menu_draw(Window *win)
     return 0;
 }
 
-void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
+void station_menu_select_segment(Window *win,int segment)
 {
     TextLine buffer;
     Matrix4 mat;
@@ -338,8 +336,11 @@ void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
     StationSection *section;
     Vector3D camera = {-672.546875,-584.498535,151.30999};
     Vector3D offset = {0};
+    StationMenuData *data;
     
-    if ((!win)||(!data)||(!data->station))return;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    if (!data->station)return;
     
     station = data->station;
     section = station_get_section_by_id(data->station,segment);
@@ -366,7 +367,7 @@ void station_menu_select_segment(Window *win,StationMenuData *data,int segment)
     display_name = station_def_get_display_name(section->name);
     if (display_name)
     {
-        gfc_line_sprintf(buffer,"Selected: %s",display_name);
+        gfc_line_sprintf(buffer,"Selected: %s %i",display_name,section->id);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_name"),buffer);
     }
     else
@@ -439,7 +440,7 @@ Window *station_menu_window(Window *parent,StationData *station)
     data->selectionList = gfc_list_new();
     data->oldPosition = gf3d_camera_get_position();
     data->oldTarget = camera_entity_get_look_target();
-    station_menu_select_segment(win,data,0);
+    station_menu_select_segment(win,0);
     message_buffer_bubble();
     return win;
 }

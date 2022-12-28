@@ -8,6 +8,7 @@
 #include "config_def.h"
 #include "station_def.h"
 #include "resources.h"
+#include "player.h"
 #include "station_facility.h"
 #include "station.h"
 
@@ -73,8 +74,6 @@ SJson *station_save_data(StationData *data)
     SJson *station,*sections;
     if (!data)return NULL;
     station = sj_object_new();
-    sj_object_insert(station,"idPool",sj_new_uint32(data->idPool));
-    sj_object_insert(station,"hull",sj_new_float(data->hull));
     sections = sj_array_new();
     c = gfc_list_get_count(data->sections);
     for (i = 0;i < c; i++)
@@ -112,8 +111,6 @@ StationData *station_load_data(SJson *station)
     {
         return NULL;
     }
-    sj_object_get_value_as_int(station,"idPool",(int *)&data->idPool);
-    
     list = sj_object_get_value(station,"sections");
     c = sj_array_get_count(list);
     for (i = 0; i < c;i++)
@@ -198,6 +195,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     if (!section)return NULL;
     gfc_matrix_identity(mat);
 
+    gfc_line_cpy(section->name,sectionName);
     section->facilities = gfc_list_new();
     section->children = gfc_list_new();
     data->sections = gfc_list_append(data->sections,section);// add us to the station sections list
@@ -239,19 +237,22 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     sj_object_get_value_as_float(sectionDef,"rotates",&section->rotates);
     section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     
-    list = sj_object_get_value(sectionDef,"default_facilities");
-    if (list)
+    if (id < 0)
     {
-        c = sj_array_get_count(list);
-        for (i = 0; i < c; i++)
+        list = sj_object_get_value(sectionDef,"default_facilities");
+        if (list)
         {
-            item = sj_array_get_nth(list,i);
-            if (!item)continue;
-            str = sj_get_string_value(item);
-            if (!str)continue;
-            facility = station_facility_new_by_name(str);
-            if (!facility)continue;
-            section->facilities = gfc_list_append(section->facilities,facility);
+            c = sj_array_get_count(list);
+            for (i = 0; i < c; i++)
+            {
+                item = sj_array_get_nth(list,i);
+                if (!item)continue;
+                str = sj_get_string_value(item);
+                if (!str)continue;
+                facility = station_facility_new_by_name(str,-1);
+                if (!facility)continue;
+                section->facilities = gfc_list_append(section->facilities,facility);
+            }
         }
     }
     stats = sj_object_get_value(sectionDef,"stats");
@@ -265,16 +266,14 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     }
     sj_object_get_value_as_uint8(sectionDef,"facility_slots",&section->facilitySlots);
     
-    str = sj_object_get_value_as_string(sectionDef,"name");
     if (id >= 0)
     {
         section->id = id;
     }
     else
     {
-        section->id = data->idPool++;
+        section->id = player_get_new_id("station");
     }
-    if (str)gfc_line_cpy(section->name,str);
     return section;
 }
 
@@ -462,6 +461,7 @@ void station_update(Entity *self)
 void station_draw(Entity *self)
 {
     int i,c;
+    float damage = 1;
     Vector4D color;
     Matrix4 mat,mat1;
     StationSection *section;
@@ -475,7 +475,8 @@ void station_draw(Entity *self)
     {
         section = gfc_list_get_nth(data->sections,i);
         if (!section)continue;
-        
+        damage = 1;
+                
         vector3d_copy(rotation,self->mat.rotation);
         rotation.x += (data->sectionRotation * section->rotates);
 
@@ -496,14 +497,24 @@ void station_draw(Entity *self)
         gfc_matrix_multiply(mat,mat1,mat);
         
         color = gfc_color_to_vector4f(self->color);
+        //color.x *= damage;
 
-        if ((data->sectionHighlight != -1)&&(data->sectionHighlight != section->id))
+        if (data->sectionHighlight != -1)
         {
-            color.w = 0.5;
-        }
-        else
-        {
-            color.w = 1.0;
+            if ((data->sectionHighlight != section->id))
+            {
+                color.w = 0.5;
+            }
+            else
+            {
+                color.w = 1.0;
+            }
+            if (section->hull < section->hullMax)
+            {            
+                damage = 0.2;
+                color.y *= damage;
+                color.z *= damage;
+            }
         }
         gf3d_model_draw(section->mat.model,0,mat,color,vector4d(1,1,1,1));
         if (data->sectionHighlight == section->id)

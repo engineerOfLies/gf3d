@@ -23,6 +23,7 @@ typedef struct
     Entity     *station;            /**<the station of the player*/
     World      *world;              /**<the world (solar system really*/
     PlanetData *planet;             /**<the planet in the solar system the player controls*/
+    SJson      *idPools;            /**<keep track of ids of station sections and facilties*/
     SJson      *history;            /**<keep track of events that have transpired*/
 }PlayerData;
 
@@ -50,6 +51,12 @@ PlanetData *player_get_planet();
  * @return NULL if no player loaded, or no history for the player
  */
 SJson *player_get_history();
+
+/**
+ * @brief get the current player's id pool data
+ * @return NULL if no player loaded, or no id pool for the player
+ */
+SJson *player_get_id_pool();
 
 /**
  * @brief get the player's space station data
@@ -90,5 +97,11 @@ Uint32 player_get_hour();
  */
 void player_save(const char *filename);
 
+/**
+ * @brief get a new ID for something named 'name'
+ * @param name the name of a station section or facility
+ * @return -1 on error or the id of a NEW item of the given name
+ */
+int player_get_new_id(const char *name);
 
 #endif

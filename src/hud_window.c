@@ -29,6 +29,7 @@
 #include "main_menu.h"
 #include "hud_window.h"
 
+extern int freeBuildMode;
 
 typedef struct
 {
@@ -163,7 +164,7 @@ int hud_update(Window *win,List *updateList)
     if (!win)return 0;
     if (!updateList)return 0;
     data = (HUDWindowData*)win->data;
-    if (!data->paused)world_run_updates(data->w);
+    if ((!freeBuildMode)&&(!data->paused))world_run_updates(data->w);
     
     day = player_get_day();
     hour = player_get_hour();

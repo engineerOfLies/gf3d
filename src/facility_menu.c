@@ -90,6 +90,8 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),"Damage: ---");
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_WHITE);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),"Storage Capacity: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),"Housing: 0");
         return;
@@ -120,6 +122,17 @@ void facility_menu_select_item(Window *win,int choice)
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
+    gfc_line_sprintf(buffer,"Damage: %.0f%%",data->facility->damage * 100);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),buffer);
+    if (data->facility->damage > 0)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_RED);
+    }
+    else
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_WHITE);
+    }
+
     gfc_line_sprintf(buffer,"Storage Capacity: %i",(int)data->facility->storage);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
 
@@ -134,7 +147,8 @@ void facility_menu_select_item(Window *win,int choice)
         gfc_line_sprintf(buffer,"Energy Use: 0");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
     
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
+    gfc_line_sprintf(buffer,"%s %i",name,data->facility->id);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),buffer);
     def = config_def_get_by_parameter("facilities","displayName",name);
     if (!def)return;
     str = sj_object_get_value_as_string(def,"description");
@@ -298,6 +312,7 @@ int facility_menu_update(Window *win,List *updateList)
 
 void facility_menu_set_list(Window *win)
 {
+    TextLine buffer;
     const char *str;
     StationFacility *facility;
     Element *button;
@@ -323,9 +338,13 @@ void facility_menu_set_list(Window *win)
             continue;
         }
         str = station_facility_get_display_name(facility->name);
-        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_YELLOW);
-        if (!button)continue;
-        gf2d_element_list_add_item(item_list,button);
+        if (str)
+        {
+            gfc_line_sprintf(buffer,"%s %i",str,facility->id);
+            button = gf2d_button_new_label_simple(win,1000+i,buffer,GFC_YELLOW);
+            if (!button)continue;
+            gf2d_element_list_add_item(item_list,button);
+        }
     }
     facility_menu_select_item(win,0);
 }
