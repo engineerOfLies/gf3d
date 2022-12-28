@@ -1,0 +1,62 @@
+{
+    "events":
+    [
+        {
+            "name":"tutorial_1",
+            "startDate":0,
+            "endDate":0,
+            "chance":1,
+            "once":true,
+            "title":"Welcome to Antioch Station",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"Welcome to Antioch Station Commander.  I am the Executive Droid Assistant for the station.  You can just call me ED-A.",
+            "options":
+            [
+                {
+                    "text":"okay",
+                    "color":[200,200,200,255],
+                    "effect":
+                    [
+                        {
+                            "key":"trigger_event",
+                            "value":"tutorial_2"
+                        }
+                    ]
+                },
+                {
+                    "text":"Nice to meet you",
+                    "color":[200,200,200,255],
+                    "effect":
+                    [
+                        {
+                            "key":"trigger_event",
+                            "value":"tutorial_2"
+                        }
+                    ]
+                },
+                {
+                    "text":"I will call you Eddie!",
+                    "color":[100,100,255,255],
+                    "effect":
+                    [
+                        {
+                            "key":"trigger_event",
+                            "value":"tutorial_2"
+                        }
+                    ]
+                },
+                {
+                    "text":"I am fully briefed, we can skip the tutorial!",
+                    "color":[255,100,100,255],
+                    "effect":
+                    [
+                        {
+                            "key":"tutorial_skip",
+                            "value":"true"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

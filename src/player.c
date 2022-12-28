@@ -13,6 +13,7 @@
 
 #include "resources.h"
 #include "station.h"
+#include "event_manager.h"
 #include "player.h"
 
 static Entity *player_entity = NULL;
@@ -48,7 +49,6 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"hour",sj_new_uint32(data->hour));
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
-    sj_object_insert(json,"planet",planet_save_to_config(data->planet));
     sj_object_insert(json,"history",sj_copy(data->history));
     return json;
 }
@@ -70,6 +70,7 @@ void player_save(const char *filename)
     {
         sj_object_insert(json,"station",station_save_data(data->station->data));
     }
+    sj_object_insert(json,"planet",planet_save_to_config(data->planet));
 
     sj_save(json,filename);
     sj_free(json);
@@ -283,6 +284,7 @@ void player_hour_advance()
             message_new("HAPPY NEW YEAR!");
         }
     }
+    event_manager_update();
 }
 
 PlanetData *player_get_planet()

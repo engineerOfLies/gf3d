@@ -1,0 +1,58 @@
+{
+    "window":
+    {
+        "dimensions" : [0,80,600,450],
+        "name":"event_menu",
+        "justify" : "center",
+        "elements":
+        [
+            {
+                "type":"actor",
+                "name":"portrait",
+                "justify":"center",
+                "align":"middle",
+                "bounds":[10,60,256,256],
+                "backgroundColor":[0,0,0,250],
+                "backgroundDraw":1
+            },
+            {
+                "type": "list",
+                "bounds": [0,8,1,1],
+                "style": "vertical",
+                "item_size" : [1,40],
+                "packed":true,
+                "elements":
+                [
+                    {
+                        "type": "label",
+                        "name":"title",
+                        "bounds": [0,0,1,40],
+                        "text":"title",
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H4"
+                    },
+                    {
+                        "type": "label",
+                        "name":"text",
+                        "bounds": [270,0,320,265],
+                        "text":"text of the message",
+                        "wraps":true,
+                        "justify" : "left",
+                        "align" : "top",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [60,0,480,1],
+                        "name":"questions",
+                        "style": "vertical",
+                        "item_size" : [1,30],
+                        "elements":
+                        []
+                    }
+                ]
+            }
+        ]
+    }
+}

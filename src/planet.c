@@ -127,8 +127,7 @@ SJson *planet_save_to_config(PlanetData *planet)
     
     sj_object_insert(config,"sites",array);
     sj_object_insert(config,"radius",sj_new_float(planet->radius));
-    sj_object_insert(config,"modelMat",gf3d_model_mat_save(&planet->mat,1));
-
+    sj_object_insert(config,"modelMat",gf3d_model_mat_save(&planet->mat,0));
     return config;
 }
 
@@ -163,7 +162,6 @@ PlanetData *planet_load_from_config(SJson *config)
         gf3d_model_mat_parse(&planet->mat,item);
         gf3d_model_mat_set_matrix(&planet->mat);
     }
-    slog("planet parsed");
     return planet;
 }
 
