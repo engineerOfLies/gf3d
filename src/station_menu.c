@@ -352,6 +352,9 @@ void station_menu_select_segment(Window *win,int segment)
     data->selection = section;
     station->sectionHighlight = segment;
     
+    gfc_line_sprintf(buffer,"Station Hull: %i/%i",(int)data->station->hull,(int)data->station->hullMax);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"station_hull"),buffer);
+
     gfc_matrix4_from_vectors(
             mat,
             station->mat->position,
@@ -367,7 +370,7 @@ void station_menu_select_segment(Window *win,int segment)
     display_name = station_def_get_display_name(section->name);
     if (display_name)
     {
-        gfc_line_sprintf(buffer,"Selected: %s %i",display_name,section->id);
+        gfc_line_sprintf(buffer,"%s %i",display_name,section->id);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_name"),buffer);
     }
     else

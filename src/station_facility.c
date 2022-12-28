@@ -195,6 +195,12 @@ void station_facility_check(StationFacility *facility)
     if (!facility)return;
     supply = player_get_resources();
     if (!supply)return;
+    if (facility->disabled)
+    {
+        facility->productivity = 0;
+        facility->inactive = 1;
+        return;
+    }
     facility->productivity = 1.0;
     facility->inactive = 0;//default to okay, but any failed test can make it inactive
     if (facility->damage >= 0.5)

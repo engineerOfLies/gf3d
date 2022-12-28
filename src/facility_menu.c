@@ -264,13 +264,18 @@ int facility_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"disable")==0)
         {
-            station_facility_check(data->facility);
-            if (data->facility->inactive)
+            if (data->facility->disabled)
             {
-                message_new("Cannot Enable Facility");
-                return 1;
+                data->facility->disabled = 0;
+                station_facility_check(data->facility);
+                if (data->facility->inactive)
+                {
+                    message_new("Cannot Enable Facility");
+                    data->facility->disabled = 1;
+                    return 1;
+                }
             }
-            data->facility->disabled = !data->facility->disabled;
+            else data->facility->disabled = 1;
             facility_menu_select_item(win,data->choice);//this will redraw
             return 1;
         }

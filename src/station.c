@@ -292,12 +292,13 @@ void station_section_recalc_values(StationSection *section)
     {
         facility = gfc_list_get_nth(section->facilities,i);
         if (!facility)continue;
+        station_facility_check(facility);
         section->storageCapacity += facility->storage;
         section->housing += facility->housing;
         section->staffAssigned += facility->staffAssigned;
         if (facility->disabled)continue;//skip the ones inactive for whatever reason
         section->energyDraw += facility->energyDraw;
-        section->energyOutput += facility->energyOutput;
+        section->energyOutput += facility->energyOutput * facility->productivity;
     }
 }
 
