@@ -1,7 +1,7 @@
 {
     "world":
     {
-        "PAUSEbackgroundMusic":"music/370801__romariogrande__space-chase.wav",
+        "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
         "sky":"models/sky.model",
         "skyScale":[1,1,1],
         "hourTime":100,

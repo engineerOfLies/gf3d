@@ -13,45 +13,94 @@
             "options":
             [
                 {
-                    "text":"okay",
+                    "text":"Okay, Droid",
                     "color":[200,200,200,255],
-                    "effect":
+                    "effects":
                     [
                         {
-                            "key":"trigger_event",
+                            "effect":"set_assisstant_name",
+                            "value":"Droid"
+                        },
+                        {
+                            "effect":"trigger_event",
                             "value":"tutorial_2"
                         }
                     ]
                 },
                 {
-                    "text":"Nice to meet you",
+                    "text":"Nice to meet you, ED-A",
                     "color":[200,200,200,255],
-                    "effect":
+                    "effects":
                     [
                         {
-                            "key":"trigger_event",
+                            "effect":"set_assisstant_name",
+                            "value":"ED-A"
+                        },
+                        {
+                            "effect":"trigger_event",
                             "value":"tutorial_2"
                         }
                     ]
                 },
                 {
                     "text":"I will call you Eddie!",
-                    "color":[100,100,255,255],
-                    "effect":
+                    "color":[200,200,200,255],
+                    "effects":
                     [
                         {
-                            "key":"trigger_event",
+                            "effect":"set_assisstant_name",
+                            "value":"Eddie"
+                        },
+                        {
+                            "effect":"trigger_event",
                             "value":"tutorial_2"
                         }
                     ]
                 },
                 {
-                    "text":"I am fully briefed, we can skip the tutorial!",
-                    "color":[255,100,100,255],
-                    "effect":
+                    "text":"Thank you, Number 1.",
+                    "color":[200,200,200,255],
+                    "effects":
                     [
                         {
-                            "key":"tutorial_skip",
+                            "effect":"set_assisstant_name",
+                            "value":"Number 1"
+                        },
+                        {
+                            "effect":"trigger_event",
+                            "value":"tutorial_2"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_2",
+            "startDate":0,
+            "endDate":0,
+            "chance":1,
+            "once":true,
+            "title":"Welcome to Antioch Station",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"I have been instructed to show you how all of the station systems work to get you up to speed as fast as possible.  This will only take a few moments if you are interested",
+            "options":
+            [
+                {
+                    "text":"Thank you, lets begin the tutorial",
+                    "color":[200,200,200,255],
+                    "effects":
+                    [
+                    ]
+                },
+                {
+                    "text":"I know how a station works already, that will be all.",
+                    "color":[255,100,100,255],
+                    "effects":
+                    [
+                        {
+                            "effect":"set_history",
+                            "event":"tutorial_skip",
+                            "key":"enable",
                             "value":"true"
                         }
                     ]

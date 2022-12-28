@@ -41,6 +41,7 @@ SJson *player_data_save(PlayerData *data)
  
     sj_object_insert(json,"filename",sj_new_str(data->filename));
     sj_object_insert(json,"name",sj_new_str(data->name));
+    sj_object_insert(json,"assistantName",sj_new_str(data->assistantName));
     sj_object_insert(json,"wages",sj_new_float(data->wages));
     sj_object_insert(json,"taxRate",sj_new_float(data->taxRate));
     sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));
@@ -90,6 +91,9 @@ PlayerData *player_data_parse(SJson *json)
     
     str = sj_object_get_value_as_string(json,"filename");
     if (str)gfc_line_cpy(data->filename,str);
+
+    str = sj_object_get_value_as_string(json,"assistantName");
+    if (str)gfc_line_cpy(data->assistantName,str);
 
     sj_object_get_value_as_uint32(json,"hour",&data->day);
     sj_object_get_value_as_uint32(json,"day",&data->day);
