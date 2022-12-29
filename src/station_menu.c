@@ -37,6 +37,16 @@ typedef struct
     int choice;
 }StationMenuData;
 
+const char *station_menu_get_selected(Window *win)
+{
+    StationMenuData *data;
+    if ((!win)||(!win->data))return NULL;
+    if (strcmp(win->name,"station_menu")!=0)return NULL;
+    data = win->data;
+    if (!data->selection)return NULL;
+    return data->selection->name;
+}
+
 int station_menu_free(Window *win)
 {
     StationMenuData *data;

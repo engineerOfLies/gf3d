@@ -94,7 +94,11 @@
                             "effect":"set_history",
                             "event":"tutorial_skip",
                             "key":"enable",
-                            "value":"true"
+                            "value":"false"
+                        },
+                        {
+                            "effect":"trigger_event",
+                            "value":"tutorial_3"
                         }
                     ]
                 },
@@ -121,7 +125,7 @@
             "conditions":
             [
                 {
-                    "effect":"check_history",
+                    "type":"check_history",
                     "event":"tutorial_skip",
                     "key":"enable",
                     "value":"false"
@@ -129,12 +133,266 @@
             ],
             "once":true,
             "title":"Station Building",
-            "portrait":"models/drones/executive_drone_alert.png",
-            "text":"I have been instructed to show you how all of the station systems work to get you up to speed as fast as possible.  This will only take a few moments if you are interested",
+            "portrait":"images/tutorial_station.png",
+            "text":"The station structure and facilities can be maintained from the 'Station' button in the top of your display here.  The station was left by the previous stewards in quite a sorry state.  Many of the facilities are damaged and under staffed.  Much more damage and the station would have been better off scuttled.  But we can save it.  Click on the 'Station' menu to proceed.",
             "options":
             [
                 {
                     "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_4",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"station_menu"
+                }
+            ],
+            "once":true,
+            "title":"Station Building",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"This menu lets you see the status of the station and the individual sections that make up the station.  You can jump right to a specific section with the 'select' button.  If a section is connected from another section the parent button will let you go to it right away.  If there is any structural damage, the hull will be less than max.  You can order repairs for each section with the 'repair' button.  Facilities are functional modules installed to a section.  They allow the station to function.  Extensions are other station sections built off of this one.",
+            "options":
+            [
+                {
+                    "text":"Next",
+                    "color":[200,200,200,255],
+                    "effects":
+                    [
+                        {
+                            "effect":"trigger_event",
+                            "value":"tutorial_5"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_5",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"station_menu"
+                }
+            ],
+            "once":true,
+            "title":"Station Building",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"If any extension slots are free, you can build a new section onto a specific slot.  If there is damage to a facility it must be handled in the facility sub-menu.  Selling a section will reclaim some of the resources that were needed to make it.  The station has sustained lots of damage.  We were left vulnerable after the last great war.  And since we have been attacked by raiders many times.  You can see all damages sections in RED in this view.  Select a damaged section and order a repair next.",
+            "options":
+            [
+                {
+                    "text":"Okay...",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_6",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"repair_mission",
+                    "section":"section_repair"
+                }
+            ],
+            "once":true,
+            "title":"Station Repair",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"Repair Crews will take some time (and credits) to get station sections repaired.  This is important because the more HULL a section has, the more damage it can take before its' facilities take damage.",
+            "options":
+            [
+                {
+                    "text":"Okay",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_7",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"repair_mission",
+                    "section":"facility_repair"
+                }
+            ],
+            "once":true,
+            "title":"Facility Repair",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"Repair Crews will take some time (and credits) to get station facilities repaired.  This is important because damaged facilities operate at reduced capacity.  Any facility damaged more than 50% will not function.",
+            "options":
+            [
+                {
+                    "text":"Okay",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_8",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"section_view",
+                    "section":"station_core"
+                }
+            ],
+            "once":true,
+            "title":"Station Core",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"The station core is the very center of the space station.  It is here where your office is Commander,  Command and Control.  Station security and officer quarters are all set here.  These facilities are critical and as such cannot be sold off.  If the Station Core is ever destroyed, the enture station is lost.  So be extra careful with safegaurding this section.",
+            "options":
+            [
+                {
+                    "text":"Okay",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_9",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"section_view",
+                    "section":"station_reactor"
+                }
+            ],
+            "once":true,
+            "title":"Station Reactor",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"The station reactor section holds the HDG Reactors.  The reactors convert High-energy Density Gluon fuel into useful power for the station.  Without at least one working reactor, nothing else on the station can function.  When you start to expand the station, you will need more reactors ( or better ones) to meet the energy requirements of the station.  Our station reactor section has sustained damage, and so has the reactor itself.  We are only producing half of our potential output.  Be sure to repair this as soon as possible.",
+            "options":
+            [
+                {
+                    "text":"Okay",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_010",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"section_view",
+                    "section":"solar_collector_single"
+                }
+            ],
+            "once":true,
+            "title":"Solar Collectors",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"Solar Collectors are the most integral part of station energy production.  The section itself intercepts solar radiation, which is directed towards solar energy processors.  The solar processors convert that radiation into High-energy Dense Gluon fuel.  This fuel is used in our reactor core to power the station.  HDGs are also the key fuel for interstellar travel.  Vast ammounts are needed to enter FTL travel through 4th Dimensional Space.  Not only does the station need it to function, we can earn revenues when ships dock at our ports in need of refueling.",
+            "options":
+            [
+                {
+                    "text":"Next",
+                    "color":[200,200,200,255],
+                    "effects":
+                    [
+                        {
+                            "effect":"trigger_event",
+                            "value":"tutorial_11"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_011",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"section_view",
+                    "section":"solar_collector_single"
+                }
+            ],
+            "once":true,
+            "title":"Solar Collectors",
+            "portrait":"models/drones/executive_drone_sad.png",
+            "text":"Currently one of our solar processors is too severely damaged to function, while the other is un staffed.  In order to make sure we have enough fuel to run our station reactor.  Be sure to add staff for the functioning Solar Processor.  And make a note to repair the other Solar Processor as soon as possible.",
+            "options":
+            [
+                {
+                    "text":"Okay",
                     "color":[200,200,200,255]
                 }
             ]

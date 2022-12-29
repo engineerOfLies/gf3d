@@ -293,7 +293,7 @@ void player_hour_advance()
     {
         data->hour = 0;
         data->day++;
-        if ((data->day % 10)== 0)//every 10 days
+        if ((data->day % 7)== 0)//every 10 days
         {
             station_upkeep(player_get_station_data());
             planet_facilities_update(player_get_planet());

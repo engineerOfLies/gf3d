@@ -686,6 +686,18 @@ Window *gf2d_window_new()
     return NULL;
 }
 
+Window *gf2d_window_get_by_name(const char *name)
+{
+    int i;
+    if (!name)return NULL;
+    for (i = 0;i < window_manager.window_max;i++)
+    {
+        if (!window_manager.window_list[i]._inuse)continue;
+        if (strcmp(window_manager.window_list[i].name,name) == 0)return &window_manager.window_list[i];
+    }
+    return NULL;
+}
+
 void gf2d_window_add_element(Window *win,Element *e)
 {
     if (!win)return;

@@ -99,6 +99,7 @@ SJson *config_def_get_by_parameter(const char *resource,const char *parameter,co
         if (!item)continue;
         str = sj_object_get_value_as_string(item,parameter);
         if (!str)continue;
+        if (strlen(str) != strlen(name))continue;
         if (strcmp(name,str)==0)return item;
     }
     slog("no resource of %s found by parameter of %s and name of %s",resource,parameter,name);
@@ -120,6 +121,7 @@ SJson *config_def_get_by_name(const char *resource,const char *name)
         if (!item)continue;
         str = sj_object_get_value_as_string(item,"name");
         if (!str)continue;
+        if (strlen(str) != strlen(name))continue;
         if (strcmp(name,str)==0)return item;
     }
     slog("no resource of %s found by name of %s",resource,name);

@@ -235,4 +235,11 @@ void gf2d_window_set_position(Window *win,Vector2D position);
  */
 void gf2d_window_set_dimensions(Window *win,Rect dimensions);
 
+/**
+ * @brief get the first window in the window list by the name provided
+ * @param name the search criteria
+ * @return NULL on error or not found, the window otherwise
+ */
+Window *gf2d_window_get_by_name(const char *name);
+
 #endif
