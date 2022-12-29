@@ -24,6 +24,7 @@
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
 #include "facility_menu.h"
+#include "repair_menu.h"
 #include "station_menu.h"
 
 typedef struct
@@ -294,6 +295,18 @@ int station_menu_update(Window *win,List *updateList)
             {
                 message_new("Station section cannot support facilities");
             }
+        }
+        if (strcmp(e->name,"repair")==0)
+        {
+            if (!data->selection)return 1;
+            if (data->selection->hull >= data->selection->hullMax)
+            {
+                message_printf("Section is not damaged");
+                return 1;
+            }
+            if (win->child)return 1;
+            win->child = repair_menu(win,data->selection,NULL);
+            return 1;
         }
         if (strcmp(e->name,"build")==0)
         {

@@ -24,6 +24,7 @@
 #include "station.h"
 #include "station_extension_menu.h"
 #include "facility_buy_menu.h"
+#include "repair_menu.h"
 #include "facility_menu.h"
 
 typedef struct
@@ -262,6 +263,18 @@ int facility_menu_update(Window *win,List *updateList)
             }
             return 1;
         }
+        if (strcmp(e->name,"repair")==0)
+        {
+            if (!data->facility)return 1;
+            if (data->facility->damage <= 0)
+            {
+                message_printf("Facility is not damaged");
+                return 1;
+            }
+            if (win->child)return 1;
+            win->child = repair_menu(win,NULL,data->facility);
+            return 1;
+        }
         if (strcmp(e->name,"disable")==0)
         {
             if (data->facility->disabled)
@@ -281,11 +294,13 @@ int facility_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"buy")==0)
         {
+            if (win->child)return 1;
             win->child = facility_buy_menu(win,data->facilityList, data->typeList,vector2d(0,0));
             return 1;
         }
         if (strcmp(e->name,"sell")==0)
         {
+            if (win->child)return 1;
             if (station_facility_is_unique(data->facility))
             {
                 message_new("Cannot sell this facility.");

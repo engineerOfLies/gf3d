@@ -29,10 +29,6 @@ typedef struct
     SJson *eventDef;
 }EventMenuData;
 
-void event_menu_set_camera_at_site(Window *win,Vector2D site);
-
-void resource_menu_update_resources(Window *win);
-
 int event_menu_free(Window *win)
 {
     EventMenuData *data;
