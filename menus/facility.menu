@@ -17,7 +17,7 @@
             {
                 "type": "button",
                 "name":"buy",
-                "bounds": [260,440,160,42],
+                "bounds": [420,440,160,42],
                 "hotkey":"buy",
                 "sound":"cancel",
                 "label" :

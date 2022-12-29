@@ -53,13 +53,13 @@ int facility_menu_free(Window *win)
 
 int facility_menu_draw(Window *win)
 {
-    int hidden;
-    FacilityMenuData *data;
+//    int hidden;
+//     FacilityMenuData *data;
     if ((!win)||(!win->data))return 0;
-    data = win->data;
-    if (gfc_list_get_count(data->facilityList)< data->facilityLimit)hidden = 0;
+//     data = win->data;
+/*    if (gfc_list_get_count(data->facilityList)< data->facilityLimit)hidden = 0;
     else hidden = 1;
-    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"), hidden);
+    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"), hidden);*/
     return 0;
 }
 
@@ -95,8 +95,12 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_WHITE);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),"Storage Capacity: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),"Housing: 0");
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"),1);
+        gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"),0);
         return;
     }
+    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"),0);
+    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"),1);
     planet_menu_set_camera_at_site(win->parent,data->facility->position);
     if ((!data->facility->inactive)&&(!data->facility->disabled))
     {
@@ -200,6 +204,13 @@ void facility_menu_yes(void *Data)
     facility = gfc_list_get_nth(data->facilityList,data->choice);
     station_facility_free(facility);
     gfc_list_delete_nth(data->facilityList,data->choice);
+    if (win->parent)
+    {
+        if (strcmp(win->parent->name,"planet_menu")==0)
+        {
+            data->facilityLimit--;
+        }
+    }
     facility_menu_set_list(win);
 }
 

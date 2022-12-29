@@ -109,6 +109,9 @@ int repair_menu_draw(Window *win)
 
 void repair_menu_setup(Window *win,RepairMenuData *data)
 {
+    List *costs;
+    List *supply;
+    float cost = -1;
     const char *display_name;
     TextLine buffer;
     if ((!win)||(!data))return;
@@ -129,6 +132,13 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
         else
         {
             data->daysToComplete = (data->section->hullMax - data->section->hull)/(float)(data->staffAssigned * 2);
+        }
+        costs = station_get_resource_cost(data->section->name);
+        if (costs)
+        {
+            cost = resources_list_get_amount(costs,"credits");
+            resources_list_free(costs);
+            cost *= data->section->hull/(float)data->section->hullMax;
         }
     }
     else
@@ -153,6 +163,14 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
         {
             data->daysToComplete = (data->facility->damage * 100)/(float)data->staffAssigned;
         }
+
+        costs = station_facility_get_resource_cost(data->facility->name,"cost");
+        if (costs)
+        {
+            cost = resources_list_get_amount(costs,"credits");
+            resources_list_free(costs);
+            cost *= data->facility->damage;
+        }
     }
     else
     {
@@ -171,7 +189,24 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_WHITE);
     }
-    
+
+    if (cost > 0)
+    {
+        supply = player_get_resources();
+        gfc_line_sprintf(buffer,"Cost: %.2fcr",cost);
+        if (resources_list_get_amount(supply,"credits") > cost)
+        {
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_WHITE);
+        }
+        else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_RED);
+    }
+    else
+    {
+        gfc_line_sprintf(buffer,"Cost: Cannot Complete");
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_RED);
+    }
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"cost"),buffer);
+
     gfc_line_sprintf(buffer,"Staff: %i / %i",data->staffAssigned,REPAIR_CREW_MAX);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
     if (data->staffAssigned < REPAIR_CREW_MIN)
