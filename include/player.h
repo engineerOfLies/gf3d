@@ -104,4 +104,20 @@ void player_save(const char *filename);
  */
 int player_get_new_id(const char *name);
 
+/**
+ * @brief after assigned staff are no longer needed, return them to the general staff of the station
+ * @param staff how many staff to return;
+ */
+void player_return_staff(Uint32 staff);
+
+
+/**
+ * @brief search all of the facilities owned by the player for a facility matching the name and id provided
+ * @param name the name of the facility
+ * @param id the id of the facility
+ * @return NULL on error or not found, the facility in question otherwise
+ */
+StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id);
+
+
 #endif

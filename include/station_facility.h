@@ -12,7 +12,7 @@
 typedef struct
 {
     TextLine    name;  //its name identifier
-    int         id;
+    Uint32      id;
     TextLine    facilityType;
     Vector2D    position;   //for planet side facilities
     ModelMat    mat;
@@ -151,5 +151,15 @@ List *station_facility_get_possible_from_list(List *list);
  * @param facility the facility to repair
  */
 void station_facility_repair(StationFacility *facility);
+
+/**
+ * @brief search a list of facilities for the one matching the name and id
+ * @param facilityList the list of facilities
+ * @param name the name to search for
+ * @param id with this id
+ * @return NULL on error or not found.  The facility otherwise
+ */
+StationFacility *station_facility_get_by_name_id(List *facilityList, const char *name,Uint32 id);
+
 
 #endif

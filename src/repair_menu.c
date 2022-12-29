@@ -65,7 +65,7 @@ void repair_mission(Window *win)
     day = player_get_day();
     if (data->facility)
     {
-        gfc_line_sprintf(buffer,"%i",data->facility->id);
+        gfc_line_sprintf(buffer,"%i:%s",data->facility->id,data->facility->name);
         data->facility->mission = mission_begin(
             "repair",
             "facility",

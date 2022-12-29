@@ -62,12 +62,53 @@ Mission *mission_begin(
     mission->dayStart = dayStart;
     mission->dayFinished = dayFinished;
     mission->staff = staff;
+    
+    mission_manager.mission_list = gfc_list_append(mission_manager.mission_list,mission);
     return mission;
 }
 
 void mission_execute(Mission *mission)
 {
+    StationFacility *facility;
+    StationSection *section;
+    TextLine buffer;
+    char *str;
+    int id;
     if (!mission)return;
+    player_return_staff(mission->staff);
+    slog("executing mission %i",mission->id);
+    if (gfc_strlcmp(mission->missionType,"repair") == 0)
+    {
+        slog("repair type mission");
+        if (gfc_strlcmp(mission->missionSubject,"facility") == 0)
+        {
+            slog("facility repair");
+            str = strchr(mission->missionTarget,':');
+            *str = '\0';
+            str++;
+            id = atoi(mission->missionTarget);
+            slog("repairing facility %s : %i",str,id);
+            facility = player_get_facility_by_name_id(str,id);
+            if (!facility)
+            {
+                slog("no facility found by that name");
+                return;
+            }
+            station_facility_repair(facility);
+            return;
+        }
+        if (gfc_strlcmp(mission->missionSubject,"section") == 0)
+        {
+            slog("section repair");
+            id = atoi(mission->missionTarget);
+            section = station_get_section_by_id(player_get_station_data(),id);
+            if (!section)return;
+            slog("repairing section: %i",id);
+            station_section_repair(section);
+            return;
+        }
+        return;
+    }
 }
 
 void mission_update_all()
@@ -76,6 +117,7 @@ void mission_update_all()
     Mission *mission;
     int i,c;
     day = player_get_day();
+    slog("checking for any completed missions");
     c = gfc_list_get_count(mission_manager.mission_list);
     for (i = c - 1; i  >= 0; i--)
     {

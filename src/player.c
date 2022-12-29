@@ -309,8 +309,42 @@ void player_hour_advance()
         {
             message_new("HAPPY NEW YEAR!");
         }
+        mission_update_all();
     }
     event_manager_update();
+}
+
+StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id)
+{
+    int i,c;
+    StationData *station;
+    StationSection *section;
+    StationFacility *facility;
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!name)return NULL;
+    slog("looking for facility %s %i",name,id);
+    if (data->planet)
+    {
+        facility = station_facility_get_by_name_id(data->planet->facilities, name,id);
+        if (facility)return facility;
+        slog("not found on the planet");
+    }
+    station = player_get_station_data();
+    if (station)
+    {
+        c = gfc_list_get_count(station->sections);
+        for (i = 0; i < c; i++)
+        {
+            section = gfc_list_get_nth(station->sections,i);
+            if (!section)continue;
+            facility = station_facility_get_by_name_id(section->facilities, name,id);
+            if (facility)return facility;
+        }
+        slog("not found on the station");
+    }
+    return NULL;
 }
 
 PlanetData *player_get_planet()
@@ -354,6 +388,15 @@ StationData *player_get_station_data()
     if (!data)return NULL;
     if (!data->station)return NULL;
     return data->station->data;
+}
+
+void player_return_staff(Uint32 staff)
+{
+    PlayerData *data;
+    if (!player_entity)return;
+    data = player_entity->data;
+    if (!data)return;
+    data->staff += staff;
 }
 
 int player_get_new_id(const char *name)

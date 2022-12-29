@@ -115,6 +115,30 @@ int station_facility_types_in_list(List *list, const char *facility_type)
     return 0;
 }
 
+StationFacility *station_facility_get_by_name_id(List *facilityList, const char *name,Uint32 id)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!facilityList)return NULL;
+    if (!name)return NULL;
+    c = gfc_list_get_count(facilityList);
+    for (i = 0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(facilityList,i);
+        if (!facility) continue;
+        if (gfc_strlcmp(facility->name,name)== 0)
+        {
+            slog("facility name matched");
+            if (facility->id == id)
+            {
+                slog("facility id matched too");
+                return facility;
+            }
+        }
+    }
+    return NULL;
+}
+
 List *station_facility_get_possible_from_list(List *typeList)
 {
     int i,c;
@@ -446,6 +470,7 @@ List *station_facility_get_resource_cost(const char *name,const char *resource_t
 void station_facility_repair(StationFacility *facility)
 {
     if (!facility)return;
+    slog("repairing facility %s - %i",facility->name,facility->id);
     facility->repairing = 0;
     facility->damage = 0;
     facility->mission = NULL;
