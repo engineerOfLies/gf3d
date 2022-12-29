@@ -254,6 +254,16 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("cannot sell section, it has child extensions!");
                     return 1;
                 }
+                if (data->selection->repairing)
+                {
+                    message_new("cannot sell section, it has repairs in progress");
+                    return 1;
+                }
+                if (station_section_facility_working(data->selection))
+                {
+                    message_new("cannot sell section, it's facilities have active jobs");
+                    return 1;
+                }
                 win->child = window_yes_no("Sell selected Section?", station_menu_yes,station_menu_no,win);
             }
             return 1;

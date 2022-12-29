@@ -242,4 +242,13 @@ void gf2d_window_set_dimensions(Window *win,Rect dimensions);
  */
 Window *gf2d_window_get_by_name(const char *name);
 
+/**
+ * @brief check to make sure the win pointer and the data pointer on the window is valid
+ * @param win the window to check
+ * @param name if not NULL, it will also check the win->name against the name provided.
+ * @return 1 if everything checks out, 0 if not.
+ */
+int gf2d_window_check(Window *win,const char *name);
+
+
 #endif

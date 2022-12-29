@@ -277,6 +277,29 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     return section;
 }
 
+int station_section_facility_working(StationSection *section)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!section)return 0;
+    c = gfc_list_get_count(section->facilities);
+    for (i = 0;i < c; i++)
+    {
+        facility = gfc_list_get_nth(section->facilities,i);
+        if (!facility)continue;
+        if (facility->mission !=  NULL)return 1;
+    }
+    return 0;
+}
+
+void station_section_repair(StationSection *section)
+{
+    if (!section)return;
+    section->repairing = 0;
+    section->hull = section->hullMax;
+    section->mission = NULL;
+}
+
 void station_section_recalc_values(StationSection *section)
 {
     int i,c;

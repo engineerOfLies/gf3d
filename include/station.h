@@ -7,6 +7,7 @@
 #include "gfc_config.h"
 
 #include "entity.h"
+#include "mission.h"
 
 typedef struct StaionSection_S
 {
@@ -18,6 +19,8 @@ typedef struct StaionSection_S
     int         staffAssigned;  //how many staff are assigned to facilities in this section
 
     float       hull,hullMax;
+    Mission    *mission;    // if any mission is assigned to the section (mostly for repairs or building)
+    Bool        repairing;  // if true, the station is being repaired
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
     float       rotates;//if it rotates
     int         storageCapacity;
@@ -110,5 +113,18 @@ void station_remove_section(StationData *station,StationSection *section);
  * @note the list should be freed, not the strings
  */
 List *station_facility_get_possible_list(StationSection *parent);
+
+/**
+ * @brief set a section to repaired
+ * @param section the section to repair
+ */
+void station_section_repair(StationSection *section);
+
+/**
+ * @brief check if any of the facilities in a section are working on a mission
+ * @param section the section to check
+ * @return 0 if there are no active jobs, 1 if there are at least one
+ */
+int station_section_facility_working(StationSection *section);
 
 #endif

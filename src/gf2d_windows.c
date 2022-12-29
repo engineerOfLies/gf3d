@@ -419,6 +419,16 @@ void gf2d_windows_init(int max_windows,const char *config)
     atexit(gf2d_windows_close);
 }
 
+int gf2d_window_check(Window *win,const char *name)
+{
+    if ((!win)||(!win->data))return 0;
+    if (name)
+    {
+        if (gfc_strlcmp(win->name,name)!= 0)return 0;
+    }
+    return 1;
+}
+
 void gf2d_window_close_child(Window *parent,Window *child)
 {
     if ((!parent)||(!child))return;

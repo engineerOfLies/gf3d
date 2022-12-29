@@ -7,6 +7,7 @@
 #include "gfc_list.h"
 
 #include "gf3d_model.h"
+#include "mission.h"
 
 typedef struct
 {
@@ -16,6 +17,8 @@ typedef struct
     Vector2D    position;   //for planet side facilities
     ModelMat    mat;
     float       damage;   //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
+    Bool        repairing;  // if true, the facility is being repaired
+    Mission    *mission;    // if a mission has been assigned to this facility
     float       productivity;   //how efficient a facility is at running.  due to factors like damage, energy, and staffing
     int         housing;        //how much housing is provided by this facility
     int         staffRequired;  //how many people are needed to run the facility at a minimum
@@ -142,5 +145,11 @@ List *station_facility_get_resource_cost(const char *name,const char *resource_t
  * @return NULL if error, or a list of strings of facility names
  */
 List *station_facility_get_possible_from_list(List *list);
+
+/**
+ * @brief set a facility to repaired
+ * @param facility the facility to repair
+ */
+void station_facility_repair(StationFacility *facility);
 
 #endif

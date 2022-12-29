@@ -24,7 +24,7 @@ void station_facility_draw(StationFacility *facility)
     {
         planet = player_get_planet();
         if (!planet)return;
-        facility->mat.position = planet_position_to_position(planet->radius + 2, facility->position);
+        facility->mat.position = planet_position_to_position(planet->radius + 5, facility->position);
         vector3d_add(facility->mat.position,facility->mat.position,planet->mat.position);
         facility->mat.rotation = planet_position_to_rotation(facility->position);
         gf3d_model_mat_set_matrix(&facility->mat);
@@ -441,6 +441,14 @@ List *station_facility_get_resource_cost(const char *name,const char *resource_t
     stationDef = config_def_get_by_name("facilities",name);
     if (!stationDef)return NULL;
     return resources_list_parse(sj_object_get_value(stationDef,resource_type));
+}
+
+void station_facility_repair(StationFacility *facility)
+{
+    if (!facility)return;
+    facility->repairing = 0;
+    facility->damage = 0;
+    facility->mission = NULL;
 }
 
 

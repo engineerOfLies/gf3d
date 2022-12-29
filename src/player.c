@@ -81,6 +81,7 @@ void player_save(const char *filename)
     {
         sj_object_insert(json,"station",station_save_data(data->station->data));
     }
+    sj_object_insert(json,"missions",missions_save_to_config());
     sj_object_insert(json,"planet",planet_save_to_config(data->planet));
 
     sj_save(json,filename);
@@ -186,6 +187,7 @@ Entity *player_new(const char *file)
         return NULL;
     }
     ent->data = data;
+    missions_load_from_config(sj_object_get_value(json,"missions"));
     data->world = world_load("config/world.json");
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
     res = sj_object_get_value(json,"planet");
