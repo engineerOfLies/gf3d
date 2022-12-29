@@ -396,6 +396,66 @@
                     "color":[200,200,200,255]
                 }
             ]
+        },
+        {
+            "name":"tutorial_12",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"resources_menu"
+                }
+            ],
+            "once":true,
+            "title":"Resources 101",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"This menu shows the station resources.  How much energy is provided and used, the amount of credits at your disposal, and the hard commodities that you have stored.  Note that the commodities take up physical storage space on the station.  Everything is measured in raw tons.  If you run out of storage space, you won't be able to hold any more until some are sold off, of you get more storage space.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_13",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"personnel_menu"
+                }
+            ],
+            "once":true,
+            "title":"Personnel 101",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"This menu shows the station population (people who live here), total staff (people employed by the station), and free staff (people hired, but not assigned).  You can also set the wages that you pay staff (even unassigned) and what you collect in taxes per resident.  Note that over taxing or under paying can lead to unrest, but that is up to you.  The amount of housing available will also affect population.  People can't move here if there is no where to live, even if they want to.  Officers are people hired to take on leadership roles for station facilities.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
         }
     ]
 }

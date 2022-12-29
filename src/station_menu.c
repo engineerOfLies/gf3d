@@ -364,6 +364,10 @@ void station_menu_select_segment(Window *win,int segment)
     
     gfc_line_sprintf(buffer,"Station Hull: %i/%i",(int)data->station->hull,(int)data->station->hullMax);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"station_hull"),buffer);
+    if (data->station->hull < data->station->hullMax)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"station_hull"),GFC_RED);
+    }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"station_hull"),GFC_WHITE);
 
     gfc_matrix4_from_vectors(
             mat,
@@ -411,6 +415,10 @@ void station_menu_select_segment(Window *win,int segment)
 
     gfc_line_sprintf(buffer,"Hull: %i/%i",(int)data->selection->hull,(int)data->selection->hullMax);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
+    if (data->selection->hull < data->selection->hullMax)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_RED);
+    }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_WHITE);
 
     gfc_line_sprintf(buffer,"Facility Slots: %i",data->selection->facilitySlots);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_slots"),buffer);

@@ -142,7 +142,6 @@ int event_manager_evaluate_conditions(SJson *conditions)
             win = gf2d_window_get_by_name("station_menu");
             if (!win)return 0;
             value = station_menu_get_selected(win);
-            slog("selected section is %s",value);
             if (!value)return 0;
             if (strcmp(str,value)!=0)return 0;
             continue;

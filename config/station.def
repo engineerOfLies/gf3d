@@ -60,7 +60,7 @@
         },
         {
             "name":"solar_collector_single",
-            "display_name":"Solar Collector Mk1",
+            "display_name":"Solar Collector",
             "icon":"models/station/solar_collector_single_icon.png",
             "model":"models/station/solar_collector_single.model",
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.",
@@ -85,8 +85,8 @@
             ]
         },
         {
-            "name":"solar_collector",
-            "display_name":"Solar Collector MkR3",
+            "name":"solar_collector_rotory",
+            "display_name":"Solar Collector R",
             "icon":"models/station/solar_collector_large_icon.png",
             "model":"models/station/solar_collector.model",
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.  Its rotating collectors are more efficient than static models",
