@@ -187,6 +187,7 @@ Entity *player_new(const char *file)
         return NULL;
     }
     ent->data = data;
+    //NOTE missions MUST be loaded before the planet or the station
     missions_load_from_config(sj_object_get_value(json,"missions"));
     data->world = world_load("config/world.json");
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));

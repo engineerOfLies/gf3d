@@ -335,15 +335,21 @@ SJson *station_facility_save(StationFacility *facility)
     sj_object_insert(json,"damage",sj_new_float(facility->damage));
     sj_object_insert(json,"staff",sj_new_int(facility->staffAssigned));
     sj_object_insert(json,"disabled",sj_new_bool(facility->disabled));
+    sj_object_insert(json,"repairing",sj_new_bool(facility->repairing));
     if (strlen(facility->officer))
     {
         sj_object_insert(json,"officer",sj_new_str(facility->officer));
+    }
+    if (facility->mission)
+    {
+        sj_object_insert(json,"mission",sj_new_uint32(facility->mission->id));
     }
     return json;
 }
 
 StationFacility *station_facility_load(SJson *config)
 {
+    Uint32 missionId = -1;
     int id = -1;
     const char *str;
     StationFacility *facility;
@@ -369,8 +375,13 @@ StationFacility *station_facility_load(SJson *config)
     sj_object_get_value_as_float(config,"damage",&facility->damage);
     sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);
     sj_object_get_value_as_bool(config,"disabled",(short int*)&facility->disabled);
+    sj_object_get_value_as_bool(config,"repairing",(short int*)&facility->repairing);
     str = sj_object_get_value_as_string(config,"officer");
     if (str)gfc_line_cpy(facility->officer,str);
+    if (sj_object_get_value_as_uint32(config,"mission",&missionId))
+    {
+        facility->mission = mission_get_by_id(missionId);
+    }
     return facility;
 }
 
@@ -470,7 +481,7 @@ List *station_facility_get_resource_cost(const char *name,const char *resource_t
 void station_facility_repair(StationFacility *facility)
 {
     if (!facility)return;
-    slog("repairing facility %s - %i",facility->name,facility->id);
+    message_printf("Facility %s %i has been repaired!",station_facility_get_display_name(facility->name),facility->id);
     facility->repairing = 0;
     facility->damage = 0;
     facility->mission = NULL;

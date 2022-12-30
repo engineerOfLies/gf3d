@@ -4,6 +4,7 @@
 #include "gfc_config.h"
 
 #include "gf3d_draw.h"
+#include "gf2d_message_buffer.h"
 
 #include "config_def.h"
 #include "station_def.h"
@@ -47,10 +48,15 @@ SJson *station_section_to_json(StationSection *section)
     sj_object_insert(json,"name",sj_new_str(section->name));
     sj_object_insert(json,"id",sj_new_uint32(section->id));
     sj_object_insert(json,"hull",sj_new_uint32(section->hull));
+    sj_object_insert(json,"repairing",sj_new_bool(section->repairing));
     if (section->parent)
     {
         sj_object_insert(json,"parent",sj_new_uint32(section->parent->id));
         sj_object_insert(json,"slot",sj_new_uint8(section->slot));
+    }
+    if (section->mission)
+    {
+        sj_object_insert(json,"mission",sj_new_uint32(section->mission->id));
     }
     c = gfc_list_get_count(section->facilities);
     if (c)
@@ -149,7 +155,12 @@ StationData *station_load_data(SJson *station)
                     section->facilities = gfc_list_append(section->facilities,stationFacility);
                 }
             }
+            sj_object_get_value_as_bool(item,"repairing",&section->repairing);
             sj_object_get_value_as_float(item,"hull",&section->hull);
+            if (sj_object_get_value_as_uint32(item,"mission",&id))
+            {
+                section->mission = mission_get_by_id(id);
+            }
         }
     }
     if (!sj_object_get_value_as_float(station,"hull",&data->hull))
@@ -295,6 +306,7 @@ int station_section_facility_working(StationSection *section)
 void station_section_repair(StationSection *section)
 {
     if (!section)return;
+    message_printf("Station Section %s %i has been repaired",section->name, section->id);
     section->repairing = 0;
     section->hull = section->hullMax;
     section->mission = NULL;

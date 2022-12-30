@@ -55,7 +55,7 @@
                 "label" :
                 {
                     "type": "label",
-                    "text":"Cancel",
+                    "text":"Done",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",

@@ -31,4 +31,11 @@ SJson *missions_save_to_config();
 
 void missions_load_from_config(SJson *config);
 
+/**
+ * @brief get a mission by its unique ID
+ * @param id the seach criteria
+ * @return NULL if not found, the mission otherwise
+ */
+Mission *mission_get_by_id(Uint32 id);
+
 #endif

@@ -35,6 +35,20 @@ void mission_free(Mission *mission)
     free(mission);
 }
 
+Mission *mission_get_by_id(Uint32 id)
+{
+    Mission *mission;
+    int i,c;
+    c = gfc_list_get_count(mission_manager.mission_list);
+    for (i = c - 1; i  >= 0; i--)
+    {
+        mission = gfc_list_get_nth(mission_manager.mission_list,i);
+        if (!mission)continue;
+        if (mission->id == id)return mission;
+    }
+    return NULL;
+}
+
 Mission *mission_new()
 {
     Mission *mission;
@@ -71,7 +85,6 @@ void mission_execute(Mission *mission)
 {
     StationFacility *facility;
     StationSection *section;
-    TextLine buffer;
     char *str;
     int id;
     if (!mission)return;
@@ -113,11 +126,9 @@ void mission_execute(Mission *mission)
 
 void mission_update_all()
 {
-    Uint32 day;
+    Uint32 day= player_get_day();
     Mission *mission;
     int i,c;
-    day = player_get_day();
-    slog("checking for any completed missions");
     c = gfc_list_get_count(mission_manager.mission_list);
     for (i = c - 1; i  >= 0; i--)
     {
