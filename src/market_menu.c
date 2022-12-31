@@ -10,6 +10,7 @@
 #include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_list.h"
+#include "gf2d_element_button.h"
 #include "gf2d_element_label.h"
 #include "gf2d_element_entry.h"
 #include "gf2d_item_list_menu.h"
@@ -86,13 +87,16 @@ int market_menu_draw(Window *win)
     return 0;
 }
 
-Element *maket_menu_build_row(Window *win, const char *resource,int amount)
+Element *maket_menu_build_row(Window *win, const char *resource,int index, int amount)
 {
     TextLine buffer;
+    int stockpile;
+    float price;
     Element *rowList;
     ListElement *le;
-
-    if ((!win)||(!resource))return NULL;
+    MarketMenuData *data;
+    if ((!win)||(!win->data)||(!resource))return NULL;
+    data = win->data;
     
     le = gf2d_element_list_new_full(gfc_rect(0,0,1,1),vector2d(120,24),LS_Horizontal,0,0,1,0);
     rowList = gf2d_element_new_full(
@@ -106,8 +110,45 @@ Element *maket_menu_build_row(Window *win, const char *resource,int amount)
     gfc_line_sprintf(buffer,"%i",amount);
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),gfc_color(1,1,1,1)));
     
+    gf2d_element_list_add_item(rowList,gf2d_button_new_simple(win,500+index,
+        "stock_up",
+        "actors/button.actor",
+        "+",
+        vector2d(0.189,0.5),
+        vector2d(30,24),
+        gfc_color8(255,255,255,255)));
+    gf2d_element_list_add_item(rowList,gf2d_button_new_simple(win,600+index,
+        "stock_down",
+        "actors/button.actor",
+        "-",
+        vector2d(0.189,0.5),
+        vector2d(30,24),
+        gfc_color8(255,255,255,255)));
     
-//    gf2d_element_list_add_item(rowList,e);
+    stockpile = (int)resources_list_get_amount(data->stockpile,resource);    
+    gfc_line_sprintf(buffer,"%i",stockpile);
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(90,24),gfc_color(1,1,1,1)));
+        
+    price = resources_list_get_amount(data->salePrice,resource);    
+    gfc_line_sprintf(buffer,"%.2f",price);
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),gfc_color(1,1,1,1)));
+    
+    gf2d_element_list_add_item(rowList,gf2d_button_new_simple(win,700+index,
+        "allow",
+        "actors/button.actor",
+        "set price",
+        vector2d(0.63,0.56),
+        vector2d(100,24),
+        gfc_color8(255,255,255,255)));
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0," ",FT_H6,vector2d(20,24),gfc_color(1,1,1,1)));
+    gf2d_element_list_add_item(rowList,gf2d_button_new_simple(win,800+index,
+        "allow",
+        "actors/button.actor",
+        "purchase",
+        vector2d(0.63,0.56),
+        vector2d(100,24),
+        gfc_color8(255,255,255,255)));
+
     return rowList;
     
 }
@@ -132,7 +173,7 @@ void market_menu_update_resources(Window *win)
         resource = gfc_list_get_nth(data->playerSupply,i);
         if (!resource)continue;
         if (!resource_is_commodity(resource->name))continue;
-        e = maket_menu_build_row(win, resource->name,(int)resource->amount);
+        e = maket_menu_build_row(win, resource->name,i, (int)resource->amount);
         if (!e)continue;
         gf2d_element_list_add_item(list,e);
     }

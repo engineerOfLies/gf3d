@@ -307,4 +307,57 @@ Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,Col
     return be;
 }
 
+Element *gf2d_button_new_simple(
+    Window *win,
+    int index,
+    const char *name,
+    const char *actorFile,
+    const char *text,
+    Vector2D scale,
+    Vector2D size,
+    Color color)
+{
+    Element *be,*le,*ae;
+    
+    LabelElement *label;
+    ActorElement *actor;
+    if (!text)return NULL;
+    
+    label = gf2d_element_label_new_full(text,color,FT_Small,LJ_Center,LA_Middle,0);
+
+    be = gf2d_element_new_full(
+        NULL,
+        index,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        color,
+        0,
+        gfc_color(.5,.5,.5,1),0,win);
+    
+    actor = gf2d_element_actor_new_full(actorFile, "idle" ,scale,NULL,vector2d(0,0),vector2d(0,0));
+    ae = gf2d_element_new_full(
+        be,
+        0,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        gfc_color(1,1,1,1),
+        0,
+        gfc_color(1,1,1,1),0,win);
+
+    le = gf2d_element_new_full(
+        be,
+        0,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        gfc_color(1,1,1,1),
+        0,
+        gfc_color(1,1,1,1),0,win);
+    
+    gf2d_element_make_label(le,label);
+    gf2d_element_make_actor(ae,actor);
+    gf2d_element_make_button(be,gf2d_element_button_new_full(le,ae,gfc_color(1,1,1,1),gfc_color(0.9,0.9,0.9,1),0));
+    return be;
+}
+
+
 /*eol@eof*/

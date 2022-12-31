@@ -75,7 +75,7 @@
                 },
                 {
                     "type": "list",
-                    "bounds": [0,0,208,280],
+                    "bounds": [0,0,208,300],
                     "name":"resources",
                     "style": "vertical",
                     "backgroundColor":[0,0,0,250],

@@ -62,7 +62,7 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
+                        "bounds": [0,0,150,1],
                         "text":"Stockpile",
                         "justify" : "left",
                         "align" : "middle",
@@ -79,7 +79,7 @@
                     {
                         "type": "label",
                         "bounds": [0,0,120,1],
-                        "text":"Sale Price",
+                        "text":"Allow Sale",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
@@ -87,7 +87,7 @@
                     {
                         "type": "label",
                         "bounds": [0,0,120,1],
-                        "text":"Allow Sale",
+                        "text":"Order",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
