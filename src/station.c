@@ -10,6 +10,7 @@
 #include "station_def.h"
 #include "resources.h"
 #include "player.h"
+#include "station_menu.h"
 #include "station_facility.h"
 #include "station.h"
 
@@ -305,11 +306,17 @@ int station_section_facility_working(StationSection *section)
 
 void station_section_repair(StationSection *section)
 {
+    Window *win;
     if (!section)return;
     message_printf("Station Section %s %i has been repaired",section->name, section->id);
     section->repairing = 0;
     section->hull = section->hullMax;
     section->mission = NULL;
+    win = gf2d_window_get_by_name("station_menu");
+    if (win)
+    {
+        station_menu_select_segment(win,-1);
+    }
 }
 
 void station_section_recalc_values(StationSection *section)

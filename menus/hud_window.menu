@@ -36,14 +36,14 @@
                     }, 
                     {
                         "type": "button",
-                        "name":"resources",
+                        "name":"planet",
                         "bounds": [0,0,120,34],
-                        "hotkey":"resources",
+                        "hotkey":"planet",
                         "sound":"confirm",
                         "label" :
                         {
                             "type": "label",
-                            "text":"Resources",
+                            "text":"Planet",
                             "bounds": [0,0,120,38],
                             "justify" : "center",
                             "align" : "middle",
@@ -80,14 +80,36 @@
                     }, 
                     {
                         "type": "button",
-                        "name":"planet",
+                        "name":"resources",
                         "bounds": [0,0,120,34],
-                        "hotkey":"planet",
+                        "hotkey":"resources",
                         "sound":"confirm",
                         "label" :
                         {
                             "type": "label",
-                            "text":"Planet",
+                            "text":"Resources",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    },
+                    {
+                        "type": "button",
+                        "name":"market",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"market",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Market",
                             "bounds": [0,0,120,38],
                             "justify" : "center",
                             "align" : "middle",
@@ -165,15 +187,6 @@
                             "scale":[0.75,0.8],
                             "actor" : "actors/button.actor"
                         }
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [10,0,120,0.8],
-                        "text":"Date Time",
-                        "name":"time",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"H6"
                     }
                 ]
             },

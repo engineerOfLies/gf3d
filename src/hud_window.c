@@ -26,6 +26,7 @@
 #include "personnel_menu.h"
 #include "resources_menu.h"
 #include "planet_menu.h"
+#include "market_menu.h"
 #include "main_menu.h"
 #include "hud_window.h"
 
@@ -44,6 +45,7 @@ typedef struct
 const char *options[] = 
 {
     "Save Game",
+    "Quick Save",
     "Audio Settings",
     "Exit to Main Menu",
     NULL
@@ -114,7 +116,11 @@ void hud_options_select(void *Data)
             }
             win->child = window_text_entry("Enter filename to Save", data->filename, win, GFCLINELEN, onFileSaveOk,onFileSaveCancel);
             break;
-        case 2:
+        case 1:
+            player_save("saves/quick.save");
+            message_new("quick save...");
+            break;
+        case 3:
             //exit to main menu
             gf2d_window_free(win);
             main_menu();
@@ -157,26 +163,13 @@ int hud_free(Window *win)
 int hud_update(Window *win,List *updateList)
 {
     int i,count;
-    Uint32 day,hour;
     Element *e;
-    TextLine buffer;
     HUDWindowData *data;
     if (!win)return 0;
     if (!updateList)return 0;
     data = (HUDWindowData*)win->data;
     if ((!freeBuildMode)&&(!data->paused))world_run_updates(data->w);
     
-    day = player_get_day();
-    hour = player_get_hour();
-    
-    e = gf2d_window_get_element_by_name(win,"time");
-    if (data->paused)
-    {
-        gfc_line_sprintf(buffer,"-<PAUSED>-");
-    }
-    else gfc_line_sprintf(buffer,"Year: %i  Day: %i  Time: %02i:00  ",2280 + (day / 365),day,hour);
-    gf2d_element_label_set_text(e,buffer);
-
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
@@ -243,6 +236,20 @@ int hud_update(Window *win,List *updateList)
             win->child = planet_menu(win);
             return 1;
         }
+        if (strcmp(e->name,"market")==0)
+        {
+            if ((win->child)&&(gf2d_window_named(win->child,"market_menu")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
+            if (win->child)
+            {
+                gf2d_window_free(win->child);
+            }
+            win->child = market_menu(win);
+            return 1;
+        }
         
         if (strcmp(e->name,"freelook")==0)
         {
@@ -276,9 +283,11 @@ int hud_draw(Window *win)
 {
     TextLine buffer;
     List *resources;
+    Uint32 day,hour;
     Vector2D res, position;
     HUDWindowData *data;
     StationData *station;
+    int spacing = 22;
 
     if ((!win)||(!win->data))return 0;
     res = gf3d_vgraphics_get_resolution();
@@ -286,26 +295,39 @@ int hud_draw(Window *win)
     world_draw(data->w);
     planet_draw(player_get_planet());
     
+    day = player_get_day();
+    hour = player_get_hour();
+    
     position.x = res.x * 0.74;
     position.y = res.y - 100;
     gf2d_draw_window_border_generic(gfc_rect(position.x,position.y,res.x *0.255,100),gfc_color8(255,255,255,255));
     
+    
     station = player_get_station_data();
     if (!station)return 0;
-    position.y += 10;
+    position.y += 5;
     position.x += 20;
+    
+    if (data->paused)
+    {
+        gfc_line_sprintf(buffer,"-<PAUSED>-");
+    }
+    else gfc_line_sprintf(buffer,"Year: %i  Day: %i  Time: %02i:00  ",2280 + (day / 365),day,hour);
+    gf2d_font_draw_line_tag(buffer,FT_H6,gfc_color8(255,255,255,255), position);
+    position.y += spacing;
+    
     gfc_line_sprintf(buffer,"Station HULL: %i / %i",(int)station->hull,(int)station->hullMax);
-    gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
+    gf2d_font_draw_line_tag(buffer,FT_H6,gfc_color8(255,255,255,255), position);
 
-    position.y += 28;
+    position.y += spacing;
     gfc_line_sprintf(buffer,"Energy Surplus: %i",(int)(station->energyOutput - station->energyDraw));
-    gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
+    gf2d_font_draw_line_tag(buffer,FT_H6,gfc_color8(255,255,255,255), position);
 
     resources = player_get_resources();
     if (!resources)return 0;
-    position.y += 28;
+    position.y += spacing;
     gfc_line_sprintf(buffer,"Credits: %iCr",(int)resources_list_get_amount(resources,"credits"));
-    gf2d_font_draw_line_tag(buffer,FT_H5,gfc_color8(255,255,255,255), position);
+    gf2d_font_draw_line_tag(buffer,FT_H6,gfc_color8(255,255,255,255), position);
     return 0;
 }
 

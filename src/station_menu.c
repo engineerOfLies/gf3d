@@ -375,6 +375,11 @@ void station_menu_select_segment(Window *win,int segment)
     data = win->data;
     if (!data->station)return;
     
+    if (segment < 0)
+    {// if -1 this is just a refresh
+        segment = data->selection->id;
+    }
+    
     station = data->station;
     section = station_get_section_by_id(data->station,segment);
     

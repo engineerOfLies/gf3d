@@ -12,6 +12,7 @@
 #include "resources.h"
 #include "player.h"
 #include "station.h"
+#include "facility_menu.h"
 #include "station_facility.h"
 
 
@@ -480,11 +481,18 @@ List *station_facility_get_resource_cost(const char *name,const char *resource_t
 
 void station_facility_repair(StationFacility *facility)
 {
+    Window *win;
     if (!facility)return;
     message_printf("Facility %s %i has been repaired!",station_facility_get_display_name(facility->name),facility->id);
     facility->repairing = 0;
     facility->damage = 0;
     facility->mission = NULL;
+    win = gf2d_window_get_by_name("station_facility_menu");
+    if (win)
+    {
+        facility_menu_select_item(win,-1);
+    }
+
 }
 
 

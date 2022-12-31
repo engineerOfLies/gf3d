@@ -76,11 +76,22 @@ List *resources_list_parse(SJson *config)
     return resources;
 }
 
+int resource_is_commodity(const char *name)
+{
+    SJson *def;
+    const char *units;
+
+    if (!name)return 0;
+    def = resources_get_def(name);
+    units = sj_object_get_value_as_string(def,"units");
+    if (!units)return 0;
+    if (gfc_strlcmp(units,"T")!=0)return 0;
+    return 1;
+}
+
 int resources_get_total_commodity_mass(List *list)
 {
-    const char *units;
     Resource *res;
-    SJson *def;
     int i,c;
     int total = 0;
     if (!list)return 0;
@@ -89,11 +100,8 @@ int resources_get_total_commodity_mass(List *list)
     {
         res = gfc_list_get_nth(list,i);
         if (!res)continue;
-        def = resources_get_def(res->name);
-        if (!def)continue;
-        units = sj_object_get_value_as_string(def,"units");
-        if (!units)continue;
-        if (strcmp(units,"T")==0)total += (int)res->amount;
+        if (!resource_is_commodity(res->name))continue;
+        total += (int)res->amount;
     }
     return total;
 }

@@ -11,7 +11,7 @@
                 "name":"portrait",
                 "justify":"center",
                 "align":"middle",
-                "bounds":[10,60,256,256],
+                "bounds":[10,55,256,256],
                 "backgroundColor":[0,0,0,250],
                 "backgroundDraw":1
             },

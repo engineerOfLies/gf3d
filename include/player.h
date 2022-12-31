@@ -20,6 +20,9 @@ typedef struct
     Uint32      hour;               /**<incremented periodically for timing*/
     Uint32      day;                /**<incremented every 24 hours to track the passage of game-time*/
     List       *resources;          /**<list of resources of the station*/
+    List       *stockpile;          /**<list of amounts of a resource that will be kept on hand and not sold*/
+    List       *salePrice;          /**<list of prices that the player will sell resources at*/
+    List       *allowSale;          /**<list of commodities that will be auto-sold*/
     Entity     *station;            /**<the station of the player*/
     World      *world;              /**<the world (solar system really*/
     PlanetData *planet;             /**<the planet in the solar system the player controls*/
@@ -69,6 +72,24 @@ StationData *player_get_station_data();
  * @return NULL if no player data, the resource list otherwise
  */
 List * player_get_resources();
+
+/**
+ * @brief get the player's list of resoures that can be sold
+ * @return NULL if no player data, the resource list otherwise
+ */
+List * player_get_allow_sale();
+
+/**
+ * @brief get the player's list of resource sale prices
+ * @return NULL if no player data, the resource list otherwise
+ */
+List * player_get_sale_price();
+
+/**
+ * @brief get the player's list of resource reserve amounts (how much to hold onto before sale)
+ * @return NULL if no player data, the resource list otherwise
+ */
+List * player_get_stockpile();
 
 /**
  * @brief get the player's world

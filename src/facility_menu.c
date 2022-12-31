@@ -74,6 +74,10 @@ void facility_menu_select_item(Window *win,int choice)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
+    if (choice < 0)
+    {
+        choice = data->choice;
+    }
     if (choice != data->choice)
     {
         gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_YELLOW);

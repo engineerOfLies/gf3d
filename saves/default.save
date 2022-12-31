@@ -232,7 +232,7 @@
         "id":"7",
         "hull":"100",
         "parent":"0",
-        "slot":"4",
+        "slot":"5",
         "facilities":[
           {
             "name":"cargo_hold_small",

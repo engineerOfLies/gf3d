@@ -71,6 +71,13 @@ void resource_list_sell(List *supply, List *cost,float rate);
 float resources_list_get_amount(List *list,const char *name);
 
 /**
+ * @brief check if a resource is a commodity (measured in Physical Tons)
+ * @param name the name of the resource in question
+ * @return 1 if the resource is a commodity.  0 for any other reason
+ */
+int resource_is_commodity(const char *name);
+
+/**
  * @brief check how much total mass the commodity takes up.
  * @note this only checks against resources with a T (tonnage) as the units
  * @param list the resource list to check

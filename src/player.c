@@ -59,6 +59,9 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"hour",sj_new_uint32(data->hour));
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
+    sj_object_insert(json,"stockpile",resources_list_save(data->stockpile));
+    sj_object_insert(json,"salePrice",resources_list_save(data->salePrice));
+    sj_object_insert(json,"allowSale",resources_list_save(data->allowSale));
     sj_object_insert(json,"history",sj_copy(data->history));
     sj_object_insert(json,"idPools",sj_copy(data->idPools));
     return json;
@@ -122,6 +125,22 @@ PlayerData *player_data_parse(SJson *json)
     {
         slog("no player resources");
     }
+    res = sj_object_get_value(json,"stockpile");
+    if (res)
+    {
+        data->stockpile = resources_list_parse(res);
+    }
+    res = sj_object_get_value(json,"salePrice");
+    if (res)
+    {
+        data->salePrice = resources_list_parse(res);
+    }
+    res = sj_object_get_value(json,"allowSale");
+    if (res)
+    {
+        data->allowSale = resources_list_parse(res);
+    }
+
     res = sj_object_get_value(json,"history");
     if (!res)
     {
@@ -365,6 +384,34 @@ List * player_get_resources()
     if (!data)return NULL;
     return data->resources;
 }
+
+List * player_get_stockpile()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->stockpile;
+}
+
+List * player_get_sale_price()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->salePrice;
+}
+
+List * player_get_allow_sale()
+{
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!data)return NULL;
+    return data->allowSale;
+}
+
 
 World *player_get_world()
 {
