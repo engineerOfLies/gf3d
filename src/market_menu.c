@@ -89,9 +89,9 @@ void market_purchase_ok(Window *win)
         data->resource,
         buffer,
         player_get_day(),
-        player_get_day()+3,//TODO: base this on WHO we are buying from
+        player_get_day()+15,//TODO: base this on WHO we are buying from
         0);
-    message_printf("It will arrive in %i days",3);
+    message_printf("It will arrive in %i days",15);
 }
 
 void market_purchase_cancel(Window *win)
