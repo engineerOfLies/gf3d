@@ -303,6 +303,19 @@ Window *market_menu(Window *parent)
 {
     Window *win;
     MarketMenuData *data;
+    StationFacility *facility;
+    facility = player_get_facility_by_name("commodities_market");
+    if (facility == NULL)
+    {
+        message_printf("Commodities Market is not available, please install the facility to the station");
+        return NULL;
+    }
+    else if ((facility->inactive)||(facility->disabled))
+    {
+        message_printf("Commodities Market facility is not functioning.  Cannot use the Market");
+        return NULL;
+    }
+
     win = gf2d_window_load("menus/market.menu");
     if (!win)
     {

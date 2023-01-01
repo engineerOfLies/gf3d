@@ -116,12 +116,20 @@ void station_facility_update(StationFacility *facility,float *energySupply);
 void station_facility_check(StationFacility *facility);
 
 /**
- * @brief check if a station facility is a unique one
+ * @brief check if a station facility is a unique one (required and only one)
  * @note unique ones cannot be bought or sold
  * @param facility the facility to check
  * @return 0 if not or error, 1 if it is unique
  */
 int station_facility_is_unique(StationFacility *facility);
+
+/**
+ * @brief check if a station facility is a singleton (only allowed to have one copy of it)
+ * @note singletons can be sold or purchased, but you can only have one at a time
+ * @param name the name of the facility
+ * @return 0 if not or error, 1 if it is a singleton
+ */
+int station_facility_is_singleton(const char *name);
 
 /**
  * @brief Assign / Remove staff from a facility
@@ -151,6 +159,14 @@ List *station_facility_get_possible_from_list(List *list);
  * @param facility the facility to repair
  */
 void station_facility_repair(StationFacility *facility);
+
+/**
+ * @brief search a list of facilities for the first one matching the name
+ * @param facilityList the list of facilities
+ * @param name the name to search for
+ * @return NULL on error or not found.  The facility otherwise
+ */
+StationFacility *station_facility_get_by_name(List *facilityList, const char *name);
 
 /**
  * @brief search a list of facilities for the one matching the name and id

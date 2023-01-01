@@ -212,10 +212,9 @@
             "facility_types":
             [
                 "operations",
-                "small_cargo_dock",
-                "cargo_dock",
-                "cargo_dock_large",
-                "passenger_docking"
+                "small_docking_bay",
+                "medium_docking_bay",
+                "commodities_market"
             ],
             "default_facilities":
             [
@@ -373,7 +372,7 @@
             "display_name":"Expansion Dock",
             "icon":"models/station/expansion_dock_icon.png",
             "model":"models/station/expansion_bay_dock.model",
-            "description":"This industrial style docking section does not support gravity, however the docking platforms can support larger ships.  Best suited for cargo and ship service.",
+            "description":"This industrial style docking section does not support gravity.  Best suited for small cargo ships, and transfer shuttles for ships too large to dock.",
             "position":[0,0,0],
             "scale":[1,1,1],
             "rotates":0,
@@ -389,8 +388,8 @@
             "facility_slots":3,
             "facility_types":
             [
-                "cargo_dock",
-                "cargo_dock_large"
+                "small_docking_bay",
+                "commodities_market"
             ],
             "default_facilities":
             [

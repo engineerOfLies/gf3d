@@ -131,6 +131,12 @@ int player_get_new_id(const char *name);
  */
 void player_return_staff(Uint32 staff);
 
+/**
+ * @brief search all of the facilities owned by the player for the first facility matching the name
+ * @param name the name of the facility
+ * @return NULL on error or not found, the facility in question otherwise
+ */
+StationFacility *player_get_facility_by_name(const char *name);
 
 /**
  * @brief search all of the facilities owned by the player for a facility matching the name and id provided
@@ -139,6 +145,19 @@ void player_return_staff(Uint32 staff);
  * @return NULL on error or not found, the facility in question otherwise
  */
 StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id);
+
+/**
+ * @brief get the count of the number of facilities that a player has between the planet and the station
+ * @return the count or 0 if a problem
+ */
+int player_get_facility_count();
+
+/**
+ * @brief get the nth facility that the player owns (index should be less than the count provided above
+ * @param index which facility to get (first the planet facilities, then each section facility.  In memory order
+ * @return NULL if not found or the facility otherwise
+ */
+StationFacility *player_get_facility_nth(Uint32 index);
 
 
 #endif

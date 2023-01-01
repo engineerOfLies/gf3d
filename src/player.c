@@ -346,6 +346,98 @@ void player_hour_advance()
     event_manager_update();
 }
 
+
+int player_get_facility_count()
+{
+    int count = 0;
+    int i,c;
+    StationData *station;
+    StationSection *section;
+    PlayerData *data;
+    if (!player_entity)return 0;
+    data = player_entity->data;
+    if (data->planet)
+    {
+        count = gfc_list_get_count(data->planet->facilities);
+    }
+    station = player_get_station_data();
+    if (station)
+    {
+        c = gfc_list_get_count(station->sections);
+        for (i = 0; i < c; i++)
+        {
+            section = gfc_list_get_nth(station->sections,i);
+            if (!section)continue;
+            count += gfc_list_get_count(section->facilities);
+        }
+    }
+    return count;
+}
+
+StationFacility *player_get_facility_nth(Uint32 index)
+{
+    int i,c;
+    StationData *station;
+    StationSection *section;
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (data->planet)
+    {
+        if (index < gfc_list_get_count(data->planet->facilities))
+        {
+            return gfc_list_get_nth(data->planet->facilities,index);
+        }
+        index -= gfc_list_get_count(data->planet->facilities);//remove the planety facilities from the seach
+    }
+    station = player_get_station_data();
+    if (station)
+    {
+        c = gfc_list_get_count(station->sections);
+        for (i = 0; i < c; i++)
+        {
+            section = gfc_list_get_nth(station->sections,i);
+            if (!section)continue;
+            if (index < gfc_list_get_count(section->facilities))
+            {
+                return gfc_list_get_nth(section->facilities,index);
+            }
+            index -= gfc_list_get_count(section->facilities);//remove the planety facilities from the seach
+        }
+    }
+    return NULL;
+}
+
+StationFacility *player_get_facility_by_name(const char *name)
+{
+    int i,c;
+    StationData *station;
+    StationSection *section;
+    StationFacility *facility;
+    PlayerData *data;
+    if (!player_entity)return NULL;
+    data = player_entity->data;
+    if (!name)return NULL;
+    if (data->planet)
+    {
+        facility = station_facility_get_by_name(data->planet->facilities, name);
+        if (facility)return facility;
+    }
+    station = player_get_station_data();
+    if (station)
+    {
+        c = gfc_list_get_count(station->sections);
+        for (i = 0; i < c; i++)
+        {
+            section = gfc_list_get_nth(station->sections,i);
+            if (!section)continue;
+            facility = station_facility_get_by_name(section->facilities, name);
+            if (facility)return facility;
+        }
+    }
+    return NULL;
+}
+
 StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id)
 {
     int i,c;
@@ -356,12 +448,10 @@ StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id)
     if (!player_entity)return NULL;
     data = player_entity->data;
     if (!name)return NULL;
-    slog("looking for facility %s %i",name,id);
     if (data->planet)
     {
         facility = station_facility_get_by_name_id(data->planet->facilities, name,id);
         if (facility)return facility;
-        slog("not found on the planet");
     }
     station = player_get_station_data();
     if (station)
@@ -374,7 +464,6 @@ StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id)
             facility = station_facility_get_by_name_id(section->facilities, name,id);
             if (facility)return facility;
         }
-        slog("not found on the station");
     }
     return NULL;
 }

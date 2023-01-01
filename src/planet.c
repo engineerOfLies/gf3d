@@ -88,8 +88,11 @@ SJson *planet_site_to_config(SiteData *site)
     if (!site)return NULL;
     config = sj_object_new();
     if (!config)return NULL;
-    sj_object_insert(config,"special",sj_new_str(site->special));
-    sj_object_insert(config,"surveyed",sj_new_int(site->surveyed));
+    if (strlen(site->special) > 0)
+    {
+        sj_object_insert(config,"special",sj_new_str(site->special));
+    }
+    if (site->surveyed)sj_object_insert(config,"surveyed",sj_new_int(site->surveyed));
     sj_object_insert(config,"nutrients",sj_new_int(site->resources[SRT_Nutrients]));
     sj_object_insert(config,"minerals",sj_new_int(site->resources[SRT_Minerals]));
     sj_object_insert(config,"ores",sj_new_int(site->resources[SRT_Ores]));

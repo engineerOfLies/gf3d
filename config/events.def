@@ -456,6 +456,36 @@
                     "color":[200,200,200,255]
                 }
             ]
+        },
+        {
+            "name":"tutorial_14",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"market_menu"
+                }
+            ],
+            "once":true,
+            "title":"Welcome to the Market",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"The Commodities Market lets you view your stock of commodities.  You can also open up your surplus commodities for sale on the open market.   If you allow a commodity to be sold, we will only sell any over the stockpile amount.  We can keep some on hand in case we need them and sell the rest.  We can also order more of a commodity from the open market.  Although our orders will take some time to ship to us.  The market can be a great source of income for the station.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
         }
     ]
 }

@@ -55,7 +55,7 @@ int facility_buy_menu_draw(Window *win)
     return 0;
 }
 
-void facility_buy_menu_select_item(Window *win,const char *name)
+void facility_buy_menu_select_item(Window *win,int choice)
 {
     TextLine buffer;
     SJson *def;
@@ -66,18 +66,30 @@ void facility_buy_menu_select_item(Window *win,const char *name)
     int staff = 0;
     Bool officer = 0;
     int storage = 0;
-    const char *str;
+    const char *str,*name,*displayName;
     FacilityBuyMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
-    if (!name)return;
-    if (data->selected == name)return;//nothing to do
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),name);
-    def = config_def_get_by_parameter("facilities","displayName",name);
+    
+    if (choice < 0)
+    {
+        choice = data->choice;
+    }
+    if (choice != data->choice)
+    {
+        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_YELLOW);
+        data->choice = choice;
+    }
+    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_CYAN);
+    name = gfc_list_get_nth(data->list,choice);
+    displayName = station_facility_get_display_name(name);
+    
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),displayName);
+    def = config_def_get_by_parameter("facilities","displayName",displayName);
     if (!def)return;
     str = sj_object_get_value_as_string(def,"description");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),str);
-    data->selected = name;
+    data->selected = displayName;
     str = sj_object_get_value_as_string(def,"icon");
     if (str)
     {
@@ -111,7 +123,7 @@ void facility_buy_menu_select_item(Window *win,const char *name)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
 
     resources_list_free(data->cost);
-    data->cost = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"cost");
+    data->cost = station_facility_get_resource_cost(name,"cost");
     e = gf2d_window_get_element_by_name(win,"costs");
     if (!e)return;
     gf2d_element_list_free_items(e);
@@ -120,7 +132,7 @@ void facility_buy_menu_select_item(Window *win,const char *name)
         cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost);
         gf2d_element_list_add_item(e,cost_list);
     }
-    resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"upkeep");
+    resources = station_facility_get_resource_cost(name,"upkeep");
     e = gf2d_window_get_element_by_name(win,"upkeep");
     if (!e)return;
     gf2d_element_list_free_items(e);
@@ -130,7 +142,7 @@ void facility_buy_menu_select_item(Window *win,const char *name)
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
     }
-    resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"produces");
+    resources = station_facility_get_resource_cost(name,"produces");
     e = gf2d_window_get_element_by_name(win,"produces");
     if (!e)return;
     gf2d_element_list_free_items(e);
@@ -142,6 +154,29 @@ void facility_buy_menu_select_item(Window *win,const char *name)
     }
 }
 
+int facility_buy_check_possible(Window *win)
+{
+    const char *name;
+    FacilityBuyMenuData* data;
+    if ((!win)||(!win->data))return 0;
+    data = (FacilityBuyMenuData*)win->data;
+    name = station_facility_get_name_from_display(data->selected);
+    if (station_facility_is_singleton(name))
+    {
+        if (player_get_facility_by_name(name) != NULL)
+        {
+            message_printf("Cannot buy another facility of this type.");
+            return 0;
+        }
+    }
+    if (!resources_list_afford(player_get_resources(),data->cost))
+    {
+        message_printf("Cannot afford to purchase, we require more resources");
+        return 0;
+    }
+    return 1;
+}
+
 int facility_buy_menu_update(Window *win,List *updateList)
 {
     int i,count;
@@ -151,7 +186,6 @@ int facility_buy_menu_update(Window *win,List *updateList)
     if ((!win)||(!win->data))return 0;
     if (!updateList)return 0;
     data = (FacilityBuyMenuData*)win->data;
-    if (!data)return 0;
         
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
@@ -161,7 +195,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"buy")==0)
         {
             if (win->child)return 1;
-            if (resources_list_afford(player_get_resources(),data->cost))
+            if (facility_buy_check_possible(win))
             {
                 resource_list_buy(player_get_resources(), data->cost);
                 new_facility = station_facility_new_by_name(station_facility_get_name_from_display(data->selected),-1);
@@ -169,10 +203,6 @@ int facility_buy_menu_update(Window *win,List *updateList)
                 data->facilityList = gfc_list_append(data->facilityList,new_facility);
                 facility_menu_set_list(win->parent);
                 gf2d_window_free(win);
-            }
-            else
-            {
-                message_new("We require more resources");
             }
             return 1;
         }
@@ -183,7 +213,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
         }
         if (e->index >= 1000)
         {
-            facility_buy_menu_select_item(win,e->name);
+            facility_buy_menu_select_item(win,e->index - 1000);
             return 1;
         }
     }
@@ -221,14 +251,11 @@ void facility_buy_menu_set_list(Window *win)
     {
         name = gfc_list_get_nth(data->list,i);
         str = station_facility_get_display_name(name);
-        if (i == 0)
-        {
-            facility_buy_menu_select_item(win,str);
-        }
-        button = gf2d_button_new_label_simple(win,1000+i,str,gfc_color8(255,255,255,255));
+        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_YELLOW);
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }
+    facility_buy_menu_select_item(win,0);
 }
 
 Window *facility_buy_menu(Window *parent,List *facility_list, List *type_list,Vector2D position)

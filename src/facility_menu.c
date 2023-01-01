@@ -74,6 +74,8 @@ void facility_menu_select_item(Window *win,int choice)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
+    station_facility_check(data->facility);
+
     if (choice < 0)
     {
         choice = data->choice;
@@ -92,6 +94,7 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),NULL);
         gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"produces"));
         gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"upkeep"));
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productivity"),"Productivity: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
@@ -147,9 +150,23 @@ void facility_menu_select_item(Window *win,int choice)
 
     gfc_line_sprintf(buffer,"Housing: %i",(int)data->facility->housing);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),buffer);
+
+    gfc_line_sprintf(buffer,"productivity: %i",(int)(data->facility->productivity * 100));
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productivity"),buffer);
     
     if (data->facility->energyOutput > 0 )
-        gfc_line_sprintf(buffer,"Energy Ouput: %i",data->facility->energyOutput);
+    {
+        if (data->facility->productivity < 1)
+        {
+            gfc_line_sprintf(buffer,"Energy Ouput: %i",(int)(data->facility->energyOutput*data->facility->productivity));
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),GFC_RED);
+        }
+        else
+        {
+            gfc_line_sprintf(buffer,"Energy Ouput: %i",(int)(data->facility->energyOutput));
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),GFC_WHITE);
+        }
+    }
     else if (data->facility->energyDraw > 0 )
         gfc_line_sprintf(buffer,"Energy Draw: %i",data->facility->energyDraw);
     else
@@ -273,6 +290,7 @@ int facility_menu_update(Window *win,List *updateList)
                 if (station_facility_change_staff(data->facility,-1) == 0)
                 {
                     player->staff++;
+                    station_facility_check(data->facility);
                     facility_menu_select_item(win,data->choice);//this will redraw
                 }
             }

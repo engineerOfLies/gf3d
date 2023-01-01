@@ -65,8 +65,9 @@
       "solar_processor1":"2",
       "cargo_hold_small":"1",
       "docking_bay_small":"1",
-      "station":"8"
-    }
+      "station":"8",
+      "commodities_market":"1"
+  }
   },
   "station":{
     "sections":[
@@ -177,7 +178,7 @@
       {
         "name":"station_reactor",
         "id":"3",
-        "hull":"500",
+        "hull":"750",
         "parent":"2",
         "slot":"0",
         "facilities":[
@@ -203,6 +204,17 @@
         "facilities":[
           {
             "name":"docking_bay",
+            "id":"1",
+            "position":[
+              "0.000000",
+              "0.000000"
+            ],
+            "damage":"0.000000",
+            "staff":"0",
+            "disabled":"true"
+          },
+          {
+            "name":"commodities_market",
             "id":"1",
             "position":[
               "0.000000",

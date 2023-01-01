@@ -389,6 +389,15 @@
                             {
                                 "type": "label",
                                 "bounds": [80,0,1,25],
+                                "name":"productivity",
+                                "text":"Productivity: 100%",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [80,0,1,25],
                                 "name":"housing",
                                 "text":"Housing: 0",
                                 "justify" : "left",

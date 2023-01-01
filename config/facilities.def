@@ -45,9 +45,10 @@
             "staffPositions":10,
             "staffRequired":5,
             "officerSlot":true,
+            "workTime":10,
             "produces":
             {
-                "fuel":30
+                "fuel":10
             }
         },
         {
@@ -65,9 +66,10 @@
             "staffRequired":5,
             "energyOutput":1000,
             "officerSlot":true,
+            "workTime":1,
             "upkeep":
             {
-                "fuel":50
+                "fuel":1
             }
         },
         {
@@ -79,12 +81,14 @@
             "cost":
             {   
                 "credits":1000,
-                "common_materials":10
+                "common_materials":10,
+                "alloys":10
             },
             "staffPositions":20,
             "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
+            "workTime":10,
             "upkeep":
             {
                 "minerals":100
@@ -103,12 +107,14 @@
             "cost":
             {   
                 "credits":2000,
-                "common_materials":50
+                "common_materials":50,
+                "alloys":20
             },
             "staffPositions":20,
             "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
+            "workTime":15,
             "upkeep":
             {
                 "ores":100
@@ -162,12 +168,14 @@
             "cost":
             {   
                 "credits":2000,
-                "common_materials":50
+                "common_materials":50,
+                "alloys":10
             },
             "staffPositions":20,
             "staffRequired":10,
             "energyDraw":200,
             "officerSlot":true,
+            "workTime":10,
             "upkeep":
             {
                 "minerals":10
@@ -227,10 +235,10 @@
         },
         {
             "name":"docking_bay",
-            "displayName":"Docking Bay",
+            "displayName":"Medium Docking Bay",
             "icon":"",
             "description":"This facility allows for the docking and short term storage of small and medium sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
-            "type":"",
+            "type":"medium_docking_bay",
             "cost":
             {   
                 "credits":3000,
@@ -245,7 +253,7 @@
             "displayName":"Docking Bay",
             "icon":"",
             "description":"This facility allows for the docking and short term storage of large sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
-            "type":"",
+            "type":"large_docking_bay",
             "cost":
             {   
                 "credits":6000,
@@ -254,6 +262,24 @@
             "staffPositions":60,
             "staffRequired":35,
             "energyDraw":800
+        },
+        {
+            "name":"commodities_market",
+            "displayName":"Commodities Market",
+            "icon":"",
+            "description":"This facility enabled the trade of commodities through interstellar shipping.  Prices are updated to galactic standards regularly.  The market can let the station order additional commodities as well as enable the sale of the station's surplus resources.",
+            "type":"commodities_market",
+            "cost":
+            {   
+                "credits":6000,
+                "common_materials":400,
+                "alloys":400
+            },
+            "staffPositions":40,
+            "staffRequired":20,
+            "energyDraw":100,
+            "officerSlot":true,
+            "singleton":true
         },
         {
             "name":"survey_site",
@@ -269,7 +295,8 @@
             },
             "staffPositions":10,
             "staffRequired":5,
-            "officerSlot":true
+            "officerSlot":true,
+            "workTime":15
         },
         {
             "name":"mineral_mine1",
@@ -286,6 +313,7 @@
             "staffPositions":20,
             "staffRequired":10,
             "officerSlot":true,
+            "workTime":10,
             "produces":
             {
                 "minerals":100
@@ -306,9 +334,32 @@
             "staffPositions":20,
             "staffRequired":10,
             "officerSlot":true,
+            "workTime":10,
             "produces":
             {
                 "minerals":100
+            }
+        },
+        {
+            "name":"planetary_farm",
+            "displayName":"Planetary Farm",
+            "model":"models/planet/ore_mine.model",
+            "icon":"models/planet/ore_mine_icon.png",
+            "description":"This is a planet side industrial green house.  It is designed to extract useful nutrients from the planet soil and use them to grow food.  Once up and running the facility is self sufficient as long as the site contains nutrients to extract.  The process is slower than growing food in a hydroponic farm on the station, but doesn't take station resources (other than worker pay) in order to produce the food.",
+            "type":"planetary",
+            "cost":
+            {   
+                "credits":1000,
+                "common_materials":50,
+                "alloys":50
+            },
+            "staffPositions":40,
+            "staffRequired":20,
+            "officerSlot":true,
+            "workTime":15,
+            "produces":
+            {
+                "food":50
             }
         }
     ]

@@ -116,6 +116,25 @@ int station_facility_types_in_list(List *list, const char *facility_type)
     return 0;
 }
 
+StationFacility *station_facility_get_by_name(List *facilityList, const char *name)
+{
+    int i,c;
+    StationFacility *facility;
+    if (!facilityList)return NULL;
+    if (!name)return NULL;
+    c = gfc_list_get_count(facilityList);
+    for (i = 0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(facilityList,i);
+        if (!facility) continue;
+        if (gfc_strlcmp(facility->name,name)== 0)
+        {
+            return facility;
+        }
+    }
+    return NULL;
+}
+
 StationFacility *station_facility_get_by_name_id(List *facilityList, const char *name,Uint32 id)
 {
     int i,c;
@@ -235,7 +254,10 @@ void station_facility_check(StationFacility *facility)
         facility->disabled = 1;
         return;
     }
-    facility->productivity *= (1 - facility->damage);
+    if (facility->damage > 0)
+    {
+        facility->productivity *= (1.0 - facility->damage);
+    }
     if (facility->staffRequired)
     {
         if (facility->staffAssigned < facility->staffRequired)
@@ -245,7 +267,10 @@ void station_facility_check(StationFacility *facility)
             facility->disabled = 1;
             return;
         }
-        facility->productivity *= ((float)facility->staffAssigned / (float)facility->staffPositions);
+        if (facility->staffAssigned < facility->staffPositions)
+        {
+            facility->productivity *= ((float)facility->staffAssigned / (float)facility->staffPositions);
+        }
     }
     if (facility->upkeep)
     {
@@ -384,6 +409,25 @@ StationFacility *station_facility_load(SJson *config)
         facility->mission = mission_get_by_id(missionId);
     }
     return facility;
+}
+
+int station_facility_is_singleton(const char *name)
+{
+    Bool value;
+    SJson *facilityDef;
+    if (!name)
+    {
+        slog("no name provided");
+        return 0;
+    }
+    facilityDef = config_def_get_by_name("facilities",name);
+    if (!facilityDef)
+    {
+        slog("facility %s not found",name);
+        return 0;
+    }
+    if ((sj_object_get_value_as_bool(facilityDef,"singleton",&value))&&(value))return 1;
+    return 0;
 }
 
 StationFacility *station_facility_new_by_name(const char *name,int id)

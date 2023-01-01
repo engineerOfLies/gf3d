@@ -159,7 +159,7 @@
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,120],
+                                "bounds": [0,0,450,140],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
@@ -167,47 +167,47 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
                                 "name":"officer",
                                 "text":"Officer Needed: No",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"small"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
                                 "name":"staff",
                                 "text":"Staff Required: 0",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"small"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
                                 "name":"energy",
                                 "text":"Energy Draw: 0",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"small"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,30],
+                                "bounds": [80,0,1,25],
                                 "name":"storage",
                                 "text":"Storage Provided: No",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"small"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,40],
+                                "bounds": [80,0,1,30],
                                 "text":"Install Price",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H4"
+                                "style":"H5"
                             },
                             {
                                 "type": "list",
