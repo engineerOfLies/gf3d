@@ -1,6 +1,8 @@
 #include "simple_logger.h"
 
 #include "player.h"
+#include "resources.h"
+#include "gf2d_message_buffer.h"
 #include "mission.h"
 
 
@@ -86,10 +88,18 @@ void mission_execute(Mission *mission)
     StationFacility *facility;
     StationSection *section;
     char *str;
+    int amount;
     int id;
     if (!mission)return;
     player_return_staff(mission->staff);
     slog("executing mission %i",mission->id);
+    if (gfc_strlcmp(mission->missionType,"commodity_order") == 0)
+    {
+        amount = atoi(mission->missionTarget);
+        resources_list_give(player_get_resources(),mission->missionSubject,amount);
+        message_printf("You have received your order for %i tons of %s",amount,mission->missionSubject);
+        return;
+    }
     if (gfc_strlcmp(mission->missionType,"repair") == 0)
     {
         slog("repair type mission");

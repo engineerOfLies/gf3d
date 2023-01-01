@@ -30,7 +30,9 @@
 
 typedef struct
 {
+    TextLine entryText;
     int updated;
+    char *resource;
     List *playerSupply;
     List *stockpile;
     List *salePrice;
@@ -50,9 +52,60 @@ int market_menu_free(Window *win)
     return 0;
 }
 
+void market_purchase_ok(Window *win)
+{
+    TextLine buffer;
+    int amount = -1;
+    float cost = 0;
+    float credits = 0;
+    MarketMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    win->child = NULL;
+    amount = abs(atoi(data->entryText));
+    if (amount <= 0)
+    {
+        message_printf("Not ordering any %s",data->resource);
+        return;
+    }
+    cost = resources_list_get_amount(data->salePrice,data->resource);
+    if (!cost)
+    {
+        message_printf("No price information for %s",data->resource);
+        return;
+    }
+    cost *= amount;
+    message_printf("ordering %i tons of %s for %.2f credits",amount,data->resource,cost);
+    credits = resources_list_get_amount(data->playerSupply,"credits");
+    if (credits < cost)
+    {
+        message_printf("however, you do not have enough credits for the order");
+        return;
+    }
+    gfc_line_sprintf(buffer,"%i",amount);
+    resources_list_withdraw(data->playerSupply,"credits",cost);
+    mission_begin(
+        "commodity_order",
+        data->resource,
+        buffer,
+        player_get_day(),
+        player_get_day()+3,//TODO: base this on WHO we are buying from
+        0);
+    message_printf("It will arrive in %i days",3);
+}
+
+void market_purchase_cancel(Window *win)
+{
+    if (!win)return;
+    win->child = NULL;
+}
+
 int market_menu_update(Window *win,List *updateList)
 {
     int i,count;
+    int choice;
+    TextLine buffer;
+    Resource *resource,*stock;
     Element *e;
     MarketMenuData *data;
     if (!win)return 0;
@@ -69,6 +122,63 @@ int market_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if ((e->index >= 500)&&(e->index < 600))
+        {
+            //stock_up
+            choice = e->index - 500;
+            resource = gfc_list_get_nth(data->playerSupply,choice);
+            if (!resource)return 1;
+            resources_list_give(data->stockpile,resource->name,100);
+            market_menu_update_resources(win);
+            return 1;
+        }
+        if ((e->index >= 600)&&(e->index < 700))
+        {
+            //stock_up
+            choice = e->index - 600;
+            resource = gfc_list_get_nth(data->playerSupply,choice);
+            if (!resource)return 1;
+            stock = resources_list_get(data->stockpile,resource->name);
+            if (stock)
+            {
+                stock->amount -= 100;
+                if (stock->amount < 0)stock->amount = 0;
+            }
+            market_menu_update_resources(win);
+            return 1;
+        }
+        if ((e->index >= 700)&&(e->index < 800))
+        {
+            //stock_up
+            choice = e->index - 700;
+            resource = gfc_list_get_nth(data->playerSupply,choice);
+            if (!resource)return 1;
+            stock = resources_list_get(data->allowSale,resource->name);
+            if (stock)
+            {
+                if (stock->amount > 0)stock->amount = 0;
+                else stock->amount = 1;
+            }
+            else
+            {
+                resources_list_give(data->allowSale,resource->name,1);
+            }
+            market_menu_update_resources(win);
+            return 1;
+        }
+        if ((e->index >= 800)&&(e->index < 900))
+        {
+            //stock_up
+            choice = e->index - 800;
+            if (win->child)return 1;
+            resource = gfc_list_get_nth(data->playerSupply,choice);
+            if (!resource)return 1;
+            data->resource = resource->name;
+            gfc_line_clear(data->entryText);
+            gfc_line_sprintf(buffer,"Enter Amount of %s to Purchase",data->resource);
+            win->child = window_text_entry(buffer, data->entryText, win, 10, (gfc_work_func*)market_purchase_ok,(gfc_work_func*)market_purchase_cancel);
+            return 1;
+        }
         if (strcmp(e->name,"done")==0)
         {
             gf2d_window_free(win);
@@ -133,10 +243,18 @@ Element *maket_menu_build_row(Window *win, const char *resource,int index, int a
     gfc_line_sprintf(buffer,"%.2f",price);
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),gfc_color(1,1,1,1)));
     
+    if (resources_list_get_amount(data->allowSale,resource)> 0)
+    {
+        gfc_line_sprintf(buffer,"Yes");
+    }
+    else
+    {
+        gfc_line_sprintf(buffer,"no");
+    }
     gf2d_element_list_add_item(rowList,gf2d_button_new_simple(win,700+index,
         "allow",
         "actors/button.actor",
-        "set price",
+        buffer,
         vector2d(0.63,0.56),
         vector2d(100,24),
         gfc_color8(255,255,255,255)));
@@ -164,6 +282,7 @@ void market_menu_update_resources(Window *win)
     data->playerSupply = player_get_resources();
     data->stockpile = player_get_stockpile();
     data->salePrice = player_get_sale_price();
+    data->allowSale = player_get_allow_sale();
     list = gf2d_window_get_element_by_name(win,"commodities");
     gf2d_element_list_free_items(list);
     if (!list)return;

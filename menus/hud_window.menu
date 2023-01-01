@@ -124,6 +124,28 @@
                     },
                     {
                         "type": "button",
+                        "name":"missions",
+                        "bounds": [0,0,120,34],
+                        "hotkey":"missions",
+                        "sound":"confirm",
+                        "label" :
+                        {
+                            "type": "label",
+                            "text":"Missions",
+                            "bounds": [0,0,120,38],
+                            "justify" : "center",
+                            "align" : "middle",
+                            "style":"H5"
+                        },
+                        "actor" :
+                        {
+                            "type": "actor",
+                            "scale":[0.75,0.8],
+                            "actor" : "actors/button.actor"
+                        }
+                    },
+                    {
+                        "type": "button",
                         "name":"fleet",
                         "bounds": [0,0,120,34],
                         "hotkey":"fleet",

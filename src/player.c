@@ -121,24 +121,36 @@ PlayerData *player_data_parse(SJson *json)
     {
         data->resources = resources_list_parse(res);
     }
-    else 
+    else
     {
-        slog("no player resources");
+        data->allowSale = gfc_list_new();
     }
     res = sj_object_get_value(json,"stockpile");
     if (res)
     {
         data->stockpile = resources_list_parse(res);
     }
+    else
+    {
+        data->allowSale = gfc_list_new();
+    }
     res = sj_object_get_value(json,"salePrice");
     if (res)
     {
         data->salePrice = resources_list_parse(res);
     }
+    else
+    {
+        data->allowSale = gfc_list_new();
+    }
     res = sj_object_get_value(json,"allowSale");
     if (res)
     {
         data->allowSale = resources_list_parse(res);
+    }
+    else
+    {
+        data->allowSale = gfc_list_new();
     }
 
     res = sj_object_get_value(json,"history");
