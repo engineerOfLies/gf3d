@@ -37,9 +37,7 @@ Window *station_extension_menu(
     {
         child = gfc_list_get_nth(section->children,i);
         if (!child)continue;
-        name = station_def_get_display_name(child->name);
-        if (!name)continue;
-        gfc_list_set_nth(list,child->slot,(void *)name);
+        gfc_list_set_nth(list,child->slot,child->displayName);
     }
     
     win = item_list_menu(parent,position,250,(char *)title,list,onSelect,callbackData,result);

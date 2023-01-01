@@ -93,6 +93,14 @@ void mission_execute(Mission *mission)
     if (!mission)return;
     player_return_staff(mission->staff);
     slog("executing mission %i",mission->id);
+    if (gfc_strlcmp(mission->missionType,"facility_production") == 0)
+    {
+        id = atoi(mission->missionTarget);
+        facility = player_get_facility_by_name_id(mission->missionSubject,id);
+        message_printf("Facility %s %i Production completed",mission->missionSubject,id);
+        resource_list_sell(player_get_resources(), facility->produces,facility->productivity);
+        return;
+    }
     if (gfc_strlcmp(mission->missionType,"commodity_order") == 0)
     {
         amount = atoi(mission->missionTarget);

@@ -47,6 +47,7 @@ SJson *station_section_to_json(StationSection *section)
     json = sj_object_new();
     if (!json)return NULL;
     sj_object_insert(json,"name",sj_new_str(section->name));
+    sj_object_insert(json,"displayName",sj_new_str(section->displayName));
     sj_object_insert(json,"id",sj_new_uint32(section->id));
     sj_object_insert(json,"hull",sj_new_uint32(section->hull));
     sj_object_insert(json,"repairing",sj_new_bool(section->repairing));
@@ -95,7 +96,7 @@ SJson *station_save_data(StationData *data)
 
 StationData *station_load_data(SJson *station)
 {
-    const char *name;
+    const char *name,*str;
     Uint32 id;
     int parentId;
     StationSection *section;
@@ -162,9 +163,17 @@ StationData *station_load_data(SJson *station)
             {
                 section->mission = mission_get_by_id(id);
             }
+            str = sj_object_get_value_as_string(item,"displayName");
+            if (str)
+            {
+                gfc_line_cpy(section->displayName,str);
+            }
+            else
+            {
+                gfc_line_sprintf(section->displayName,"%s %i",station_def_get_display_name(section->name),section->id);
+            }
         }
-    }
-    if (!sj_object_get_value_as_float(station,"hull",&data->hull))
+    }    if (!sj_object_get_value_as_float(station,"hull",&data->hull))
     {
         data->hull = data->hullMax;
     }

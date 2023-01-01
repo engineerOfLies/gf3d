@@ -329,8 +329,6 @@ void player_hour_advance()
         data->day++;
         if ((data->day % 7)== 0)//every 10 days
         {
-            station_upkeep(player_get_station_data());
-            planet_facilities_update(player_get_planet());
             player_upkeep(data);
         }
         if ((data->day % 30)== 0)//every 30 days
@@ -341,6 +339,8 @@ void player_hour_advance()
         {
             message_new("HAPPY NEW YEAR!");
         }
+        station_upkeep(player_get_station_data());
+        planet_facilities_update(player_get_planet());
         mission_update_all();
     }
     event_manager_update();

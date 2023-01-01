@@ -13,6 +13,7 @@ typedef struct StaionSection_S
 {
     struct StaionSection_S *parent;// if not null, this is the parent
     TextLine    name;  //its name identifier
+    TextLine    displayName;  //its name as displayed to the user (including ID number)
     Uint32      id;      //unique ID for the station section
     ModelMat    mat;
     int         housing;        //how much housing is provided by this S

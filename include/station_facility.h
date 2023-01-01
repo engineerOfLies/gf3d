@@ -11,27 +11,29 @@
 
 typedef struct
 {
-    TextLine    name;  //its name identifier
+    TextLine    name;           //its name identifier
+    TextLine    displayName;    //its name as displayed to the user (including ID number)
     Uint32      id;
-    TextLine    facilityType;
-    Vector2D    position;   //for planet side facilities
+    TextLine    facilityType;  
+    Vector2D    position;       //for planet side facilities
     ModelMat    mat;
-    float       damage;   //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
-    Bool        repairing;  // if true, the facility is being repaired
-    Mission    *mission;    // if a mission has been assigned to this facility
+    float       damage;         //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
+    Bool        repairing;      // if true, the facility is being repaired
+    Mission    *mission;        // if a mission has been assigned to this facility
     float       productivity;   //how efficient a facility is at running.  due to factors like damage, energy, and staffing
+    Uint32      lastProduction; //last time this facility produced
     int         housing;        //how much housing is provided by this facility
     int         staffRequired;  //how many people are needed to run the facility at a minimum
-    int         staffAssigned;     //how many people are actually hired to do so
-    int         staffPositions;     //how many people are CAN be hired to do so
-    int         energyDraw;
-    int         energyOutput;
-    int         inactive;//if the facility cannot run
-    int         disabled;//if the player has chosen to turn it off
-    int         storage;// how many commodities can be stored here
-    TextLine    officer;//if there is an officer assigned to help run this facility
-    List        *upkeep;    //what resources are needed to keep this running every update
-    List        *produces;  //what this produces every update cycle
+    int         staffAssigned;  //how many people are actually hired to do so
+    int         staffPositions; //how many people are CAN be hired to do so
+    int         energyDraw;     //how much energy is needed for the facility to run
+    int         energyOutput;   //how much energy is produced by the facility
+    int         inactive;       //if the facility cannot run
+    int         disabled;       //if the player has chosen to turn it off
+    int         storage;        // how many commodities can be stored here
+    TextLine    officer;        //if there is an officer assigned to help run this facility
+    List        *upkeep;        //what resources are needed to keep this running every update
+    List        *produces;      //what this produces every update cycle
 }StationFacility;
 
 /**

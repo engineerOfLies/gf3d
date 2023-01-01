@@ -284,10 +284,22 @@ void station_facility_check(StationFacility *facility)
     }
 }
 
+Uint32 station_facility_get_work_time(const char *name)
+{
+    SJson *def;
+    Uint32 workTime = 0;
+    def = config_def_get_by_name("facilities",name);
+    if (!def)return 0;
+    sj_object_get_value_as_uint32(def,"workTime",&workTime);
+    return workTime;
+}
+
 void station_facility_update(StationFacility *facility,float *energySupply)
 {
     int newMass;
     int space;
+    TextLine buffer;
+    Uint32 workTime = 0;
     StationData *station;
     List *supply;
     if (!facility)return;
@@ -312,6 +324,9 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     if (facility->inactive)return;
     
     supply = player_get_resources();
+    workTime = station_facility_get_work_time(facility->name);
+    if (facility->lastProduction + workTime > player_get_day())return;//haven't gotten here yet
+    facility->lastProduction = player_get_day();
     if (facility->upkeep)
     {
         resource_list_buy(supply, facility->upkeep);
@@ -338,7 +353,15 @@ void station_facility_update(StationFacility *facility,float *energySupply)
             facility->disabled = 1;
             resource_list_sell(supply, facility->produces,facility->productivity * ((float)space / (float)newMass));
         }
-        resource_list_sell(supply, facility->produces,facility->productivity);
+        gfc_line_sprintf(buffer,"%i",facility->id);
+        facility->mission = mission_begin(
+            "facility_production",
+            facility->name,
+            buffer,
+            facility->lastProduction,
+            facility->lastProduction + workTime,
+            0);
+        //resource_list_sell(supply, facility->produces,facility->productivity);
     }
 }
 
@@ -356,6 +379,7 @@ SJson *station_facility_save(StationFacility *facility)
     if (!facility)return NULL;
     json = sj_object_new();
     sj_object_insert(json,"name",sj_new_str(facility->name));
+    sj_object_insert(json,"displayName",sj_new_str(facility->displayName));
     sj_object_insert(json,"id",sj_new_int(facility->id));
     sj_object_insert(json,"position",sj_vector2d_new(facility->position));
     sj_object_insert(json,"damage",sj_new_float(facility->damage));
@@ -397,6 +421,21 @@ StationFacility *station_facility_load(SJson *config)
         slog("failed to make facility %s",str);
         return NULL;
     }
+    str = sj_object_get_value_as_string(config,"displayName");
+    if (str)
+    {
+        gfc_line_cpy(facility->displayName,str);
+    }
+    else
+    {
+        str = station_facility_get_display_name(facility->name);
+        if (str)
+        {
+            gfc_line_sprintf(facility->displayName,"%s %i",str,facility->id);
+        }
+        else slog("failed to get display name for facility %s",facility->name);
+    }
+
     sj_value_as_vector2d(sj_object_get_value(config,"position"),&facility->position);
     sj_object_get_value_as_float(config,"damage",&facility->damage);
     sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);

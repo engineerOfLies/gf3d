@@ -100,7 +100,7 @@ void station_menu_section_list(Window *win)
     {
         section = gfc_list_get_nth(data->station->sections,i);
         if (!section)continue;
-        data->selectionList = gfc_list_append(data->selectionList,(void *)station_def_get_display_name(section->name));
+        gfc_list_append(data->selectionList,(void *)section->displayName);
     }
     
     win->child = item_list_menu(win,vector2d(230,58),250,"Select Section",data->selectionList,station_menu_section_list_choice,win,&data->choice);
