@@ -97,7 +97,7 @@ void mission_execute(Mission *mission)
     {
         id = atoi(mission->missionTarget);
         facility = player_get_facility_by_name_id(mission->missionSubject,id);
-        message_printf("Facility %s %i Production completed",mission->missionSubject,id);
+        message_printf("Facility %s %i Production completed",facility->displayName,id);
         resource_list_sell(player_get_resources(), facility->produces,facility->productivity);
         return;
     }
@@ -105,7 +105,7 @@ void mission_execute(Mission *mission)
     {
         amount = atoi(mission->missionTarget);
         resources_list_give(player_get_resources(),mission->missionSubject,amount);
-        message_printf("You have received your order for %i tons of %s",amount,mission->missionSubject);
+        message_printf("You have received your order for %i tons of %s",amount,resources_get_display_name(mission->missionSubject));
         return;
     }
     if (gfc_strlcmp(mission->missionType,"repair") == 0)

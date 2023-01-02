@@ -87,7 +87,7 @@ void station_buy_menu_select_item(Window *win,int choice, const char *name)
     data->cost = station_get_resource_cost(sj_object_get_value_as_string(def,"name"));
     if (data->cost)
     {
-        cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost);
+        cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost,NULL);
         
         e = gf2d_window_get_element_by_name(win,"costs");
         if (!e)return;

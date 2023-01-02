@@ -59,6 +59,9 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"hour",sj_new_uint32(data->hour));
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
+    sj_object_insert(json,"yesterday",resources_list_save(data->yesterday));
+    sj_object_insert(json,"lastMonth",resources_list_save(data->lastMonth));
+    sj_object_insert(json,"lastYear",resources_list_save(data->lastYear));
     sj_object_insert(json,"stockpile",resources_list_save(data->stockpile));
     sj_object_insert(json,"salePrice",resources_list_save(data->salePrice));
     sj_object_insert(json,"allowSale",resources_list_save(data->allowSale));
@@ -99,7 +102,6 @@ PlayerData *player_data_parse(SJson *json)
     if (!json)return NULL;
     data = gfc_allocate_array(sizeof(PlayerData),1);
     if (!data)return NULL;
-    data->resources = gfc_list_new();
     str = sj_object_get_value_as_string(json,"name");
     if (str)gfc_line_cpy(data->name,str);
     
@@ -123,7 +125,34 @@ PlayerData *player_data_parse(SJson *json)
     }
     else
     {
-        data->allowSale = gfc_list_new();
+        data->resources = gfc_list_new();
+    }
+    res = sj_object_get_value(json,"yesterday");
+    if (res)
+    {
+        data->yesterday = resources_list_parse(res);
+    }
+    else
+    {
+        data->yesterday = resources_list_duplicate(data->resources);
+    }
+    res = sj_object_get_value(json,"lastMonth");
+    if (res)
+    {
+        data->lastMonth = resources_list_parse(res);
+    }
+    else
+    {
+        data->lastMonth = resources_list_duplicate(data->resources);
+    }
+    res = sj_object_get_value(json,"lastYear");
+    if (res)
+    {
+        data->lastYear = resources_list_parse(res);
+    }
+    else
+    {
+        data->lastYear = resources_list_duplicate(data->resources);
     }
     res = sj_object_get_value(json,"stockpile");
     if (res)
@@ -327,6 +356,8 @@ void player_hour_advance()
     {
         data->hour = 0;
         data->day++;
+        resources_list_free(data->yesterday);
+        data->yesterday = resources_list_duplicate(data->resources);
         if ((data->day % 7)== 0)//every 7 days is a week
         {
             player_upkeep(data);
@@ -334,10 +365,14 @@ void player_hour_advance()
         if ((data->day % 30)== 0)//every 30 days is a month
         {
             message_new("New Month");
+            resources_list_free(data->lastMonth);
+            data->lastMonth = resources_list_duplicate(data->resources);
         }
         if ((data->day % 360)== 0)//every 360 days is a year
         {
             message_new("HAPPY NEW YEAR!");
+            resources_list_free(data->lastYear);
+            data->lastYear = resources_list_duplicate(data->resources);
         }
         station_upkeep(player_get_station_data());
         planet_facilities_update(player_get_planet());
@@ -406,6 +441,28 @@ StationFacility *player_get_facility_nth(Uint32 index)
         }
     }
     return NULL;
+}
+
+int player_has_working_dock()
+{
+    int i,c;
+    StationFacility *facility;
+    c = player_get_facility_count();
+    for (i =0; i < c; i++)
+    {
+        facility = player_get_facility_nth(i);
+        if (!facility)continue;
+        if ((strcmp(facility->facilityType,"small_docking_bay")==0)||
+            (strcmp(facility->facilityType,"medium_docking_bay")==0)||
+            (strcmp(facility->facilityType,"large_docking_bay")==0))
+        {
+            if ((!facility->inactive)&&(!facility->disabled))
+            {
+                return 1;
+            }
+        }
+    }    
+    return 0;
 }
 
 StationFacility *player_get_facility_by_name(const char *name)

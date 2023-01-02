@@ -223,7 +223,7 @@
             "displayName":"Small Docking Bay",
             "icon":"",
             "description":"This facility allows for the docking and short term storage of small space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
-            "type":"",
+            "type":"small_docking_bay",
             "cost":
             {   
                 "credits":1500,

@@ -148,10 +148,8 @@ StationFacility *station_facility_get_by_name_id(List *facilityList, const char 
         if (!facility) continue;
         if (gfc_strlcmp(facility->name,name)== 0)
         {
-            slog("facility name matched");
             if (facility->id == id)
             {
-                slog("facility id matched too");
                 return facility;
             }
         }
@@ -305,6 +303,13 @@ void station_facility_market_update()
     //todo make it based on galactic faction
     player = player_get_data();
     if (!player)return;
+    //check if there is a working port
+    if (!player_has_working_dock())
+    {
+        message_printf("No working dock, cannot sell goods on the open market");
+        return;
+    }
+    
     c = gfc_list_get_count(player->allowSale);
     for (i =0; i < c; i++)
     {
@@ -317,7 +322,7 @@ void station_facility_market_update()
         if (supply < (stockpile + 100))continue;
         // where I find the best buyer, for now just go with market price
         resources_list_withdraw(player->resources,resource->name,100);
-        resources_list_give(player->resources,resource->name,100 * value);
+        resources_list_give(player->resources,"credits",100 * value);
         message_printf("Sold %i of %s for %0.2f",100,resources_get_display_name(resource->name),100 * value);
     }
 }

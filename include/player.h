@@ -20,6 +20,9 @@ typedef struct
     Uint32      hour;               /**<incremented periodically for timing*/
     Uint32      day;                /**<incremented every 24 hours to track the passage of game-time*/
     List       *resources;          /**<list of resources of the station*/
+    List       *yesterday;          /**<list of resources of the station from yesterday*/
+    List       *lastMonth;          /**<list of resources of the station from last month*/
+    List       *lastYear;           /**<list of resources of the station from last year*/
     List       *stockpile;          /**<list of amounts of a resource that will be kept on hand and not sold*/
     List       *salePrice;          /**<list of prices that the player will sell resources at*/
     List       *allowSale;          /**<list of commodities that will be auto-sold*/
@@ -145,6 +148,12 @@ StationFacility *player_get_facility_by_name(const char *name);
  * @return NULL on error or not found, the facility in question otherwise
  */
 StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id);
+
+/**
+ * @brief check if the player has a working dock or not
+ * @return 0 is not, 1 if they do
+ */
+int player_has_working_dock();
 
 /**
  * @brief get the count of the number of facilities that a player has between the planet and the station

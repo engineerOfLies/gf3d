@@ -109,7 +109,7 @@ void resource_menu_update_resources(Window *win)
     gfc_line_sprintf(buffer,"Storage : %i / %i T",total_mass,station->storageCapacity);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
     
-    resource_list = resource_list_element_new(win,"resource_list", vector2d(0,0),player_get_resources(),NULL);
+    resource_list = resource_list_element_new(win,"resource_list", vector2d(0,0),player_get_resources(),NULL,player->yesterday);
     e = gf2d_window_get_element_by_name(win,"resources");
     if (!e)return;
     gf2d_element_list_free_items(e);

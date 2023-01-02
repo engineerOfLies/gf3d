@@ -30,7 +30,16 @@ List *resources_list_new();
  */
 void resources_list_free(List *list);
 
+/**
+ * @brief make a separate copy of the resource list
+ * @param list the resource list to duplicate
+ * @return NULL if the list provided is NULL or out of memory, the resource list copy otherwise
+ */
+List *resources_list_duplicate(List *list);
 
+/**
+ * @brief get a resource's display name by its name id
+ */
 const char *resources_get_display_name(const char *name);
 
 /**
@@ -135,8 +144,9 @@ int resources_list_afford(List *supply, List *cost);
  * @param offset offset position of the list.  relative to parent element
  * @param supply list of resources to display.  how much of a resource there is available.  
  * @param cost If provided, this will be shown as supply/cost and show in Green if supply>=cost or red otherwise
+ * @param last if procided and no cost provided, this will color code the supply based on gains / losses relative to this last period
  * @note if a resource is more than the supply
  */
-Element *resource_list_element_new(Window *win,const char *name, Vector2D offset,List *supply,List *cost);
+Element *resource_list_element_new(Window *win,const char *name, Vector2D offset,List *supply,List *cost,List *last);
 
 #endif

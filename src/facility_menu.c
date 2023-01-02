@@ -191,7 +191,7 @@ void facility_menu_select_item(Window *win,int choice)
     gf2d_element_list_free_items(e);
     if (resources)
     {
-        cost_list = resource_list_element_new(win,"upkeep_list", vector2d(0,0),resources,NULL);
+        cost_list = resource_list_element_new(win,"upkeep_list", vector2d(0,0),resources,NULL,NULL);
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
     }
@@ -200,7 +200,7 @@ void facility_menu_select_item(Window *win,int choice)
     gf2d_element_list_free_items(e);
     if (resources)
     {
-        cost_list = resource_list_element_new(win,"produces_list", vector2d(0,0),resources,NULL);        
+        cost_list = resource_list_element_new(win,"produces_list", vector2d(0,0),resources,NULL,NULL);        
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
     }

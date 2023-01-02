@@ -21,6 +21,26 @@ List *resources_list_new()
     return gfc_list_new();
 }
 
+List *resources_list_duplicate(List *list)
+{
+    List *dup;
+    Resource *resource,*resourceDup;
+    int i,c;
+    if (!list)return NULL;
+    c = gfc_list_get_count(list);
+    dup = gfc_list_new();
+    for (i = 0;i < c; i++)
+    {
+        resource = gfc_list_get_nth(list,i);
+        if (!resource)continue;
+        resourceDup = resource_new();
+        if (!resourceDup)continue;
+        memcpy(resourceDup,resource,sizeof(Resource));
+        gfc_list_append(dup,resourceDup);
+    }
+    return dup;
+}
+
 Resource *resources_list_get(List *list,const char *name)
 {
     Resource *resource;
@@ -233,7 +253,7 @@ float resources_list_get_amount(List *list,const char *name)
     return resource->amount;
 }
 
-Element *resource_list_element_new(Window *win,const char *name, Vector2D offset,List *supply,List *cost)
+Element *resource_list_element_new(Window *win,const char *name, Vector2D offset,List *supply,List *cost,List *last)
 {
     int i,c;
     Color color;
@@ -267,25 +287,42 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
     if (!cost)
     {//raw data, no color
         c = gfc_list_get_count(supply);
-        for (i = 0; i < c; i++)
+        if (!last)
         {
-            resource = gfc_list_get_nth(supply,i);
-            if (!resource)continue;
-            gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resources_get_display_name(resource->name));
-            gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,gfc_color(1,1,1,1)));
+            for (i = 0; i < c; i++)
+            {
+                resource = gfc_list_get_nth(supply,i);
+                if (!resource)continue;
+                gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resources_get_display_name(resource->name));
+                gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,GFC_WHITE));
+            }
+        }
+        else
+        {
+            for (i = 0; i < c; i++)
+            {
+                resource = gfc_list_get_nth(supply,i);
+                if (!resource)continue;
+                amount = resources_list_get_amount(last,resource->name);
+                if (resource->amount > amount)color = GFC_GREEN;
+                else if (resource->amount < amount)color = GFC_RED;
+                else color = GFC_WHITE;
+                gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resources_get_display_name(resource->name));
+                gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,color));
+            }
         }
     }
     else 
-    {//raw data, no color
+    {//Price Compare, add color for affordable
         c = gfc_list_get_count(cost);
         for (i = 0; i < c; i++)
         {
             resource = gfc_list_get_nth(cost,i);
             if (!resource)continue;
             amount = resources_list_get_amount(supply,resource->name);
-            if (amount >= resource->amount)color = gfc_color(0,1,0,1);
-            else color = gfc_color(0.9,0.2,0.2,1);
-            gfc_line_sprintf(buffer,"%.2f / %.2f: %s",amount, resource->amount,resources_get_display_name(resource->name));
+            if (amount >= resource->amount)color = GFC_GREEN;
+            else color = GFC_RED;
+            gfc_line_sprintf(buffer,"%.2f / %.2f: %s",resource->amount, amount,resources_get_display_name(resource->name));
             gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,color));
         }
     }

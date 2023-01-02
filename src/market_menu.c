@@ -168,6 +168,11 @@ int market_menu_update(Window *win,List *updateList)
         }
         if ((e->index >= 800)&&(e->index < 900))
         {
+            if (!player_has_working_dock())
+            {
+                message_printf("Cannot purchase goods on the open market, functioning dock is required!");
+                return 1;
+            }
             //stock_up
             choice = e->index - 800;
             if (win->child)return 1;
