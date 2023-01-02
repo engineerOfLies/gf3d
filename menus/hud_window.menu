@@ -124,14 +124,14 @@
                     },
                     {
                         "type": "button",
-                        "name":"missions",
+                        "name":"reports",
                         "bounds": [0,0,120,34],
-                        "hotkey":"missions",
+                        "hotkey":"reports",
                         "sound":"confirm",
                         "label" :
                         {
                             "type": "label",
-                            "text":"Missions",
+                            "text":"Reports",
                             "bounds": [0,0,120,38],
                             "justify" : "center",
                             "align" : "middle",

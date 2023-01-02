@@ -67,6 +67,7 @@ void facility_menu_select_item(Window *win,int choice)
 {
     SJson *def;
     TextLine buffer;
+    int workTime = 0;
     const char *str,*name;
     Element *e;
     Element *cost_list;
@@ -198,11 +199,18 @@ void facility_menu_select_item(Window *win,int choice)
     resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"produces");
     e = gf2d_window_get_element_by_name(win,"produces");
     gf2d_element_list_free_items(e);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productionNext"),"Next Production Day: ---");
     if (resources)
     {
         cost_list = resource_list_element_new(win,"produces_list", vector2d(0,0),resources,NULL,NULL);        
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
+        if ((!data->facility->inactive)&&(!data->facility->disabled))
+        {
+            workTime = station_facility_get_work_time(data->facility->name);
+            gfc_line_sprintf(buffer,"Next Production Day: %02i",data->facility->lastProduction + workTime);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productionNext"),buffer);
+        }
     }
 }
 
@@ -247,6 +255,7 @@ int facility_menu_update(Window *win,List *updateList)
 {
     int i,count;
     Element *e;
+    StationData *station;
     FacilityMenuData* data;
     PlayerData *player;
     if ((!win)||(!win->data))return 0;
@@ -320,6 +329,18 @@ int facility_menu_update(Window *win,List *updateList)
                     data->facility->disabled = 1;
                     return 1;
                 }
+                if (data->facility->energyDraw)
+                {
+                    station = player_get_station_data();
+                    if (!station)return 1;//wtf
+                    if (data->facility->energyDraw > station->energySupply)
+                    {
+                        message_printf("Facility %s cannot be enabled, not enough energy to power it.",data->facility->displayName);
+                        data->facility->disabled = 1;
+                        return 1;
+                    }
+                }
+                data->facility->lastProduction = player_get_day();//starting from NOW
             }
             else data->facility->disabled = 1;
             facility_menu_select_item(win,data->choice);//this will redraw

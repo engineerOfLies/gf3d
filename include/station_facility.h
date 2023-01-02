@@ -104,6 +104,11 @@ const char *station_facility_get_display_name(const char *name);
 const char *station_facility_get_name_from_display(const char *display);
 
 /**
+ * @brief figure out how long it will take for the the facility to complete its work
+ */
+Uint32 station_facility_get_work_time(const char *name);
+
+/**
  * @brief run the upkeep on the facility
  * @param facility the facility
  * @param energySupply how much energy the station has left

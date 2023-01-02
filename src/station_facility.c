@@ -298,6 +298,7 @@ void station_facility_market_update()
     float value;
     int stockpile = 0;
     int supply = 0;
+    int nodock = 0;
     Resource *resource;
     PlayerData *player;
     //todo make it based on galactic faction
@@ -306,8 +307,7 @@ void station_facility_market_update()
     //check if there is a working port
     if (!player_has_working_dock())
     {
-        message_printf("No working dock, cannot sell goods on the open market");
-        return;
+        nodock = 1;
     }
     
     c = gfc_list_get_count(player->allowSale);
@@ -316,6 +316,11 @@ void station_facility_market_update()
         resource = gfc_list_get_nth(player->allowSale,i);
         if (!resource)continue;
         if (resource->amount <= 0)continue;
+        if (nodock)
+        {
+            message_printf("No working dock, cannot sell goods on the open market");
+            return;
+        }
         stockpile = resources_list_get_amount(player->stockpile,resource->name);
         supply = resources_list_get_amount(player->resources,resource->name);
         value = resources_list_get_amount(player->salePrice,resource->name);

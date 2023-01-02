@@ -23,6 +23,7 @@
 #include "player.h"
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
+#include "market_menu.h"
 #include "facility_menu.h"
 #include "resources_menu.h"
 
@@ -48,6 +49,7 @@ int resources_menu_update(Window *win,List *updateList)
 {
     int i,count;
     Element *e;
+    Window *parent,*market;
     ResourcesMenuData *data;
     if (!win)return 0;
     if (!updateList)return 0;
@@ -63,6 +65,18 @@ int resources_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"market")==0)
+        {
+            market = market_menu(win->parent);
+            if (!market)return 1;// cancel, if the child window can't open
+            parent = win->parent;
+            gf2d_window_free(win);
+            if (parent)
+            {
+                parent->child = market;
+            }
+            return 1;
+        }
     }
     if (gfc_input_command_released("cancel"))
     {
@@ -109,7 +123,7 @@ void resource_menu_update_resources(Window *win)
     gfc_line_sprintf(buffer,"Storage : %i / %i T",total_mass,station->storageCapacity);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
     
-    resource_list = resource_list_element_new(win,"resource_list", vector2d(0,0),player_get_resources(),NULL,player->yesterday);
+    resource_list = resource_list_element_new(win,"resource_list", vector2d(0,0),player_get_resources(),NULL,player->lastMonth);
     e = gf2d_window_get_element_by_name(win,"resources");
     if (!e)return;
     gf2d_element_list_free_items(e);
