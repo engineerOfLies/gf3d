@@ -327,15 +327,15 @@ void player_hour_advance()
     {
         data->hour = 0;
         data->day++;
-        if ((data->day % 7)== 0)//every 10 days
+        if ((data->day % 7)== 0)//every 7 days is a week
         {
             player_upkeep(data);
         }
-        if ((data->day % 30)== 0)//every 30 days
+        if ((data->day % 30)== 0)//every 30 days is a month
         {
             message_new("New Month");
         }
-        if ((data->day % 365)== 0)//every 30 days
+        if ((data->day % 360)== 0)//every 360 days is a year
         {
             message_new("HAPPY NEW YEAR!");
         }

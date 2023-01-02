@@ -30,6 +30,9 @@ List *resources_list_new();
  */
 void resources_list_free(List *list);
 
+
+const char *resources_get_display_name(const char *name);
+
 /**
  * @brief give count of a resource to a list
  * @param list the list to add to

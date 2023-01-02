@@ -294,6 +294,34 @@ Uint32 station_facility_get_work_time(const char *name)
     return workTime;
 }
 
+void station_facility_market_update()
+{
+    int i,c;
+    float value;
+    int stockpile = 0;
+    int supply = 0;
+    Resource *resource;
+    PlayerData *player;
+    //todo make it based on galactic faction
+    player = player_get_data();
+    if (!player)return;
+    c = gfc_list_get_count(player->allowSale);
+    for (i =0; i < c; i++)
+    {
+        resource = gfc_list_get_nth(player->allowSale,i);
+        if (!resource)continue;
+        if (resource->amount <= 0)continue;
+        stockpile = resources_list_get_amount(player->stockpile,resource->name);
+        supply = resources_list_get_amount(player->resources,resource->name);
+        value = resources_list_get_amount(player->salePrice,resource->name);
+        if (supply < (stockpile + 100))continue;
+        // where I find the best buyer, for now just go with market price
+        resources_list_withdraw(player->resources,resource->name,100);
+        resources_list_give(player->resources,resource->name,100 * value);
+        message_printf("Sold %i of %s for %0.2f",100,resources_get_display_name(resource->name),100 * value);
+    }
+}
+
 void station_facility_update(StationFacility *facility,float *energySupply)
 {
     int newMass;
@@ -327,6 +355,12 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     workTime = station_facility_get_work_time(facility->name);
     if (facility->lastProduction + workTime > player_get_day())return;//haven't gotten here yet
     facility->lastProduction = player_get_day();
+    if (strcmp(facility->name,"commodities_market")==0)
+    {   //override for the market sale
+        station_facility_market_update();
+        return;
+    }
+    
     if (facility->upkeep)
     {
         resource_list_buy(supply, facility->upkeep);

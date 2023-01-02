@@ -278,6 +278,7 @@
             "staffPositions":40,
             "staffRequired":20,
             "energyDraw":100,
+            "workTime":10,
             "officerSlot":true,
             "singleton":true
         },
