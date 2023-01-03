@@ -331,8 +331,11 @@ void station_section_repair(StationSection *section)
 void station_section_recalc_values(StationSection *section)
 {
     int i,c;
+    PlayerData *player;
     StationFacility *facility;
     if (!section)return;
+    player = player_get_data();
+    if (!player)return;
     c = gfc_list_get_count(section->facilities);
     section->storageCapacity = 0;
     section->energyOutput = 0;
@@ -349,6 +352,7 @@ void station_section_recalc_values(StationSection *section)
         section->housing += facility->housing;
         section->staffAssigned += facility->staffAssigned;
         section->staffPositions += facility->staffPositions;
+        facility->operatingCost = facility->staffAssigned * player->wages;
         if (facility->disabled)continue;//skip the ones inactive for whatever reason
         section->energyDraw += facility->energyDraw;
         section->energyOutput += facility->energyOutput * facility->productivity;

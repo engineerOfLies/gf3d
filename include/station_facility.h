@@ -22,6 +22,8 @@ typedef struct
     Mission    *mission;        // if a mission has been assigned to this facility
     float       productivity;   //how efficient a facility is at running.  due to factors like damage, energy, and staffing
     Uint32      lastProduction; //last time this facility produced
+    int         operatingCost;  //cost of running due to staff and office wages
+    int         income;         //if this facility directly produces income, this is the amount
     int         housing;        //how much housing is provided by this facility
     int         staffRequired;  //how many people are needed to run the facility at a minimum
     int         staffAssigned;  //how many people are actually hired to do so

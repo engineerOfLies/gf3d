@@ -111,7 +111,7 @@
                     {
                         "type": "label",
                         "bounds": [0,0,80,1],
-                        "text":"Online",
+                        "text":"Cost",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"

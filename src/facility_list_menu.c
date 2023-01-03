@@ -300,16 +300,20 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(90,24),GFC_WHITE));
 
-    if ((facility->inactive)||(facility->disabled))
+    if (((!facility->operatingCost)&&(!facility->income))||(facility->operatingCost == facility->income))
     {
+        gfc_line_sprintf(buffer,"---");
+        color = GFC_WHITE;
+    }
+    else if (facility->operatingCost > facility->income)
+    {
+        gfc_line_sprintf(buffer,"-%i",facility->operatingCost - facility->income);
         color = GFC_RED;
-        gfc_line_sprintf(buffer,"Offline");
-
     }
     else
     {
-        gfc_line_sprintf(buffer,"Online");
-        color = GFC_WHITE;
+        gfc_line_sprintf(buffer,"+%i",facility->operatingCost - facility->income);
+        color = GFC_GREEN;
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),color));
 
