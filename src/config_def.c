@@ -75,6 +75,24 @@ SJson *config_def_get_by_index(const char *resource,Uint8 index)
     return sj_array_get_nth(list,index);
 }
 
+const char *config_def_get_name_by_index(const char *resource,Uint8 index)
+{
+    SJson *list;
+    SJson *def;
+    if (!config_manager.defs)
+    {
+        slog("config def file not loaded");
+        return NULL;
+    }
+    if (!resource)return NULL;
+    list = config_def_get_resource_by_name(resource);
+    if (!list)return NULL;
+    def = sj_array_get_nth(list,index);
+    if (!def)return NULL;
+    return sj_object_get_value_as_string(def,"name");
+}
+
+
 Uint32 config_def_get_resource_count(const char *resource)
 {
     SJson *list;

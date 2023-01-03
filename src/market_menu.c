@@ -18,6 +18,7 @@
 #include "gf2d_windows_common.h"
 
 #include "entity.h"
+#include "config_def.h"
 #include "camera_entity.h"
 #include "resources.h"
 #include "station_def.h"
@@ -29,6 +30,8 @@ typedef struct
 {
     TextLine entryText;
     int updated;
+    int offset;
+    int scrollCount;
     char *resource;
     List *playerSupply;
     List *stockpile;
@@ -97,10 +100,36 @@ void market_purchase_cancel(Window *win)
     win->child = NULL;
 }
 
+void market_menu_scroll_up(Window *win)
+{
+    MarketMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    if (data->offset > 0)
+    {
+        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"commodities"),--data->offset);
+        market_menu_update_resources(win);
+    }
+}
+
+void market_menu_scroll_down(Window *win)
+{
+    MarketMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    if (data->offset < data->scrollCount)
+    {
+        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"commodities"),++data->offset);
+        market_menu_update_resources(win);
+    }
+}
+
+
 int market_menu_update(Window *win,List *updateList)
 {
     int i,count;
     int choice;
+    const char *name;
     TextLine buffer;
     Resource *resource,*stock;
     Element *e;
@@ -119,11 +148,23 @@ int market_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"scroll_down")==0)
+        {
+            market_menu_scroll_down(win);
+            return 1;
+        }
+        if (strcmp(e->name,"scroll_up")==0)
+        {
+            market_menu_scroll_up(win);
+            return 1;
+        }
         if ((e->index >= 500)&&(e->index < 600))
         {
             //stock_up
             choice = e->index - 500;
-            resource = gfc_list_get_nth(data->playerSupply,choice);
+            name = config_def_get_name_by_index("resources",choice);
+            if (!name)return 1;
+            resource = resources_list_get(data->playerSupply,name);
             if (!resource)return 1;
             resources_list_give(data->stockpile,resource->name,100);
             market_menu_update_resources(win);
@@ -133,7 +174,9 @@ int market_menu_update(Window *win,List *updateList)
         {
             //stock_up
             choice = e->index - 600;
-            resource = gfc_list_get_nth(data->playerSupply,choice);
+            name = config_def_get_name_by_index("resources",choice);
+            if (!name)return 1;
+            resource = resources_list_get(data->playerSupply,name);
             if (!resource)return 1;
             stock = resources_list_get(data->stockpile,resource->name);
             if (stock)
@@ -148,7 +191,9 @@ int market_menu_update(Window *win,List *updateList)
         {
             //stock_up
             choice = e->index - 700;
-            resource = gfc_list_get_nth(data->playerSupply,choice);
+            name = config_def_get_name_by_index("resources",choice);
+            if (!name)return 1;
+            resource = resources_list_get(data->playerSupply,name);
             if (!resource)return 1;
             stock = resources_list_get(data->allowSale,resource->name);
             if (stock)
@@ -173,7 +218,9 @@ int market_menu_update(Window *win,List *updateList)
             //stock_up
             choice = e->index - 800;
             if (win->child)return 1;
-            resource = gfc_list_get_nth(data->playerSupply,choice);
+            name = config_def_get_name_by_index("resources",choice);
+            if (!name)return 1;
+            resource = resources_list_get(data->playerSupply,name);
             if (!resource)return 1;
             data->resource = resource->name;
             gfc_line_clear(data->entryText);
@@ -186,6 +233,16 @@ int market_menu_update(Window *win,List *updateList)
             gf2d_window_free(win);
             return 1;
         }
+    }
+    if (gfc_input_mouse_wheel_up())
+    {
+        market_menu_scroll_up(win);
+        return 1;
+    }
+    if (gfc_input_mouse_wheel_down())
+    {
+        market_menu_scroll_down(win);
+        return 1;
     }
     return 0;
 }
@@ -275,9 +332,12 @@ Element *market_menu_build_row(Window *win, const char *resource,int index, int 
 void market_menu_update_resources(Window *win)
 {
     int i,c;
-    Resource *resource;
+    int count = 0;
+    SJson *def;
+    const char *name;
     Element *list,*e;
     MarketMenuData *data;
+    List *supply;
     if ((!win)||(!win->data))return;
     data = win->data;
     data->playerSupply = player_get_resources();
@@ -287,16 +347,26 @@ void market_menu_update_resources(Window *win)
     list = gf2d_window_get_element_by_name(win,"commodities");
     gf2d_element_list_free_items(list);
     if (!list)return;
-    c = gfc_list_get_count(data->playerSupply);
+    c = config_def_get_resource_count("resources");
+    supply = player_get_resources();
     for (i = 0; i < c; i++)
     {
-        resource = gfc_list_get_nth(data->playerSupply,i);
-        if (!resource)continue;
-        if (!resource_is_commodity(resource->name))continue;
-        e = market_menu_build_row(win, resource->name,i, (int)resource->amount);
+        def = config_def_get_by_index("resources",i);
+        if (!def)continue;
+        name = sj_object_get_value_as_string(def,"name");
+        if (!name)continue;
+        if (!resource_is_commodity(name))continue;        
+        e = market_menu_build_row(win, name,i, (int)resources_list_get_amount(supply,name));
         if (!e)continue;
         gf2d_element_list_add_item(list,e);
+        count++;
     }
+    if (count > gf2d_element_list_get_row_count(list))
+    {
+        data->scrollCount = count - gf2d_element_list_get_row_count(list);
+    }
+    else data->scrollCount = 0;
+
     data->updated = player_get_day();
 }
 

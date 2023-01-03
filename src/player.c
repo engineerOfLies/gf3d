@@ -161,7 +161,7 @@ PlayerData *player_data_parse(SJson *json)
     }
     else
     {
-        data->allowSale = gfc_list_new();
+        data->stockpile = gfc_list_new();
     }
     res = sj_object_get_value(json,"salePrice");
     if (res)
@@ -170,7 +170,7 @@ PlayerData *player_data_parse(SJson *json)
     }
     else
     {
-        data->allowSale = gfc_list_new();
+        data->salePrice = resources_get_default_prices();
     }
     res = sj_object_get_value(json,"allowSale");
     if (res)

@@ -244,6 +244,33 @@ List *resources_list_give(List *list,const char *name,float count)
     return list;
 }
 
+List *resources_get_default_prices()
+{
+    int i,c;
+    float amount;
+    const char *name;
+    Resource *resource;
+    SJson *def;
+    List *resourceList;
+    resourceList = gfc_list_new();
+    if (!resourceList)return NULL;
+    c = config_def_get_resource_count("resources");
+    for (i = 0; i < c; i++)
+    {
+        def = config_def_get_by_index("resources",i);
+        if (!def)continue;
+        if (!sj_object_get_value_as_float(def,"value",&amount))continue;
+        name = sj_object_get_value_as_string(def,"name");
+        if (!name)continue;
+        resource = resource_new();
+        if (!resource)continue;
+        gfc_line_cpy(resource->name,name);
+        resource->amount = amount;
+        gfc_list_append(resourceList,resource);
+    }
+    return resourceList;
+}
+
 float resources_list_get_amount(List *list,const char *name)
 {
     Resource *resource;

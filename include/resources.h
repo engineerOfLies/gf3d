@@ -106,6 +106,12 @@ int resources_get_total_commodity_mass(List *list);
 Resource *resources_list_get(List *list,const char *name);
 
 /**
+ * @brief get the default prices for each resource from the definition file
+ * @return NULL if there is an error, or a list where each where each resource amount is the market value
+ */
+List *resources_get_default_prices();
+
+/**
  * @brief get the resource definition data by its name
  */
 SJson *resources_get_def(const char *name);

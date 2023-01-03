@@ -48,6 +48,14 @@ SJson *config_def_get_by_index(const char *resource,Uint8 index);
 SJson *config_def_get_by_name(const char *resource,const char *name);
 
 /**
+ * @brief get the name of a resource by its index
+ * @param resource the name of the resource list
+ * @param index the search item
+ * @return NULL if not found or error, the name of the resource.  DO NOT FREE IT, you do not own it.
+ */
+const char *config_def_get_name_by_index(const char *resource,Uint8 index);
+
+/**
  * @brief get definition name for a given resource by the "display_name" key
  * @param section the display name of the resource
  * @return NULL if not found or error, the name otherwise

@@ -269,7 +269,7 @@
                 "common_materials":400,
                 "alloys":400
             },
-            "staffPositions":40,
+            "staffPositions":20,
             "staffRequired":20,
             "energyDraw":100,
             "workTime":10,
