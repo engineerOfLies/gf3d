@@ -111,7 +111,7 @@
                     {
                         "type": "label",
                         "bounds": [0,0,80,1],
-                        "text":"Cost",
+                        "text":"Revenue",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
