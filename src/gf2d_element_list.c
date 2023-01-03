@@ -19,12 +19,21 @@ void gf2d_element_list_set_scroll_offset(Element *element,int offset)
     list->scrollOffset = offset;
 }
 
+int gf2d_element_list_get_row_count(Element *element)
+{
+    ListElement *list;
+    if (!element)return 0;
+    list = (ListElement*)element->data;
+    if (!list->itemSize.y)return 0;
+    return (int)element->bounds.h / list->itemSize.y;
+}
+
 int gf2d_element_list_get_items_per_column(Element *element)
 {
-//     ListElement *list;
-//     if (!element)return 0;
-//     list = (ListElement*)element->data;
-    return 0;
+    ListElement *list;
+    if (!element)return 0;
+    list = (ListElement*)element->data;
+    return list->itemsPerColumn;
 }
 
 Vector2D gf2d_element_get_item_position(Element *element,int i,Vector2D lastPosition)
@@ -135,11 +144,11 @@ void gf2d_element_list_draw(Element *element,Vector2D offset)
         position = gf2d_element_get_item_position(element,i,position);
         if (list->cropped)
         {
-            if ((position.x < 0)||(position.y < 0))
+            if ((position.x < element->bounds.x)||(position.y < element->bounds.y))
             {
                 skip = 1;
             }
-            if ((position.x > element->bounds.w)||(position.y > element->bounds.h))
+            if ((position.x + e->bounds.w > element->bounds.x + element->bounds.w)||(position.y + e->bounds.h > element->bounds.y + element->bounds.h))
             {
                 skip = 1;//skip outside of range
             }

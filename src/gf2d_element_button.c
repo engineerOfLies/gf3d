@@ -70,6 +70,8 @@ List *gf2d_element_button_update(Element *element,Vector2D offset)
     button = (ButtonElement*)element->data;
     if (!button)return NULL;
     bounds = gf2d_element_get_absolute_bounds(element,offset);
+    bounds.x = element->lastDrawPosition.x;
+    bounds.y = element->lastDrawPosition.y;
     gf2d_element_update(button->actor, offset);
     
     if (element->hasFocus)

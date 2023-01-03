@@ -23,9 +23,6 @@
 #include "station_def.h"
 #include "station.h"
 #include "player.h"
-#include "station_extension_menu.h"
-#include "station_buy_menu.h"
-#include "facility_menu.h"
 #include "market_menu.h"
 
 typedef struct
@@ -202,7 +199,7 @@ int market_menu_draw(Window *win)
     return 0;
 }
 
-Element *maket_menu_build_row(Window *win, const char *resource,int index, int amount)
+Element *market_menu_build_row(Window *win, const char *resource,int index, int amount)
 {
     TextLine buffer;
     int stockpile;
@@ -273,7 +270,6 @@ Element *maket_menu_build_row(Window *win, const char *resource,int index, int a
         gfc_color8(255,255,255,255)));
 
     return rowList;
-    
 }
 
 void market_menu_update_resources(Window *win)
@@ -297,7 +293,7 @@ void market_menu_update_resources(Window *win)
         resource = gfc_list_get_nth(data->playerSupply,i);
         if (!resource)continue;
         if (!resource_is_commodity(resource->name))continue;
-        e = maket_menu_build_row(win, resource->name,i, (int)resource->amount);
+        e = market_menu_build_row(win, resource->name,i, (int)resource->amount);
         if (!e)continue;
         gf2d_element_list_add_item(list,e);
     }

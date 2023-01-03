@@ -25,6 +25,7 @@
 #include "station_buy_menu.h"
 #include "facility_menu.h"
 #include "repair_menu.h"
+#include "facility_list_menu.h"
 #include "station_menu.h"
 
 typedef struct
@@ -193,6 +194,12 @@ int station_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"sections")==0)
         {
             station_menu_section_list(win);
+            return 1;
+        }
+        if (strcmp(e->name,"facilities_view")==0)
+        {
+            if (win->child)return 1;
+            win->child = facility_list_menu(win);
             return 1;
         }
         if (strcmp(e->name,"parent")==0)

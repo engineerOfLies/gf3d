@@ -150,6 +150,14 @@ StationFacility *player_get_facility_by_name(const char *name);
 StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id);
 
 /**
+ * @brief given a facility, get its parent station section if it has one
+ * @note many facility types do NOT belong to a station section (planet and ship) so expect NULL for those facilities
+ * @param facilityTarget the facility to find a section for
+ * @return NULL if not found among the station section facilities. or the section in question otherwise
+ */
+StationSection *player_get_section_by_facility(StationFacility *facilityTarget);
+
+/**
  * @brief check if the player has a working dock or not
  * @return 0 is not, 1 if they do
  */

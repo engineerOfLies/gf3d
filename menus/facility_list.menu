@@ -1,0 +1,146 @@
+{
+    "window":
+    {
+        "dimensions" : [0,80,900,490],
+        "name":"facility_list_menu",
+        "justify" : "center",
+        "elements":
+        [
+            {
+                "type": "label",
+                "bounds": [0,8,1,40],
+                "text":"Facilities",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
+                "type": "button",
+                "name":"done",
+                "bounds": [740,440,160,42],
+                "hotkey":"done",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Done",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"scroll_up",
+                "bounds": [864,78,32,20],
+                "hotkey":"scroll_up",
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,32,20],
+                    "scale":[0.5,0.5],
+                    "actor" : "actors/arrow_button_up.json"
+                }
+            },
+            {
+                "type": "button",
+                "name":"scroll_down",
+                "bounds": [864,400,32,20],
+                "hotkey":"scroll_down",
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,-32,32,20],
+                    "scale":[0.5,-0.5],
+                    "actor" : "actors/arrow_button_up.json"
+                }
+            },
+            {
+                "type": "list",
+                "bounds": [10,48,880,30],
+                "style": "horizontal",
+                "packed":true,
+                "elements":
+                [
+
+                    {
+                        "type": "label",
+                        "bounds": [0,0,200,1],
+                        "text":"Facility",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,100,1],
+                        "text":"Damage",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":"Energy Use",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":"Director",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":"Staff",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":"Productivity",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":"View",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    }
+                ]
+            },
+            {
+                "type": "list",
+                "bounds": [10,78,848,350],
+                "name":"facilities",
+                "style": "vertical",
+                "backgroundColor":[0,0,0,250],
+                "backgroundDraw":1,
+                "cropped":true,
+                "scrolls":true,
+                "item_size" : [1,25],
+                "elements":
+                []
+            }
+        ]
+    }
+}

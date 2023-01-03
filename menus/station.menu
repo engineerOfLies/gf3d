@@ -15,7 +15,7 @@
             [
                 {
                     "type": "label",
-                    "bounds": [0,0,1,35],
+                    "bounds": [0,0,1,32],
                     "text":"Station",
                     "justify" : "center",
                     "align" : "middle",
@@ -73,9 +73,51 @@
                     ]
                 },
                 {
+                    "type": "list",
+                    "bounds": [0,0,1,25],
+                    "style": "horizontal",
+                    "packed":true,
+                    "item_size" : [80,1],
+                    "elements":
+                    [
+                        {
+                            "type": "label",
+                            "bounds": [0,0,130,25],
+                            "name":"facility_count",
+                            "text":"Facilities: 1",
+                            "justify" : "left",
+                            "align" : "middle",
+                            "style":"H6"
+                        },
+                        {
+                            "type": "button",
+                            "name":"facilities_view",
+                            "bounds": [0,0,80,21],
+                            "hotkey":"sections",
+                            "sound":"confirm",
+                            "label" :
+                            {
+                                "type": "label",
+                                "text":"view all",
+                                "bounds": [0,0,80,24],
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            "actor" :
+                            {
+                                "type": "actor",
+                                "bounds": [0,0,40,24],
+                                "scale":[0.5,0.5],
+                                "actor" : "actors/button.actor"
+                            }
+                        }
+                    ]
+                },
+                {
                     "type": "label",
                     "name":"section_name",
-                    "bounds": [0,0,0.9565,60],
+                    "bounds": [0,0,0.9565,40],
                     "text":"Station Core",
                     "wraps":true,
                     "justify" : "center",

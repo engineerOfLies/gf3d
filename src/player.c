@@ -495,6 +495,34 @@ StationFacility *player_get_facility_by_name(const char *name)
     return NULL;
 }
 
+StationSection *player_get_section_by_facility(StationFacility *facilityTarget)
+{
+    int i,c;
+    int j,d;
+    StationData *station;
+    StationSection *section;
+    StationFacility *facility;
+    if (!player_entity)return NULL;
+    station = player_get_station_data();
+    if (station)
+    {
+        c = gfc_list_get_count(station->sections);
+        for (i = 0; i < c; i++)
+        {
+            section = gfc_list_get_nth(station->sections,i);
+            if (!section)continue;
+            d = gfc_list_get_count(section->facilities);
+            for (j = 0; j < d; j++)
+            {
+                facility = gfc_list_get_nth(section->facilities,j);
+                if (!facility)continue;
+                if (facility == facilityTarget)return section;
+            }
+        }
+    }
+    return NULL;
+}
+
 StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id)
 {
     int i,c;
