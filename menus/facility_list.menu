@@ -8,7 +8,7 @@
         [
             {
                 "type": "label",
-                "bounds": [0,8,1,40],
+                "bounds": [0,4,1,40],
                 "text":"Facilities",
                 "justify" : "center",
                 "align" : "middle",
@@ -37,34 +37,8 @@
                 }
             },
             {
-                "type": "button",
-                "name":"scroll_up",
-                "bounds": [864,78,32,20],
-                "hotkey":"scroll_up",
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,32,20],
-                    "scale":[0.5,0.5],
-                    "actor" : "actors/arrow_button_up.json"
-                }
-            },
-            {
-                "type": "button",
-                "name":"scroll_down",
-                "bounds": [864,400,32,20],
-                "hotkey":"scroll_down",
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,-32,32,20],
-                    "scale":[0.5,-0.5],
-                    "actor" : "actors/arrow_button_up.json"
-                }
-            },
-            {
                 "type": "list",
-                "bounds": [10,48,880,30],
+                "bounds": [10,38,880,30],
                 "style": "horizontal",
                 "packed":true,
                 "elements":
@@ -80,16 +54,16 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,100,1],
-                        "text":"Damage",
+                        "bounds": [0,0,60,1],
+                        "text":"Dmg",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
-                        "text":"Energy Use",
+                        "bounds": [0,0,80,1],
+                        "text":"Energy",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
@@ -104,7 +78,7 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
+                        "bounds": [0,0,60,1],
                         "text":"Staff",
                         "justify" : "left",
                         "align" : "middle",
@@ -112,16 +86,32 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
-                        "text":"Productivity",
+                        "bounds": [0,0,60,1],
+                        "text":"Prod.",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
-                        "text":"View",
+                        "bounds": [0,0,80,1],
+                        "text":"Storage",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,90,1],
+                        "text":"Housing",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,80,1],
+                        "text":"Online",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
@@ -130,7 +120,7 @@
             },
             {
                 "type": "list",
-                "bounds": [10,78,848,350],
+                "bounds": [10,65,848,350],
                 "name":"facilities",
                 "style": "vertical",
                 "backgroundColor":[0,0,0,250],
@@ -140,6 +130,111 @@
                 "item_size" : [1,25],
                 "elements":
                 []
+            },
+            {
+                "type": "button",
+                "name":"scroll_up",
+                "bounds": [822,65,32,20],
+                "hotkey":"scroll_up",
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,32,20],
+                    "scale":[0.5,0.5],
+                    "actor" : "actors/arrow_button_up.json"
+                }
+            },
+            {
+                "type": "button",
+                "name":"scroll_down",
+                "bounds": [822,385,32,20],
+                "hotkey":"scroll_down",
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,-32,32,20],
+                    "scale":[0.5,-0.5],
+                    "actor" : "actors/arrow_button_up.json"
+                }
+            },
+            {
+                "type": "list",
+                "bounds": [10,415,880,30],
+                "style": "horizontal",
+                "packed":true,
+                "elements":
+                [
+
+                    {
+                        "type": "label",
+                        "bounds": [0,0,200,1],
+                        "text":"Net Totals:",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":" ",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,80,1],
+                        "text":"Energy",
+                        "name":"energy_supply",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":" ",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"Staff",
+                        "name":"staff_totals",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":" ",
+                        "name":"total_productivity",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,80,1],
+                        "text":" ",
+                        "name":"total_storage",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,90,1],
+                        "text":" ",
+                        "name":"total_housing",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"H6"
+                    }
+                ]
             }
         ]
     }

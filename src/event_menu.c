@@ -102,7 +102,7 @@ void event_menu_setup(Window *win,EventMenuData *data)
         vector4d_set(color,255,255,255,255);
         sj_value_as_vector4d(sj_object_get_value(item,"color"),&color);
         text = sj_object_get_value_as_string(item,"text");
-        button = gf2d_button_new_label_simple(win,1000+i,text,gfc_color_from_vector4(color));
+        button = gf2d_button_new_label_simple(win,1000+i,text,FT_Small,vector2d(1,30),gfc_color_from_vector4(color));
         if (!button)continue;
         gf2d_element_list_add_item(questions,button);
     }

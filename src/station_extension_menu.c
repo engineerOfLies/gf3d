@@ -15,7 +15,6 @@ Window *station_extension_menu(
     int *result)
 {
     int i,c;
-    const char *name;
     const char *empty = "<empty>";
     Window *win;
     StationSection *child;

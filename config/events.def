@@ -486,6 +486,156 @@
                     "color":[200,200,200,255]
                 }
             ]
+        },
+        {
+            "name":"tutorial_15",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"facility_list_menu"
+                }
+            ],
+            "once":true,
+            "title":"Facility List At a Glance",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"This screen shows you all of the facilities, both on the station and on the planet below.  From here you can see if any facilities are damaged, offline, or under staffed.  You can see how much (if any) storage or housing is provided by a facility.  You can see if the facility provides energy or draws energy.  If you click on the name of the facility, you can directly to the details view for the facility.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_16",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"section_view",
+                    "section":"station_dock"
+                }
+            ],
+            "once":true,
+            "title":"Station Dock Overview",
+            "portrait":"models/drones/executive_drone_alert.png",
+            "text":"Welcome to the station dock.  You may remember it from when you arrived.  In the rotating dock section we can support docking bays for small, medium, and large ships.  Although currently we only have a medium size docking bay.  We also have a commodities market that you can use to buy and sell commodites on the galactic market.  The transfer of goods does require at least one working dock, and it will take some time to deliver.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_17",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"planet_menu"
+                }
+            ],
+            "once":true,
+            "title":"Planet Antioch",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"Welcome to planet Antioch, Commander.  This is the planet around which our station orbits.  It is a lifeless planet, but it is rich in resources.  Mineral Mines and Ore Mines extract minerals and ores from the planet respectively.  Farms can be setup to produce food from the nutrients in the planet's soil.  A survey site can be set up to determine if a particular location is better suited for which facility.  Produced goods are automatically shipped to the station as long as we have at least one working dock.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_18",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"station_facility_menu"
+                }
+            ],
+            "once":true,
+            "title":"Facilities",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"This is the facility detailed view.  Here you can see the facility, where it is installed, and select different facilities installed in the same section (or planet).  You can see what a station needs to upkeep (resources needed to function), what resources are produced (if any), and other stats about it.  You can control how many staff are assigned.  Most facilities require at least a minimum staff to function.  If a facility is damaged, you can order a repair job right from here.",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
+        },
+        {
+            "name":"tutorial_19",
+            "startDate":0,
+            "endDate":10,
+            "chance":1,
+            "conditions":
+            [
+                {
+                    "type":"check_history",
+                    "event":"tutorial_skip",
+                    "key":"enable",
+                    "value":"false"
+                },
+                {
+                    "type":"window_open",
+                    "window":"repair_menu"
+                }
+            ],
+            "once":true,
+            "title":"Repairs",
+            "portrait":"models/drones/executive_drone_portrait.png",
+            "text":"The station has not been well taken care of by your predecessor.  Many of its facilities are in dire need of repair (or removal).  Here you can order a repair.  Repairs need staff in order to complete, and it will take some money (in addition to staff wages) in order to complete.  Repairing is often better than selling and building new as it is usually faster and won't cost additional resources (other than credits).",
+            "options":
+            [
+                {
+                    "text":"Got it",
+                    "color":[200,200,200,255]
+                }
+            ]
         }
     ]
 }

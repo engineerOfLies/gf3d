@@ -266,7 +266,8 @@ Entity *player_new(const char *file)
     ent->update = player_update;
     ent->draw = player_draw;
     ent->free = player_free;
-    
+    station_recalc_values(player_get_station_data());
+
     return ent;
 }
 

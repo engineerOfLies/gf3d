@@ -339,6 +339,7 @@ void station_section_recalc_values(StationSection *section)
     section->energyDraw = 0;
     section->housing = 0;
     section->staffAssigned = 0;
+    section->staffPositions = 0;
     for (i = 0; i < c; i++)
     {
         facility = gfc_list_get_nth(section->facilities,i);
@@ -347,6 +348,7 @@ void station_section_recalc_values(StationSection *section)
         section->storageCapacity += facility->storage;
         section->housing += facility->housing;
         section->staffAssigned += facility->staffAssigned;
+        section->staffPositions += facility->staffPositions;
         if (facility->disabled)continue;//skip the ones inactive for whatever reason
         section->energyDraw += facility->energyDraw;
         section->energyOutput += facility->energyOutput * facility->productivity;
@@ -365,6 +367,7 @@ void station_recalc_values(StationData *station)
     station->energyDraw = 0;
     station->housing = 0;
     station->staffAssigned = 0;
+    station->staffPositions = 0;
     c = gfc_list_get_count(station->sections);
     for (i = 0; i < c; i++)
     {
@@ -378,6 +381,7 @@ void station_recalc_values(StationData *station)
         station->energyOutput += section->energyOutput;
         station->energyDraw += section->energyDraw;
         station->staffAssigned += section->staffAssigned;
+        station->staffPositions += section->staffPositions;
     }
 }
 

@@ -251,7 +251,7 @@ void facility_buy_menu_set_list(Window *win)
     {
         name = gfc_list_get_nth(data->list,i);
         str = station_facility_get_display_name(name);
-        button = gf2d_button_new_label_simple(win,1000+i,str,GFC_YELLOW);
+        button = gf2d_button_new_label_simple(win,1000+i,str,FT_Small,vector2d(1,30),GFC_YELLOW);
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }

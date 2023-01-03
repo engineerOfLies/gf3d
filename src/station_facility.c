@@ -597,6 +597,16 @@ const char *station_facility_get_display_name(const char *name)
     return sj_object_get_value_as_string(facilityDef,"displayName");
 }
 
+int station_facility_supports_officer(const char *name)
+{
+    Bool officer = 0;
+    SJson *facilityDef;
+    facilityDef = config_def_get_by_name("facilities",name);
+    if (!facilityDef)return 0;
+    sj_object_get_value_as_bool(facilityDef,"officerSlot",&officer);
+    return officer;
+}
+
 List *station_facility_get_resource_cost(const char *name,const char *resource_type)
 {
     SJson *stationDef;

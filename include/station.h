@@ -17,7 +17,6 @@ typedef struct StaionSection_S
     Uint32      id;      //unique ID for the station section
     ModelMat    mat;
     int         housing;        //how much housing is provided by this S
-    int         staffAssigned;  //how many staff are assigned to facilities in this section
 
     float       hull,hullMax;
     Mission    *mission;    // if any mission is assigned to the section (mostly for repairs or building)
@@ -25,6 +24,7 @@ typedef struct StaionSection_S
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
     float       rotates;//if it rotates
     int         storageCapacity;
+    int         staffAssigned,staffPositions; // how many staff have are working this section / how many positions there are to work
     Uint8       slot;                      // where the section is mounted on the parent
     Uint8       expansionSlots;            // how many sections can link off of this
     List       *children;
@@ -37,11 +37,12 @@ typedef struct
     ModelMat   *mat;
     int         housing;        //how much housing is provided by this station
     int         staffAssigned;  //how many staff are assigned to facilities
+    int         staffPositions; //how many staff positions are available
     int         sectionHighlight;
     float       sectionRotation;
     float       hull,hullMax;
     float       energyOutput,energyDraw,energySupply;//how much is produced, how much is needed, how much we have
-    int         storageCapacity;
+    int         storageCapacity,storageUsage;
     List       *sections;     /**<list of staiton sections*/
 }StationData;
 

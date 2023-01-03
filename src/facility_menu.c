@@ -406,7 +406,7 @@ void facility_menu_set_list(Window *win)
         facility = gfc_list_get_nth(data->facilityList ,i);
         if (!facility)
         {
-            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",GFC_YELLOW);
+            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",FT_Small,vector2d(1,30),GFC_YELLOW);
             if (!button)continue;
             gf2d_element_list_add_item(item_list,button);
             continue;
@@ -415,7 +415,7 @@ void facility_menu_set_list(Window *win)
         if (str)
         {
             gfc_line_sprintf(buffer,"%s %i",str,facility->id);
-            button = gf2d_button_new_label_simple(win,1000+i,buffer,GFC_YELLOW);
+            button = gf2d_button_new_label_simple(win,1000+i,buffer,FT_Small,vector2d(1,30),GFC_YELLOW);
             if (!button)continue;
             gf2d_element_list_add_item(item_list,button);
         }

@@ -44,7 +44,7 @@
             },
             "staffPositions":10,
             "staffRequired":5,
-            "officerSlot":true,
+            "officerSlot":false,
             "workTime":10,
             "produces":
             {
@@ -196,9 +196,6 @@
                 "credits":500,
                 "alloys":50
             },
-            "staffPositions":5,
-            "staffRequired":0,
-            "energyDraw":10,
             "storage":100,
             "officerSlot":false
         },
@@ -213,9 +210,6 @@
                 "credits":2000,
                 "alloys":200
             },
-            "staffPositions":20,
-            "staffRequired":0,
-            "energyDraw":20,
             "storage":2000
         },
         {

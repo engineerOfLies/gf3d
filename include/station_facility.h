@@ -97,6 +97,13 @@ void station_facility_free_list(List *list);
 const char *station_facility_get_display_name(const char *name);
 
 /**
+ * @brief check if a facility supports a directing officer
+ * @param name the name of the facility
+ * @return 0 if not, 1 if it does
+ */
+int station_facility_supports_officer(const char *name);
+
+/**
  * @brief get the id name, given a facility's display name
  * @param name the name id
  * @return NULL if not found, the name otherwise
