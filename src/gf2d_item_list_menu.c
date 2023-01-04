@@ -2,7 +2,9 @@
 
 #include "gfc_callbacks.h"
 #include "gfc_input.h"
+#include "gfc_vector.h"
 
+#include "gf3d_vgraphics.h"
 #include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_list.h"
@@ -121,6 +123,7 @@ void item_list_menu_add_all_options(Window *win,List *options)
 {
     const char *item;
     int i,c;
+    Vector2D screen;
     if ((!win)||(!options))return;
     c = gfc_list_get_count(options);
     gf2d_window_set_dimensions(
@@ -131,6 +134,15 @@ void item_list_menu_add_all_options(Window *win,List *options)
         item = gfc_list_get_nth(options,i);
         if (!item)continue;
         item_list_menu_add_option(win, item,i);
+    }
+    screen = gf3d_vgraphics_get_resolution();
+    if ((win->dimensions.y + win->dimensions.h) > screen.y)
+    {
+        win->dimensions.y = screen.y - win->dimensions.h;
+    }
+    if (win->dimensions.y < 0)
+    {
+        win->dimensions.y = 0;
     }
 }
 

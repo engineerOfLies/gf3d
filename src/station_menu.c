@@ -281,6 +281,11 @@ int station_menu_update(Window *win,List *updateList)
             {
                 return 1;
             }
+            if (data->selection->hull < 0)
+            {
+                message_new("under construction");
+                return 1;
+            }
             if ((data->selection)&&(data->selection->children))
             {
                 win->child = station_extension_menu(
@@ -300,6 +305,11 @@ int station_menu_update(Window *win,List *updateList)
             {
                 return 1;
             }
+            if (data->selection->hull < 0)
+            {
+                message_new("under construction");
+                return 1;
+            }
             if ((data->selection)&&(data->selection->facilitySlots > 0))
             {
                 win->child = facility_menu(
@@ -316,6 +326,11 @@ int station_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"repair")==0)
         {
             if (!data->selection)return 1;
+            if (data->selection->hull < 0)
+            {
+                message_new("under construction");
+                return 1;
+            }
             if (data->selection->hull >= data->selection->hullMax)
             {
                 message_printf("Section is not damaged");
@@ -338,6 +353,11 @@ int station_menu_update(Window *win,List *updateList)
             }
             if (data->selection)
             {
+                if (data->selection->hull < 0)
+                {
+                    message_new("under construction");
+                    return 1;
+                }
                 if (gfc_list_get_count(data->selection->children) >= data->selection->expansionSlots)
                 {
                     message_new("no free expansion slots for this section");
@@ -456,12 +476,21 @@ void station_menu_select_segment(Window *win,int segment)
     gfc_line_sprintf(buffer,"Section Count: %i",gfc_list_get_count(station->sections));
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_count"),buffer);
 
-    gfc_line_sprintf(buffer,"Hull: %i/%i",(int)data->selection->hull,(int)data->selection->hullMax);
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
-    if (data->selection->hull < data->selection->hullMax)
+    if (data->selection->hull < 0)
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_RED);
-    }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_WHITE);
+        gfc_line_sprintf(buffer,"<Constructing>");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_WHITE);
+    }
+    else
+    {
+        gfc_line_sprintf(buffer,"Hull: %i/%i",(int)data->selection->hull,(int)data->selection->hullMax);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
+        if (data->selection->hull < data->selection->hullMax)
+        {
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_RED);
+        }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_WHITE);
+    }
 
     gfc_line_sprintf(buffer,"Facility Slots: %i",data->selection->facilitySlots);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_slots"),buffer);

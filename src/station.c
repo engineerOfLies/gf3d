@@ -295,6 +295,11 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     {
         section->id = player_get_new_id("station");
     }
+    str = sj_object_get_value_as_string(sectionDef,"display_name");
+    if (str)
+    {
+        gfc_line_sprintf(section->displayName,"%s %i",str,section->id);
+    }
     return section;
 }
 
@@ -378,6 +383,7 @@ void station_recalc_values(StationData *station)
         section = gfc_list_get_nth(station->sections,i);
         if (!section)continue;
         station_section_recalc_values(section);
+        if (section->hull < 0)continue;//under construction
         station->housing += section->housing;
         station->hull += section->hull;
         station->hullMax += section->hullMax;

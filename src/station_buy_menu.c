@@ -99,6 +99,7 @@ void station_buy_menu_select_item(Window *win,int choice, const char *name)
 int station_buy_menu_update(Window *win,List *updateList)
 {
     int i,count;
+    TextLine buffer;
     StationSection *newSection;
     Element *e;
     StationBuyMenuData* data;
@@ -123,6 +124,17 @@ int station_buy_menu_update(Window *win,List *updateList)
             {
                 resource_list_buy(player_get_resources(), data->cost);
                 newSection = station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
+                newSection->working = 1;
+                newSection->hull = -1;
+                gfc_line_sprintf(buffer,"%i",newSection->id);
+                newSection->mission = mission_begin(
+                    "Section Construction",
+                    "build_section",
+                    newSection->name,
+                    buffer,
+                    player_get_day(),
+                    player_get_day() + 2,
+                    0);
                 station_menu_select_segment(win->parent,newSection->id);
                 gf2d_window_free(win);
             }

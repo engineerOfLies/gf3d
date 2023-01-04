@@ -111,6 +111,20 @@ void mission_build_facility(Mission *mission)
     message_printf("Construction of Facility %s complete",facility->displayName);
 }
 
+void mission_build_section(Mission *mission)
+{
+    int id;
+    StationSection *section;
+    if (!mission)return;
+    id = atoi(mission->missionTarget);
+    section = station_get_section_by_id(player_get_station_data(),id);
+    if (!section)return;
+    section->working = 0;
+    section->hull = section->hullMax;
+    section->mission = NULL;
+    message_printf("Construction of Station Section %s complete",section->displayName);
+}
+
 void mission_execute(Mission *mission)
 {
     int parent;
@@ -127,6 +141,11 @@ void mission_execute(Mission *mission)
     if (gfc_strlcmp(mission->missionType,"build_facility") == 0)
     {
         mission_build_facility(mission);
+        return;
+    }
+    if (gfc_strlcmp(mission->missionType,"build_section") == 0)
+    {
+        mission_build_section(mission);
         return;
     }
     if (gfc_strlcmp(mission->missionType,"section_sale") == 0)
