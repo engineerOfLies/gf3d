@@ -300,9 +300,10 @@ void station_facility_remove(StationFacility *facility)
     planet = player_get_planet();
     if (planet)
     {
-        if (gfc_list_get_item_index(planet->facilities,facility) > 0)
+        if (gfc_list_get_item_index(planet->facilities,facility) >= 0)
         {
             gfc_list_delete_data(planet->facilities,facility);
+            slog("planet facility %s removed",facility->displayName);
             station_facility_free(facility);
             return;
         }
