@@ -57,9 +57,9 @@ void gate_update(Entity *self)
         return;
     }
     data = self->data;
-    data->r += 0.1;
-    data->frame += 0.001;
-    if (data->frame >= 16)data->frame = 0;
+    data->r += 0.001;
+    data->frame += 0.0001;
+    if (data->frame >= 1)data->frame = 0;
 }
 
 void gate_draw(Entity *self)
@@ -70,9 +70,10 @@ void gate_draw(Entity *self)
     gfc_matrix4_from_vectors(
         mat,
         self->mat.position,
-        vector3d(self->mat.rotation.x,self->mat.rotation.y + data->r,self->mat.rotation.z),
-        self->mat.scale);
-    gf3d_model_draw(data->tunnel,(Uint32)data->frame,mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
+        vector3d(self->mat.rotation.x + data->r,self->mat.rotation.y,self->mat.rotation.z),
+        vector3d(self->mat.scale.x,self->mat.scale.y * data->frame,self->mat.scale.z));
+    
+    gf3d_model_draw(data->tunnel,0,mat,vector4d(255,255,255,128),vector4d(0,0,0,0),vector4d(0,0,0,1));
 }
 
 void gate_think(Entity *self)

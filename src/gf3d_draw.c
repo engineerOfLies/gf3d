@@ -64,7 +64,7 @@ void gf3d_draw_edge_3d(Edge3D edge,Vector3D position,Vector3D rotation,Vector3D 
         vector3d(position.x + edge.a.x,position.y + edge.a.y,position.z + edge.a.z),
         vector3d(rotation.x + angles.x,rotation.y + angles.y,rotation.z + angles.z),
         scale);
-    gf3d_model_draw(gf3d_draw_manager.icylinder,0,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,0));
+    gf3d_model_draw(gf3d_draw_manager.icylinder,0,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,1),vector4d(1,1,1,0));
 }
 
 void gf3d_draw_cube_wireframe(Box cube,Vector3D position,Vector3D rotation,Vector3D scale,Color color)
@@ -88,7 +88,7 @@ void gf3d_draw_cube_solid(Box cube,Vector3D position,Vector3D rotation,Vector3D 
         vector3d(position.x + cube.x,position.y + cube.y,position.z + cube.z),
         rotation,
         vector3d(scale.x * cube.w,scale.y * cube.h,scale.z * cube.d));
-    gf3d_model_draw(gf3d_draw_manager.cube,0,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,1));
+    gf3d_model_draw(gf3d_draw_manager.cube,0,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,1),vector4d(1,1,1,1));
 }
 
 
@@ -113,7 +113,7 @@ void gf3d_draw_sphere_solid(Sphere sphere,Vector3D position,Vector3D rotation,Ve
         vector3d(position.x + sphere.x,position.y + sphere.y,position.z + sphere.z),
         rotation,
         vector3d(scale.x * sphere.r,scale.y * sphere.r,scale.z * sphere.r));
-    gf3d_model_draw(gf3d_draw_manager.sphere,0,modelMat,gfc_color_to_vector4f(color),gfc_color_to_vector4f(ambient));
+    gf3d_model_draw(gf3d_draw_manager.sphere,0,modelMat,gfc_color_to_vector4f(color),vector4d(1,1,1,1),gfc_color_to_vector4f(ambient));
 }
 
 
@@ -131,7 +131,7 @@ void gf3d_draw_circle(Circle circle,Vector3D position,Vector3D rotation,Vector3D
         vector3d(position.x + circle.x,position.y + circle.y,position.z),
         rotation,
         vector3d(scale.x * circle.r,scale.y * circle.r,scale.z * circle.r));
-    gf3d_model_draw(gf3d_draw_manager.sphere,0,modelMat,vector4d(0,0,0,0),vector4d(0,0,0,0));
+    gf3d_model_draw(gf3d_draw_manager.sphere,0,modelMat,vector4d(0,0,0,0),vector4d(1,1,1,1),vector4d(0,0,0,0));
     gf3d_model_draw_highlight(gf3d_draw_manager.sphere,0,modelMat,gfc_color_to_vector4f(color));
 }
 

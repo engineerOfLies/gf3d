@@ -538,6 +538,7 @@ void station_draw(Entity *self)
     int i,c;
     float damage = 1;
     Vector4D color;
+    Vector4D detailColor;
     Matrix4 mat,mat1;
     StationSection *section;
     StationData *data;
@@ -572,6 +573,7 @@ void station_draw(Entity *self)
         gfc_matrix_multiply(mat,mat1,mat);
         
         color = gfc_color_to_vector4f(self->color);
+        detailColor = gfc_color_to_vector4(self->detailColor);
         //color.x *= damage;
 
         if (data->sectionHighlight != -1)
@@ -589,9 +591,11 @@ void station_draw(Entity *self)
                 damage = 0.2;
                 color.y *= damage;
                 color.z *= damage;
+                detailColor.y *= damage;
+                detailColor.z *= damage;
             }
         }
-        gf3d_model_draw(section->mat.model,0,mat,color,vector4d(1,1,1,1));
+        gf3d_model_draw(section->mat.model,0,mat,color,detailColor,vector4d(1,1,1,1));
         if (data->sectionHighlight == section->id)
         {
             gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(1,0.67,0,1));

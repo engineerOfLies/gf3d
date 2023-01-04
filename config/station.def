@@ -33,26 +33,32 @@
             ],
             "extensions":[
                 {
+                    "mountType":"c",
                     "offset":[0,-1,0],
                     "rotation":[0,0,0]
                 },
                 {
+                    "mountType":"c",
                     "offset":[0,1,0],
                     "rotation":[0,0,180]
                 },
                 {
+                    "mountType":"s",
                     "offset":[1.5,0,0],
                     "rotation":[0,0,90]
                 },
                 {
+                    "mountType":"s",
                     "offset":[-1.5,0,0],
                     "rotation":[0,0,-90]
                 },
                 {
+                    "mountType":"s",
                     "offset":[0,0,1.5],
                     "rotation":[0,-90,0]
                 },
                 {
+                    "mountType":"s",
                     "offset":[0,0,-1.5],
                     "rotation":[0,90,0]
                 }
@@ -65,6 +71,7 @@
             "model":"models/station/solar_collector_single.model",
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.",
             "rotates":0,
+            "mountType":"s",
             "stats":
             {
                 "hull":300
@@ -78,6 +85,50 @@
             "facility_types":
             [
                 "solar_processor"
+            ],
+            "extensions":
+            [
+                {
+                    "mountType":"e",
+                    "offset":[-1,-1,0],
+                    "rotation":[90,0,-90]
+                },
+                {
+                    "mountType":"e",
+                    "offset":[1,-1,0],
+                    "rotation":[-90,0,90]
+                }
+            ]
+        },
+        {
+            "name":"solar_collector_single_ext",
+            "display_name":"Solar Collector E",
+            "icon":"models/station/solar_collector_single_icon.png",
+            "model":"models/station/solar_collector_single_ext.model",
+            "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.",
+            "rotates":0,
+            "mountType":"e",
+            "stats":
+            {
+                "hull":300
+            },
+            "cost":
+            {
+                "credits":3000,
+                "meta_materials":300
+            },
+            "facility_slots":1,
+            "facility_types":
+            [
+                "solar_processor"
+            ],
+            "extensions":
+            [
+                {
+                    "mountType":"e",
+                    "offset":[0,-2,0],
+                    "rotation":[0,0,0]
+                }
             ]
         },
         {
@@ -87,6 +138,7 @@
             "model":"models/station/solar_collector.model",
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.  Its rotating collectors are more efficient than static models",
             "rotates":-0.25,
+            "mountType":"c",
             "stats":
             {
                 "hull":1000
@@ -103,6 +155,7 @@
             ],
             "extensions":[
                 {
+                    "mountType":"s",
                     "offset":[0,-2,0],
                     "rotation":[0,0,0]
                 }
@@ -117,6 +170,7 @@
             "position":[0,0,0],
             "rotates":1,
             "scale":[1,1,1],
+            "mountType":"c",
             "stats":
             {
                 "hull":1000
@@ -137,6 +191,7 @@
             ],
             "extensions":[
                 {
+                    "mountType":"c",
                     "offset":[0,-2,0],
                     "rotation":[0,0,0]
                 }
@@ -150,6 +205,7 @@
             "description":"This large rotating habitat is best suited for facilities where personnel are going to work and live.   The gravity here allows for residential, commercial, and entertainment facilities.  The greater space allows for luxury facilities as well.",
             "position":[0,0,0],
             "rotates":1,
+            "mountType":"c",
             "scale":[1,1,1],
             "stats":
             {
@@ -171,6 +227,7 @@
             ],
             "extensions":[
                 {
+                    "mountType":"c",
                     "offset":[0,-4,0],
                     "rotation":[0,0,0]
                 }
@@ -183,6 +240,7 @@
             "model":"models/station/station_dock.model",
             "description":"A rotating section with an open port for small and medium ship sizes.  The gravity provided makes this type of dock section suitable for passengers.",
             "position":[0,0,0],
+            "mountType":"c",
             "scale":[1,1,1],
             "rotates":1,
             "stats":
@@ -211,6 +269,7 @@
             "description":"Special shielding in the Reactor Core section allows for reactors to operate safely.  Additional Hull armor also helps to keep reactors working in spite of damage the section may sustain.",
             "position":[0,0,0],
             "rotates":0,
+            "mountType":"c",
             "facility_slots":3,
             "facility_types":
             [
@@ -228,6 +287,7 @@
             "scale":[1,1,1],
             "extensions":[
                 {
+                    "mountType":"c",
                     "offset":[0,-4,0],
                     "rotation":[0,0,0]
                 }
@@ -240,6 +300,7 @@
             "model":"models/station/station_industrial.model",
             "description":"Rotating section allows for working personnel to work more comfortably.  Section is designed to support the flow of energy, materials, and goods ideal for industrial activities.",
             "position":[0,0,0],
+            "mountType":"c",
             "rotates":0.5,
             "stats":
             {
@@ -260,6 +321,7 @@
             "scale":[1,1,1],
             "extensions":[
                 {
+                    "mountType":"c",
                     "offset":[0,-4,0],
                     "rotation":[0,0,0]
                 }
@@ -273,6 +335,7 @@
             "description":"A small, all purpose zero G expansion bay.  Great for storage and medium size craft docking.  Can be equipped with defensive systems.",
             "position":[0,0,0],
             "rotates":0,
+            "mountType":"s",
             "facility_slots":4,
             "stats":
             {
@@ -292,10 +355,12 @@
             "scale":[1,1,1],
             "extensions":[
                 {
+                    "mountType":"e",
                     "offset":[0,-0.7,-1],
                     "rotation":[0,90,0]
                 },
                 {
+                    "mountType":"e",
                     "offset":[0,-0.7,1],
                     "rotation":[180,-90,0]
                 }
@@ -308,6 +373,7 @@
             "model":"models/station/expansion_bay_extension.model",
             "description":"A small, all purpose zero G expansion bay.  Great for storage and medium size craft docking.  Can be equipped with defensive systems.  This one is limited in mounting options",
             "position":[0,0,0],
+            "mountType":"e",
             "rotates":0,
             "stats":
             {
@@ -328,6 +394,7 @@
             "scale":[1,1,1],
             "extensions":[
                 {
+                    "mountType":"e",
                     "offset":[0,-2,0],
                     "rotation":[0,0,0]
                 }
@@ -341,6 +408,7 @@
             "description":"This industrial style docking section does not support gravity.  Best suited for small cargo ships, and transfer shuttles for ships too large to dock.",
             "position":[0,0,0],
             "scale":[1,1,1],
+            "mountType":"e",
             "rotates":0,
             "stats":
             {

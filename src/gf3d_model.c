@@ -159,7 +159,6 @@ Model *gf3d_model_load_from_config(SJson *json)
     modelFile = sj_get_string_value(sj_object_get_value(json,"gltf"));
     if (modelFile)
     {
-        slog("parsing gltf for model file");
         model = gf3d_gltf_parse_model(modelFile);
         textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
         if (textureFile)
@@ -394,7 +393,8 @@ ModelMat *gf3d_model_mat_new()
 MeshUBO gf3d_model_get_mesh_ubo(
     Matrix4 modelMat,
     Vector4D colorMod,
-    Vector4D ambient)
+    Vector4D ambient,
+    Vector4D detail)
 
 {
     Vector3D cameraPosition;
@@ -406,11 +406,13 @@ MeshUBO gf3d_model_get_mesh_ubo(
     gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
     gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
     vector4d_copy(modelUBO.color,colorMod);
+    vector4d_copy(modelUBO.detailColor,detail);
     cameraPosition = gf3d_camera_get_position();
     vector3d_copy(modelUBO.cameraPosition,cameraPosition);
     modelUBO.cameraPosition.w = 1;
     
     gf3d_lights_get_global_light(&modelUBO.ambientColor, &modelUBO.ambientDir);
+    vector4d_scale_by(modelUBO.ambientColor,modelUBO.ambientColor,ambient);
 
     return modelUBO;
 }
@@ -557,14 +559,15 @@ void gf3d_model_draw_generic(
     gf3d_mesh_render_generic(mesh,pipe,descriptorSet);
 }
 
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambientLight)
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight)
 {
     MeshUBO uboData = {0};
     UniformBuffer *ubo;
     uboData = gf3d_model_get_mesh_ubo(
         modelMat,
         colorMod,
-        ambientLight);
+        ambientLight,
+        detailColor);
     
     ubo = gf3d_model_get_uniform_buffer(gf3d_model.pipe,&uboData,sizeof(MeshUBO));
     gf3d_model_draw_generic(model,index,gf3d_model.pipe,ubo);

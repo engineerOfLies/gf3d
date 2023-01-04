@@ -98,6 +98,7 @@ PlayerData *player_data_parse(SJson *json)
 {
     const char *str;
     SJson *res;
+    Vector4D colorv = {0};
     PlayerData *data;
     if (!json)return NULL;
     data = gfc_allocate_array(sizeof(PlayerData),1);
@@ -111,6 +112,11 @@ PlayerData *player_data_parse(SJson *json)
     str = sj_object_get_value_as_string(json,"assistantName");
     if (str)gfc_line_cpy(data->assistantName,str);
 
+    if (sj_value_as_vector4d(sj_object_get_value(json,"detailColor"),&colorv))
+    {
+        data->detailColor = gfc_color_from_vector4f(colorv);
+    }
+    
     sj_object_get_value_as_uint32(json,"hour",&data->day);
     sj_object_get_value_as_uint32(json,"day",&data->day);
     sj_get_integer_value(sj_object_get_value(json,"staff"),&data->staff);
@@ -251,6 +257,7 @@ Entity *player_new(const char *file)
     missions_load_from_config(sj_object_get_value(json,"missions"));
     data->world = world_load("config/world.json");
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
+    gfc_color_copy(data->station->detailColor,data->detailColor);
     res = sj_object_get_value(json,"planet");
     if (res)data->planet = planet_load_from_config(res);
     if (!data->planet)

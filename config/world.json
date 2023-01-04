@@ -14,16 +14,10 @@
         "models":
         [
             {
-                "model":"models/tunnel_gate/gate.model",
+                "model":"models/fighter/fighter.model",
                 "position":[0,-3000,0],
-                "scale":[100,100,100],
-                "rotation":[0,0,90]
-            },
-            {
-                "model":"models/tunnel_gate/tunnel.model",
-                "position":[0,-3000,0],
-                "scale":[100,100,100],
-                "rotation":[0,0,90]
+                "scale":[10,10,10],
+                "rotation":[0,0,180]
             }
         ],
         "lights":

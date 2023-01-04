@@ -12,6 +12,7 @@ typedef struct
     TextLine    name;               /**<player's name*/
     TextLine    filename;           /**<save game filename*/
     TextLine    assistantName;      /**<what the player calls the assistant droid*/
+    Color       detailColor;        /**<station detail color*/
     float       wages;              /**<how much you pay employees*/
     float       taxRate;            /**<how much locals provide for the system*/
     float       salesTaxRate;       /**<rate of income for commerce*/

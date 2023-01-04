@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "obj":"models/station/solar_collector_single_ext.obj",
+        "texture":"models/station/solar_collector_single.png"
+    }
+}

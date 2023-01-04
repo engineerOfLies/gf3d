@@ -8,6 +8,7 @@
 
 #include "camera_entity.h"
 #include "fighter.h"
+#include "gate.h"
 #include "player.h"
 #include "world.h"
 
@@ -116,6 +117,7 @@ World *world_load(char *filename)
     sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
     
     sj_free(json);
+    gate_new(vector3d(0,-3000,0));
     return w;
 }
 
@@ -136,7 +138,7 @@ void world_draw(World *world)
     {
         m = gfc_list_get_nth(world->model_list,i);
         if (!m)continue;
-        gf3d_model_draw(m->model,0,m->mat,vector4d(1,1,1,1),vector4d(1,1,1,0.5));
+        gf3d_model_draw(m->model,0,m->mat,vector4d(1,1,1,1),vector4d(1,1,1,1),vector4d(1,1,1,0.5));
     }
     gf3d_particle_draw(world->theSun);
 }

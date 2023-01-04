@@ -1,29 +1,7 @@
 {
     "model":
     {
-        "obj_list":
-        [
-            "models/tunnel_gate/tunnel_000001.obj",
-            "models/tunnel_gate/tunnel_000002.obj",
-            "models/tunnel_gate/tunnel_000003.obj",
-            "models/tunnel_gate/tunnel_000004.obj",
-            "models/tunnel_gate/tunnel_000005.obj",
-            "models/tunnel_gate/tunnel_000006.obj",
-            "models/tunnel_gate/tunnel_000007.obj",
-            "models/tunnel_gate/tunnel_000008.obj",
-            "models/tunnel_gate/tunnel_000009.obj",
-            "models/tunnel_gate/tunnel_000010.obj",
-            "models/tunnel_gate/tunnel_000011.obj",
-            "models/tunnel_gate/tunnel_000012.obj",
-            "models/tunnel_gate/tunnel_000013.obj",
-            "models/tunnel_gate/tunnel_000014.obj",
-            "models/tunnel_gate/tunnel_000015.obj",
-            "models/tunnel_gate/tunnel_000016.obj",
-            "models/tunnel_gate/tunnel_000017.obj",
-            "models/tunnel_gate/tunnel_000018.obj",
-            "models/tunnel_gate/tunnel_000019.obj",
-            "models/tunnel_gate/tunnel_000020.obj"
-        ]
-        "texture":"models/tunnel_gate/tunnel.png"
+        "obj":"models/tunnel_gate/tunnel.obj",
+        "texture":"models/sky/sky.png"
     }
 }

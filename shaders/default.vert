@@ -14,11 +14,11 @@ layout(binding = 0) uniform UniformBufferObject {
     vec4 ambientColor;
     vec4 ambientDir;
     vec4 color;
+    vec4 detailColor;
     vec4 cameraPostion;
     dynamicLight dynamicLights[8];
     float dynamicLightCount;
 } ubo;
-
 
 out gl_PerVertex
 {
@@ -36,6 +36,7 @@ layout(location = 3) out vec4 fragAmbient;
 layout(location = 4) out vec3 fragAmbientDir;
 layout(location = 5) out vec3 position;
 layout(location = 6) out vec3 camPosition;
+layout(location = 7) out vec4 detailColor;
 
 void main()
 {
@@ -52,4 +53,5 @@ void main()
     colorMod = ubo.color;
     fragAmbient = ubo.ambientColor;
     fragAmbientDir = ubo.ambientDir.xyz;
+    detailColor = ubo.detailColor;
 }

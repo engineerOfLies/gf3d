@@ -13,6 +13,7 @@ typedef struct Entity_S
     TextLine    name;
     ModelMat    mat;   /**<orientation matrix for the model*/
     Color       color;      /**<default color for the model*/
+    Color       detailColor;/**<detail color for the model*/
     Model      *model;      /**<pointer to the entity model to draw  (optional)*/
     Uint8       hidden;     /**<if true, not drawn*/
     Uint8       selected;

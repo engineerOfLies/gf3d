@@ -83,12 +83,30 @@
             "units":"T"
         },
         {
+            "name":"exotic_deposits",
+            "displayName":"Exotic Deposits",
+            "description":"Extremely rare complex minerals whose conditions for forming are not well known.  Likely due to remnants of a long since gone space faring species.  No known way to manufacture has been discovered.",
+            "precision":0,
+            "negative":false,
+            "value":200,
+            "units":"T"
+        },
+        {
             "name":"meta_materials",
             "displayName":"Meta Materials",
             "description":"Advanced materials that cannot be created through mundane means.  Many have properties that enable more advanced technologies.  Including FTL propulsion systems and energy weapons.",
             "precision":0,
             "negative":false,
             "value":300,
+            "units":"T"
+        },
+        {
+            "name":"exotic_deposits",
+            "displayName":"Exotic Deposits",
+            "description":"Extremely rare complex minerals whose conditions for forming are not well known.  Likely due to remnants of a long since gone space faring species.",
+            "precision":0,
+            "negative":false,
+            "value":200,
             "units":"T"
         },
         {

@@ -100,9 +100,10 @@ Model * gf3d_model_load_from_config(SJson *json);
  * @param index the mesh to render from the mesh_list
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
+ * @param detailColor color to swap in for sections of PURE red of the texture
  * @param ambient how much ambient light there is
  */
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambient);
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe

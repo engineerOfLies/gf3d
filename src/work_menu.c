@@ -31,6 +31,8 @@
 #define WORK_CREW_MAX 20
 #define WORK_CREW_MIN 5
 
+extern int freeBuildMode;
+
 typedef struct
 {
     TextLine action;
@@ -83,14 +85,28 @@ void work_mission(Window *win)
         else if (strcmp(data->action,"remove")==0)
         {
             gfc_line_sprintf(buffer,"%i",data->facility->id);
-            data->facility->mission = mission_begin(
-                "Facility Removal",
-                "facility_sale",
-                data->facility->name,
-                buffer,
-                day,
-                day + data->daysToComplete,
-                data->staffAssigned);
+            if (freeBuildMode)
+            {
+                data->facility->mission = mission_begin(
+                    "Facility Removal",
+                    "facility_sale",
+                    data->facility->name,
+                    buffer,
+                    day,
+                    day,
+                    data->staffAssigned);
+            }
+            else
+            {
+                data->facility->mission = mission_begin(
+                    "Facility Removal",
+                    "facility_sale",
+                    data->facility->name,
+                    buffer,
+                    day,
+                    day + data->daysToComplete,
+                    data->staffAssigned);
+            }
         }
         data->facility->working = 1;
         facility_menu_refresh_view(gf2d_window_get_by_name("station_facility_menu"));
@@ -112,14 +128,29 @@ void work_mission(Window *win)
         else if (strcmp(data->action,"remove")==0)
         {
             gfc_line_sprintf(buffer,"%i",data->section->id);
-            data->section->mission = mission_begin(
-                "Section Remove",
-                "section_sale",
-                "section",
-                buffer,
-                day,
-                day + data->daysToComplete,
-                data->staffAssigned);
+            if (freeBuildMode)
+            {
+                data->section->mission = mission_begin(
+                    "Section Remove",
+                    "section_sale",
+                    "section",
+                    buffer,
+                    day,
+                    day,
+                    data->staffAssigned);
+            }
+            else
+            {
+                data->section->mission = mission_begin(
+                    "Section Remove",
+                    "section_sale",
+                    "section",
+                    buffer,
+                    day,
+                    day + data->daysToComplete,
+                    data->staffAssigned);
+            }
+
         }
         data->section->working = 1;
     }

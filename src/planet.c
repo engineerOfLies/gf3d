@@ -41,7 +41,7 @@ void planet_draw(PlanetData *planet)
     {
         vector3d_add(planet->mat.rotation,planet->mat.rotation,planet->mat.rotationDelta);
         gf3d_model_mat_set_matrix(&planet->mat);
-        gf3d_model_draw(planet->mat.model,0,planet->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+        gf3d_model_draw(planet->mat.model,0,planet->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1),vector4d(1,1,1,1));
     }
 }
 

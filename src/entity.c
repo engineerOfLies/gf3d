@@ -77,7 +77,7 @@ void entity_draw(Entity *self)
     if (self->hidden)return;
     if (self->draw)self->draw(self);
     if (!self->model)return;
-    gf3d_model_draw(self->model,0,self->mat.mat,gfc_color_to_vector4f(self->color),vector4d(1,1,1,1));
+    gf3d_model_draw(self->model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4f(self->detailColor),vector4d(1,1,1,1));
     if (self->selected)
     {
         gf3d_model_draw_highlight(

@@ -15,6 +15,7 @@
 #include "facility_menu.h"
 #include "station_facility.h"
 
+extern int freeBuildMode;
 
 void station_facility_draw(StationFacility *facility)
 {
@@ -30,7 +31,7 @@ void station_facility_draw(StationFacility *facility)
         facility->mat.rotation = planet_position_to_rotation(facility->position);
         gf3d_model_mat_set_matrix(&facility->mat);
     }
-    gf3d_model_draw(facility->mat.model,0,facility->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1));
+    gf3d_model_draw(facility->mat.model,0,facility->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1),vector4d(1,1,1,1));
 }
 
 void station_facility_draw_highlight(StationFacility *facility)
@@ -555,19 +556,22 @@ void station_facility_build(const char *name,Vector2D position,List *parentList)
     new_facility = station_facility_new_by_name(name,-1);
     vector2d_copy(new_facility->position,position);
     gfc_list_append(parentList,new_facility);
-    new_facility->working = 1;
-    new_facility->disabled = 1;
-    new_facility->inactive = 1;
-    new_facility->damage = -1;
-    gfc_line_sprintf(buffer,"%i",new_facility->id);
-    new_facility->mission = mission_begin(
-        "Facility Construction",
-        "build_facility",
-        new_facility->name,
-        buffer,
-        player_get_day(),
-        player_get_day() + 7,
-        0);
+    if (!freeBuildMode)
+    {
+        new_facility->working = 1;
+        new_facility->disabled = 1;
+        new_facility->inactive = 1;
+        new_facility->damage = -1;
+        gfc_line_sprintf(buffer,"%i",new_facility->id);
+        new_facility->mission = mission_begin(
+            "Facility Construction",
+            "build_facility",
+            new_facility->name,
+            buffer,
+            player_get_day(),
+            player_get_day() + 7,
+            0);
+    }
     resources_list_free(cost);
 }
 
