@@ -282,6 +282,35 @@ void station_facility_check(StationFacility *facility)
     }
 }
 
+void station_facility_remove(StationFacility *facility)
+{
+    PlanetData *planet;
+    StationSection *section;
+    if (!facility)return;
+    player_return_staff(facility->staffAssigned);
+
+    section = player_get_section_by_facility(facility);
+    if (section)
+    {
+        //station section
+        gfc_list_delete_data(section->facilities,facility);
+        station_facility_free(facility);
+        return;
+    }
+    planet = player_get_planet();
+    if (planet)
+    {
+        if (gfc_list_get_item_index(planet->facilities,facility) > 0)
+        {
+            gfc_list_delete_data(planet->facilities,facility);
+            station_facility_free(facility);
+            return;
+        }
+    }
+    // any other place where a facility may be
+    station_facility_free(facility);//couldn't find it anywhere, but still delete it
+}
+
 Uint32 station_facility_get_work_time(const char *name)
 {
     SJson *def;
@@ -399,6 +428,7 @@ void station_facility_update(StationFacility *facility,float *energySupply)
         }
         gfc_line_sprintf(buffer,"%i",facility->id);
         facility->mission = mission_begin(
+            "Production",
             "facility_production",
             facility->name,
             buffer,

@@ -99,6 +99,7 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),"Energy Use: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: ---");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),"Damage: ---");
         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_WHITE);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),"Storage Capacity: 0");
@@ -135,6 +136,15 @@ void facility_menu_select_item(Window *win,int choice)
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
+    if (data->facility->mission)
+    {
+        gfc_line_sprintf(buffer,"Action: %s",data->facility->mission->title);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: ---");
+    }
+    else
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: ---");        
+    }
     gfc_line_sprintf(buffer,"Damage: %.0f%%",data->facility->damage * 100);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),buffer);
     if (data->facility->damage > 0)
@@ -217,15 +227,30 @@ void facility_menu_select_item(Window *win,int choice)
 void facility_menu_yes(void *Data)
 {
     Window *win;
+    TextLine buffer;
     StationFacility *facility;
     FacilityMenuData *data;
-    List *cost;
     win = Data;
     if (!win)return;
     win->child = NULL;
     data = win->data;
     if (!data)return;
     if (!data->selected)return;
+    
+    facility = gfc_list_get_nth(data->facilityList,data->choice);
+    if (!facility)return;
+    
+    gfc_line_sprintf(buffer,"%i",facility->id);
+    facility->mission = mission_begin(
+        "Facility Removal",
+        "facility_sale",
+        facility->name,
+        buffer,
+        player_get_day(),
+        player_get_day()+2,
+        0);//TODO make this staffed
+
+    /*
     cost = station_facility_get_resource_cost(station_facility_get_name_from_display(data->selected),"cost");
     resource_list_sell(player_get_resources(), cost,0.9);
     resources_list_free(cost);
@@ -233,6 +258,7 @@ void facility_menu_yes(void *Data)
     facility = gfc_list_get_nth(data->facilityList,data->choice);
     station_facility_free(facility);
     gfc_list_delete_nth(data->facilityList,data->choice);
+    
     if (win->parent)
     {
         if (strcmp(win->parent->name,"planet_menu")==0)
@@ -240,6 +266,7 @@ void facility_menu_yes(void *Data)
             data->facilityLimit--;
         }
     }
+    */
     facility_menu_set_list(win);
 }
 
@@ -319,6 +346,7 @@ int facility_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"disable")==0)
         {
+            if (!data->facility)return 1;
             if (data->facility->disabled)
             {
                 data->facility->disabled = 0;
@@ -342,7 +370,14 @@ int facility_menu_update(Window *win,List *updateList)
                 }
                 data->facility->lastProduction = player_get_day();//starting from NOW
             }
-            else data->facility->disabled = 1;
+            else
+            {
+                data->facility->disabled = 1;
+                if (data->facility->mission)
+                {
+                    mission_cancel(data->facility->mission);
+                }
+            }
             facility_menu_select_item(win,data->choice);//this will redraw
             return 1;
         }
@@ -355,11 +390,17 @@ int facility_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"sell")==0)
         {
             if (win->child)return 1;
+            if (!data->facility)return 1;
             if (station_facility_is_unique(data->facility))
             {
                 message_new("Cannot sell this facility.");
+                return 1;
             }
-            else win->child = window_yes_no("Sell selected facility?", facility_menu_yes,facility_menu_no,win);
+            if (data->facility->mission)
+            {
+                message_new("facility has on ongoing job.  Cannot remove it now.");
+            }
+            win->child = window_yes_no("Sell selected facility?", facility_menu_yes,facility_menu_no,win);
             return 1;
         }
         if (e->index >= 1000)

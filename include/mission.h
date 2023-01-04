@@ -6,6 +6,7 @@
 
 typedef struct
 {
+    TextLine title;         // to display to user
     Uint32  id;         /**<unique mission ID*/
     Uint32 dayStart;
     Uint32 dayFinished;
@@ -18,6 +19,7 @@ typedef struct
 void mission_init();
 
 Mission *mission_begin(
+    const char *missionTitle,
     const char *missionType,
     const char *missionSubject,
     const char *missionTarget,
@@ -37,5 +39,7 @@ void missions_load_from_config(SJson *config);
  * @return NULL if not found, the mission otherwise
  */
 Mission *mission_get_by_id(Uint32 id);
+
+void mission_cancel(Mission *mission);
 
 #endif

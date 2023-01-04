@@ -67,6 +67,7 @@ void repair_mission(Window *win)
     {
         gfc_line_sprintf(buffer,"%i:%s",data->facility->id,data->facility->name);
         data->facility->mission = mission_begin(
+            "Facility Repair",
             "repair",
             "facility",
             buffer,
@@ -79,6 +80,7 @@ void repair_mission(Window *win)
     {
         gfc_line_sprintf(buffer,"%i",data->section->id);
         data->section->mission = mission_begin(
+            "Section Repair",
             "repair",
             "section",
             buffer,

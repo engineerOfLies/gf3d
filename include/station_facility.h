@@ -51,6 +51,11 @@ StationFacility *station_facility_new();
 void station_facility_draw(StationFacility *facility);
 void station_facility_draw_highlight(StationFacility *facility);
 
+/**
+ * @brief remove a facility from its location and delete it
+ * @param facility the facility to remove
+ */
+void station_facility_remove(StationFacility *facility);
 
 /**
  * @brief create a new default facility based on its definition name.

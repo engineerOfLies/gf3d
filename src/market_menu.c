@@ -85,6 +85,7 @@ void market_purchase_ok(Window *win)
     gfc_line_sprintf(buffer,"%i",amount);
     resources_list_withdraw(data->playerSupply,"credits",cost);
     mission_begin(
+        "Commodity Order",
         "commodity_order",
         data->resource,
         buffer,

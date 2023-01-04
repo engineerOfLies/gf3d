@@ -1,8 +1,10 @@
 #include "simple_logger.h"
 
+#include "gf2d_message_buffer.h"
+
 #include "player.h"
 #include "resources.h"
-#include "gf2d_message_buffer.h"
+#include "facility_menu.h"
 #include "mission.h"
 
 
@@ -59,7 +61,15 @@ Mission *mission_new()
     return mission;
 }
 
+void mission_cancel(Mission *mission)
+{
+    if (!mission)return;
+    player_return_staff(mission->staff);
+    mission_free(mission);
+}
+
 Mission *mission_begin(
+    const char *missionTitle,
     const char *missionType,
     const char *missionSubject,
     const char *missionTarget,
@@ -72,6 +82,7 @@ Mission *mission_begin(
     if (!mission)return NULL;
     
     mission->id = mission_manager.missionIdPool++;
+    if (missionTitle)gfc_line_cpy(mission->title,missionTitle);
     if (missionType)gfc_line_cpy(mission->missionType,missionType);
     if (missionTarget)gfc_line_cpy(mission->missionTarget,missionTarget);
     if (missionSubject)gfc_line_cpy(mission->missionSubject,missionSubject);
@@ -87,16 +98,37 @@ void mission_execute(Mission *mission)
 {
     StationFacility *facility;
     StationSection *section;
+    List *cost;
     char *str;
     int amount;
     int id;
+    Window *win;
     if (!mission)return;
     player_return_staff(mission->staff);
-    slog("executing mission %i",mission->id);
+    slog("executing mission %s:%i",mission->title,mission->id);
+    if (gfc_strlcmp(mission->missionType,"facility_sale") == 0)
+    {
+        id = atoi(mission->missionTarget);
+        facility = player_get_facility_by_name_id(mission->missionSubject,id);
+        if (!facility)return;
+        
+        cost = station_facility_get_resource_cost(facility->name,"cost");
+        resource_list_sell(player_get_resources(), cost,0.9);
+        resources_list_free(cost);
+
+        station_facility_remove(facility);
+        
+        win = gf2d_window_get_by_name("station_facility_menu");
+        if (win)facility_menu_set_list(win);
+
+        message_printf("Facility %s %i removal complete",facility->displayName,id);
+        return;
+    }
     if (gfc_strlcmp(mission->missionType,"facility_production") == 0)
     {
         id = atoi(mission->missionTarget);
         facility = player_get_facility_by_name_id(mission->missionSubject,id);
+        if (!facility)return;
         message_printf("Facility %s %i Production completed",facility->displayName,id);
         resource_list_sell(player_get_resources(), facility->produces,facility->productivity);
         return;
@@ -168,6 +200,7 @@ SJson *mission_save_to_config(Mission *mission)
     json = sj_object_new();
     if (!json)return NULL;
     
+    sj_object_insert(json,"missionTitle",sj_new_str(mission->title));
     sj_object_insert(json,"id",sj_new_uint32(mission->id));
     sj_object_insert(json,"dayStart",sj_new_uint32(mission->dayStart));
     sj_object_insert(json,"dayFinished",sj_new_uint32(mission->dayFinished));
@@ -214,6 +247,9 @@ Mission *mission_parse_from_config(SJson *config)
     mission = mission_new();
     if (!mission)return NULL;
    
+    str = sj_object_get_value_as_string(config,"missionTitle");
+    if (str)gfc_line_cpy(mission->title,str);
+
     sj_object_get_value_as_uint32(config,"id",&mission->id);
     sj_object_get_value_as_uint32(config,"dayStart",&mission->dayStart);
     sj_object_get_value_as_uint32(config,"dayFinished",&mission->dayFinished);
