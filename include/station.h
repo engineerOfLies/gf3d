@@ -20,7 +20,7 @@ typedef struct StaionSection_S
 
     float       hull,hullMax;
     Mission    *mission;    // if any mission is assigned to the section (mostly for repairs or building)
-    Bool        repairing;  // if true, the station is being repaired
+    Bool        working;  // if true, the station is working
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
     float       rotates;//if it rotates
     int         storageCapacity;

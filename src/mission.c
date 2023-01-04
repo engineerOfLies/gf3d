@@ -96,6 +96,21 @@ Mission *mission_begin(
     return mission;
 }
 
+void mission_build_facility(Mission *mission)
+{
+    int id;
+    StationFacility *facility;
+    if (!mission)return;
+    id = atoi(mission->missionTarget);
+    facility = player_get_facility_by_name_id(mission->missionSubject,id);
+    if (!facility)return;
+    facility->working = 0;
+    facility->disabled = 0;
+    facility->damage = 0;
+    facility->mission = NULL;
+    message_printf("Construction of Facility %s complete",facility->displayName);
+}
+
 void mission_execute(Mission *mission)
 {
     int parent;
@@ -109,6 +124,11 @@ void mission_execute(Mission *mission)
     if (!mission)return;
     player_return_staff(mission->staff);
     slog("executing mission %s:%i",mission->title,mission->id);
+    if (gfc_strlcmp(mission->missionType,"build_facility") == 0)
+    {
+        mission_build_facility(mission);
+        return;
+    }
     if (gfc_strlcmp(mission->missionType,"section_sale") == 0)
     {
         id = atoi(mission->missionTarget);

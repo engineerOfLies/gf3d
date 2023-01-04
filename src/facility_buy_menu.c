@@ -181,7 +181,6 @@ int facility_buy_menu_update(Window *win,List *updateList)
 {
     int i,count;
     Element *e;
-    StationFacility *new_facility;
     FacilityBuyMenuData* data;
     if ((!win)||(!win->data))return 0;
     if (!updateList)return 0;
@@ -197,10 +196,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
             if (win->child)return 1;
             if (facility_buy_check_possible(win))
             {
-                resource_list_buy(player_get_resources(), data->cost);
-                new_facility = station_facility_new_by_name(station_facility_get_name_from_display(data->selected),-1);
-                vector2d_copy(new_facility->position,data->position);
-                data->facilityList = gfc_list_append(data->facilityList,new_facility);
+                station_facility_build(station_facility_get_name_from_display(data->selected),data->position,data->facilityList);
                 facility_menu_set_list(win->parent);
                 gf2d_window_free(win);
             }

@@ -245,6 +245,13 @@ void station_facility_check(StationFacility *facility)
     }
     facility->productivity = 1.0;
     facility->inactive = 0;//default to okay, but any failed test can make it inactive
+    if (facility->damage < 0)
+    {
+        //under construction
+        facility->inactive = 1;
+        facility->disabled = 1;
+        return;
+    }
     if (facility->damage >= 0.5)
     {
         message_printf("Facility %s is too damaged to function.",facility->name);
@@ -453,7 +460,7 @@ SJson *station_facility_save(StationFacility *facility)
     sj_object_insert(json,"damage",sj_new_float(facility->damage));
     sj_object_insert(json,"staff",sj_new_int(facility->staffAssigned));
     sj_object_insert(json,"disabled",sj_new_bool(facility->disabled));
-    sj_object_insert(json,"repairing",sj_new_bool(facility->repairing));
+    sj_object_insert(json,"working",sj_new_bool(facility->working));
     if (strlen(facility->officer))
     {
         sj_object_insert(json,"officer",sj_new_str(facility->officer));
@@ -508,7 +515,7 @@ StationFacility *station_facility_load(SJson *config)
     sj_object_get_value_as_float(config,"damage",&facility->damage);
     sj_object_get_value_as_int(config,"staff",&facility->staffAssigned);
     sj_object_get_value_as_bool(config,"disabled",(short int*)&facility->disabled);
-    sj_object_get_value_as_bool(config,"repairing",(short int*)&facility->repairing);
+    sj_object_get_value_as_bool(config,"working",(short int*)&facility->working);
     str = sj_object_get_value_as_string(config,"officer");
     if (str)gfc_line_cpy(facility->officer,str);
     if (sj_object_get_value_as_uint32(config,"mission",&missionId))
@@ -535,6 +542,33 @@ int station_facility_is_singleton(const char *name)
     }
     if ((sj_object_get_value_as_bool(facilityDef,"singleton",&value))&&(value))return 1;
     return 0;
+}
+
+void station_facility_build(const char *name,Vector2D position,List *parentList)
+{
+    TextLine buffer;
+    StationFacility *new_facility;
+    List *cost;
+    cost = station_facility_get_resource_cost(name,"cost");
+    resource_list_buy(player_get_resources(), cost);
+    
+    new_facility = station_facility_new_by_name(name,-1);
+    vector2d_copy(new_facility->position,position);
+    gfc_list_append(parentList,new_facility);
+    new_facility->working = 1;
+    new_facility->disabled = 1;
+    new_facility->inactive = 1;
+    new_facility->damage = -1;
+    gfc_line_sprintf(buffer,"%i",new_facility->id);
+    new_facility->mission = mission_begin(
+        "Facility Construction",
+        "build_facility",
+        new_facility->name,
+        buffer,
+        player_get_day(),
+        player_get_day() + 7,
+        0);
+    resources_list_free(cost);
 }
 
 StationFacility *station_facility_new_by_name(const char *name,int id)
@@ -585,6 +619,8 @@ StationFacility *station_facility_new_by_name(const char *name,int id)
         facility->id = player_get_new_id(name);
     }
     else facility->id = id;
+    str = sj_object_get_value_as_string(facilityDef,"displayName");
+    if (str)gfc_line_sprintf(facility->displayName,"%s %i",str,facility->id);
     return facility;
 }
 
@@ -644,8 +680,8 @@ void station_facility_repair(StationFacility *facility)
 {
     Window *win;
     if (!facility)return;
-    message_printf("Facility %s %i has been repaired!",station_facility_get_display_name(facility->name),facility->id);
-    facility->repairing = 0;
+    message_printf("Facility %s has been repaired!",facility->displayName);
+    facility->working = 0;
     facility->damage = 0;
     facility->mission = NULL;
     win = gf2d_window_get_by_name("station_facility_menu");

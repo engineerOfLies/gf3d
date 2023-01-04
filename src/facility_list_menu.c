@@ -206,7 +206,11 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
             facility->displayName,
             FT_H6,vector2d(200,24),color));
 
-    gfc_line_sprintf(buffer,"%i",(int)(facility->damage * 100));
+    if (facility->damage < 0)
+    {
+        gfc_line_sprintf(buffer,"<uc>");
+    }
+    else gfc_line_sprintf(buffer,"%i",(int)(facility->damage * 100));
     if (facility->damage > 0)color = GFC_RED;
     else color = GFC_WHITE;
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));

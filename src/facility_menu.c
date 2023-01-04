@@ -24,7 +24,7 @@
 #include "station.h"
 #include "station_extension_menu.h"
 #include "facility_buy_menu.h"
-#include "repair_menu.h"
+#include "work_menu.h"
 #include "facility_menu.h"
 
 typedef struct
@@ -155,7 +155,14 @@ void facility_menu_refresh_view(Window *win)
     {
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: ---");        
     }
-    gfc_line_sprintf(buffer,"Damage: %.0f%%",data->facility->damage * 100);
+    if (data->facility->damage >= 0)
+    {
+        gfc_line_sprintf(buffer,"Damage: %.0f%%",data->facility->damage * 100);
+    }
+    else
+    {
+        gfc_line_sprintf(buffer,"Under Construction");
+    }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),buffer);
     if (data->facility->damage > 0)
     {
@@ -356,7 +363,7 @@ int facility_menu_update(Window *win,List *updateList)
                 return 1;
             }
             if (win->child)return 1;
-            win->child = repair_menu(win,NULL,data->facility,"repair");
+            win->child = work_menu(win,NULL,data->facility,"repair");
             return 1;
         }
         if (strcmp(e->name,"sell")==0)
@@ -368,13 +375,13 @@ int facility_menu_update(Window *win,List *updateList)
             }
             if (!data->facility)return 1;
             if (win->child)return 1;
-            win->child = repair_menu(win,NULL,data->facility,"remove");
+            win->child = work_menu(win,NULL,data->facility,"remove");
             return 1;
         }
 
         if (strcmp(e->name,"disable")==0)
         {
-            if (!data->facility)return 1;
+            if (!data->facility)return 1;//TODO: move this to station_facility.c
             if (data->facility->disabled)
             {
                 data->facility->disabled = 0;

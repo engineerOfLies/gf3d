@@ -235,18 +235,18 @@
                 },
                 {
                     "type": "label",
-                    "name":"facility_slots",
-                    "bounds": [0,0,1,25],
-                    "text":"Facility Slots: 4",
-                    "justify" : "left",
+                    "bounds": [0,0,1,30],
+                    "text":"Facilities",
+                    "justify" : "center",
                     "align" : "middle",
                     "style":"H6"
                 },
                 {
                     "type": "label",
-                    "bounds": [0,0,1,30],
-                    "text":"Facilities",
-                    "justify" : "center",
+                    "name":"facility_slots",
+                    "bounds": [0,0,1,25],
+                    "text":"Facility Slots: 4",
+                    "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
                 },
@@ -261,7 +261,7 @@
                         {
                             "type": "label",
                             "bounds": [0,0,130,25],
-                            "name":"facility_count",
+                            "name":"section_facility_count",
                             "text":"Facilities : 1",
                             "justify" : "left",
                             "align" : "middle",

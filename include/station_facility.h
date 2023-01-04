@@ -18,7 +18,7 @@ typedef struct
     Vector2D    position;       //for planet side facilities
     ModelMat    mat;
     float       damage;         //keeps track of damage.  Damaged facilities lave lower output  0 is no damage, 100 is destroyed anything else can be repaired.
-    Bool        repairing;      // if true, the facility is being repaired
+    Bool        working;      // if true, the facility is working
     Mission    *mission;        // if a mission has been assigned to this facility
     float       productivity;   //how efficient a facility is at running.  due to factors like damage, energy, and staffing
     Uint32      lastProduction; //last time this facility produced
@@ -64,6 +64,14 @@ void station_facility_remove(StationFacility *facility);
  * @return NULL if not found or other error, the newly created facility otherwise
  */
 StationFacility *station_facility_new_by_name(const char *name,int id);
+
+/**
+ * @brief build a new facility and set up its construction mission
+ * @param name the name of the facility to build
+ * @param position if its planetary, where on the planet
+ * @param parentList the station section or planet facility list to add this to
+ */
+void station_facility_build(const char *name,Vector2D position,List *parentList);
 
 /**
  * @brief load a station facility based on config

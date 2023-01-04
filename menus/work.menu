@@ -2,14 +2,14 @@
     "window":
     {
         "dimensions" : [0,80,600,450],
-        "name":"repair_menu",
+        "name":"work_menu",
         "justify" : "center",
         "elements":
         [
             {
                 "type": "label",
                 "bounds": [0,0,1,40],
-                "text":"Repair Order",
+                "text":"Work Order",
                 "name":"title",
                 "justify" : "center",
                 "align" : "middle",
@@ -27,14 +27,14 @@
             },
             {
                 "type": "button",
-                "name":"repair",
+                "name":"work",
                 "bounds": [280,400,160,42],
-                "hotkey":"repair",
+                "hotkey":"work",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "text":"Repair",
+                    "text":"Work",
                     "name":"action_label"
                     "bounds": [0,0,160,48],
                     "justify" : "center",
@@ -102,7 +102,7 @@
                         "type": "label",
                         "name":"text",
                         "bounds": [0,0,320,80],
-                        "text":"Order crew to repair the damaged equipment.",
+                        "text":"Order crew to work the damaged equipment.",
                         "wraps":true,
                         "justify" : "left",
                         "align" : "top",

@@ -24,7 +24,7 @@
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
 #include "facility_menu.h"
-#include "repair_menu.h"
+#include "work_menu.h"
 #include "facility_list_menu.h"
 #include "station_menu.h"
 
@@ -261,7 +261,7 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("cannot sell section, it has child extensions!");
                     return 1;
                 }
-                if (data->selection->repairing)
+                if (data->selection->working)
                 {
                     message_new("cannot sell section, it has work in progress");
                     return 1;
@@ -271,7 +271,7 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("cannot sell section, it's facilities have active jobs");
                     return 1;
                 }
-                win->child = repair_menu(win,data->selection,NULL,"remove");
+                win->child = work_menu(win,data->selection,NULL,"remove");
             }
             return 1;
         }
@@ -321,13 +321,13 @@ int station_menu_update(Window *win,List *updateList)
                 message_printf("Section is not damaged");
                 return 1;
             }
-            if (data->selection->repairing)
+            if (data->selection->working)
             {
                 message_new("cannot repair section, it has work in progress");
                 return 1;
             }
             if (win->child)return 1;
-            win->child = repair_menu(win,data->selection,NULL,"repair");
+            win->child = work_menu(win,data->selection,NULL,"repair");
             return 1;
         }
         if (strcmp(e->name,"build")==0)
@@ -402,6 +402,9 @@ void station_menu_select_segment(Window *win,int segment)
     data->selection = section;
     station->sectionHighlight = segment;
     
+    gfc_line_sprintf(buffer,"Facility Count: %i",player_get_facility_count());
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_count"),buffer);
+
     gfc_line_sprintf(buffer,"Station Hull: %i/%i",(int)data->station->hull,(int)data->station->hullMax);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"station_hull"),buffer);
     if (data->station->hull < data->station->hullMax)
@@ -464,7 +467,7 @@ void station_menu_select_segment(Window *win,int segment)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_slots"),buffer);
 
     gfc_line_sprintf(buffer,"Facility Count: %i",gfc_list_get_count(data->selection->facilities));
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_count"),buffer);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_facility_count"),buffer);
 
     gfc_line_sprintf(buffer,"Energy Draw: %i",(int)data->selection->energyDraw);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy_draw"),buffer);

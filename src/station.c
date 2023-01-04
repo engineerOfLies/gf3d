@@ -50,7 +50,7 @@ SJson *station_section_to_json(StationSection *section)
     sj_object_insert(json,"displayName",sj_new_str(section->displayName));
     sj_object_insert(json,"id",sj_new_uint32(section->id));
     sj_object_insert(json,"hull",sj_new_uint32(section->hull));
-    sj_object_insert(json,"repairing",sj_new_bool(section->repairing));
+    sj_object_insert(json,"working",sj_new_bool(section->working));
     if (section->parent)
     {
         sj_object_insert(json,"parent",sj_new_uint32(section->parent->id));
@@ -157,7 +157,7 @@ StationData *station_load_data(SJson *station)
                     section->facilities = gfc_list_append(section->facilities,stationFacility);
                 }
             }
-            sj_object_get_value_as_bool(item,"repairing",&section->repairing);
+            sj_object_get_value_as_bool(item,"working",&section->working);
             sj_object_get_value_as_float(item,"hull",&section->hull);
             if (sj_object_get_value_as_uint32(item,"mission",&id))
             {
@@ -318,7 +318,7 @@ void station_section_repair(StationSection *section)
     Window *win;
     if (!section)return;
     message_printf("Station Section %s %i has been repaired",section->name, section->id);
-    section->repairing = 0;
+    section->working = 0;
     section->hull = section->hullMax;
     section->mission = NULL;
     win = gf2d_window_get_by_name("station_menu");
@@ -348,12 +348,12 @@ void station_section_recalc_values(StationSection *section)
         facility = gfc_list_get_nth(section->facilities,i);
         if (!facility)continue;
         station_facility_check(facility);
-        section->storageCapacity += facility->storage;
-        section->housing += facility->housing;
         section->staffAssigned += facility->staffAssigned;
         section->staffPositions += facility->staffPositions;
         facility->operatingCost = facility->staffAssigned * player->wages;
         if (facility->disabled)continue;//skip the ones inactive for whatever reason
+        section->housing += facility->housing;
+        section->storageCapacity += facility->storage;
         section->energyDraw += facility->energyDraw;
         section->energyOutput += facility->energyOutput * facility->productivity;
     }
@@ -588,7 +588,7 @@ void station_draw(Entity *self)
         gf3d_model_draw(section->mat.model,0,mat,color,vector4d(1,1,1,1));
         if (data->sectionHighlight == section->id)
         {
-            gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(0,1,0,1));
+            gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(1,0.67,0,1));
         }
         
     }
