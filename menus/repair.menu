@@ -10,6 +10,7 @@
                 "type": "label",
                 "bounds": [0,0,1,40],
                 "text":"Repair Order",
+                "name":"title",
                 "justify" : "center",
                 "align" : "middle",
                 "style":"H4"
@@ -34,6 +35,7 @@
                 {
                     "type": "label",
                     "text":"Repair",
+                    "name":"action_label"
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",

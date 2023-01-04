@@ -465,7 +465,16 @@ Entity *station_new(Vector3D position,SJson *config)
 
 void station_remove_section(StationData *station,StationSection *section)
 {
+    int i,c;
+    StationFacility *facility;
     if ((!station)||(!section))return;
+    c = gfc_list_get_count(section->facilities);
+    for (i = c - 1;i >= 0;--i)
+    {
+        facility = gfc_list_get_nth(section->facilities,i);
+        if (!facility)continue;
+        station_facility_remove(facility);//remove and collect assigned staff
+    }
     if (section->parent)
     {
         gfc_list_delete_data(section->parent->children,section);

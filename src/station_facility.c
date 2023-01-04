@@ -365,7 +365,6 @@ void station_facility_update(StationFacility *facility,float *energySupply)
 {
     int newMass;
     int space;
-    TextLine buffer;
     Uint32 workTime = 0;
     StationData *station;
     List *supply;
@@ -426,16 +425,10 @@ void station_facility_update(StationFacility *facility,float *energySupply)
             facility->disabled = 1;
             resource_list_sell(supply, facility->produces,facility->productivity * ((float)space / (float)newMass));
         }
-        gfc_line_sprintf(buffer,"%i",facility->id);
-        facility->mission = mission_begin(
-            "Production",
-            "facility_production",
-            facility->name,
-            buffer,
-            facility->lastProduction,
-            facility->lastProduction + workTime,
-            0);
-        //resource_list_sell(supply, facility->produces,facility->productivity);
+        if (!facility->disabled)
+        {
+            resource_list_sell(supply, facility->produces,facility->productivity);
+        }
     }
 }
 

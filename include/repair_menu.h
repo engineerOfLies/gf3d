@@ -5,7 +5,7 @@
 #include "station_facility.h"
 #include "gf2d_windows.h"
 
-Window *repair_menu(Window *parent, StationSection *section, StationFacility *facility);
+Window *repair_menu(Window *parent, StationSection *section, StationFacility *facility,const char *action);
 
 
 #endif

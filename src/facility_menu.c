@@ -65,13 +65,6 @@ int facility_menu_draw(Window *win)
 
 void facility_menu_select_item(Window *win,int choice)
 {
-    SJson *def;
-    TextLine buffer;
-    int workTime = 0;
-    const char *str,*name;
-    Element *e;
-    Element *cost_list;
-    List *resources;
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
@@ -88,6 +81,22 @@ void facility_menu_select_item(Window *win,int choice)
     }
     gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_CYAN);
     data->facility = gfc_list_get_nth(data->facilityList,choice);
+    facility_menu_refresh_view(win);
+}
+
+void facility_menu_refresh_view(Window *win)
+{
+    SJson *def;
+    TextLine buffer;
+    int workTime = 0;
+    const char *str,*name;
+    Element *e;
+    Element *cost_list;
+    List *resources;
+    FacilityMenuData *data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+
     if (!data->facility)
     {
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),"Empty Slot");
@@ -108,6 +117,7 @@ void facility_menu_select_item(Window *win,int choice)
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"),0);
         return;
     }
+    station_facility_check(data->facility);
     gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"),0);
     gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"),1);
     planet_menu_set_camera_at_site(win->parent,data->facility->position);
@@ -139,7 +149,7 @@ void facility_menu_select_item(Window *win,int choice)
     if (data->facility->mission)
     {
         gfc_line_sprintf(buffer,"Action: %s",data->facility->mission->title);
-        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: ---");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),buffer);
     }
     else
     {
@@ -267,7 +277,7 @@ void facility_menu_yes(void *Data)
         }
     }
     */
-    facility_menu_set_list(win);
+    facility_menu_refresh_view(win);
 }
 
 void facility_menu_no(void *Data)
@@ -313,7 +323,7 @@ int facility_menu_update(Window *win,List *updateList)
                 if (station_facility_change_staff(data->facility,1) == 0)
                 {
                     player->staff--;
-                    facility_menu_select_item(win,data->choice);//this will redraw
+                    facility_menu_refresh_view(win);
                 }
             }
             return 1;
@@ -327,7 +337,7 @@ int facility_menu_update(Window *win,List *updateList)
                 {
                     player->staff++;
                     station_facility_check(data->facility);
-                    facility_menu_select_item(win,data->choice);//this will redraw
+                    facility_menu_refresh_view(win);
                 }
             }
             return 1;
@@ -340,10 +350,28 @@ int facility_menu_update(Window *win,List *updateList)
                 message_printf("Facility is not damaged");
                 return 1;
             }
+            if (data->facility->mission)
+            {
+                message_printf("Facility cannot be repaired while another mission is in progress");
+                return 1;
+            }
             if (win->child)return 1;
-            win->child = repair_menu(win,NULL,data->facility);
+            win->child = repair_menu(win,NULL,data->facility,"repair");
             return 1;
         }
+        if (strcmp(e->name,"sell")==0)
+        {
+            if (data->facility->mission)
+            {
+                message_printf("Facility cannot be removed while another mission is in progress");
+                return 1;
+            }
+            if (!data->facility)return 1;
+            if (win->child)return 1;
+            win->child = repair_menu(win,NULL,data->facility,"remove");
+            return 1;
+        }
+
         if (strcmp(e->name,"disable")==0)
         {
             if (!data->facility)return 1;
@@ -378,29 +406,13 @@ int facility_menu_update(Window *win,List *updateList)
                     mission_cancel(data->facility->mission);
                 }
             }
-            facility_menu_select_item(win,data->choice);//this will redraw
+            facility_menu_refresh_view(win);
             return 1;
         }
         if (strcmp(e->name,"buy")==0)
         {
             if (win->child)return 1;
             win->child = facility_buy_menu(win,data->facilityList, data->typeList,vector2d(0,0));
-            return 1;
-        }
-        if (strcmp(e->name,"sell")==0)
-        {
-            if (win->child)return 1;
-            if (!data->facility)return 1;
-            if (station_facility_is_unique(data->facility))
-            {
-                message_new("Cannot sell this facility.");
-                return 1;
-            }
-            if (data->facility->mission)
-            {
-                message_new("facility has on ongoing job.  Cannot remove it now.");
-            }
-            win->child = window_yes_no("Sell selected facility?", facility_menu_yes,facility_menu_no,win);
             return 1;
         }
         if (e->index >= 1000)

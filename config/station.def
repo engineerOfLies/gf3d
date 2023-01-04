@@ -78,10 +78,6 @@
             "facility_types":
             [
                 "solar_processor"
-            ],
-            "default_facilities":
-            [
-                "solar_processor1"
             ]
         },
         {
@@ -104,10 +100,6 @@
             "facility_types":
             [
                 "solar_processor"
-            ],
-            "default_facilities":
-            [
-                "solar_processor1"
             ],
             "extensions":[
                 {
@@ -142,12 +134,6 @@
                 "entertainment",
                 "commercial",
                 "operations"
-            ],
-            "default_facilities":
-            [
-                "quarters1",
-                "quarters1",
-                "aggriculture1"
             ],
             "extensions":[
                 {
@@ -215,10 +201,6 @@
                 "small_docking_bay",
                 "medium_docking_bay",
                 "commodities_market"
-            ],
-            "default_facilities":
-            [
-                "docking_bay"
             ]
         },
         {
@@ -233,10 +215,6 @@
             "facility_types":
             [
                 "reactor"
-            ],
-            "default_facilities":
-            [
-                "hdg_reactor1"
             ],
             "stats":
             {
@@ -285,10 +263,6 @@
                     "offset":[0,-4,0],
                     "rotation":[0,0,0]
                 }
-            ],
-            "default_facilities":
-            [
-                "cargo_hold_large"
             ]
         },
         {
@@ -325,10 +299,6 @@
                     "offset":[0,-0.7,1],
                     "rotation":[180,-90,0]
                 }
-            ],
-            "default_facilities":
-            [
-                "cargo_hold_small"
             ]
         },
         {
@@ -361,10 +331,6 @@
                     "offset":[0,-2,0],
                     "rotation":[0,0,0]
                 }
-            ],
-            "default_facilities":
-            [
-                "cargo_hold_small"
             ]
         },
         {
@@ -390,10 +356,6 @@
             [
                 "small_docking_bay",
                 "commodities_market"
-            ],
-            "default_facilities":
-            [
-                "docking_bay_small"
             ]
         }
     ]

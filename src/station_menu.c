@@ -263,7 +263,7 @@ int station_menu_update(Window *win,List *updateList)
                 }
                 if (data->selection->repairing)
                 {
-                    message_new("cannot sell section, it has repairs in progress");
+                    message_new("cannot sell section, it has work in progress");
                     return 1;
                 }
                 if (station_section_facility_working(data->selection))
@@ -271,7 +271,7 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("cannot sell section, it's facilities have active jobs");
                     return 1;
                 }
-                win->child = window_yes_no("Sell selected Section?", station_menu_yes,station_menu_no,win);
+                win->child = repair_menu(win,data->selection,NULL,"remove");
             }
             return 1;
         }
@@ -321,8 +321,13 @@ int station_menu_update(Window *win,List *updateList)
                 message_printf("Section is not damaged");
                 return 1;
             }
+            if (data->selection->repairing)
+            {
+                message_new("cannot repair section, it has work in progress");
+                return 1;
+            }
             if (win->child)return 1;
-            win->child = repair_menu(win,data->selection,NULL);
+            win->child = repair_menu(win,data->selection,NULL,"repair");
             return 1;
         }
         if (strcmp(e->name,"build")==0)

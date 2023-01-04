@@ -3,6 +3,8 @@
 #include "gf2d_message_buffer.h"
 
 #include "player.h"
+#include "station_def.h"
+#include "station_menu.h"
 #include "resources.h"
 #include "facility_menu.h"
 #include "mission.h"
@@ -96,6 +98,7 @@ Mission *mission_begin(
 
 void mission_execute(Mission *mission)
 {
+    int parent;
     StationFacility *facility;
     StationSection *section;
     List *cost;
@@ -106,6 +109,27 @@ void mission_execute(Mission *mission)
     if (!mission)return;
     player_return_staff(mission->staff);
     slog("executing mission %s:%i",mission->title,mission->id);
+    if (gfc_strlcmp(mission->missionType,"section_sale") == 0)
+    {
+        id = atoi(mission->missionTarget);
+        section = station_get_section_by_id(player_get_station_data(),id);
+        if (!section)return;
+        
+        cost = station_get_resource_cost(section->name);
+        if (section->parent)
+        {
+            parent = section->parent->id;
+        }else parent = 0;
+        resource_list_sell(player_get_resources(), cost,0.9);
+        resources_list_free(cost);
+        station_remove_section(player_get_station_data(),section);
+
+        win = gf2d_window_get_by_name("station_menu");
+        if (win)station_menu_select_segment(win,parent);
+
+        message_printf("Section %s removal complete",section->displayName,id);
+        return;
+    }
     if (gfc_strlcmp(mission->missionType,"facility_sale") == 0)
     {
         id = atoi(mission->missionTarget);
@@ -121,7 +145,7 @@ void mission_execute(Mission *mission)
         win = gf2d_window_get_by_name("station_facility_menu");
         if (win)facility_menu_set_list(win);
 
-        message_printf("Facility %s %i removal complete",facility->displayName,id);
+        message_printf("Facility %s removal complete",facility->displayName,id);
         return;
     }
     if (gfc_strlcmp(mission->missionType,"facility_production") == 0)
@@ -129,7 +153,7 @@ void mission_execute(Mission *mission)
         id = atoi(mission->missionTarget);
         facility = player_get_facility_by_name_id(mission->missionSubject,id);
         if (!facility)return;
-        message_printf("Facility %s %i Production completed",facility->displayName,id);
+        message_printf("Facility %s Production completed",facility->displayName,id);
         resource_list_sell(player_get_resources(), facility->produces,facility->productivity);
         return;
     }

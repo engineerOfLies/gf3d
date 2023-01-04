@@ -45,7 +45,7 @@
                 "label" :
                 {
                     "type": "label",
-                    "text":"Sell",
+                    "text":"Remove",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",

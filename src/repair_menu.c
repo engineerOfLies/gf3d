@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 
+#include "gfc_types.h"
 #include "gfc_list.h"
 #include "gfc_input.h"
 #include "gfc_callbacks.h"
@@ -23,6 +24,7 @@
 #include "player.h"
 #include "station.h"
 #include "station_def.h"
+#include "facility_menu.h"
 #include "station_facility.h"
 #include "repair_menu.h"
 
@@ -31,6 +33,7 @@
 
 typedef struct
 {
+    TextLine action;
     int inProgress;
     int repairPossible;
     Uint32 staffAssigned;
@@ -65,32 +68,64 @@ void repair_mission(Window *win)
     day = player_get_day();
     if (data->facility)
     {
-        gfc_line_sprintf(buffer,"%i:%s",data->facility->id,data->facility->name);
-        data->facility->mission = mission_begin(
-            "Facility Repair",
-            "repair",
-            "facility",
-            buffer,
-            day,
-            day + data->daysToComplete,
-            data->staffAssigned);
+        if (strcmp(data->action,"repair")==0)
+        {
+            gfc_line_sprintf(buffer,"%i:%s",data->facility->id,data->facility->name);
+            data->facility->mission = mission_begin(
+                "Facility Repair",
+                "repair",
+                "facility",
+                buffer,
+                day,
+                day + data->daysToComplete,
+                data->staffAssigned);
+        }
+        else if (strcmp(data->action,"remove")==0)
+        {
+            gfc_line_sprintf(buffer,"%i",data->facility->id);
+            data->facility->mission = mission_begin(
+                "Facility Removal",
+                "facility_sale",
+                data->facility->name,
+                buffer,
+                day,
+                day + data->daysToComplete,
+                data->staffAssigned);
+        }
         data->facility->repairing = 1;
+        facility_menu_refresh_view(gf2d_window_get_by_name("station_facility_menu"));
     }
     else if (data->section)
     {
-        gfc_line_sprintf(buffer,"%i",data->section->id);
-        data->section->mission = mission_begin(
-            "Section Repair",
-            "repair",
-            "section",
-            buffer,
-            day,
-            day + data->daysToComplete,
-            data->staffAssigned);
+        if (strcmp(data->action,"repair")==0)
+        {
+            gfc_line_sprintf(buffer,"%i",data->section->id);
+            data->section->mission = mission_begin(
+                "Section Repair",
+                "repair",
+                "section",
+                buffer,
+                day,
+                day + data->daysToComplete,
+                data->staffAssigned);
+        }
+        else if (strcmp(data->action,"remove")==0)
+        {
+            gfc_line_sprintf(buffer,"%i",data->section->id);
+            data->section->mission = mission_begin(
+                "Section Remove",
+                "section_sale",
+                "section",
+                buffer,
+                day,
+                day + data->daysToComplete,
+                data->staffAssigned);
+        }
         data->section->repairing = 1;
     }
     data->inProgress = 1;
     repair_menu_setup(win,data);
+    data->staffAssigned = 0;
     message_new("Repair Mission Begin!");
 }
 
@@ -148,18 +183,19 @@ int repair_menu_update(Window *win,List *updateList)
         {
             if (data->inProgress)
             {
-                message_new("Repair already in progress");
+                message_new("Already in progress");
                 return 1;
             }
             if (data->repairPossible)
             {
                 repair_mission(win);
             }
-            else message_new("cannot initiate repair");
+            else message_new("cannot initiate work order");
             return 1;
         }
         if (strcmp(e->name,"cancel")==0)
         {
+            player_return_staff(data->staffAssigned);
             gf2d_window_free(win);
             return 1;
         }
@@ -189,6 +225,14 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
     data->inProgress = 0;
     data->repairPossible = 1;
     data->cost = -1;
+    
+    if (strcmp(data->action,"remove")==0)
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),"Remove Order");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"action_label"),"remove");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"text"),"Order a crew to dismantle and recover the materials from the unit.");
+    }
+    
     if (data->section)
     {
         display_name = station_def_get_display_name(data->section->name);
@@ -213,14 +257,28 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
             }
             else
             {
-                data->daysToComplete = (data->section->hullMax - data->section->hull)/(float)(data->staffAssigned * 2);
+                if (strcmp(data->action,"repair")==0)
+                {
+                    data->daysToComplete = (data->section->hullMax - data->section->hull)/(float)(data->staffAssigned * 2);
+                }
+                else if (strcmp(data->action,"remove")==0)
+                {
+                    data->daysToComplete = MAX(1,40*(data->section->hull/(float)data->section->hullMax )/(float)(data->staffAssigned));
+                }
             }
             costs = station_get_resource_cost(data->section->name);
             if (costs)
             {
                 data->cost = resources_list_get_amount(costs,"credits");
                 resources_list_free(costs);
-                data->cost *= data->section->hull/(float)data->section->hullMax;
+                if (strcmp(data->action,"repair")==0)
+                {
+                    data->cost *= 1.0 - (data->section->hull/(float)data->section->hullMax);
+                }
+                else if (strcmp(data->action,"remove")==0)
+                {
+                    data->cost *= (data->section->hull/(float)data->section->hullMax)*0.1;
+                }
             }
         }
     }
@@ -253,7 +311,14 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
             }
             else
             {
-                data->daysToComplete = (data->facility->damage * 100)/(float)data->staffAssigned;
+                if (strcmp(data->action,"repair")==0)
+                {
+                    data->daysToComplete = (data->facility->damage * 100)/(float)data->staffAssigned;
+                }
+                else if (strcmp(data->action,"remove")==0)
+                {
+                    data->daysToComplete = MAX((40 * (1 - data->facility->damage)/(float)data->staffAssigned),1);
+                }
             }
 
             costs = station_facility_get_resource_cost(data->facility->name,"cost");
@@ -261,7 +326,15 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
             {
                 data->cost = resources_list_get_amount(costs,"credits");
                 resources_list_free(costs);
-                data->cost *= data->facility->damage;
+                
+                if (strcmp(data->action,"repair")==0)
+                {
+                    data->cost *= data->facility->damage;
+                }
+                else if (strcmp(data->action,"remove")==0)
+                {
+                    data->cost *= ((1 - data->facility->damage) * 0.1);
+                }
             }
         }
     }
@@ -332,7 +405,7 @@ void repair_menu_setup(Window *win,RepairMenuData *data)
     }
 }
 
-Window *repair_menu(Window *parent, StationSection *section, StationFacility *facility)
+Window *repair_menu(Window *parent, StationSection *section, StationFacility *facility,const char *action)
 {
     Window *win;
     RepairMenuData *data;
@@ -353,6 +426,7 @@ Window *repair_menu(Window *parent, StationSection *section, StationFacility *fa
     win->update = repair_menu_update;
     win->free_data = repair_menu_free;
     win->draw = repair_menu_draw;
+    if (action)gfc_line_cpy(data->action,action);
     data->section = section;
     data->facility = facility;
     repair_menu_setup(win,data);
