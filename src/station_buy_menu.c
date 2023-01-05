@@ -29,6 +29,7 @@ extern int freeBuildMode;
 
 typedef struct
 {
+    const char *mountType;
     StationSection *parent;
     StationData *station;
     const char *selected;
@@ -174,6 +175,7 @@ int station_buy_menu_update(Window *win,List *updateList)
 void station_buy_menu_set_list(Window *win)
 {
     const char *str;
+    const char *mountType;
     const char *first = NULL;
     Element *button;
     Element *item_list;
@@ -189,6 +191,8 @@ void station_buy_menu_set_list(Window *win)
         str = gfc_list_get_nth(data->list,i);
         if (!str)continue;
         if (station_def_is_unique(str))continue;
+        mountType = station_def_get_mount_type(str);
+        if (strcmp(mountType,data->mountType) != 0)continue;
         str = station_def_get_display_name(str);
         if (!first)
         {
@@ -222,6 +226,7 @@ Window *station_buy_menu(Window *parent,StationData *station, StationSection *pa
     data->station = station;
     data->parent = parentSection;
     data->slot = slot;
+    data->mountType = station_def_get_extension_mount_type(parentSection->name,slot);
     station_buy_menu_set_list(win);
     message_buffer_bubble();
     return win;

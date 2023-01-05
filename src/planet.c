@@ -1,9 +1,54 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
+#include "gf2d_message_buffer.h"
 #include "station_facility.h"
 #include "player.h"
 #include "planet.h"
+
+SiteResourceTypes planet_site_resource_type_by_name(const char *name)
+{
+    if (!name)return SRT_MAX;
+    if (strcmp(name,"nutrients")== 0)return SRT_Nutrients;
+    if (strcmp(name,"minerals")== 0)return SRT_Minerals;
+    if (strcmp(name,"ores")== 0)return SRT_Ores;
+    return SRT_MAX;
+}
+
+void planet_site_survey(PlanetData *planet,Vector2D position)
+{
+    SiteData *site;
+    if (!planet)return;
+    site = planet_get_site_data_by_position(planet,position);
+    if (!site)return;
+    site->surveyed = 1;
+    //TODO: check if there is anything special about this site and then reveal it
+    message_printf("Survery complete.  Site revealed %i nutrients, %i minerals, and %i ores",site->resources[SRT_Nutrients],site->resources[SRT_Minerals],site->resources[SRT_Ores]);
+}
+
+int planet_site_surveyed(PlanetData *planet,Vector2D position)
+{
+    SiteData *site;
+    if (!planet)return 0;
+    site = planet_get_site_data_by_position(planet,position);
+    if (!site)return 0;
+    return site->surveyed;
+}
+
+
+int planet_site_extract_resource(PlanetData *planet,Vector2D position,const char *resource)
+{
+    SiteResourceTypes rType = SRT_MAX;
+    SiteData *site;
+    if (!planet)return 0;
+    site = planet_get_site_data_by_position(planet,position);
+    if (!site)return 0;
+    rType = planet_site_resource_type_by_name(resource);
+    if (rType == SRT_MAX)return 0;
+    if (site->resources[rType] <= 0)return 0;
+    site->resources[rType]--;
+    return 1;
+}
 
 void planet_facilities_update(PlanetData *planet)
 {

@@ -169,7 +169,7 @@ int planet_menu_draw(Window *win)
 
     if (site)
     {
-        if (!site->surveyed)
+        if (site->surveyed)
         {
             gfc_line_sprintf(buffer,"Surveyed: Yes");
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"survey"),buffer);

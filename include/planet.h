@@ -107,4 +107,28 @@ Vector3D planet_position_to_position(float radius, Vector2D coorindate);
  */
 Vector3D planet_position_to_rotation(Vector2D position);
 
+/**
+ * @brief extract a resource from a planet site
+ * @param planet the planet in question
+ * @param position the planet coordinates
+ * @param resource what to extract "nutrients","minerals","ores", whatever else I come up with
+ * @return 0 if there is no resource of that type at the site in question.  1 if there was and it was decrimented
+ */
+int planet_site_extract_resource(PlanetData *planet,Vector2D position,const char *resource);
+
+/**
+ * @brief complete a survey for a planetary site
+ * @param planet the planet
+ * @param position where on it we surveyed
+ */
+void planet_site_survey(PlanetData *planet,Vector2D position);
+
+/**
+ * @brief check if a site has been surveyed yet or not
+ * @param planet the planet
+ * @param position where on it we check
+ * @return 0 if error or not surveyed 1, if it has
+ */
+int planet_site_surveyed(PlanetData *planet,Vector2D position);
+
 #endif

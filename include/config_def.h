@@ -72,6 +72,15 @@ const char *station_def_get_name_by_display(const char *section);
 SJson *config_def_get_by_parameter(const char *resource,const char *parameter,const char *name);
 
 /**
+ * @brief get a specific parameter from a named resource by its key
+ * @param resource the name of the resource list
+ * @param name the search item
+ * @param key the search item
+ * @return NULL if not found, the json object value that matches the key otherwise
+ */
+SJson *config_def_get_value(const char *resource, const char *name, const char *key);
+
+/**
  * @brief get the number of a resources that has been loaded
  * @param resource the resource type to check
  * @return 0 if not loaded or error, the count otherwise

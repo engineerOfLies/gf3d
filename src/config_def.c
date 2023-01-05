@@ -75,6 +75,15 @@ SJson *config_def_get_by_index(const char *resource,Uint8 index)
     return sj_array_get_nth(list,index);
 }
 
+SJson *config_def_get_value(const char *resource, const char *name, const char *key)
+{
+    SJson *def;
+    if ((!resource)||(!name)||(!key))return NULL;
+    def = config_def_get_by_name(resource,name);
+    if (!def)return NULL;
+    return sj_object_get_value(def,key);
+}
+
 const char *config_def_get_name_by_index(const char *resource,Uint8 index)
 {
     SJson *list;

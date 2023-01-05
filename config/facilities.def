@@ -45,6 +45,7 @@
             "staffPositions":10,
             "staffRequired":5,
             "officerSlot":false,
+            "buildTime":10,
             "workTime":10,
             "produces":
             {
@@ -67,6 +68,7 @@
             "energyOutput":1000,
             "officerSlot":true,
             "workTime":1,
+            "buildTime":10,
             "upkeep":
             {
                 "fuel":1
@@ -88,6 +90,7 @@
             "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
+            "buildTime":14,
             "workTime":10,
             "upkeep":
             {
@@ -114,6 +117,7 @@
             "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
+            "buildTime":14,
             "workTime":15,
             "upkeep":
             {
@@ -137,6 +141,7 @@
             },
             "staffPositions":10,
             "staffRequired":5,
+            "buildTime":30,
             "housing":200,
             "energyDraw":100,
             "officerSlot":true
@@ -154,6 +159,7 @@
                 "common_materials":100
             },
             "staffPositions":10,
+            "buildTime":30,
             "staffRequired":5,
             "housing":10,
             "energyDraw":100,
@@ -176,6 +182,7 @@
             "energyDraw":200,
             "officerSlot":true,
             "workTime":10,
+            "buildTime":14,
             "upkeep":
             {
                 "minerals":10
@@ -197,6 +204,7 @@
                 "alloys":50
             },
             "storage":100,
+            "buildTime":7,
             "officerSlot":false
         },
         {
@@ -205,6 +213,7 @@
             "icon":"",
             "description":"This facility is equipped to store and make available large quantities of commodities.  It's capacity is an impressive 2000 tons",
             "type":"large_storage",
+            "buildTime":14,
             "cost":
             {   
                 "credits":2000,
@@ -223,6 +232,7 @@
                 "credits":1500,
                 "alloys":100
             },
+            "buildTime":7,
             "staffPositions":20,
             "staffRequired":8,
             "energyDraw":200
@@ -238,6 +248,7 @@
                 "credits":3000,
                 "alloys":200
             },
+            "buildTime":14,
             "staffPositions":30,
             "staffRequired":15,
             "energyDraw":400
@@ -253,6 +264,7 @@
                 "credits":6000,
                 "alloys":400
             },
+            "buildTime":21,
             "staffPositions":60,
             "staffRequired":35,
             "energyDraw":800
@@ -270,6 +282,7 @@
                 "alloys":400
             },
             "staffPositions":20,
+            "buildTime":30,
             "staffRequired":20,
             "energyDraw":100,
             "workTime":10,
@@ -289,9 +302,10 @@
                 "alloys":10
             },
             "staffPositions":10,
+            "buildTime":2,
             "staffRequired":5,
             "officerSlot":true,
-            "workTime":15
+            "workTime":2
         },
         {
             "name":"mineral_mine1",
@@ -309,6 +323,8 @@
             "staffRequired":10,
             "officerSlot":true,
             "workTime":10,
+            "buildTime":5,
+            "extract":"minerals",
             "produces":
             {
                 "minerals":100
@@ -329,7 +345,9 @@
             "staffPositions":20,
             "staffRequired":10,
             "officerSlot":true,
+            "buildTime":5,
             "workTime":10,
+            "extract":"ores",
             "produces":
             {
                 "minerals":100
@@ -351,7 +369,9 @@
             "staffPositions":40,
             "staffRequired":20,
             "officerSlot":true,
+            "buildTime":5,
             "workTime":15,
+            "extract":"nutrients",
             "produces":
             {
                 "food":50

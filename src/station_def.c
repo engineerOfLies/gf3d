@@ -33,6 +33,24 @@ List *station_def_get_section_list()
     return list;
 }
 
+const char *station_def_get_extension_mount_type(const char *section,Uint8 extension)
+{
+    SJson *def,*ext;
+    def = config_def_get_by_name("sections",section);
+    if (!def)return NULL;
+    ext = station_def_get_extension_by_index(def,extension);
+    if (!ext)return NULL;
+    return sj_object_get_value_as_string(ext,"mountType");
+}
+
+const char *station_def_get_mount_type(const char *section)
+{
+    SJson *def;
+    def = config_def_get_by_name("sections",section);
+    if (!def)return NULL;
+    return sj_object_get_value_as_string(def,"mountType");
+}
+
 const char *station_def_get_name_by_display(const char *section)
 {
     SJson *def;

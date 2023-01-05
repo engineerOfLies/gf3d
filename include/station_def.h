@@ -65,4 +65,20 @@ List *station_def_get_section_list();
  */
 List *station_get_resource_cost(const char *name);
 
+/**
+ * @brief get the mount type of the extension slot of a section
+ * @param section the name of the extension
+ * @param extension the extension to get the type of
+ * @return the extension code ("c","s","e",etc)
+ */
+const char *station_def_get_extension_mount_type(const char *section,Uint8 extension);
+
+/**
+ * @brief get the mount type of a section
+ * @param section the name of the extension
+ * @return the extension code ("c","s","e",etc)
+ */
+const char *station_def_get_mount_type(const char *section);
+
+
 #endif

@@ -35,6 +35,7 @@ typedef struct
     StationFacility *facility;
     const char *selected;
     int choice;
+    int lastUpdated;
 }FacilityMenuData;
 
 void facility_menu_set_list(Window *win);
@@ -56,6 +57,7 @@ int facility_menu_draw(Window *win)
 //    int hidden;
 //     FacilityMenuData *data;
     if ((!win)||(!win->data))return 0;
+    facility_menu_refresh_view(win);
 //     data = win->data;
 /*    if (gfc_list_get_count(data->facilityList)< data->facilityLimit)hidden = 0;
     else hidden = 1;
@@ -96,6 +98,9 @@ void facility_menu_refresh_view(Window *win)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
+    
+    if (data->lastUpdated == player_get_day())return;
+    else data->lastUpdated = player_get_day();
 
     if (!data->facility)
     {
@@ -161,7 +166,14 @@ void facility_menu_refresh_view(Window *win)
     }
     else
     {
-        gfc_line_sprintf(buffer,"Under Construction");
+        if (data->facility->mission)
+        {
+            gfc_line_sprintf(buffer,"Construction Until Day %i",data->facility->mission->dayFinished);
+        }
+        else
+        {
+            gfc_line_sprintf(buffer,"Under Construction");
+        }
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),buffer);
     if (data->facility->damage > 0)
@@ -384,6 +396,14 @@ int facility_menu_update(Window *win,List *updateList)
             if (!data->facility)return 1;//TODO: move this to station_facility.c
             if (data->facility->disabled)
             {
+                if (strcmp(data->facility->name,"survey_site")==0)
+                {
+                    if (planet_site_surveyed(player_get_planet(),data->facility->position))
+                    {
+                        message_new("Survey is already complete!");
+                        return 1;
+                    }
+                }
                 data->facility->disabled = 0;
                 station_facility_check(data->facility);
                 if (data->facility->inactive)

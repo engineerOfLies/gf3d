@@ -376,6 +376,7 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     int space;
     Uint32 workTime = 0;
     StationData *station;
+    const char *extract = NULL;
     List *supply;
     if (!facility)return;
     if (facility->disabled)return;// not updating what has been turned off by the player
@@ -397,10 +398,34 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     
     station_facility_check(facility);
     if (facility->inactive)return;
-    
+
     supply = player_get_resources();
     workTime = station_facility_get_work_time(facility->name);
     if (facility->lastProduction + workTime > player_get_day())return;//haven't gotten here yet
+    
+    
+    if (strcmp("survey_site",facility->name) == 0)
+    {
+        //survey site is now working
+        planet_site_survey(player_get_planet(),facility->position);
+        facility->disabled = 1;
+        facility->inactive = 1;
+        return;
+    }
+    
+    extract = sj_get_string_value(config_def_get_value("facilities", facility->name, "extract"));
+    if (extract != NULL)
+    {
+        // if this is defined, then this is a planet facility that needs to extract resources to work
+        if (!planet_site_extract_resource(player_get_planet(),facility->position,extract))
+        {
+            // resource is not at the site, cancel production
+            facility->disabled = 1;
+            message_printf("Production at %s has halted, no more %s to extract!",facility->displayName,extract);
+            return;
+        }
+    }
+        
     facility->lastProduction = player_get_day();
     if (strcmp(facility->name,"commodities_market")==0)
     {   //override for the market sale
@@ -412,6 +437,7 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     {
         resource_list_buy(supply, facility->upkeep);
     }
+    
     if (gfc_list_get_count(facility->produces)>0)
     {
         newMass = resources_get_total_commodity_mass(facility->produces) * facility->productivity;
@@ -547,6 +573,7 @@ int station_facility_is_singleton(const char *name)
 
 void station_facility_build(const char *name,Vector2D position,List *parentList)
 {
+    int buildTime = 5;
     TextLine buffer;
     StationFacility *new_facility;
     List *cost;
@@ -558,6 +585,7 @@ void station_facility_build(const char *name,Vector2D position,List *parentList)
     gfc_list_append(parentList,new_facility);
     if (!freeBuildMode)
     {
+        sj_get_integer_value(config_def_get_value("facilities", name, "buildTime"),&buildTime);
         new_facility->working = 1;
         new_facility->disabled = 1;
         new_facility->inactive = 1;
@@ -569,7 +597,7 @@ void station_facility_build(const char *name,Vector2D position,List *parentList)
             new_facility->name,
             buffer,
             player_get_day(),
-            player_get_day() + 7,
+            player_get_day() + buildTime,
             0);
     }
     resources_list_free(cost);
