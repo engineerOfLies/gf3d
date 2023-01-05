@@ -16,6 +16,8 @@
 #include "event_manager.h"
 #include "player.h"
 
+#define rollWeight 0.9
+
 static Entity *player_entity = NULL;
 
 void player_draw(Entity *self);
@@ -41,6 +43,21 @@ SJson *player_get_history()
     return data->history;
 }
 
+SJson *player_data_save_reputation(PlayerReputation *reputation)
+{
+    SJson *json;
+    if (!reputation)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    sj_object_insert(json,"satisfaction",sj_new_float(reputation->satisfaction));
+    sj_object_insert(json,"basicNeeds",sj_new_float(reputation->basicNeeds));
+    sj_object_insert(json,"opportunities",sj_new_float(reputation->opportunities));
+    sj_object_insert(json,"commerce",sj_new_float(reputation->commerce));
+    sj_object_insert(json,"entertainment",sj_new_float(reputation->entertainment));
+    sj_object_insert(json,"safety",sj_new_float(reputation->safety));    
+    return json;
+}
+
 SJson *player_data_save(PlayerData *data)
 {
     SJson *json;
@@ -57,6 +74,7 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));
     sj_object_insert(json,"staff",sj_new_int(data->staff));
     sj_object_insert(json,"population",sj_new_int(data->population));
+    sj_object_insert(json,"reputation",player_data_save_reputation(&data->reputation));
     sj_object_insert(json,"hour",sj_new_uint32(data->hour));
     sj_object_insert(json,"day",sj_new_uint32(data->day));
     sj_object_insert(json,"resources",resources_list_save(data->resources));
@@ -95,6 +113,20 @@ void player_save(const char *filename)
     sj_free(json);
 }
 
+void player_data_load_reputation(SJson *json, PlayerReputation *data)
+{
+    if ((!json)||(!data))return;
+    memset(data,0,sizeof(PlayerReputation));
+    
+    sj_object_get_value_as_float(json,"satisfaction",&data->satisfaction);
+    sj_object_get_value_as_float(json,"basicNeeds",&data->basicNeeds);
+    sj_object_get_value_as_float(json,"opportunities",&data->opportunities);
+    sj_object_get_value_as_float(json,"commerce",&data->commerce);
+    sj_object_get_value_as_float(json,"entertainment",&data->entertainment);
+    sj_object_get_value_as_float(json,"safety",&data->safety);
+}
+
+
 PlayerData *player_data_parse(SJson *json)
 {
     const char *str;
@@ -118,10 +150,11 @@ PlayerData *player_data_parse(SJson *json)
         data->detailColor = gfc_color_from_vector4f(colorv);
     }
     
-    sj_object_get_value_as_uint32(json,"hour",&data->day);
+    sj_object_get_value_as_uint32(json,"hour",&data->hour);
     sj_object_get_value_as_uint32(json,"day",&data->day);
     sj_get_integer_value(sj_object_get_value(json,"staff"),&data->staff);
     sj_get_integer_value(sj_object_get_value(json,"population"),&data->population);
+    player_data_load_reputation(sj_object_get_value(json,"reputation"), &data->reputation);
     sj_get_float_value(sj_object_get_value(json,"wages"),&data->wages);
     sj_get_float_value(sj_object_get_value(json,"taxRate"),&data->taxRate);
     sj_get_float_value(sj_object_get_value(json,"salesTaxRate"),&data->salesTaxRate);
@@ -324,16 +357,23 @@ Uint32 player_get_hour()
     return data->hour;
 }
 
+
 void player_upkeep(PlayerData *player)
 {
     float amount;
     int totalStaff;
     float wages,taxes;
+    float percent;
     int food;
     StationData *station;
     if (!player)return;
     station = player_get_station_data();
     if (!station)return;
+    if (!player->population)
+    {
+        message_printf("The Station Has Been Abandoned!");
+        return;
+    }
     totalStaff = player->staff + station->staffAssigned;
     wages = totalStaff * player->wages;
     resources_list_withdraw(player->resources,"credits",wages);
@@ -344,22 +384,87 @@ void player_upkeep(PlayerData *player)
     food = (player->population/12);
     
     amount = resources_list_get_amount(player->resources,"food");
-    if (amount < food)
+    if ((food)&&(amount < food))
     {
         message_new("There is not enough food to feed the people!");
+        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ ((1- rollWeight)*(amount / food));
         food = amount;
+    }
+    else
+    {
+        //this is good, it keeps going
+        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ (1- rollWeight);
+    }
+    if (player->population > station->housing)
+    {
+        message_printf("There is not adequate housing for the people! we need %i more working housing!",(int)(player->population - station->housing));
+        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ ((1- rollWeight)*((player->population - station->housing)/player->population));//percentage of population un housed
+    }
+    else
+    {
+        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ (1- rollWeight);
     }
 
     resources_list_withdraw(player->resources,"food",food);
     message_printf("People consumed %i tons of food this month",food);
+    if (station->crimeRate <= 10)
+    {
+        //crime is down!
+        player->reputation.safety = (player->reputation.safety * rollWeight)+ (1- rollWeight);
+    }
+    else 
+    {
+        percent = station->crimeRate / (float)player->population;// percentage of the population
+        player->reputation.safety = (player->reputation.safety * rollWeight)+ ((1- rollWeight) * (1 - percent));
+    }
+    if (player->reputation.safety < 0.5)
+    {
+        message_printf("People are unhappy with the public safety levels on the station.");
+    }
+
+    percent = station->commerce / (float)player->population;// percentage of the population
+    player->reputation.commerce = (player->reputation.commerce * rollWeight)+ ((1- rollWeight) * percent);    
+    if (player->reputation.commerce < 0.5)
+    {
+        message_printf("People are unhappy with the commercial prospects on the station.");
+    }
+
+    percent = station->opportunities / MAX(1,(float)player->population - totalStaff);// percentage of the population
+    player->reputation.opportunities = (player->reputation.opportunities * rollWeight)+ ((1- rollWeight) * percent);
+    if (player->reputation.opportunities < 0.5)
+    {
+        message_printf("People are unhappy with the employment opportunities on the station.");
+    }
+
+    percent = station->entertainment / (float)player->population;// percentage of the population
+    player->reputation.entertainment = (player->reputation.entertainment * rollWeight)+ ((1- rollWeight) * percent);
+    if (player->reputation.opportunities < 0.25)
+    {
+        message_printf("People are unhappy with the entertainment options on the station.");
+    }
+    
+    percent = 0;
+    percent += (player->reputation.entertainment * 0.2);
+    percent += (player->reputation.opportunities * 0.2);
+    percent += (player->reputation.commerce * 0.2);
+    percent += (player->reputation.safety * 0.2);
+    percent += (player->reputation.basicNeeds * 0.2);
+    
+    player->reputation.satisfaction = (player->reputation.satisfaction * rollWeight) + (percent * (1-rollWeight));
+    if (player->reputation.satisfaction < 0.3)
+    {
+        message_printf("People are unhappy with your job as station Commander.");
+    }
 }
 
 void player_hour_advance()
 {
     PlayerData *data;
+    StationData *station;
     if (!player_entity)return;
     data = player_entity->data;
-    if (!data)return;
+    station = player_get_station_data();
+    if ((!data)||(!station))return;
     data->hour++;
     if (data->hour >= 24)
     {
@@ -385,6 +490,7 @@ void player_hour_advance()
         }
         station_upkeep(player_get_station_data());
         planet_facilities_update(player_get_planet());
+
         mission_update_all();
     }
     event_manager_update();

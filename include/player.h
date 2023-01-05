@@ -10,11 +10,11 @@
 typedef struct
 {
     float satisfaction; //overall view of the player's performance by the station population
+    float basicNeeds;   //Are the basic needs of the people getting met
     float opportunities;//Are there enough jobs for people who seek them
     float commerce;     //can the people buy and sell things?
     float entertainment;//is there enough entertainment
     float safety;       //factor of crime and how often the station is directly attacked and damaged
-    
 }PlayerReputation;
 
 typedef struct
@@ -28,6 +28,7 @@ typedef struct
     float       salesTaxRate;       /**<rate of income for commerce*/
     int         population;         /**<how many people live in on the station.  This is for taing purposes*/
     int         staff;              /**<people hired by the station to work for the station*/
+    PlayerReputation reputation;    /**<how the people who live in the station view the player*/
     Uint32      hour;               /**<incremented periodically for timing*/
     Uint32      day;                /**<incremented every 24 hours to track the passage of game-time*/
     List       *resources;          /**<list of resources of the station*/

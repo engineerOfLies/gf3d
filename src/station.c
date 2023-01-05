@@ -349,6 +349,9 @@ void station_section_recalc_values(StationSection *section)
     section->housing = 0;
     section->staffAssigned = 0;
     section->staffPositions = 0;
+    section->opportunities = 0;
+    section->commerce = 0;
+    section->entertainment = 0;
     for (i = 0; i < c; i++)
     {
         facility = gfc_list_get_nth(section->facilities,i);
@@ -363,6 +366,9 @@ void station_section_recalc_values(StationSection *section)
         section->energyDraw += facility->energyDraw;
         section->energyOutput += facility->energyOutput * facility->productivity;
         section->crimeRate += facility->crimeRate * facility->productivity;//the more you do, the more the crime
+        section->opportunities += facility->opportunities * facility->productivity;
+        section->commerce += facility->commerce * facility->productivity;
+        section->entertainment += facility->entertainment * facility->productivity;
     }
 }
 
@@ -380,6 +386,9 @@ void station_recalc_values(StationData *station)
     station->staffAssigned = 0;
     station->staffPositions = 0;
     station->crimeRate = 0;
+    station->opportunities = 0;
+    station->commerce = 0;
+    station->entertainment = 0;
     c = gfc_list_get_count(station->sections);
     for (i = 0; i < c; i++)
     {
@@ -396,6 +405,9 @@ void station_recalc_values(StationData *station)
         station->staffAssigned += section->staffAssigned;
         station->staffPositions += section->staffPositions;
         station->crimeRate += section->crimeRate;
+        station->opportunities += section->opportunities;
+        station->commerce += section->commerce;
+        station->entertainment += section->entertainment;
     }
 }
 

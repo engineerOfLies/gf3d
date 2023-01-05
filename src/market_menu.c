@@ -125,6 +125,27 @@ void market_menu_scroll_down(Window *win)
     }
 }
 
+int market_menu_facility_check()
+{
+    StationFacility *facility;
+    facility = player_get_facility_by_name("commodities_market");
+    if (facility == NULL)
+    {
+        message_printf("Commodities Market is not available, please install the facility to the station");
+        return 0;
+    }
+    else if ((facility->inactive)||(facility->disabled))
+    {
+        message_printf("Commodities Market facility is not functioning.  Cannot buy or sell goods");
+        return 0;
+    }
+    if (!player_has_working_dock())
+    {
+        message_printf("Cannot purchase goods on the open market, functioning dock is required!");
+        return 0;
+    }
+    return 1;
+}
 
 int market_menu_update(Window *win,List *updateList)
 {
@@ -161,6 +182,7 @@ int market_menu_update(Window *win,List *updateList)
         }
         if ((e->index >= 500)&&(e->index < 600))
         {
+            if (!market_menu_facility_check())return 1;
             //stock_up
             choice = e->index - 500;
             name = config_def_get_name_by_index("resources",choice);
@@ -173,7 +195,7 @@ int market_menu_update(Window *win,List *updateList)
         }
         if ((e->index >= 600)&&(e->index < 700))
         {
-            //stock_up
+            if (!market_menu_facility_check())return 1;
             choice = e->index - 600;
             name = config_def_get_name_by_index("resources",choice);
             if (!name)return 1;
@@ -190,6 +212,7 @@ int market_menu_update(Window *win,List *updateList)
         }
         if ((e->index >= 700)&&(e->index < 800))
         {
+            if (!market_menu_facility_check())return 1;
             //stock_up
             choice = e->index - 700;
             name = config_def_get_name_by_index("resources",choice);
@@ -211,11 +234,7 @@ int market_menu_update(Window *win,List *updateList)
         }
         if ((e->index >= 800)&&(e->index < 900))
         {
-            if (!player_has_working_dock())
-            {
-                message_printf("Cannot purchase goods on the open market, functioning dock is required!");
-                return 1;
-            }
+            if (!market_menu_facility_check())return 1;
             //stock_up
             choice = e->index - 800;
             if (win->child)return 1;
@@ -262,10 +281,15 @@ Element *market_menu_build_row(Window *win, const char *resource,int index, int 
     TextLine buffer;
     int stockpile;
     float price;
+    int lastAmount;
+    Color color;
     Element *rowList;
     ListElement *le;
+    PlayerData *player;
     MarketMenuData *data;
     if ((!win)||(!win->data)||(!resource))return NULL;
+    player = player_get_data();
+    if (!player)return NULL;
     data = win->data;
     
     le = gf2d_element_list_new_full(gfc_rect(0,0,1,1),vector2d(120,24),LS_Horizontal,0,0,1,0);
@@ -275,10 +299,15 @@ Element *market_menu_build_row(Window *win, const char *resource,int index, int 
         gfc_color(1,1,1,1),0,
         gfc_color(0,0,0,1),0,win);
     gf2d_element_make_list(rowList,le);
-    
+    //name
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,resource,FT_H6,vector2d(200,24),gfc_color(1,1,1,1)));
+    //supply
+    lastAmount = (int)resources_list_get_amount(player->yesterday,resource);
+    color = GFC_WHITE;
+    if (lastAmount < amount)color = GFC_GREEN;
+    else if (lastAmount > amount)color = GFC_RED;
     gfc_line_sprintf(buffer,"%i",amount);
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),gfc_color(1,1,1,1)));
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),color));
     
     gf2d_element_list_add_item(rowList,gf2d_button_new_simple(win,500+index,
         "stock_up",
@@ -375,18 +404,6 @@ Window *market_menu(Window *parent)
 {
     Window *win;
     MarketMenuData *data;
-    StationFacility *facility;
-    facility = player_get_facility_by_name("commodities_market");
-    if (facility == NULL)
-    {
-        message_printf("Commodities Market is not available, please install the facility to the station");
-        return NULL;
-    }
-    else if ((facility->inactive)||(facility->disabled))
-    {
-        message_printf("Commodities Market facility is not functioning.  Cannot use the Market");
-        return NULL;
-    }
 
     win = gf2d_window_load("menus/market.menu");
     if (!win)

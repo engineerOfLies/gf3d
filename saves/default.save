@@ -12,6 +12,14 @@
     "detailColor":[0.2,0.6,0.2,1],
     "hour":"0",
     "day":"0",
+    "reputation":{
+      "satisfaction":1.0,
+      "basicNeeds":1.0,
+      "opportunities":1.0,
+      "commerce":1.0,
+      "entertainment":1.0,
+      "safety":1.0
+    },
     "resources":{
       "credits":"10000.000000",
       "fuel":"1000.000000",

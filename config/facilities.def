@@ -237,6 +237,7 @@
                 "alloys":100
             },
             "buildTime":7,
+            "commerce":10,
             "crimeRate":5,
             "staffPositions":20,
             "staffRequired":8,
@@ -255,6 +256,8 @@
             },
             "buildTime":14,
             "crimeRate":10,
+            "commerce":20,
+            "opportunities":10,
             "staffPositions":30,
             "staffRequired":15,
             "energyDraw":400
@@ -272,6 +275,8 @@
             },
             "buildTime":21,
             "crimeRate":15,
+            "commerce":40,
+            "opportunities":20,
             "staffPositions":60,
             "staffRequired":35,
             "energyDraw":800
@@ -289,11 +294,11 @@
                 "alloys":400
             },
             "staffPositions":20,
+            "staffRequired":10,
             "crimeRate":20,
-            "commerce":20,
-            "opportunities":20,
+            "commerce":200,
+            "opportunities":100,
             "buildTime":30,
-            "staffRequired":20,
             "energyDraw":100,
             "workTime":10,
             "officerSlot":true,
@@ -311,7 +316,7 @@
                 "credits":200,
                 "alloys":10
             },
-            "staffPositions":10,
+            "staffPositions":5,
             "buildTime":2,
             "staffRequired":5,
             "officerSlot":true,

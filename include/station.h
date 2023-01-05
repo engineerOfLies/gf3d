@@ -20,6 +20,9 @@ typedef struct StaionSection_S
 
     float       hull,hullMax;
     float       crimeRate;  //how much crime goes on in the seciton as an aggregate of the facilities
+    float       opportunities;  //how many business and employment opportunities are provided by the facility
+    float       commerce;       //how much taxable commerce is conducted by the facility
+    float       entertainment;  //how much public entertainment is provided by the facility
     Mission    *mission;    // if any mission is assigned to the section (mostly for repairs or building)
     Bool        working;  // if true, the station is working
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
@@ -38,6 +41,9 @@ typedef struct
     ModelMat   *mat;
     int         housing;        //how much housing is provided by this station
     float       crimeRate;     //how much crime goes on in the seciton as an aggregate of the station
+    float       opportunities;  //how many business and employment opportunities are provided by the facility
+    float       commerce;       //how much taxable commerce is conducted by the facility
+    float       entertainment;  //how much public entertainment is provided by the facility
     int         staffAssigned;  //how many staff are assigned to facilities
     int         staffPositions; //how many staff positions are available
     int         sectionHighlight;

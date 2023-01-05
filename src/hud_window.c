@@ -283,13 +283,18 @@ int hud_draw(Window *win)
 {
     TextLine buffer;
     List *resources;
+    Color color;
+    float cash,lastCash;
     Uint32 day,hour;
     Vector2D res, position;
     HUDWindowData *data;
+    PlayerData *player;
     StationData *station;
     int spacing = 22;
 
     if ((!win)||(!win->data))return 0;
+    player = player_get_data();
+    if (!player)return 0;
     res = gf3d_vgraphics_get_resolution();
     data = win->data;
     world_draw(data->w);
@@ -326,8 +331,13 @@ int hud_draw(Window *win)
     resources = player_get_resources();
     if (!resources)return 0;
     position.y += spacing;
+    cash = resources_list_get_amount(resources,"credits");
+    lastCash = resources_list_get_amount(player->yesterday,"credits");
+    color = GFC_WHITE;
+    if (cash < lastCash)color = GFC_RED;
+    if (cash > lastCash)color = GFC_GREEN;
     gfc_line_sprintf(buffer,"Credits: %iCr",(int)resources_list_get_amount(resources,"credits"));
-    gf2d_font_draw_line_tag(buffer,FT_H6,gfc_color8(255,255,255,255), position);
+    gf2d_font_draw_line_tag(buffer,FT_H6,color, position);
     return 0;
 }
 

@@ -249,13 +249,14 @@ void station_facility_check(StationFacility *facility)
     if (facility->damage < 0)
     {
         //under construction
+        message_printf("Facility %s is under construction.",facility->displayName);
         facility->inactive = 1;
         facility->disabled = 1;
         return;
     }
     if (facility->damage >= 0.5)
     {
-        message_printf("Facility %s is too damaged to function.",facility->name);
+        message_printf("Facility %s is too damaged to function.",facility->displayName);
         facility->inactive = 1;
         facility->disabled = 1;
         return;
@@ -268,7 +269,7 @@ void station_facility_check(StationFacility *facility)
     {
         if (facility->staffAssigned < facility->staffRequired)
         {
-            message_printf("Facility %s requires %i staff to function.",facility->name,facility->staffRequired);
+            message_printf("Facility %s requires %i staff to function.",facility->displayName,facility->staffRequired);
             facility->inactive = 1;
             facility->disabled = 1;
             return;
@@ -282,7 +283,7 @@ void station_facility_check(StationFacility *facility)
     {
         if (!resources_list_afford(supply, facility->upkeep))
         {
-            message_printf("Facility %s: not enough resources to run",facility->name);
+            message_printf("Facility %s: not enough resources to run",facility->displayName);
             facility->inactive = 1;
             facility->disabled = 1;
             return;
@@ -640,9 +641,14 @@ StationFacility *station_facility_new_by_name(const char *name,int id)
     if (res)facility->produces = resources_list_parse(res);
     res = sj_object_get_value(facilityDef,"upkeep");
     if (res)facility->upkeep = resources_list_parse(res);
-    sj_object_get_value_as_int(facilityDef,"housing",&facility->housing);
+
     sj_object_get_value_as_int(facilityDef,"storage",&facility->storage);
+    sj_object_get_value_as_int(facilityDef,"housing",&facility->housing);
     sj_object_get_value_as_float(facilityDef,"crimeRate",&facility->crimeRate);
+    sj_object_get_value_as_float(facilityDef,"opportunities",&facility->opportunities);
+    sj_object_get_value_as_float(facilityDef,"commerce",&facility->commerce);
+    sj_object_get_value_as_float(facilityDef,"entertainment",&facility->entertainment);
+
     sj_object_get_value_as_int(facilityDef,"staffRequired",&facility->staffRequired);
     sj_object_get_value_as_int(facilityDef,"staffPositions",&facility->staffPositions);
     sj_object_get_value_as_int(facilityDef,"energyDraw",&facility->energyDraw);

@@ -26,6 +26,9 @@ typedef struct
     int         income;         //if this facility directly produces income, this is the amount
     int         housing;        //how much housing is provided by this facility
     float       crimeRate;      //how much crime is generated as a byproduct of this facility
+    float       opportunities;  //how many business and employment opportunities are provided by the facility
+    float       commerce;       //how much taxable commerce is conducted by the facility
+    float       entertainment;  //how much public entertainment is provided by the facility
     int         staffRequired;  //how many people are needed to run the facility at a minimum
     int         staffAssigned;  //how many people are actually hired to do so
     int         staffPositions; //how many people are CAN be hired to do so

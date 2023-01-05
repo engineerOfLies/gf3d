@@ -296,7 +296,69 @@
                 },
                 {
                     "type": "label",
-                    "bounds": [10,0,1,25],
+                    "bounds": [10,0,1,30],
+                    "text":"Public Opinion",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
+                    "name":"satisfaction",
+                    "text":"Overall Satisfaction: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
+                    "name":"basic_needs",
+                    "text":"Basic Needs: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
+                    "name":"commerce",
+                    "text":"Commercial Opportunities: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
+                    "name":"opportunity",
+                    "text":"Opportunities: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
+                    "name":"entertainment",
+                    "text":"Entertainment: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
+                    "name":"safety",
+                    "text":"Public Safety: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "bounds": [5,0,1,25],
                     "name":"crime_rate",
                     "text":"Crime Rate: 0",
                     "justify" : "left",

@@ -198,7 +198,6 @@ PlanetData *planet_load_from_config(SJson *config)
     }
     array = sj_object_get_value(config,"sites");
     c = sj_array_get_count(array);
-    slog("%i sites found on planet",c);
     for (i = 0;i < c; i++)
     {
         item = sj_array_get_nth(array,i);

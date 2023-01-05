@@ -136,7 +136,6 @@ void mission_execute(Mission *mission)
     Window *win;
     if (!mission)return;
     player_return_staff(mission->staff);
-    slog("executing mission %s:%i",mission->title,mission->id);
     if (gfc_strlcmp(mission->missionType,"build_facility") == 0)
     {
         mission_build_facility(mission);
@@ -196,15 +195,12 @@ void mission_execute(Mission *mission)
     }
     if (gfc_strlcmp(mission->missionType,"repair") == 0)
     {
-        slog("repair type mission");
         if (gfc_strlcmp(mission->missionSubject,"facility") == 0)
         {
-            slog("facility repair");
             str = strchr(mission->missionTarget,':');
             *str = '\0';
             str++;
             id = atoi(mission->missionTarget);
-            slog("repairing facility %s : %i",str,id);
             facility = player_get_facility_by_name_id(str,id);
             if (!facility)
             {
@@ -216,11 +212,9 @@ void mission_execute(Mission *mission)
         }
         if (gfc_strlcmp(mission->missionSubject,"section") == 0)
         {
-            slog("section repair");
             id = atoi(mission->missionTarget);
             section = station_get_section_by_id(player_get_station_data(),id);
             if (!section)return;
-            slog("repairing section: %i",id);
             station_section_repair(section);
             return;
         }

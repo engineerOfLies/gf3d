@@ -387,7 +387,7 @@
             "facility_slots":4,
             "facility_types":
             [
-                "small_cargo_dock",
+                "small_docking_bay",
                 "small_storage",
                 "defenses"
             ],
