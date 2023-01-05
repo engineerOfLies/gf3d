@@ -16,7 +16,7 @@
                 {
                     "type": "label",
                     "bounds": [0,0,1,35],
-                    "text":"Personnel",
+                    "text":"Population",
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H4"
@@ -293,6 +293,15 @@
                             "style":"H6"
                         }
                     ]
+                },
+                {
+                    "type": "label",
+                    "bounds": [10,0,1,25],
+                    "name":"crime_rate",
+                    "text":"Crime Rate: 0",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
                 }
             ]
         }

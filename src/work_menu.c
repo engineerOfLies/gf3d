@@ -130,14 +130,9 @@ void work_mission(Window *win)
             gfc_line_sprintf(buffer,"%i",data->section->id);
             if (freeBuildMode)
             {
-                data->section->mission = mission_begin(
-                    "Section Remove",
-                    "section_sale",
-                    "section",
-                    buffer,
-                    day,
-                    day,
-                    data->staffAssigned);
+                station_remove_section(player_get_station_data(),data->section);
+                gf2d_window_free(win);
+                return;
             }
             else
             {
@@ -217,7 +212,7 @@ int work_menu_update(Window *win,List *updateList)
                 message_new("Already in progress");
                 return 1;
             }
-            if (data->workPossible)
+            if ((freeBuildMode)||(data->workPossible))
             {
                 work_mission(win);
             }

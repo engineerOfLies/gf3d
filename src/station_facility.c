@@ -642,6 +642,7 @@ StationFacility *station_facility_new_by_name(const char *name,int id)
     if (res)facility->upkeep = resources_list_parse(res);
     sj_object_get_value_as_int(facilityDef,"housing",&facility->housing);
     sj_object_get_value_as_int(facilityDef,"storage",&facility->storage);
+    sj_object_get_value_as_float(facilityDef,"crimeRate",&facility->crimeRate);
     sj_object_get_value_as_int(facilityDef,"staffRequired",&facility->staffRequired);
     sj_object_get_value_as_int(facilityDef,"staffPositions",&facility->staffPositions);
     sj_object_get_value_as_int(facilityDef,"energyDraw",&facility->energyDraw);

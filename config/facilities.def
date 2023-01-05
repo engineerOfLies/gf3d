@@ -27,6 +27,7 @@
             {   
                 "credits":500
             },
+            "crimeRate":-100,
             "staffPositions":50,
             "staffRequired":10,
             "energyDraw":10,
@@ -139,6 +140,7 @@
                 "credits":2000,
                 "common_materials":100
             },
+            "crimeRate":10,
             "staffPositions":10,
             "staffRequired":5,
             "buildTime":30,
@@ -203,6 +205,7 @@
                 "credits":500,
                 "alloys":50
             },
+            "crimeRate":5,
             "storage":100,
             "buildTime":7,
             "officerSlot":false
@@ -219,6 +222,7 @@
                 "credits":2000,
                 "alloys":200
             },
+            "crimeRate":10,
             "storage":2000
         },
         {
@@ -233,6 +237,7 @@
                 "alloys":100
             },
             "buildTime":7,
+            "crimeRate":5,
             "staffPositions":20,
             "staffRequired":8,
             "energyDraw":200
@@ -249,6 +254,7 @@
                 "alloys":200
             },
             "buildTime":14,
+            "crimeRate":10,
             "staffPositions":30,
             "staffRequired":15,
             "energyDraw":400
@@ -265,6 +271,7 @@
                 "alloys":400
             },
             "buildTime":21,
+            "crimeRate":15,
             "staffPositions":60,
             "staffRequired":35,
             "energyDraw":800
@@ -282,6 +289,9 @@
                 "alloys":400
             },
             "staffPositions":20,
+            "crimeRate":20,
+            "commerce":20,
+            "opportunities":20,
             "buildTime":30,
             "staffRequired":20,
             "energyDraw":100,
@@ -376,6 +386,29 @@
             {
                 "food":50
             }
+        },
+        {
+            "name":"market_square",
+            "displayName":"Market Square",
+            "description":"This designates an area of the station where the general public can set up their own shops to buy, sell, and trade (legal) goods.  This improves the lives of the citizens of the station and increases revenues for the station as we collect rent and sales tax.",
+            "type":"commercial",
+            "cost":
+            {   
+                "credits":1000,
+                "common_materials":50,
+                "alloys":50
+            },
+            "morale":15,
+            "commerce":40,
+            "opportunities":40,
+            "crimeRate":20,
+            "serviceLimit":200,
+            "serviceRate":0.25,
+            "staffPositions":10,
+            "staffRequired":10,
+            "officerSlot":true,
+            "buildTime":5,
+            "workTime":7
         }
     ]
 }

@@ -127,7 +127,6 @@ void mission_build_section(Mission *mission)
 
 void mission_execute(Mission *mission)
 {
-    int parent;
     StationFacility *facility;
     StationSection *section;
     List *cost;
@@ -155,17 +154,9 @@ void mission_execute(Mission *mission)
         if (!section)return;
         
         cost = station_get_resource_cost(section->name);
-        if (section->parent)
-        {
-            parent = section->parent->id;
-        }else parent = 0;
         resource_list_sell(player_get_resources(), cost,0.9);
         resources_list_free(cost);
         station_remove_section(player_get_station_data(),section);
-
-        win = gf2d_window_get_by_name("station_menu");
-        if (win)station_menu_select_segment(win,parent);
-
         message_printf("Section %s removal complete",section->displayName,id);
         return;
     }

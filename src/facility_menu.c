@@ -99,9 +99,6 @@ void facility_menu_refresh_view(Window *win)
     if ((!win)||(!win->data))return;
     data = win->data;
     
-    if (data->lastUpdated == player_get_day())return;
-    else data->lastUpdated = player_get_day();
-
     if (!data->facility)
     {
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),"Empty Slot");

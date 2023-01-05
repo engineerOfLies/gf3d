@@ -45,6 +45,7 @@ int planet_site_extract_resource(PlanetData *planet,Vector2D position,const char
     if (!site)return 0;
     rType = planet_site_resource_type_by_name(resource);
     if (rType == SRT_MAX)return 0;
+//    slog("site %i,%i has %i nutrients, %i minerals, %i ores",(int)position.x,(int)position.y,site->resources[SRT_Nutrients],site->resources[SRT_Minerals],site->resources[SRT_Ores]);
     if (site->resources[rType] <= 0)return 0;
     site->resources[rType]--;
     return 1;
@@ -197,11 +198,12 @@ PlanetData *planet_load_from_config(SJson *config)
     }
     array = sj_object_get_value(config,"sites");
     c = sj_array_get_count(array);
+    slog("%i sites found on planet",c);
     for (i = 0;i < c; i++)
     {
         item = sj_array_get_nth(array,i);
         if (!item)continue;
-        planet_site_data_from_config(item,&planet->sites[c%MAX_LONGITUDE][c / MAX_LONGITUDE]);
+        planet_site_data_from_config(item,&planet->sites[i%MAX_LONGITUDE][i / MAX_LONGITUDE]);
     }
     sj_object_get_value_as_float(config,"radius",&planet->radius);
     item = sj_object_get_value(config,"modelMat");

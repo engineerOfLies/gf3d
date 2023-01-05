@@ -342,9 +342,10 @@ void station_section_recalc_values(StationSection *section)
     player = player_get_data();
     if (!player)return;
     c = gfc_list_get_count(section->facilities);
-    section->storageCapacity = 0;
+    section->storageCapacity = 0;//Note this could probably be organized into a type...
     section->energyOutput = 0;
     section->energyDraw = 0;
+    section->crimeRate = 0;
     section->housing = 0;
     section->staffAssigned = 0;
     section->staffPositions = 0;
@@ -361,6 +362,7 @@ void station_section_recalc_values(StationSection *section)
         section->storageCapacity += facility->storage;
         section->energyDraw += facility->energyDraw;
         section->energyOutput += facility->energyOutput * facility->productivity;
+        section->crimeRate += facility->crimeRate * facility->productivity;//the more you do, the more the crime
     }
 }
 
@@ -377,6 +379,7 @@ void station_recalc_values(StationData *station)
     station->housing = 0;
     station->staffAssigned = 0;
     station->staffPositions = 0;
+    station->crimeRate = 0;
     c = gfc_list_get_count(station->sections);
     for (i = 0; i < c; i++)
     {
@@ -392,6 +395,7 @@ void station_recalc_values(StationData *station)
         station->energyDraw += section->energyDraw;
         station->staffAssigned += section->staffAssigned;
         station->staffPositions += section->staffPositions;
+        station->crimeRate += section->crimeRate;
     }
 }
 
@@ -472,6 +476,8 @@ Entity *station_new(Vector3D position,SJson *config)
 void station_remove_section(StationData *station,StationSection *section)
 {
     int i,c;
+    int parent;
+    Window *win;
     StationFacility *facility;
     if ((!station)||(!section))return;
     c = gfc_list_get_count(section->facilities);
@@ -481,6 +487,14 @@ void station_remove_section(StationData *station,StationSection *section)
         if (!facility)continue;
         station_facility_remove(facility);//remove and collect assigned staff
     }
+    // clean up UI
+    if (section->parent)
+    {
+        parent = section->parent->id;
+    }else parent = 0;
+    win = gf2d_window_get_by_name("station_menu");
+    if (win)station_menu_select_segment(win,parent);
+
     if (section->parent)
     {
         gfc_list_delete_data(section->parent->children,section);

@@ -9,6 +9,16 @@
 
 typedef struct
 {
+    float satisfaction; //overall view of the player's performance by the station population
+    float opportunities;//Are there enough jobs for people who seek them
+    float commerce;     //can the people buy and sell things?
+    float entertainment;//is there enough entertainment
+    float safety;       //factor of crime and how often the station is directly attacked and damaged
+    
+}PlayerReputation;
+
+typedef struct
+{
     TextLine    name;               /**<player's name*/
     TextLine    filename;           /**<save game filename*/
     TextLine    assistantName;      /**<what the player calls the assistant droid*/

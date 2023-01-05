@@ -51,6 +51,7 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"filename",sj_new_str(data->filename));
     sj_object_insert(json,"name",sj_new_str(data->name));
     sj_object_insert(json,"assistantName",sj_new_str(data->assistantName));
+    sj_object_insert(json,"detailColor",sj_vector4d_new(gfc_color_to_vector4f(data->detailColor)));
     sj_object_insert(json,"wages",sj_new_float(data->wages));
     sj_object_insert(json,"taxRate",sj_new_float(data->taxRate));
     sj_object_insert(json,"salesTaxRate",sj_new_float(data->salesTaxRate));

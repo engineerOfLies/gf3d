@@ -65,7 +65,7 @@
                         "label" :
                         {
                             "type": "label",
-                            "text":"Personnel",
+                            "text":"Population",
                             "bounds": [0,0,120,38],
                             "justify" : "center",
                             "align" : "middle",

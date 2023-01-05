@@ -162,6 +162,8 @@ void personnel_menu_update_resources(Window *win)
     gfc_line_sprintf(buffer,"Assigned : %i",station->staffAssigned);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"assigned"),buffer);
         
+    gfc_line_sprintf(buffer,"Crime Rate : %.1f%%",MAX(1,station->crimeRate));
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"crime_rate"),buffer);
     data->updated = player_get_day();
 }
 

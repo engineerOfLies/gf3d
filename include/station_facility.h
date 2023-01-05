@@ -25,6 +25,7 @@ typedef struct
     int         operatingCost;  //cost of running due to staff and office wages
     int         income;         //if this facility directly produces income, this is the amount
     int         housing;        //how much housing is provided by this facility
+    float       crimeRate;      //how much crime is generated as a byproduct of this facility
     int         staffRequired;  //how many people are needed to run the facility at a minimum
     int         staffAssigned;  //how many people are actually hired to do so
     int         staffPositions; //how many people are CAN be hired to do so
