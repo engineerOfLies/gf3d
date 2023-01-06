@@ -103,8 +103,6 @@ void station_buy_menu_select_item(Window *win,int choice, const char *name)
 int station_buy_menu_update(Window *win,List *updateList)
 {
     int i,count;
-    TextLine buffer;
-    StationSection *newSection;
     Element *e;
     StationBuyMenuData* data;
     if ((!win)||(!win->data))return 0;
