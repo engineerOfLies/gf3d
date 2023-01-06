@@ -25,6 +25,7 @@
 #include "station.h"
 #include "station_def.h"
 #include "facility_menu.h"
+#include "station_menu.h"
 #include "station_facility.h"
 #include "work_menu.h"
 
@@ -65,7 +66,9 @@ int work_menu_free(Window *win)
 void work_mission(Window *win)
 {
     Uint32 day;
+    TextLine buffer;
     WorkMenuData *data;
+    StationSection *newSection;
     if (!gf2d_window_check(win,"work_menu"))return;
     data = win->data;
         
@@ -77,10 +80,7 @@ void work_mission(Window *win)
         
         station_facility_build(data->what,data->position,data->facilityList,data->staffAssigned,data->daysToComplete);
 
-        data->inProgress = 1;
-        work_menu_setup(win,data);
-        data->staffAssigned = 0;
-        message_new("Work Mission Begin!");
+        message_new("Build Mission Begin!");
         if (win->parent)
         {
             if ((strcmp(win->parent->name,"station_buy_menu") == 0)||
@@ -89,6 +89,42 @@ void work_mission(Window *win)
                 gf2d_window_free(win->parent);
             }
         }
+        gf2d_window_free(win);
+        return;
+    }
+    if (strcmp(data->action,"build_section")==0)
+    {
+        if (freeBuildMode)
+        {
+            data->daysToComplete = 0;
+            data->staffAssigned = 0;
+        }
+        else resource_list_buy(player_get_resources(), data->costs);
+        newSection = station_add_section(player_get_station_data(),data->what,-1,data->section,data->position.x);
+        if (!newSection)return;
+        newSection->working = 1;
+        newSection->hull = -1;
+        gfc_line_sprintf(buffer,"%i",newSection->id);
+        newSection->mission = mission_begin(
+            "Section Construction",
+            NULL,
+            "build",
+            "section",
+            newSection->name,
+            newSection->id,
+            player_get_day(),
+            data->daysToComplete,
+            data->staffAssigned);
+        message_new("Build Mission Begin!");
+        if (win->parent)
+        {
+            if ((strcmp(win->parent->name,"station_buy_menu") == 0)||
+                (strcmp(win->parent->name,"facility_buy_menu") == 0))
+            {
+                gf2d_window_free(win->parent);
+            }
+        }
+        station_menu_select_segment(gf2d_window_get_by_name("station_menu"),newSection->id);
         gf2d_window_free(win);
         return;
     }
@@ -345,6 +381,53 @@ void work_menu_setup(Window *win,WorkMenuData *data)
         }
         return;
     }
+    else if (strcmp(data->action,"build_section")==0)
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),"Build Order");
+        gfc_line_sprintf(buffer,"Build %s?",station_def_get_display_name(data->what));
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"subject"),buffer);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"action_label"),"build");
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"text"),"Order a crew to build the station section.");
+        
+        if (data->staffAssigned < WORK_CREW_MIN)
+        {
+            data->daysToComplete = -1;
+            data->workPossible = 0;
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
+        }
+        else
+        {
+            data->daysToComplete = MAX(1,station_def_get_build_time_by_name(data->what)/data->staffAssigned);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+        }
+        gfc_line_sprintf(buffer,"Staff: %i / %i",data->staffAssigned,WORK_CREW_MAX);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
+
+        e = gf2d_window_get_element_by_name(win,"costs");
+        if (!e)return;
+        gf2d_element_list_free_items(e);
+        
+        if (data->costs)
+        {
+            if (!resources_list_afford(player_get_resources(),data->costs))data->cost = 1;
+            cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->costs,NULL);
+            gf2d_element_list_add_item(e,cost_list);
+        }
+        if (data->daysToComplete < 0)
+        {
+            data->workPossible = 0;
+            gfc_line_sprintf(buffer,"Time To Complete: Cannot Complete");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_RED);
+        }
+        else
+        {
+            gfc_line_sprintf(buffer,"Time To Complete: %i days",data->daysToComplete);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_WHITE);
+        }
+        return;
+    }
     
     if (data->section)
     {
@@ -554,6 +637,10 @@ Window *work_menu(
         if (strcmp(action,"build_facility")==0)
         {
             data->costs = station_facility_get_resource_cost(what,"cost");
+        }
+        else if (strcmp(action,"build_section")==0)
+        {
+            data->costs = station_get_resource_cost(what);
         }
     }
     data->facilityList = facilityList;

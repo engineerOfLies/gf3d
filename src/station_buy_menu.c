@@ -22,6 +22,7 @@
 #include "station_def.h"
 #include "station.h"
 #include "station_menu.h"
+#include "work_menu.h"
 #include "station_extension_menu.h"
 #include "station_buy_menu.h"
 
@@ -123,9 +124,18 @@ int station_buy_menu_update(Window *win,List *updateList)
         }
         if (strcmp(e->name,"buy")==0)
         {
+            if (win->child)return 1;
             if (resources_list_afford(player_get_resources(),data->cost))
             {
-                resource_list_buy(player_get_resources(), data->cost);
+                win->child = work_menu(
+                    win,
+                    NULL,
+                    data->parent,
+                    NULL,
+                    "build_section",
+                    station_def_get_name_by_display(data->selected),
+                    vector2d(data->slot,0));
+/*                resource_list_buy(player_get_resources(), data->cost);
                 newSection = station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
                 if (!freeBuildMode)
                 {
@@ -144,7 +154,8 @@ int station_buy_menu_update(Window *win,List *updateList)
                         0);
                 }
                 station_menu_select_segment(win->parent,newSection->id);
-                gf2d_window_free(win);
+                gf2d_window_free(win);*/
+                return 1;
             }
             else
             {
