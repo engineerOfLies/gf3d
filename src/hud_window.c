@@ -26,6 +26,7 @@
 #include "personnel_menu.h"
 #include "resources_menu.h"
 #include "planet_menu.h"
+#include "mission_list_menu.h"
 #include "market_menu.h"
 #include "main_menu.h"
 #include "hud_window.h"
@@ -208,20 +209,6 @@ int hud_update(Window *win,List *updateList)
             win->child = station_menu_window(win,player_get_station_data());
             return 1;
         }
-        if (strcmp(e->name,"resources")==0)
-        {
-            if ((win->child)&&(gf2d_window_named(win->child,"resources_menu")))
-            {
-                gf2d_window_free(win->child);
-                return 1;
-            }
-            if (win->child)
-            {
-                gf2d_window_free(win->child);
-            }
-            win->child = resources_menu(win);
-            return 1;
-        }
         if (strcmp(e->name,"planet")==0)
         {
             if ((win->child)&&(gf2d_window_named(win->child,"planet_menu")))
@@ -248,6 +235,20 @@ int hud_update(Window *win,List *updateList)
                 gf2d_window_free(win->child);
             }
             win->child = market_menu(win);
+            return 1;
+        }
+        if (strcmp(e->name,"missions")==0)
+        {
+            if ((win->child)&&(gf2d_window_named(win->child,"mission_list_menu")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
+            if (win->child)
+            {
+                gf2d_window_free(win->child);
+            }
+            win->child = mission_list_menu(win);
             return 1;
         }
         
@@ -285,7 +286,6 @@ int hud_draw(Window *win)
     List *resources;
     Color color;
     float cash,lastCash;
-    Uint32 day,hour;
     Vector2D res, position;
     HUDWindowData *data;
     PlayerData *player;
@@ -300,8 +300,6 @@ int hud_draw(Window *win)
     world_draw(data->w);
     planet_draw(player_get_planet());
     
-    day = player_get_day();
-    hour = player_get_hour();
     
     position.x = res.x * 0.74;
     position.y = res.y - 100;
@@ -317,7 +315,7 @@ int hud_draw(Window *win)
     {
         gfc_line_sprintf(buffer,"-<PAUSED>-");
     }
-    else gfc_line_sprintf(buffer,"Year: %i  Day: %i  Time: %02i:00  ",2280 + (day / 365),day,hour);
+    else get_datetime(buffer);
     gf2d_font_draw_line_tag(buffer,FT_H6,gfc_color8(255,255,255,255), position);
     position.y += spacing;
     

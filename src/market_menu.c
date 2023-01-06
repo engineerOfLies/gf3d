@@ -54,7 +54,6 @@ int market_menu_free(Window *win)
 
 void market_purchase_ok(Window *win)
 {
-    TextLine buffer;
     int amount = -1;
     float cost = 0;
     float credits = 0;
@@ -82,15 +81,16 @@ void market_purchase_ok(Window *win)
         message_printf("however, you do not have enough credits for the order");
         return;
     }
-    gfc_line_sprintf(buffer,"%i",amount);
     resources_list_withdraw(data->playerSupply,"credits",cost);
     mission_begin(
         "Commodity Order",
-        "commodity_order",
+        NULL,//TODO: base this off of who is the market officer
+        "buy",
+        "commodity",
         data->resource,
-        buffer,
+        amount,
         player_get_day(),
-        player_get_day()+15,//TODO: base this on WHO we are buying from
+        14,//TODO: base this on WHO we are buying from
         0);
     message_printf("It will arrive in %i days",15);
 }

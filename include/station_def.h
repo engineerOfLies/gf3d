@@ -80,5 +80,10 @@ const char *station_def_get_extension_mount_type(const char *section,Uint8 exten
  */
 const char *station_def_get_mount_type(const char *section);
 
+/**
+ * @brief get how long it will take a station to be built by name
+ */
+int station_def_get_build_time_by_name(const char *name);
+
 
 #endif

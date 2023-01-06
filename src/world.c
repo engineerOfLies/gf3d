@@ -121,6 +121,35 @@ World *world_load(char *filename)
     return w;
 }
 
+void get_date_of(char *output,Uint32 day)
+{
+    if (!output)return;
+    gfc_line_sprintf(output,"%02i/%02i/%04i",(day%360)%30+1,(day%360)/30+1,2280 + (day / 360));
+}
+
+void get_date(char *output)
+{
+    int day;
+    if (!output)return;
+    day = player_get_day();
+    get_date_of(output,day);
+}
+
+void get_datetime_of(char *output,Uint32 day,Uint32 hour)
+{
+    if (!output)return;
+    gfc_line_sprintf(output,"%02i/%02i/%04i %02i:00 Day: %i",(day%360)%30+1,(day%360)/30+1,2280 + (day / 360),hour,day);
+}
+
+void get_datetime(char *output)
+{
+    int day,hour;
+    if (!output)return;
+    day = player_get_day();
+    hour = player_get_hour();
+    get_datetime_of(output,day,hour);
+}
+
 ModelMat *world_get_model_mat(World *world,Uint32 index)
 {
     if (!world)return NULL;

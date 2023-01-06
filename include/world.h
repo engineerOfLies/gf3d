@@ -27,6 +27,35 @@ typedef struct
     Mix_Music *backgroundMusic;
 }World;
 
+/**
+ * @brief get the current date formatted to Y: yyyy D: ddd
+ * @param output a TextLine or longer string
+ */
+void get_date(char *output);
+
+/**
+ * @brief get the current date and time formatted to Y: yyyy D: ddd T: hh:00 of a specific day
+ * @param output a TextLine or longer string
+ * @param day the day to use
+ */
+void get_date_of(char *output,Uint32 day);
+
+
+/**
+ * @brief convert a specific time to datetime
+ * @param output a TextLine or longer string
+ * @param day the day to use
+ * @param hour the hour to use
+ */
+void get_datetime_of(char *output,Uint32 day,Uint32 hour);
+
+
+/**
+ * @brief get the current date and time formatted to Y: yyyy D: ddd T: hh:00
+ * @param output a TextLine or longer string
+ */
+void get_datetime(char *output);
+
 World *world_load(char *filename);
 
 void world_draw(World *world);

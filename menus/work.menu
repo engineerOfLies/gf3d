@@ -80,23 +80,13 @@
                 [
                     {
                         "type": "label",
-                        "name":"section",
-                        "bounds": [0,0,320,60],
+                        "name":"subject",
+                        "bounds": [0,0,320,40],
                         "text":"Section Name",
                         "wraps":true,
                         "justify" : "left",
                         "align" : "top",
-                        "style":"H5"
-                    },
-                    {
-                        "type": "label",
-                        "name":"facility",
-                        "bounds": [0,0,320,60],
-                        "text":"Facility Name",
-                        "wraps":true,
-                        "justify" : "left",
-                        "align" : "top",
-                        "style":"H5"
+                        "style":"small"
                     },
                     {
                         "type": "label",
@@ -175,13 +165,34 @@
                     },
                     {
                         "type": "label",
-                        "name":"cost",
-                        "bounds": [0,0,1,40],
-                        "text":"Cost: 1000cr",
+                        "bounds": [0,0,1,25],
+                        "text":"Cost:",
                         "wraps":true,
                         "justify" : "left",
                         "align" : "top",
                         "style":"H6"
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,0,328,60],
+                        "name":"costs",
+                        "style": "vertical",
+                        "backgroundColor":[0,0,0,250],
+                        "backgroundDraw":1,
+                        "item_size" : [320,90],
+                        "packed":true,
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "name":"cost",
+                                "bounds": [0,0,1,25],
+                                "text":" ",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            }
+                        ]
                     },
                     {
                         "type": "label",

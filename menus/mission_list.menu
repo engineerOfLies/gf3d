@@ -1,0 +1,154 @@
+{
+    "window":
+    {
+        "dimensions" : [0,80,900,490],
+        "name":"mission_list_menu",
+        "justify" : "center",
+        "elements":
+        [
+            {
+                "type": "label",
+                "bounds": [0,4,1,40],
+                "text":"Facilities",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
+                "type": "button",
+                "name":"done",
+                "bounds": [740,440,160,42],
+                "hotkey":"done",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Done",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "list",
+                "bounds": [10,38,880,30],
+                "style": "horizontal",
+                "packed":true,
+                "elements":
+                [
+
+                    {
+                        "type": "label",
+                        "bounds": [0,0,200,1],
+                        "text":"Mission",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"ID",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,200,1],
+                        "text":"Target",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,100,1],
+                        "text":"Started",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,100,1],
+                        "text":"Finish on",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"Left",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"Staff",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"View",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    }
+                ]
+            },
+            {
+                "type": "list",
+                "bounds": [10,65,880,350],
+                "name":"list_items",
+                "style": "vertical",
+                "backgroundColor":[0,0,0,250],
+                "backgroundDraw":1,
+                "cropped":true,
+                "scrolls":true,
+                "item_size" : [1,25],
+                "elements":
+                []
+            },
+            {
+                "type": "button",
+                "name":"scroll_up",
+                "bounds": [854,65,32,20],
+                "hotkey":"scroll_up",
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,32,20],
+                    "scale":[0.5,0.5],
+                    "actor" : "actors/arrow_button_up.json"
+                }
+            },
+            {
+                "type": "button",
+                "name":"scroll_down",
+                "bounds": [854,385,32,20],
+                "hotkey":"scroll_down",
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,-32,32,20],
+                    "scale":[0.5,-0.5],
+                    "actor" : "actors/arrow_button_up.json"
+                }
+            }
+        ]
+    }
+}

@@ -271,7 +271,7 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("cannot sell section, it's facilities have active jobs");
                     return 1;
                 }
-                win->child = work_menu(win,data->selection,NULL,"remove");
+                win->child = work_menu(win,NULL,data->selection,NULL,"remove",NULL,vector2d(0,0));
             }
             return 1;
         }
@@ -342,7 +342,7 @@ int station_menu_update(Window *win,List *updateList)
                 return 1;
             }
             if (win->child)return 1;
-            win->child = work_menu(win,data->selection,NULL,"repair");
+            win->child = work_menu(win,NULL,data->selection,NULL,"repair",NULL,vector2d(0,0));
             return 1;
         }
         if (strcmp(e->name,"build")==0)
@@ -494,6 +494,9 @@ void station_menu_select_segment(Window *win,int segment)
 
     gfc_line_sprintf(buffer,"Facility Slots: %i",data->selection->facilitySlots);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"facility_slots"),buffer);
+
+    gfc_line_sprintf(buffer,"Extension Slots: %i",data->selection->expansionSlots);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"extension_slots"),buffer);
 
     gfc_line_sprintf(buffer,"Facility Count: %i",gfc_list_get_count(data->selection->facilities));
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"section_facility_count"),buffer);

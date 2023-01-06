@@ -5,7 +5,24 @@
 #include "station_facility.h"
 #include "gf2d_windows.h"
 
-Window *work_menu(Window *parent, StationSection *section, StationFacility *facility,const char *action);
+/**
+ * @brief open up a work menu for things like repair, remove, and build for station sections and facilities
+ * @param parent the parent window
+ * @param facilityList if you are building a new facility, you need this to know where to build it.
+ * @param section you need this for a section remove or repair order
+ * @param facility you need this for a facility remove or repair order
+ * @param action what is happening "repair","remove","build_facility","build_section"
+ * @param where if this a planet facility to be build, where to build it
+ * @return a pointer to the new window, NULL if failed
+ */
+Window *work_menu(
+    Window *parent,
+    List *facilityList,
+    StationSection *section,
+    StationFacility *facility,
+    const char *action,
+    const char *what,
+    Vector2D where);
 
 
 #endif

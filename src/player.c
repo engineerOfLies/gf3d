@@ -487,6 +487,7 @@ void player_hour_advance()
             message_new("HAPPY NEW YEAR!");
             resources_list_free(data->lastYear);
             data->lastYear = resources_list_duplicate(data->resources);
+            // TODO show annual report
         }
         station_upkeep(player_get_station_data());
         planet_facilities_update(player_get_planet());

@@ -134,11 +134,13 @@ int station_buy_menu_update(Window *win,List *updateList)
                     gfc_line_sprintf(buffer,"%i",newSection->id);
                     newSection->mission = mission_begin(
                         "Section Construction",
-                        "build_section",
+                        NULL,
+                        "build",
+                        "section",
                         newSection->name,
-                        buffer,
+                        newSection->id,
                         player_get_day(),
-                        player_get_day() + 2,
+                        station_def_get_build_time_by_name(newSection->name),
                         0);
                 }
                 station_menu_select_segment(win->parent,newSection->id);

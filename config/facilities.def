@@ -395,7 +395,7 @@
         {
             "name":"market_square",
             "displayName":"Market Square",
-            "description":"This designates an area of the station where the general public can set up their own shops to buy, sell, and trade (legal) goods.  This improves the lives of the citizens of the station and increases revenues for the station as we collect rent and sales tax.",
+            "description":"This designates an area of the station where the general public can set up their own shops to buy, sell, and trade (legal) goods.  Buskars and beggers will show up too.  This improves the lives of the citizens of the station and increases revenues for the station as we collect rent and sales tax.",
             "type":"commercial",
             "cost":
             {   
@@ -403,12 +403,89 @@
                 "common_materials":50,
                 "alloys":50
             },
-            "morale":15,
+            "energyDraw":100,
             "commerce":40,
             "opportunities":40,
+            "entertainment":20,
             "crimeRate":20,
-            "serviceLimit":200,
-            "serviceRate":0.25,
+            "staffPositions":10,
+            "staffRequired":10,
+            "officerSlot":true,
+            "buildTime":5,
+            "workTime":7
+        },
+        {
+            "name":"culinary_district",
+            "displayName":"Culinary District",
+            "description":"This designates an area of the station where the general public can set food vendors, restaurants, public houses, and bars.  Appointing a director will let them setup a premier location in the district.",
+            "type":"commercial",
+            "cost":
+            {   
+                "credits":1000,
+                "common_materials":50,
+                "alloys":50
+            },
+            "upkeep":
+            {
+                "food":10
+            },
+            "commerce":50,
+            "energyDraw":100,
+            "entertainment":50,
+            "opportunities":50,
+            "crimeRate":10,
+            "staffPositions":10,
+            "staffRequired":10,
+            "officerSlot":true,
+            "buildTime":5,
+            "workTime":7
+        },
+        {
+            "name":"theatre_district",
+            "displayName":"Theatre District",
+            "description":"This designates an area of the station where the general public can set up viewings of movies and live performances of circus, plays, musicals, or opera.  Designating a Director will guide the type of performances put on display here.",
+            "type":"commercial",
+            "cost":
+            {   
+                "credits":1000,
+                "common_materials":50,
+                "alloys":50
+            },
+            "upkeep":
+            {
+                "food":10
+            },
+            "commerce":50,
+            "energyDraw":200,
+            "entertainment":100,
+            "opportunities":50,
+            "crimeRate":10,
+            "staffPositions":10,
+            "staffRequired":10,
+            "officerSlot":true,
+            "buildTime":5,
+            "workTime":7
+        },
+        {
+            "name":"casino",
+            "displayName":"Casino",
+            "description":"This designates an area of the station to be set up as a casino.",
+            "type":"commercial",
+            "cost":
+            {   
+                "credits":1000,
+                "common_materials":50,
+                "alloys":50
+            },
+            "upkeep":
+            {
+                "food":20
+            },
+            "commerce":50,
+            "energyDraw":200,
+            "entertainment":200,
+            "opportunities":50,
+            "crimeRate":50,
             "staffPositions":10,
             "staffRequired":10,
             "officerSlot":true,

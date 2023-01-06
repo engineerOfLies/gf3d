@@ -196,7 +196,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
             if (win->child)return 1;
             if (facility_buy_check_possible(win))
             {
-                station_facility_build(station_facility_get_name_from_display(data->selected),data->position,data->facilityList);
+                station_facility_build(station_facility_get_name_from_display(data->selected),data->position,data->facilityList,0);
                 facility_menu_set_list(win->parent);
                 gf2d_window_free(win);
             }

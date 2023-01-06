@@ -89,7 +89,7 @@ void facility_menu_select_item(Window *win,int choice)
 void facility_menu_refresh_view(Window *win)
 {
     SJson *def;
-    TextLine buffer;
+    TextLine buffer,buffer2;
     int workTime = 0;
     const char *str,*name;
     Element *e;
@@ -152,6 +152,10 @@ void facility_menu_refresh_view(Window *win)
     {
         gfc_line_sprintf(buffer,"Action: %s",data->facility->mission->title);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),buffer);
+    }
+    else if ((!data->facility->inactive))
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: Working");        
     }
     else
     {
@@ -244,7 +248,8 @@ void facility_menu_refresh_view(Window *win)
         if ((!data->facility->inactive)&&(!data->facility->disabled))
         {
             workTime = station_facility_get_work_time(data->facility->name);
-            gfc_line_sprintf(buffer,"Next Production Day: %02i",data->facility->lastProduction + workTime);
+            get_date_of(buffer2,data->facility->lastProduction + workTime);
+            gfc_line_sprintf(buffer,"Next Production on: %s",buffer2);
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productionNext"),buffer);
         }
     }
@@ -269,30 +274,15 @@ void facility_menu_yes(void *Data)
     gfc_line_sprintf(buffer,"%i",facility->id);
     facility->mission = mission_begin(
         "Facility Removal",
-        "facility_sale",
-        facility->name,
-        buffer,
+        NULL,
+        "removal",
+        "facility",
+        station_facility_get_display_name(facility->name),
+        facility->id,
         player_get_day(),
-        player_get_day()+2,
+        station_facility_get_build_time(facility->name)/2,
         0);//TODO make this staffed
 
-    /*
-    cost = station_facility_get_resource_cost(station_facility_get_name_from_display(data->selected),"cost");
-    resource_list_sell(player_get_resources(), cost,0.9);
-    resources_list_free(cost);
-    
-    facility = gfc_list_get_nth(data->facilityList,data->choice);
-    station_facility_free(facility);
-    gfc_list_delete_nth(data->facilityList,data->choice);
-    
-    if (win->parent)
-    {
-        if (strcmp(win->parent->name,"planet_menu")==0)
-        {
-            data->facilityLimit--;
-        }
-    }
-    */
     facility_menu_refresh_view(win);
 }
 
@@ -372,7 +362,7 @@ int facility_menu_update(Window *win,List *updateList)
                 return 1;
             }
             if (win->child)return 1;
-            win->child = work_menu(win,NULL,data->facility,"repair");
+            win->child = work_menu(win,NULL,NULL,data->facility,"repair",NULL,vector2d(0,0));
             return 1;
         }
         if (strcmp(e->name,"sell")==0)
@@ -384,7 +374,7 @@ int facility_menu_update(Window *win,List *updateList)
             }
             if (!data->facility)return 1;
             if (win->child)return 1;
-            win->child = work_menu(win,NULL,data->facility,"remove");
+            win->child = work_menu(win,NULL,NULL,data->facility,"remove",NULL,vector2d(0,0));
             return 1;
         }
 

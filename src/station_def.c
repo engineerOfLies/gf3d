@@ -86,6 +86,16 @@ int station_def_is_unique(const char *name)
     return 0;
 }
 
+int station_def_get_build_time_by_name(const char *name)
+{
+    int time = 0;
+    SJson *section;
+    section = config_def_get_by_name("sections",name);
+    if (!section)return 0;
+    sj_object_get_value_as_int(section,"buildTime",&time);
+    return time;
+}
+
 int station_def_get_extension_count_by_name(const char *name)
 {
     return station_def_get_extension_count(config_def_get_by_name("sections",name));

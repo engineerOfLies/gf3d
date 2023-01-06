@@ -293,6 +293,7 @@ void station_facility_check(StationFacility *facility)
 
 void station_facility_remove(StationFacility *facility)
 {
+    Window *win;
     PlanetData *planet;
     StationSection *section;
     if (!facility)return;
@@ -304,6 +305,8 @@ void station_facility_remove(StationFacility *facility)
         //station section
         gfc_list_delete_data(section->facilities,facility);
         station_facility_free(facility);
+        win = gf2d_window_get_by_name("station_facility_menu");
+        if (win)facility_menu_set_list(win);
         return;
     }
     planet = player_get_planet();
@@ -314,11 +317,25 @@ void station_facility_remove(StationFacility *facility)
             gfc_list_delete_data(planet->facilities,facility);
             slog("planet facility %s removed",facility->displayName);
             station_facility_free(facility);
+            win = gf2d_window_get_by_name("station_facility_menu");
+            if (win)facility_menu_set_list(win);
             return;
         }
     }
     // any other place where a facility may be
     station_facility_free(facility);//couldn't find it anywhere, but still delete it
+    win = gf2d_window_get_by_name("station_facility_menu");
+    if (win)facility_menu_set_list(win);
+}
+
+Uint32 station_facility_get_build_time(const char *name)
+{
+    SJson *def;
+    Uint32 workTime = 0;
+    def = config_def_get_by_name("facilities",name);
+    if (!def)return 0;
+    sj_object_get_value_as_uint32(def,"buildTime",&workTime);
+    return workTime;
 }
 
 Uint32 station_facility_get_work_time(const char *name)
@@ -572,20 +589,20 @@ int station_facility_is_singleton(const char *name)
     return 0;
 }
 
-void station_facility_build(const char *name,Vector2D position,List *parentList)
+void station_facility_build(const char *name,Vector2D position,List *parentList,Uint32 staff)
 {
     int buildTime = 5;
     TextLine buffer;
     StationFacility *new_facility;
     List *cost;
-    cost = station_facility_get_resource_cost(name,"cost");
-    resource_list_buy(player_get_resources(), cost);
     
     new_facility = station_facility_new_by_name(name,-1);
     vector2d_copy(new_facility->position,position);
     gfc_list_append(parentList,new_facility);
     if (!freeBuildMode)
     {
+        cost = station_facility_get_resource_cost(name,"cost");
+        resource_list_buy(player_get_resources(), cost);
         sj_get_integer_value(config_def_get_value("facilities", name, "buildTime"),&buildTime);
         new_facility->working = 1;
         new_facility->disabled = 1;
@@ -594,13 +611,16 @@ void station_facility_build(const char *name,Vector2D position,List *parentList)
         gfc_line_sprintf(buffer,"%i",new_facility->id);
         new_facility->mission = mission_begin(
             "Facility Construction",
-            "build_facility",
-            new_facility->name,
-            buffer,
+            NULL,
+            "build",
+            "facility",
+            station_facility_get_display_name(new_facility->name),
+            new_facility->id,
             player_get_day(),
-            player_get_day() + buildTime,
-            0);
+            buildTime,
+            staff);
     }
+    facility_menu_set_list(gf2d_window_get_by_name("facility_menu"));
     resources_list_free(cost);
 }
 
