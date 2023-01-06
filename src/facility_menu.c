@@ -319,6 +319,11 @@ int facility_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"staff_assign")==0)
         {
             if (!data->facility)return 1;//nothing selected
+            if (data->facility->damage < 0)
+            {
+                message_new("Cannot change staff assignments while under construction");
+                return 1;
+            }
             if (data->facility->staffAssigned < data->facility->staffPositions)
             {
                 if (player->staff <= 0)
@@ -337,6 +342,11 @@ int facility_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"staff_remove")==0)
         {
             if (!data->facility)return 1;//nothing selected
+            if (data->facility->damage < 0)
+            {
+                message_new("Cannot change staff assignments while under construction");
+                return 1;
+            }
             if (data->facility->staffAssigned > 0)
             {
                 if (station_facility_change_staff(data->facility,-1) == 0)

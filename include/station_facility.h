@@ -75,8 +75,9 @@ StationFacility *station_facility_new_by_name(const char *name,int id);
  * @param position if its planetary, where on the planet
  * @param parentList the station section or planet facility list to add this to
  * @param staff the staff assigned to build it
+ * @param buildTime how many days it will take to complete
  */
-void station_facility_build(const char *name,Vector2D position,List *parentList,Uint32 staff);
+void station_facility_build(const char *name,Vector2D position,List *parentList,Uint32 staff,int buildTime);
 
 /**
  * @brief load a station facility based on config

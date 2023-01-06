@@ -115,6 +115,16 @@ void mission_build_facility(Mission *mission)
     facility->disabled = 0;
     facility->damage = 0;
     facility->mission = NULL;
+    if (facility->staffPositions > 0)
+    {
+        facility->staffAssigned = mission->staff;
+        mission->staff = 0;
+        if (facility->staffAssigned > facility->staffPositions)
+        {
+            mission->staff = (facility->staffAssigned - facility->staffPositions);
+            facility->staffAssigned = facility->staffPositions;
+        }
+    }
     message_printf("Construction of Facility %s complete",facility->displayName);
 }
 
@@ -204,7 +214,6 @@ void mission_facility_produce(Mission *mission)
 void mission_execute(Mission *mission)
 {
     if (!mission)return;
-    player_return_staff(mission->staff);
     if (gfc_strlcmp(mission->missionType,"build") == 0)
     {
         if (gfc_strlcmp(mission->missionSubject,"facility") == 0)
@@ -280,6 +289,7 @@ void mission_update_all()
         if (day >= mission->dayFinished)
         {
             mission_execute(mission);
+            player_return_staff(mission->staff);
             mission_free(mission);
             gfc_list_delete_nth(mission_manager.mission_list,i);
         }

@@ -46,7 +46,7 @@
             "staffPositions":10,
             "staffRequired":5,
             "officerSlot":false,
-            "buildTime":10,
+            "buildTime":30,
             "workTime":10,
             "produces":
             {
@@ -69,7 +69,7 @@
             "energyOutput":1000,
             "officerSlot":true,
             "workTime":1,
-            "buildTime":10,
+            "buildTime":35,
             "upkeep":
             {
                 "fuel":1
@@ -91,7 +91,7 @@
             "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
-            "buildTime":14,
+            "buildTime":40,
             "workTime":10,
             "upkeep":
             {
@@ -118,7 +118,7 @@
             "staffRequired":10,
             "energyDraw":100,
             "officerSlot":true,
-            "buildTime":14,
+            "buildTime":40,
             "workTime":15,
             "upkeep":
             {
@@ -143,7 +143,7 @@
             "crimeRate":10,
             "staffPositions":10,
             "staffRequired":5,
-            "buildTime":30,
+            "buildTime":60,
             "housing":200,
             "energyDraw":100,
             "officerSlot":true
@@ -161,7 +161,7 @@
                 "common_materials":100
             },
             "staffPositions":10,
-            "buildTime":30,
+            "buildTime":65,
             "staffRequired":5,
             "housing":10,
             "energyDraw":100,
@@ -184,7 +184,7 @@
             "energyDraw":200,
             "officerSlot":true,
             "workTime":10,
-            "buildTime":14,
+            "buildTime":50,
             "upkeep":
             {
                 "minerals":10
@@ -207,7 +207,7 @@
             },
             "crimeRate":5,
             "storage":100,
-            "buildTime":7,
+            "buildTime":30,
             "officerSlot":false
         },
         {
@@ -216,7 +216,7 @@
             "icon":"",
             "description":"This facility is equipped to store and make available large quantities of commodities.  It's capacity is an impressive 2000 tons",
             "type":"large_storage",
-            "buildTime":14,
+            "buildTime":60,
             "cost":
             {   
                 "credits":2000,
@@ -236,7 +236,7 @@
                 "credits":1500,
                 "alloys":100
             },
-            "buildTime":7,
+            "buildTime":30,
             "commerce":10,
             "crimeRate":5,
             "staffPositions":20,
@@ -254,7 +254,7 @@
                 "credits":3000,
                 "alloys":200
             },
-            "buildTime":14,
+            "buildTime":50,
             "crimeRate":10,
             "commerce":20,
             "opportunities":10,
@@ -273,7 +273,7 @@
                 "credits":6000,
                 "alloys":400
             },
-            "buildTime":21,
+            "buildTime":70,
             "crimeRate":15,
             "commerce":40,
             "opportunities":20,
@@ -298,7 +298,7 @@
             "crimeRate":20,
             "commerce":200,
             "opportunities":100,
-            "buildTime":30,
+            "buildTime":60,
             "energyDraw":100,
             "workTime":10,
             "officerSlot":true,
@@ -317,7 +317,7 @@
                 "alloys":10
             },
             "staffPositions":5,
-            "buildTime":2,
+            "buildTime":20,
             "staffRequired":5,
             "officerSlot":true,
             "workTime":2
@@ -338,7 +338,7 @@
             "staffRequired":10,
             "officerSlot":true,
             "workTime":10,
-            "buildTime":5,
+            "buildTime":35,
             "extract":"minerals",
             "produces":
             {
@@ -360,7 +360,7 @@
             "staffPositions":20,
             "staffRequired":10,
             "officerSlot":true,
-            "buildTime":5,
+            "buildTime":35,
             "workTime":10,
             "extract":"ores",
             "produces":
@@ -384,7 +384,7 @@
             "staffPositions":40,
             "staffRequired":20,
             "officerSlot":true,
-            "buildTime":5,
+            "buildTime":35,
             "workTime":15,
             "extract":"nutrients",
             "produces":

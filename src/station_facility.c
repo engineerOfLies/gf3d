@@ -426,6 +426,8 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     {
         //survey site is now working
         planet_site_survey(player_get_planet(),facility->position);
+        player_return_staff(facility->staffAssigned);
+        facility->staffAssigned = 0;
         facility->disabled = 1;
         facility->inactive = 1;
         return;
@@ -589,9 +591,8 @@ int station_facility_is_singleton(const char *name)
     return 0;
 }
 
-void station_facility_build(const char *name,Vector2D position,List *parentList,Uint32 staff)
+void station_facility_build(const char *name,Vector2D position,List *parentList,Uint32 staff,int buildTime)
 {
-    int buildTime = 5;
     TextLine buffer;
     StationFacility *new_facility;
     List *cost;
@@ -603,7 +604,6 @@ void station_facility_build(const char *name,Vector2D position,List *parentList,
     {
         cost = station_facility_get_resource_cost(name,"cost");
         resource_list_buy(player_get_resources(), cost);
-        sj_get_integer_value(config_def_get_value("facilities", name, "buildTime"),&buildTime);
         new_facility->working = 1;
         new_facility->disabled = 1;
         new_facility->inactive = 1;

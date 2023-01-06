@@ -64,29 +64,36 @@ int work_menu_free(Window *win)
 
 void work_mission(Window *win)
 {
-    TextLine buffer;
     Uint32 day;
     WorkMenuData *data;
     if (!gf2d_window_check(win,"work_menu"))return;
     data = win->data;
-    
-    resources_list_withdraw(player_get_resources(),"credits",data->cost);
-    
+        
     day = player_get_day();
     
     if (strcmp(data->action,"build_facility")==0)
     {
         if (freeBuildMode)data->daysToComplete = 0;
         
-        station_facility_build(data->what,data->position,data->facilityList,data->staffAssigned);
+        station_facility_build(data->what,data->position,data->facilityList,data->staffAssigned,data->daysToComplete);
 
         data->inProgress = 1;
         work_menu_setup(win,data);
         data->staffAssigned = 0;
         message_new("Work Mission Begin!");
+        if (win->parent)
+        {
+            if ((strcmp(win->parent->name,"station_buy_menu") == 0)||
+                (strcmp(win->parent->name,"facility_buy_menu") == 0))
+            {
+                gf2d_window_free(win->parent);
+            }
+        }
+        gf2d_window_free(win);
         return;
     }
 
+    resources_list_withdraw(player_get_resources(),"credits",data->cost);
     if (data->facility)
     {
         if (strcmp(data->action,"repair")==0)
@@ -104,7 +111,6 @@ void work_mission(Window *win)
         }
         else if (strcmp(data->action,"remove")==0)
         {
-            gfc_line_sprintf(buffer,"%i",data->facility->id);
             if (freeBuildMode)
             {
                 data->facility->mission = mission_begin(
@@ -115,8 +121,8 @@ void work_mission(Window *win)
                     station_facility_get_display_name(data->facility->name),
                     data->facility->id,
                     day,
-                    data->daysToComplete,
-                    data->staffAssigned);
+                    0,
+                    0);
             }
             else
             {
@@ -129,7 +135,7 @@ void work_mission(Window *win)
                     data->facility->id,
                     day,
                     data->daysToComplete,
-                    0);
+                    data->staffAssigned);
             }
         }
         data->facility->working = 1;
@@ -179,6 +185,7 @@ void work_mission(Window *win)
     work_menu_setup(win,data);
     data->staffAssigned = 0;
     message_new("Work Mission Begin!");
+    gf2d_window_free(win);
 }
 
 int work_menu_update(Window *win,List *updateList)
@@ -188,7 +195,7 @@ int work_menu_update(Window *win,List *updateList)
     Element *e;
     WorkMenuData *data;
     if (!win)return 0;
-    if (!updateList)return 0;
+    if (!updateList)return 1;
     data = (WorkMenuData*)win->data;
     player = player_get_data();
     count = gfc_list_get_count(updateList);
@@ -302,20 +309,41 @@ void work_menu_setup(Window *win,WorkMenuData *data)
         if (data->staffAssigned < WORK_CREW_MIN)
         {
             data->daysToComplete = -1;
+            data->workPossible = 0;
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
         }
         else
         {
             data->daysToComplete = MAX(1,station_facility_get_build_time(data->what)/data->staffAssigned);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
         }
+        gfc_line_sprintf(buffer,"Staff: %i / %i",data->staffAssigned,WORK_CREW_MAX);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
+
         e = gf2d_window_get_element_by_name(win,"costs");
         if (!e)return;
         gf2d_element_list_free_items(e);
         
         if (data->costs)
         {
+            if (!resources_list_afford(player_get_resources(),data->costs))data->cost = 1;
             cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->costs,NULL);
             gf2d_element_list_add_item(e,cost_list);
         }
+        if (data->daysToComplete < 0)
+        {
+            data->workPossible = 0;
+            gfc_line_sprintf(buffer,"Time To Complete: Cannot Complete");
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_RED);
+        }
+        else
+        {
+            gfc_line_sprintf(buffer,"Time To Complete: %i days",data->daysToComplete);
+            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_WHITE);
+        }
+        return;
     }
     
     if (data->section)
@@ -491,7 +519,14 @@ void work_menu_setup(Window *win,WorkMenuData *data)
     }
 }
 
-Window *work_menu(Window *parent, List *facilityList, StationSection *section, StationFacility *facility,const char *action,const char *what,Vector2D where)
+Window *work_menu(
+    Window *parent,
+    List *facilityList,
+    StationSection *section,
+    StationFacility *facility,
+    const char *action,
+    const char *what,
+    Vector2D where)
 {
     Window *win;
     WorkMenuData *data;
@@ -515,8 +550,8 @@ Window *work_menu(Window *parent, List *facilityList, StationSection *section, S
     if (action)gfc_line_cpy(data->action,action);
     if (what)
     {
-        gfc_line_cpy(data->action,what);
-        if (strcmp(what,"build_facility")==0)
+        gfc_line_cpy(data->what,what);
+        if (strcmp(action,"build_facility")==0)
         {
             data->costs = station_facility_get_resource_cost(what,"cost");
         }
