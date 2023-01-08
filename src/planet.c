@@ -23,7 +23,7 @@ void planet_site_survey(PlanetData *planet,Vector2D position)
     if (!site)return;
     site->surveyed = 1;
     //TODO: check if there is anything special about this site and then reveal it
-    message_printf("Survery complete.  Site revealed %i nutrients, %i minerals, and %i ores",site->resources[SRT_Nutrients],site->resources[SRT_Minerals],site->resources[SRT_Ores]);
+    
 }
 
 int planet_site_surveyed(PlanetData *planet,Vector2D position)

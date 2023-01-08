@@ -50,7 +50,7 @@
             "workTime":10,
             "produces":
             {
-                "fuel":10
+                "fuel":15
             }
         },
         {
@@ -365,7 +365,7 @@
             "extract":"ores",
             "produces":
             {
-                "minerals":100
+                "ores":100
             }
         },
         {

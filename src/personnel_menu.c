@@ -69,6 +69,7 @@ int personnel_menu_update(Window *win,List *updateList)
         if (!e)continue;
         if (strcmp(e->name,"tax_raise")==0)
         {
+            if (player->taxRate >= 1)return 1;
             player->taxRate += 0.01;
             personnel_menu_update_resources(win);
             return 1;
@@ -77,6 +78,20 @@ int personnel_menu_update(Window *win,List *updateList)
         {
             player->taxRate -= 0.01;
             if (player->taxRate < 0)player->taxRate = 0;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"sales_tax_raise")==0)
+        {
+            if (player->salesTaxRate >= 1)return 1;
+            player->salesTaxRate += 0.01;
+            personnel_menu_update_resources(win);
+            return 1;
+        }
+        if (strcmp(e->name,"sales_tax_lower")==0)
+        {
+            player->salesTaxRate -= 0.01;
+            if (player->salesTaxRate < 0)player->salesTaxRate = 0;
             personnel_menu_update_resources(win);
             return 1;
         }
@@ -150,6 +165,9 @@ void personnel_menu_update_resources(Window *win)
 
     gfc_line_sprintf(buffer,"Taxes: %.2f %%",player->taxRate);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"taxes"),buffer);
+
+    gfc_line_sprintf(buffer,"Sales Tax: %.2f %%",player->salesTaxRate);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"sale_tax"),buffer);
 
     gfc_line_sprintf(buffer,"Wages: %.2fCr",player->wages);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"wages"),buffer);

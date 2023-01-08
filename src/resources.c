@@ -91,7 +91,7 @@ List *resources_list_parse(SJson *config)
         res = sj_object_get_value(config,name);
         if (!res)continue;
         sj_get_float_value(res,&count);
-        resources = resources_list_give(resources,name,count);
+        resources_list_give(resources,name,count);
     }
     return resources;
 }
@@ -163,7 +163,7 @@ void resource_list_sell(List *supply, List *cost,float rate)
     {
         resource = gfc_list_get_nth(cost,i);
         if (!resource)continue;
-        supply = resources_list_give(supply,resource->name,resource->amount*rate);
+        resources_list_give(supply,resource->name,resource->amount*rate);
     }
 }
 
@@ -224,24 +224,23 @@ void resources_list_withdraw(List *list,const char *name,float count)
     resource->amount -= count;
 }
 
-List *resources_list_give(List *list,const char *name,float count)
+void resources_list_give(List *list,const char *name,float count)
 {
     Resource *resource;
     if (!list)
     {
         slog("no resource list provided");
-        return NULL;
+        return;
     }
     resource = resources_list_get(list,name);
     if (!resource)
     {
         resource = resource_new();
-        if (!resource)return list;
+        if (!resource)return;
         gfc_line_cpy(resource->name,name);
-        list = gfc_list_append(list,resource);
+        gfc_list_append(list,resource);
     }
     resource->amount += count;
-    return list;
 }
 
 List *resources_get_default_prices()

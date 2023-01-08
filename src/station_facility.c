@@ -392,6 +392,7 @@ void station_facility_update(StationFacility *facility,float *energySupply)
 {
     int newMass;
     int space;
+    SiteData *site;
     Uint32 workTime = 0;
     StationData *station;
     const char *extract = NULL;
@@ -426,6 +427,11 @@ void station_facility_update(StationFacility *facility,float *energySupply)
     {
         //survey site is now working
         planet_site_survey(player_get_planet(),facility->position);
+        site = planet_get_site_data_by_position(player_get_planet(),facility->position);
+        if (site)
+        {
+            message_printf("Survery complete.  Site revealed %i nutrients, %i minerals, and %i ores",site->resources[SRT_Nutrients],site->resources[SRT_Minerals],site->resources[SRT_Ores]);
+        }
         player_return_staff(facility->staffAssigned);
         facility->staffAssigned = 0;
         facility->disabled = 1;

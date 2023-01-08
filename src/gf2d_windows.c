@@ -446,6 +446,7 @@ void gf2d_window_free(Window *win)
     {
         win->free_data(win);
     }
+    if (win->child)gf2d_window_free(win->child);
     gfc_list_delete_data(window_manager.window_deque,win);
     count = gfc_list_get_count(win->elements);
     for (i = 0;i < count;i++)

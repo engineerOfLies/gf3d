@@ -12,6 +12,8 @@
 #include "player.h"
 #include "world.h"
 
+static World *the_world = NULL;
+
 World *world_load(char *filename)
 {
     Vector4D globalColor = {0};
@@ -24,17 +26,17 @@ World *world_load(char *filename)
     ModelMat *m;
     const char *modelName = NULL;
     const char *str;
-    w = gfc_allocate_array(sizeof(World),1);
-    if (w == NULL)
-    {
-        slog("failed to allocate data for the world");
-        return NULL;
-    }
     json = sj_load(filename);
     if (!json)
     {
         slog("failed to load json file (%s) for the world data",filename);
-        free(w);
+        return NULL;
+    }
+    w = gfc_allocate_array(sizeof(World),1);
+    if (w == NULL)
+    {
+        slog("failed to allocate data for the world");
+        sj_free(json);
         return NULL;
     }
     wjson = sj_object_get_value(json,"world");
@@ -47,6 +49,7 @@ World *world_load(char *filename)
     }
     list = sj_object_get_value(wjson,"models");
     c = sj_array_get_count(list);
+    w->model_list = gfc_list_new();
     for (i = 0; i < c; i++)
     {
         item = sj_array_get_nth(list,i);
@@ -55,7 +58,7 @@ World *world_load(char *filename)
         if (!m)continue;
         gf3d_model_mat_parse(m,item);
         gf3d_model_mat_set_matrix(m);
-        w->model_list = gfc_list_append(w->model_list,m);
+        gfc_list_append(w->model_list,m);
     }
     
     modelName = sj_get_string_value(sj_object_get_value(wjson,"sky"));
@@ -113,11 +116,16 @@ World *world_load(char *filename)
         sj_value_as_vector3d(sj_object_get_value(item,"rotation"),&rotation);
         camera_entity_new(position,rotation);
     }
-    
+    item = sj_object_get_value(wjson,"sounds");
+    if (item)
+    {
+        w->sounds = gfc_sound_pack_parse(item);
+    }
     sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
-    
+    w->entity_list = gfc_list_new();
+    gfc_list_append(w->entity_list,gate_new(vector3d(0,-3000,0)));
     sj_free(json);
-    gate_new(vector3d(0,-3000,0));
+    the_world = w;
     return w;
 }
 
@@ -176,6 +184,7 @@ void world_delete(World *world)
 {
     int i,c;
     ModelMat *m;
+    Entity *entity;
     if (!world)return;
     c = gfc_list_get_count(world->model_list);
     for (i = 0; i < c; i++)
@@ -185,7 +194,17 @@ void world_delete(World *world)
         gf3d_model_mat_free(m);
     }
     gfc_list_delete(world->model_list);
+    c = gfc_list_get_count(world->entity_list);
+    for (i = 0; i < c; i++)
+    {
+        entity = gfc_list_get_nth(world->entity_list,i);
+        if (!entity)continue;
+        entity_free(entity);
+    }
+    gfc_list_delete(world->entity_list);
+    gfc_sound_pack_free(world->sounds);
     free(world);
+    the_world = NULL;
 }
 
 void world_run_updates(World *w)
@@ -200,5 +219,10 @@ void world_run_updates(World *w)
     }
 }
 
+void world_play_sound(const char *sound)
+{
+    if ((!the_world)||(!sound))return;
+    gfc_sound_pack_play(the_world->sounds, sound,0,1,-1,-1);
+}
 
 /*eol@eof*/

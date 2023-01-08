@@ -11,6 +11,8 @@
 #include "player.h"
 #include "player_history.h"
 #include "station_menu.h"
+#include "hud_window.h"
+#include "main_menu.h"
 #include "event_menu.h"
 #include "event_manager.h"
 
@@ -31,6 +33,28 @@ void event_manager_execute_effect(SJson *effect)
     if (!str)
     {
         slog("effect not valid");
+        return;
+    }
+    if (strcmp("game_over",str)==0)
+    {
+        value = sj_object_get_value_as_string(effect,"value");
+        if (strcmp("quit",value)==0)
+        {
+            main_menu();
+            return;
+        }
+        if (strcmp("reload",value)==0)
+        {
+            gf2d_window_free(gf2d_window_get_by_name("hud_window"));//shut it all down
+            hud_window("saves/quick.save");
+            return;
+        }
+        if (strcmp("restart",value)==0)
+        {
+            gf2d_window_free(gf2d_window_get_by_name("hud_window"));//shut it all down
+            main_menu_start_new_game();
+            return;
+        }
         return;
     }
     if (strcmp("set_history",str)==0)

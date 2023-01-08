@@ -636,6 +636,50 @@
                     "color":[200,200,200,255]
                 }
             ]
+        },
+        {
+            "name":"game_over_population",
+            "once":true,
+            "sound":"game_over",
+            "title":"Game Over",
+            "portrait":"models/drones/executive_drone_sad.png",
+            "text":"There are no more people living on the station.  It can no longer function.  You have failed as station commander.  How would you like to proceed?",
+            "options":
+            [
+                {
+                    "text":"Reload Last Quicksave",
+                    "color":[200,200,200,255],
+                    "effects":
+                    [
+                        {
+                            "effect":"game_over",
+                            "value":"reload"
+                        }
+                    ]
+                },
+                {
+                    "text":"Start A New Game",
+                    "color":[200,200,200,255],
+                    "effects":
+                    [
+                        {
+                            "effect":"game_over",
+                            "value":"restart"
+                        }
+                    ]
+                },
+                {
+                    "text":"Exit The Game",
+                    "color":[200,200,200,255],
+                    "effects":
+                    [
+                        {
+                            "effect":"game_over",
+                            "value":"quit"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

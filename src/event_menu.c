@@ -106,6 +106,11 @@ void event_menu_setup(Window *win,EventMenuData *data)
         if (!button)continue;
         gf2d_element_list_add_item(questions,button);
     }
+    text = sj_object_get_value_as_string(data->eventDef,"sound");
+    if (text)
+    {
+         world_play_sound(text);
+    }
 }
 
 Window *event_menu(Window *parent,const char *eventName)

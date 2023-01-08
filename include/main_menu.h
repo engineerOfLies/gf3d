@@ -5,5 +5,10 @@
 
 Window *main_menu();
 
+/**
+ * @brief start a new game
+ */
+void main_menu_start_new_game();
+
 
 #endif

@@ -13,6 +13,7 @@
 
 #include "resources.h"
 #include "station.h"
+#include "event_menu.h"
 #include "event_manager.h"
 #include "player.h"
 
@@ -357,14 +358,86 @@ Uint32 player_get_hour()
     return data->hour;
 }
 
+void player_lose_staff(int staff)
+{
+    StationFacility *facility;
+    int i,c;
+    c = player_get_facility_count();
+    slog("player losing %i staff",staff);
+    for (i = c - 1; (i >= 0)&&(staff > 0);--i)
+    {
+        //step through this backwards because the lower numbers are the priorities
+        facility = player_get_facility_nth(i);
+        if (!facility)continue;
+        if (facility->staffAssigned > 0)
+        {
+            facility->staffAssigned--;
+            staff--;
+        }
+    }
+}
+
+void player_station_exodus(int exodus)
+{
+    int totalStaff;
+    PlayerData *player;
+    StationData *station;
+    player = player_get_data();
+    station = player_get_station_data();
+    if ((!player)||(!station))return;
+
+    totalStaff = player->staff + station->staffAssigned;
+
+    if (exodus >= player->population)
+    {
+        //trigger game over
+        player->population = 0;
+        event_menu(NULL,"game_over_population");
+        return;
+    }
+    else
+    {
+        player->population -= exodus;
+        exodus = ((float)exodus * (totalStaff / (float)player->population));//percentage of total population
+        if (exodus > 0)
+        {
+            if (player->staff > 0)
+            {
+                //first we lose the un-assigned staff
+                player->staff -= exodus;
+                if (player->staff < 0)
+                {
+                    exodus = abs(player->staff);
+                    player->staff = 0;
+                }
+            }
+            if (exodus > 0)
+            {
+                //now we lose staff from the rest of the station
+                player_lose_staff(exodus);
+            }
+        }
+        if (player_has_working_dock())
+        {
+            message_printf("%i People have have left the station!",exodus);
+        }
+        else
+        {
+            message_printf("%i People have have died due to inhospitable conditions!",exodus);
+        }
+    }
+
+}
 
 void player_upkeep(PlayerData *player)
 {
     float amount;
     int totalStaff;
     float wages,taxes;
+    float housingFactor;
+    float foodFactor;
     float percent;
-    int food;
+    int food,exodus;
     StationData *station;
     if (!player)return;
     station = player_get_station_data();
@@ -372,6 +445,7 @@ void player_upkeep(PlayerData *player)
     if (!player->population)
     {
         message_printf("The Station Has Been Abandoned!");
+        event_menu(NULL,"game_over_population");
         return;
     }
     totalStaff = player->staff + station->staffAssigned;
@@ -379,7 +453,7 @@ void player_upkeep(PlayerData *player)
     resources_list_withdraw(player->resources,"credits",wages);
     message_printf("Paid out %.2fCr to station staff",wages);
     taxes = player->population * player->taxRate;
-    player->resources = resources_list_give(player->resources,"credits",taxes);
+    resources_list_give(player->resources,"credits",taxes);
     message_printf("Collected %.2fCr in taxes from the people living on the station.",taxes);
     food = (player->population/12);
     
@@ -387,22 +461,39 @@ void player_upkeep(PlayerData *player)
     if ((food)&&(amount < food))
     {
         message_new("There is not enough food to feed the people!");
-        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ ((1- rollWeight)*(amount / food));
+        foodFactor = (amount / food);
+        slog("food factor: %f",foodFactor);
         food = amount;
     }
     else
     {
         //this is good, it keeps going
-        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ (1- rollWeight);
+        foodFactor = 1;
     }
     if (player->population > station->housing)
     {
         message_printf("There is not adequate housing for the people! we need %i more working housing!",(int)(player->population - station->housing));
-        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ ((1- rollWeight)*((player->population - station->housing)/player->population));//percentage of population un housed
+        housingFactor = (1 - ((player->population - station->housing)/player->population));
+        slog("housing factor: %f",housingFactor);
     }
     else
     {
-        player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ (1- rollWeight);
+        housingFactor = 1;
+    }
+    player->reputation.basicNeeds = (player->reputation.basicNeeds * rollWeight)+ (1- rollWeight)*(housingFactor * foodFactor);
+    
+    if (player->reputation.basicNeeds < 0.2)
+    {
+        exodus = MAX (10, player->population * 0.1);
+        player_station_exodus(exodus);
+    }
+    else if (player->reputation.basicNeeds < 0.2)
+    {
+        message_new("People are talking about leaving the station!");
+    }
+    else if (player->reputation.basicNeeds < 0.3)
+    {
+        message_new("People are getting frustraited with their basic needs not being met!");
     }
 
     resources_list_withdraw(player->resources,"food",food);
@@ -420,6 +511,25 @@ void player_upkeep(PlayerData *player)
     if (player->reputation.safety < 0.5)
     {
         message_printf("People are unhappy with the public safety levels on the station.");
+    }
+
+    if (player->salesTaxRate > 0)
+    {
+        //lets do taxes!
+        taxes = station->commerce * player->salesTaxRate;
+        resources_list_give(player->resources,"credits",taxes);
+        message_printf("Collected %.2fCr in sales taxes from the businesses on the station.",taxes);
+    }
+    if (player->salesTaxRate > 0.10)
+    {
+        message_new("People are complaining that the station sales taxes are too high!");
+        player->reputation.commerce = (player->reputation.commerce * rollWeight)+ ((1- rollWeight)*(1 - player->taxRate));
+    }
+    if (player->taxRate > 0.45)
+    {
+        message_new("People are complaining that the station taxes are too high!");
+        player->reputation.commerce = (player->reputation.commerce * rollWeight)+ ((1- rollWeight)*(1 - player->taxRate));
+        //percentage of population unhoused
     }
 
     percent = station->commerce / (float)player->population;// percentage of the population
@@ -453,6 +563,11 @@ void player_upkeep(PlayerData *player)
     player->reputation.satisfaction = (player->reputation.satisfaction * rollWeight) + (percent * (1-rollWeight));
     if (player->reputation.satisfaction < 0.3)
     {
+        exodus = MAX (10, player->population * 0.1);
+        player_station_exodus(exodus);
+    }
+    else if (player->reputation.satisfaction < 0.4)
+    {
         message_printf("People are unhappy with your job as station Commander.");
     }
 }
@@ -474,13 +589,14 @@ void player_hour_advance()
         data->yesterday = resources_list_duplicate(data->resources);
         if ((data->day % 7)== 0)//every 7 days is a week
         {
-            player_upkeep(data);
+        //    player_upkeep(data);
         }
         if ((data->day % 30)== 0)//every 30 days is a month
         {
             message_new("New Month");
             resources_list_free(data->lastMonth);
             data->lastMonth = resources_list_duplicate(data->resources);
+            player_upkeep(data);
         }
         if ((data->day % 360)== 0)//every 360 days is a year
         {

@@ -1,6 +1,7 @@
 {
     "window":{
         "dimensions" : [-1300,0,1320,40],
+        "name":"hud_window",
         "elements":
         [
             {

@@ -47,9 +47,8 @@ const char *resources_get_display_name(const char *name);
  * @param list the list to add to
  * @param name the name of the resource
  * @param count how much to give
- * @return list the new resource list.  Old may be destroyed
  */
-List *resources_list_give(List *list,const char *name,float count);
+void resources_list_give(List *list,const char *name,float count);
 
 /**
  * @brief take count of a resource from a list

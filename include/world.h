@@ -25,6 +25,8 @@ typedef struct
     Particle theSun;
     Model *sky;
     Mix_Music *backgroundMusic;
+    List    *entity_list;
+    HashMap *sounds;
 }World;
 
 /**
@@ -49,6 +51,10 @@ void get_date_of(char *output,Uint32 day);
  */
 void get_datetime_of(char *output,Uint32 day,Uint32 hour);
 
+/**
+ * @brief play a sound from the world sound pack
+ */
+void world_play_sound(const char *sound);
 
 /**
  * @brief get the current date and time formatted to Y: yyyy D: ddd T: hh:00

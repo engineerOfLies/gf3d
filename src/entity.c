@@ -9,7 +9,7 @@ typedef struct
 {
     Entity *entity_list;
     Uint32  entity_count;
-    
+    Uint8   initialized;
 }EntityManager;
 
 static EntityManager entity_manager = {0};
@@ -34,12 +34,14 @@ void entity_system_init(Uint32 maxEntities)
         return;
     }
     entity_manager.entity_count = maxEntities;
+    entity_manager.initialized = 1;
     atexit(entity_system_close);
 }
 
 Entity *entity_new()
 {
     int i;
+    if (!entity_manager.initialized)return NULL;
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet, so we can!
@@ -60,6 +62,7 @@ Entity *entity_new()
 
 void entity_free(Entity *self)
 {
+    if (!entity_manager.initialized)return;
     if (!self)return;
     //MUST DESTROY
     if (self->free)
@@ -73,6 +76,7 @@ void entity_free(Entity *self)
 
 void entity_draw(Entity *self)
 {
+    if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->hidden)return;
     if (self->draw)self->draw(self);
@@ -91,6 +95,7 @@ void entity_draw(Entity *self)
 void entity_draw_all()
 {
     int i;
+    if (!entity_manager.initialized)return;
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet
@@ -103,6 +108,7 @@ void entity_draw_all()
 
 void entity_think(Entity *self)
 {
+    if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->think)self->think(self);
 }
@@ -110,6 +116,7 @@ void entity_think(Entity *self)
 void entity_think_all()
 {
     int i;
+    if (!entity_manager.initialized)return;
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet
@@ -123,6 +130,7 @@ void entity_think_all()
 
 void entity_update(Entity *self)
 {
+    if (!entity_manager.initialized)return;
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
     
@@ -138,6 +146,7 @@ void entity_update(Entity *self)
 void entity_update_all()
 {
     int i;
+    if (!entity_manager.initialized)return;
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet

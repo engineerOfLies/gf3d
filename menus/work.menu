@@ -174,7 +174,7 @@
                     },
                     {
                         "type": "list",
-                        "bounds": [0,0,328,60],
+                        "bounds": [0,0,328,100],
                         "name":"costs",
                         "style": "vertical",
                         "backgroundColor":[0,0,0,250],

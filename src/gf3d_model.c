@@ -20,6 +20,7 @@ extern int __DEBUG;
 
 typedef struct
 {
+    Uint8                   initiliazed;
     Model               *   model_list;
     Uint32                  max_models;
     Uint32                  chain_length;   /**<length of swap chain*/
@@ -79,7 +80,7 @@ void gf3d_model_manager_init(Uint32 max_models)
     gf3d_model.device = gf3d_vgraphics_get_default_logical_device();
     gf3d_model.pipe = gf3d_mesh_get_pipeline();
     gf3d_model.defaultTexture = gf3d_texture_load("images/default.png");
-    
+    gf3d_model.initiliazed = 1;
     if(__DEBUG)slog("model manager initiliazed");
     atexit(gf3d_model_manager_close);
 }
@@ -87,6 +88,7 @@ void gf3d_model_manager_init(Uint32 max_models)
 Model * gf3d_model_get_by_filename(const char *filename)
 {
     int i;
+    if (!gf3d_model.initiliazed)return NULL;
     for (i = 0; i < gf3d_model.max_models;i++)
     {
         if (!gf3d_model.model_list[i].refCount)
@@ -101,6 +103,7 @@ Model * gf3d_model_get_by_filename(const char *filename)
 Model * gf3d_model_new()
 {
     int i;
+    if (!gf3d_model.initiliazed)return NULL;
     for (i = 0; i < gf3d_model.max_models;i++)
     {
         if (!gf3d_model.model_list[i].refCount)
@@ -119,6 +122,7 @@ Model *gf3d_model_load(const char * filename)
 {    
     SJson *json,*config;
     Model *model;
+    if (!gf3d_model.initiliazed)return NULL;
     if (!filename)return NULL;
     
     model = gf3d_model_get_by_filename(filename);
@@ -154,6 +158,7 @@ Model *gf3d_model_load_from_config(SJson *json)
     Model *model;
     const char *modelFile;
     const char *textureFile;
+    if (!gf3d_model.initiliazed)return NULL;
     if (!json)return NULL;
 
     modelFile = sj_get_string_value(sj_object_get_value(json,"gltf"));
@@ -217,6 +222,7 @@ Model *gf3d_model_load_from_config(SJson *json)
 void gf3d_model_free(Model *model)
 {
     if (!model)return;
+    if (!gf3d_model.initiliazed)return;
     model->refCount--;
     if (model->refCount<=0)
     {
@@ -228,6 +234,7 @@ void gf3d_model_delete(Model *model)
 {
     int i,c;
     Mesh *mesh;
+    if (!gf3d_model.initiliazed)return;
     if (!model)return;
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0; i < c; i++)
@@ -245,6 +252,7 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
 {
     Mesh *mesh;
     Model *model;
+    if (!gf3d_model.initiliazed)return NULL;
     
     model = gf3d_model_get_by_filename(modelFile);
     if (model)
@@ -463,6 +471,7 @@ UniformBuffer *gf3d_model_get_uniform_buffer(
 {
     void *data;
     UniformBuffer *ubo;
+    if (!gf3d_model.initiliazed)return NULL;
     
     ubo = gf3d_uniform_buffer_list_get_buffer(pipe->uboList, gf3d_vgraphics_get_current_buffer_frame());
     if (!ubo)
@@ -488,7 +497,8 @@ VkDescriptorSet *gf3d_model_get_descriptor_set(
     VkDescriptorImageInfo imageInfo = {0};
     VkWriteDescriptorSet descriptorWrite[2] = {0};
     VkDescriptorBufferInfo bufferInfo = {0};
-    
+    if (!gf3d_model.initiliazed)return NULL;
+
     if (!model)
     {
         slog("no model provided for descriptor set update");
@@ -550,6 +560,7 @@ void gf3d_model_draw_generic(
 {
     Mesh *mesh;
     VkDescriptorSet *descriptorSet;
+    if (!gf3d_model.initiliazed)return;
     if ((!model)||(!pipe))
     {
         return;
@@ -563,6 +574,7 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
 {
     MeshUBO uboData = {0};
     UniformBuffer *ubo;
+    if (!gf3d_model.initiliazed)return;
     uboData = gf3d_model_get_mesh_ubo(
         modelMat,
         colorMod,
@@ -581,6 +593,7 @@ void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector
     HighlightUBO uboData = {0};
     UniformBuffer *ubo;
     
+    if (!gf3d_model.initiliazed)return;
     uboData = gf3d_model_get_highlight_ubo(modelMat,highlight);
     
     ubo = gf3d_model_get_uniform_buffer(gf3d_mesh_get_highlight_pipeline(),&uboData,sizeof(HighlightUBO));
@@ -591,7 +604,7 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
 {
     SkyUBO uboData = {0};
     UniformBuffer *ubo;
-    
+    if (!gf3d_model.initiliazed)return;
     uboData = gf3d_model_get_sky_ubo(modelMat,gfc_color_to_vector4f(color));
     
     ubo = gf3d_model_get_uniform_buffer(gf3d_mesh_get_sky_pipeline(),&uboData,sizeof(SkyUBO));

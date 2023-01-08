@@ -29,14 +29,15 @@ typedef struct
     Window *win;
 }MainMenuData;
 
-void main_menu_start_new_game(const char *savefile)
+void main_menu_start_new_game()
 {
     PlanetData *planet;
-    hud_window(savefile);    
+    hud_window("saves/default.save");    
     planet = player_get_planet();
     if (!planet)return;
     planet_reset_resource_map(planet);
     planet_generate_resource_map(planet);
+    planet_site_survey(planet,vector2d(0,0));
 }
 
 void onFileLoadCancel(void *Data)
@@ -105,7 +106,7 @@ int main_menu_update(Window *win,List *updateList)
         if (!e)continue;
         if (strcmp(e->name,"newgame")==0)
         {
-            main_menu_start_new_game("saves/default.save");
+            main_menu_start_new_game();
             gf2d_window_free(win);
             return 1;
         }
