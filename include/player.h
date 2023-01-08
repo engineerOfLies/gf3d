@@ -5,6 +5,7 @@
 #include "world.h"
 #include "planet.h"
 #include "station.h"
+#include "ship.h"
 #include "station_facility.h"
 
 typedef struct
@@ -43,6 +44,7 @@ typedef struct
     PlanetData *planet;             /**<the planet in the solar system the player controls*/
     SJson      *idPools;            /**<keep track of ids of station sections and facilties*/
     SJson      *history;            /**<keep track of events that have transpired*/
+    List       *ships;              /**<all the player's ships*/
 }PlayerData;
 
 /**

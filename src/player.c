@@ -59,6 +59,26 @@ SJson *player_data_save_reputation(PlayerReputation *reputation)
     return json;
 }
 
+SJson *player_save_ships(PlayerData *data)
+{
+    SJson *json,*item;
+    Ship *ship;
+    int i,c;
+    if (!data)return NULL;
+    json = sj_array_new();
+    if (!json)return NULL;
+    c = gfc_list_get_count(data->ships);
+    for (i = 0; i < c; i++)
+    {
+        ship = gfc_list_get_nth(data->ships,i);
+        if (!ship)continue;
+        item = ship_save(ship);
+        if (!item)continue;
+        sj_array_append(json,item);
+    }
+    return json;
+}
+
 SJson *player_data_save(PlayerData *data)
 {
     SJson *json;
@@ -87,6 +107,7 @@ SJson *player_data_save(PlayerData *data)
     sj_object_insert(json,"allowSale",resources_list_save(data->allowSale));
     sj_object_insert(json,"history",sj_copy(data->history));
     sj_object_insert(json,"idPools",sj_copy(data->idPools));
+    sj_object_insert(json,"ships",player_save_ships(data));
     return json;
 }
 
@@ -127,6 +148,23 @@ void player_data_load_reputation(SJson *json, PlayerReputation *data)
     sj_object_get_value_as_float(json,"safety",&data->safety);
 }
 
+List *player_ships_load(SJson *list)
+{
+    List *ships;
+    int i,c;
+    SJson *item;
+    if (!list)return NULL;
+    ships = gfc_list_new();
+    if (!ships)return NULL;
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        gfc_list_append(ships,ship_load(item));
+    }
+    return ships;
+}
 
 PlayerData *player_data_parse(SJson *json)
 {
@@ -241,7 +279,15 @@ PlayerData *player_data_parse(SJson *json)
     {
         data->idPools = sj_copy(res);
     }
-
+    res = sj_object_get_value(json,"ships");
+    if (res)
+    {
+        data->ships = player_ships_load(res);
+    }
+    else
+    {
+        data->ships = gfc_list_new();
+    }
     return data;
 }
 

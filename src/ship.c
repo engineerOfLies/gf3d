@@ -20,6 +20,43 @@ void ship_free(Ship *ship)
     free(ship);
 }
 
+Ship *ship_load(SJson *json)
+{
+    Uint32 id = 0;
+    int i,c;
+    const char *str;
+    Ship *ship;
+    ShipFacility *facility;
+    SJson *list,*item;
+    if (!json)return NULL;
+    str = sj_object_get_value_as_string(json,"name");
+    if (!str)return NULL;
+    sj_object_get_value_as_uint32(json,"id",&id);
+    ship = ship_new_by_name(str,id,0);
+    if (!ship)return NULL;
+    str = sj_object_get_value_as_string(json,"location");
+    if (str)gfc_line_cpy(ship->location,str);
+    sj_value_as_vector3d(sj_object_get_value(json,"position"),&ship->position);
+    sj_object_get_value_as_uint32(json,"idPool",&ship->idPool);
+    sj_object_get_value_as_float(json,"hull",&ship->hull);
+    if (sj_object_get_value_as_uint32(json,"mission",&id))
+    {
+        ship->mission = mission_get_by_id(id);
+    }
+    sj_object_get_value_as_bool(json,"working",&ship->working);
+    list = sj_object_get_value(json,"facilities");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        facility = ship_facility_load(item);
+        if (!facility)continue;
+        gfc_list_append(ship->facilities,facility);
+    }
+    return ship;
+}
+
 SJson *ship_save(Ship *ship)
 {
     int i,c;
@@ -33,6 +70,8 @@ SJson *ship_save(Ship *ship)
     sj_object_insert(json,"displayName",sj_new_str(ship->displayName));
     sj_object_insert(json,"id",sj_new_uint32(ship->id));
     sj_object_insert(json,"idPool",sj_new_uint32(ship->idPool));
+    sj_object_insert(json,"location",sj_new_str(ship->location));
+    sj_object_insert(json,"position",sj_vector3d_new(ship->position));
     sj_object_insert(json,"hull",sj_new_float(ship->hull));
     if (ship->mission)
     {

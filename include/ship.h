@@ -15,6 +15,8 @@ typedef struct
     TextLine    displayName;    //its name as displayed to the user, editable by the user
     Uint32      id;             //unique ID for the station section
     Uint32      idPool;         // for facilities on this ship
+    TextLine    location;       // where is the ship
+    Vector3D    position;       // more specifically
     int         housing;        //how much housing is provided by this S
     float       hull,hullMax;   //when hull <= 0 ship is destroyed
     Mission    *mission;        // if any mission is assigned to the section (mostly for repairs or building)
@@ -34,6 +36,16 @@ Ship *ship_new();
  * @brief free a ship from memory
  */
 void ship_free(Ship *ship);
+
+/**
+ * @brief load a ship instance from json
+ */
+Ship *ship_load(SJson *json);
+
+/**
+ * @brief save a ship instance to json
+ */
+SJson *ship_save(Ship *ship);
 
 /**
  * @brief create a new ship based on def
