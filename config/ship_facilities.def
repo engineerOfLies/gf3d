@@ -122,7 +122,7 @@
             "description":"This is the most basic energy based weapon for small ships.  Does decent energy damage.  Energy damage deals split damage to both hull and internal systems.",
             "damage":
             {
-                "energy":10,
+                "energy":10
             },
             "slot_type":"small_weapon",
             "staffPositions":1,
@@ -142,7 +142,7 @@
             "staffRequired":1,
             "damage":
             {
-                "kinetic":10,
+                "kinetic":10
             },
             "slot_type":"small_weapon",
             "cost":
@@ -160,7 +160,7 @@
             "staffRequired":1,
             "damage":
             {
-                "ionic":20,
+                "ionic":20
             },
             "slot_type":"small_weapon",
             "cost":

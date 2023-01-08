@@ -9,9 +9,9 @@
 #include "entity.h"
 #include "mission.h"
 
-typedef struct StaionSection_S
+typedef struct StationSection_S
 {
-    struct StaionSection_S *parent;// if not null, this is the parent
+    struct StationSection_S *parent;// if not null, this is the parent
     TextLine    name;  //its name identifier
     TextLine    displayName;  //its name as displayed to the user (including ID number)
     Uint32      id;      //unique ID for the station section

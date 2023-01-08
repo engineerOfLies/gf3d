@@ -100,6 +100,8 @@ int main(int argc,char *argv[])
     config_def_load("config/facilities.def");
     config_def_load("config/events.def");
     station_def_load("config/station.def");    
+    station_def_load("config/ships.def");    
+    station_def_load("config/ship_facilities.def");    
     
     slog_sync();
         

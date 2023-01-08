@@ -2,6 +2,7 @@
 #define __CONFIG_DEF_H__
 
 #include "simple_json.h"
+#include "gfc_types.h"
 
 /**
  * @purpose This will be used to quickly and easily pull config data from json files.
