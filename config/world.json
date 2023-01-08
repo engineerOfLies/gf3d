@@ -14,7 +14,7 @@
         "models":
         [
             {
-                "model":"models/fighter/fighter.model",
+                "model":"models/ships/fighter.model",
                 "position":[0,-3000,0],
                 "scale":[10,10,10],
                 "rotation":[0,0,180]

@@ -293,7 +293,6 @@ void station_facility_check(StationFacility *facility)
 
 void station_facility_remove(StationFacility *facility)
 {
-    Window *win;
     PlanetData *planet;
     StationSection *section;
     if (!facility)return;
@@ -305,8 +304,7 @@ void station_facility_remove(StationFacility *facility)
         //station section
         gfc_list_delete_data(section->facilities,facility);
         station_facility_free(facility);
-        win = gf2d_window_get_by_name("station_facility_menu");
-        if (win)facility_menu_set_list(win);
+        facility_menu_set_list(gf2d_window_get_by_name("station_facility_menu"));
         return;
     }
     planet = player_get_planet();
@@ -317,15 +315,13 @@ void station_facility_remove(StationFacility *facility)
             gfc_list_delete_data(planet->facilities,facility);
             slog("planet facility %s removed",facility->displayName);
             station_facility_free(facility);
-            win = gf2d_window_get_by_name("station_facility_menu");
-            if (win)facility_menu_set_list(win);
+            facility_menu_set_list(gf2d_window_get_by_name("station_facility_menu"));
             return;
         }
     }
     // any other place where a facility may be
     station_facility_free(facility);//couldn't find it anywhere, but still delete it
-    win = gf2d_window_get_by_name("station_facility_menu");
-    if (win)facility_menu_set_list(win);
+    facility_menu_set_list(gf2d_window_get_by_name("station_facility_menu"));
 }
 
 Uint32 station_facility_get_build_time(const char *name)

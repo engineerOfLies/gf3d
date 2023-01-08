@@ -1,0 +1,173 @@
+{
+    "ship_facilities":
+    [
+        {
+            "name":"cockpit1",
+            "displayName":"Cockpit",
+            "icon":"",
+            "description":"This is a standard cockpit for small craft.  Designed for a single pilot, this helm controls the rest of the ships systems from a single seat.",
+            "officers":1,
+            "slot_type":"helm",
+            "cost":
+            {   
+                "credits":100
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"cockpit2",
+            "displayName":"Dual Cockpit",
+            "icon":"",
+            "description":"This is a standard cockpit for small craft.  Designed for a pilot and a co-pilot, this helm controls the rest of the ships systems from one of two different seats.",
+            "officers":2,
+            "slot_type":"helm",
+            "cost":
+            {   
+                "credits":100
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"hdg_ship_core1",
+            "displayName":"HDG Ship Reactor Core",
+            "icon":"",
+            "description":"A small form factor HDG reactor designed for smaller ships.  Doesn't produce the power needed for open an FST Drive, but it more than adequate to run basic ship systems on a ship designed to use one of the FST Gates for interstellar travel.",
+            "slot_type":"small_power_core",
+            "staffPositions":5,
+            "staffRequired":5,
+            "cost":
+            {   
+                "credits":200
+            },
+            "energyOutput":100
+        },
+        {
+            "name":"long_range_scanner1",
+            "displayName":"Long Range Scanners",
+            "icon":"",
+            "description":"All in one standard sensor package.  Able to commuicate with the QET Network, scan at distances up to an AU, and detect a number of points of interest (life signs, energy signatures, resources, etc)",
+            "range":1,
+            "slot_type":"sensor",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"cabin1",
+            "displayName":"Small Passenger Cabin",
+            "icon":"",
+            "description":"A small cabin with beds for up to 8 people.  Useful for small ships that need to tranfer people.",
+            "housing":8,
+            "staffPositions":5,
+            "staffRequired":5,
+            "slot_type":"small_auxiliary",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"cargo1",
+            "displayName":"Small Cargo Hold",
+            "icon":"",
+            "description":"A small cargo hold capable of storing up to 8 tons of a commodity.  Not very economical for commercial use, but can be used to hold a few tons of something if the event presents itself.",
+            "cargo":8,
+            "slot_type":"small_auxiliary",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"shields1",
+            "displayName":"Small Shield Generator",
+            "icon":"",
+            "description":"A small shield generator able to project an energy shield around a small ship.  Energy shields can reduce damage from a wide range of sources, preventing damage to the ship.",
+            "shields":
+            {
+                "energy":20,
+                "kinetic":20,
+                "ionic":20
+            },
+            "slot_type":"small_auxiliary",
+            "staffPositions":5,
+            "staffRequired":5,
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":20
+        },
+        {
+            "name":"ion_thrusters1",
+            "displayName":"Small Ion Thrusters",
+            "icon":"",
+            "description":"Maneuvering thrusters designed to work with small ships.  They use the raw output from the power core to produce thrust.  Powerful enough to maneuver the ship in both normal space and fourth-space.",
+            "speed":5,
+            "slot_type":"small_thruster",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"pulse_cannon1",
+            "displayName":"Pulse Cannon 1S",
+            "icon":"",
+            "description":"This is the most basic energy based weapon for small ships.  Does decent energy damage.  Energy damage deals split damage to both hull and internal systems.",
+            "damage":
+            {
+                "energy":10,
+            },
+            "slot_type":"small_weapon",
+            "staffPositions":1,
+            "staffRequired":1,
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"gauss_cannon1",
+            "displayName":"Gauss Cannon 1S",
+            "icon":"",
+            "description":"A gauss cannon accelerates a solid metal slug up to hypersonic velocites very quickly without the need for chemical accelerants.  Kinetic weapon damage deals damage first to the hull, then internal systems after pentration.",
+            "staffPositions":1,
+            "staffRequired":1,
+            "damage":
+            {
+                "kinetic":10,
+            },
+            "slot_type":"small_weapon",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"ion_cannon1",
+            "displayName":"Ion Cannon 1S",
+            "icon":"",
+            "description":"Ionic weapons fire small projectiles that generate intense ionic fields at the point of impact.  These do little damage in the way of hull or system damage.  However, they overload shields faster than energy or kinetic weapons and can disrupt (not damage) systems making the target vulnerable to other attack types.",
+            "staffPositions":1,
+            "staffRequired":1,
+            "damage":
+            {
+                "ionic":20,
+            },
+            "slot_type":"small_weapon",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":15
+        }
+    ]
+}

@@ -204,7 +204,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     StationFacility *facility;
     Vector3D offsetPosition = {0},offsetRotation = {0};
     StationSection *section;
-    SJson *sectionDef,*parentDef,*extension,*stats,*list,*item;
+    SJson *sectionDef,*parentDef,*extension,*list,*item;
     if (!sectionName)return NULL;
     sectionDef = config_def_get_by_name("sections",sectionName);
     if (!sectionDef)
@@ -276,14 +276,10 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
             }
         }
     }
-    stats = sj_object_get_value(sectionDef,"stats");
-    if (stats)
+    if (sj_object_get_value_as_float(sectionDef,"hull",&tempf))
     {
-        if (sj_object_get_value_as_float(stats,"hull",&tempf))
-        {
-            section->hull = section->hullMax = tempf;
-            data->hullMax += tempf;
-        }
+        section->hull = section->hullMax = tempf;
+        data->hullMax += tempf;
     }
     sj_object_get_value_as_uint8(sectionDef,"facility_slots",&section->facilitySlots);
     

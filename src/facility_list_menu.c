@@ -104,9 +104,11 @@ int facility_list_menu_update(Window *win,List *updateList)
             facility_list_menu_scroll_up(win);
             return 1;
         }
-        if (e->index >= 500)
+        if ((e->index >= 500)&&((e->index < 1000)))
         {
             //View
+            slog("updated element: %s",e->name);
+            if (win->child)return 1;
             facility = player_get_facility_nth(e->index - 500);
             if (strcmp(facility->facilityType,"planetary")==0)
             {

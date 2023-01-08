@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "gltf":"models/ships/fighter.gltf",
+        "texture":"models/ships/fighter.png"
+    }
+}

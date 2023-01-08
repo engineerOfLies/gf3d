@@ -6,10 +6,7 @@
             "icon":"models/station/station_core_icon.png",
             "model":"models/station/station_core.model",
             "description":"A core station section with a lot of hull armor.  Has many extension slots to build more station off of, including rotating sections.  It does not support gravity.  It can support Industrial or Operations facilities.",
-            "stats":
-            {
-                "hull":1000
-            },
+            "hull":1000,
             "buildTime":100,
             "cost":
             {
@@ -73,10 +70,7 @@
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.",
             "rotates":0,
             "mountType":"s",
-            "stats":
-            {
-                "hull":300
-            },
+            "hull":300,
             "buildTime":60,
             "cost":
             {
@@ -111,10 +105,7 @@
             "rotates":0,
             "buildTime":60,
             "mountType":"e",
-            "stats":
-            {
-                "hull":300
-            },
+            "hull":300,
             "cost":
             {
                 "credits":3000,
@@ -142,10 +133,7 @@
             "description":"This station section is outfitted with solar panels that are needed for solar processing plants.  This is one of the backbones of any station.  Its rotating collectors are more efficient than static models",
             "rotates":-0.25,
             "mountType":"c",
-            "stats":
-            {
-                "hull":1000
-            },
+            "hull":1000,
             "cost":
             {
                 "credits":10000,
@@ -175,10 +163,7 @@
             "rotates":1,
             "scale":[1,1,1],
             "mountType":"c",
-            "stats":
-            {
-                "hull":1000
-            },
+            "hull":1000,
             "cost":
             {
                 "credits":1000,
@@ -212,10 +197,7 @@
             "rotates":1,
             "mountType":"c",
             "scale":[1,1,1],
-            "stats":
-            {
-                "hull":2000
-            },
+            "hull":2000,
             "cost":
             {
                 "credits":2500,
@@ -249,10 +231,7 @@
             "mountType":"c",
             "scale":[1,1,1],
             "rotates":1,
-            "stats":
-            {
-                "hull":1500
-            },
+            "hull":1500,
             "cost":
             {
                 "credits":2000,
@@ -283,10 +262,7 @@
                 "reactor"
             ],
             "buildTime":90,
-            "stats":
-            {
-                "hull":1000
-            },
+            "hull":1000,
             "cost":
             {
                 "credits":1000,
@@ -311,10 +287,7 @@
             "mountType":"c",
             "rotates":0.5,
             "buildTime":90,
-            "stats":
-            {
-                "hull":3000
-            },
+            "hull":3000,
             "cost":
             {
                 "credits":4000,
@@ -347,10 +320,7 @@
             "rotates":0,
             "mountType":"s",
             "facility_slots":4,
-            "stats":
-            {
-                "hull":100
-            },
+            "hull":200,
             "cost":
             {
                 "credits":250,
@@ -386,10 +356,7 @@
             "mountType":"e",
             "buildTime":60,
             "rotates":0,
-            "stats":
-            {
-                "hull":100
-            },
+            "hull":100,
             "cost":
             {
                 "credits":250,
@@ -422,10 +389,7 @@
             "buildTime":150,
             "mountType":"e",
             "rotates":0,
-            "stats":
-            {
-                "hull":200
-            },
+            "hull":200,
             "cost":
             {
                 "credits":300,

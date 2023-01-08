@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "obj":"models/ships/scout_ship.obj",
+        "texture":"models/ships/scout_ship.png"
+    }
+}
