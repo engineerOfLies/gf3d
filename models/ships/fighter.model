@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "gltf":"models/ships/fighter.gltf",
-        "texture":"models/ships/fighter.png"
+        "obj":"models/ships/osprey.obj",
+        "texture":"models/ships/osprey.png"
     }
 }

@@ -7,6 +7,7 @@
 #include "gfc_text.h"
 #include "gfc_config.h"
 
+#include "gf3d_entity.h"
 #include "mission.h"
 
 typedef struct
@@ -24,7 +25,8 @@ typedef struct
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
     int         storageCapacity;
     int         staffAssigned,staffPositions; // how many staff have are working this section / how many positions there are to work
-    List       *facilities;
+    List       *facilities;     //list of ship facilities
+    Entity     *entity;         // pointer to the ship entity
 }Ship;
 
 /**
@@ -55,5 +57,10 @@ SJson *ship_save(Ship *ship);
  * @return NULL on error or the ship
  */
 Ship *ship_new_by_name(const char *name,int id,int defaults);
+
+/**
+ * @brief set a ship's location and position
+ */
+void ship_set_location(Ship *ship,const char *location,Vector3D position);
 
 #endif

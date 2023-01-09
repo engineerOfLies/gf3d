@@ -236,6 +236,7 @@
                 "credits":1500,
                 "alloys":100
             },
+            "small_bays":12,
             "buildTime":30,
             "commerce":10,
             "crimeRate":5,
@@ -247,7 +248,7 @@
             "name":"docking_bay",
             "displayName":"Medium Docking Bay",
             "icon":"",
-            "description":"This facility allows for the docking and short term storage of small and medium sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
+            "description":"This facility allows for the docking and short term storage of small and medium sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.  Although each bay is designed for medium sized craft, smaller craft can still use the facility.",
             "type":"medium_docking_bay",
             "cost":
             {   
@@ -255,6 +256,7 @@
                 "alloys":200
             },
             "buildTime":50,
+            "medium_bays":6,
             "crimeRate":10,
             "commerce":20,
             "opportunities":10,
@@ -266,13 +268,14 @@
             "name":"docking_bay_large",
             "displayName":"Docking Bay",
             "icon":"",
-            "description":"This facility allows for the docking and short term storage of large sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.",
+            "description":"This facility allows for the docking and short term storage of large sized space craft.  Stored craft can be refueled and engage in cargo and passenger tranfer.  Although each bay is designed for larger craft, smaller craft can still use the facility.",
             "type":"large_docking_bay",
             "cost":
             {   
                 "credits":6000,
                 "alloys":400
             },
+            "large_bays":4,
             "buildTime":70,
             "crimeRate":15,
             "commerce":40,

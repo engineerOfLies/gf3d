@@ -86,4 +86,11 @@ void gf3d_entity_think_all();
  */
 void gf3d_entity_update_all();
 
+/**
+ * @brief get an entity by its name.  Names are not guaranteed to be unique, so be careful
+ * @param name the name to search for
+ * @return NULL if not found, or the first entity with the given name
+ */
+Entity *gf3d_entity_get_by_name(const char *name);
+
 #endif

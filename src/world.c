@@ -12,6 +12,9 @@
 #include "player.h"
 #include "world.h"
 
+#define PARKING_WIDTH 10
+#define PARKING_DEPTH 10
+
 static World *the_world = NULL;
 
 World *world_load(char *filename)
@@ -124,6 +127,13 @@ World *world_load(char *filename)
     sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
     w->entity_list = gfc_list_new();
     gfc_list_append(w->entity_list,gate_new(vector3d(0,-3000,0)));
+    w->parking_spots = gfc_list_new();
+    item = sj_object_get_value(wjson,"parking");
+    if (item)
+    {
+        sj_value_as_vector3d(sj_object_get_value(item,"position"),&w->parkingStart);
+        sj_value_as_vector3d(sj_object_get_value(item,"delta"),&w->parkingDelta);
+    }
     sj_free(json);
     the_world = w;
     return w;
@@ -223,6 +233,75 @@ void world_play_sound(const char *sound)
 {
     if ((!the_world)||(!sound))return;
     gfc_sound_pack_play(the_world->sounds, sound,0,1,-1,-1);
+}
+
+Vector3D world_parking_claim_spot(Vector3D spot)
+{
+    Vector3D *location;
+    if (!world_parking_spot_get_by_location(spot))
+    {
+        location = gfc_allocate_array(sizeof(Vector3D),1);
+        vector3d_copy((*location),spot);
+        gfc_list_append(the_world->parking_spots,location);
+        return spot;
+    }
+    // spot is already taken, find another one
+    return world_parking_get_spot();
+}
+
+Vector3D *world_parking_spot_get_by_location(Vector3D spot)
+{
+    int i,c;
+    Vector3D *location;
+    if (!the_world)return NULL;
+    c = gfc_list_get_count(the_world->parking_spots);
+    for (i = 0; i < c; i++)
+    {
+        location = gfc_list_get_nth(the_world->parking_spots,i);
+        if (!location)continue;
+        if ((location->x == spot.x)&&
+            (location->y == spot.y)&&
+            (location->z == spot.z))
+        {
+            return location;
+        }
+    }
+    return NULL;
+}
+
+Vector3D world_parking_get_spot()
+{
+    int i,j;
+    Vector3D spot,*location;
+    if (!the_world)return vector3d(-1,-1,-1);
+    vector3d_copy(spot,the_world->parkingStart);
+    for (j = 0; j < PARKING_DEPTH;j++)
+    {
+        vector3d_copy(spot,the_world->parkingStart);
+        spot.x += the_world->parkingDelta.x * j;
+        for (i = 0; i < PARKING_WIDTH;i++)
+        {
+            spot.y = the_world->parkingStart.y + (the_world->parkingDelta.y * i);
+            if (!world_parking_spot_get_by_location(spot))
+            {
+                //this location is in use
+                location = gfc_allocate_array(sizeof(Vector3D),1);
+                vector3d_copy((*location),spot);
+                gfc_list_append(the_world->parking_spots,location);
+                return spot;
+            }
+        }
+    }
+    return vector3d(-1,-1,-1);
+}
+
+void world_parking_vacate_spot(Vector3D spot)
+{
+    Vector3D *location;
+    if (!the_world)return;
+    location = world_parking_spot_get_by_location(spot);
+    if (!location)return;
+    gfc_list_delete_data(the_world->parking_spots,location);
 }
 
 /*eol@eof*/

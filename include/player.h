@@ -190,5 +190,11 @@ int player_get_facility_count();
  */
 StationFacility *player_get_facility_nth(Uint32 index);
 
+/**
+ * @brief generate a new ship of the type specified for the player
+ * @param name the name identifier for the ship
+ */
+void player_give_new_ship(const char *name);
+
 
 #endif

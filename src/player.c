@@ -13,6 +13,7 @@
 
 #include "resources.h"
 #include "station.h"
+#include "ship_entity.h"
 #include "event_menu.h"
 #include "event_manager.h"
 #include "player.h"
@@ -829,6 +830,19 @@ StationFacility *player_get_facility_by_name_id(const char *name,Uint32 id)
         }
     }
     return NULL;
+}
+
+void player_give_new_ship(const char *name)
+{
+    Ship *ship;
+    PlayerData *player;
+    player = player_get_data();
+    if ((!player)||(!name))return;
+    ship = ship_new_by_name(name,player_get_new_id(name),1);
+    if (!ship)return;
+    gfc_list_append(player->ships,ship);
+    ship->entity = ship_entity_new(vector3d(0,-1000,0),ship,player->detailColor);
+    ship_set_location(ship,"parking",world_parking_get_spot());
 }
 
 PlanetData *player_get_planet()

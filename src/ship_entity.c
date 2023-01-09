@@ -33,7 +33,7 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     str = sj_object_get_value_as_string(def,"model");
     if (str)
     {
-        ent->model = gf3d_model_load("models/ships/passenger_transport.model");
+        ent->model = gf3d_model_load(str);
         if (!ent->model)
         {
             slog("SHIP MODEL DID NOT LOAD");
@@ -52,6 +52,7 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     ent->selectedColor = gfc_color(0.9,0.7,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     gfc_color_copy(ent->detailColor,detailColor);
+    slog("color: %f,%f,%f,%f",ent->detailColor.r,ent->detailColor.g,ent->detailColor.b,ent->detailColor.a);
     ent->think = ship_entity_think;
     ent->draw = ship_entity_draw;
     ent->update = ship_entity_update;
@@ -63,6 +64,7 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
 
 void ship_entity_free(Entity *self)
 {
+    // the ship entity doesn't own the Ship data, ship data owns this
 }
 
 void ship_entity_update(Entity *self)
@@ -76,6 +78,16 @@ void ship_entity_update(Entity *self)
 
 void ship_entity_draw(Entity *self)
 {
+    Ship *data;
+    if ((!self)||(!self->data))return;
+    data = self->data;
+    if ((strcmp(data->location,"docked")==0)||
+        (strcmp(data->location,"interstellar")==0))
+    {
+        self->hidden = 1;
+        return;// inside the station
+    }
+    self->hidden = 0;
 }
 
 void ship_entity_think(Entity *self)

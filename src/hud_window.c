@@ -158,7 +158,6 @@ int hud_free(Window *win)
     gf2d_window_free(data->messages);
     gf3d_entity_free(data->player);
     free(data);
-    slog("hud cleaned up");
     return 0;
 }
 

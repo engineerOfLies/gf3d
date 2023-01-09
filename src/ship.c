@@ -1,11 +1,12 @@
 #include "simple_logger.h"
 #include "config_def.h"
+#include "ship_entity.h"
 #include "ship_facility.h"
 #include "ship.h"
 
 Ship *ship_new()
 {
-    Ship *ship = gfc_allocate_array(sizeof(ship),1);
+    Ship *ship = gfc_allocate_array(sizeof(Ship),1);
     if (!ship)return NULL;
     
     ship->facilities = gfc_list_new();
@@ -17,6 +18,7 @@ void ship_free(Ship *ship)
     if (!ship)return;
     gfc_list_foreach(ship->facilities,(gfc_work_func*)ship_facility_free);
     gfc_list_delete(ship->facilities);
+    if (ship->entity)gf3d_entity_free(ship->entity);
     free(ship);
 }
 
@@ -124,6 +126,17 @@ Ship *ship_new_by_name(const char *name,int id,int defaults)
         }
     }
     return ship;
+}
+
+void ship_set_location(Ship *ship,const char *location,Vector3D position)
+{
+    if (!ship)return;
+    if (location)gfc_line_cpy(ship->location,location);
+    vector3d_copy(ship->position,position);
+    if (ship->entity)
+    {
+        vector3d_copy(ship->entity->mat.position,position);
+    }
 }
 
 /*eol@eof*/

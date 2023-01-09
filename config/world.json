@@ -28,6 +28,11 @@
                 "direction":[-1,-1,0]
             }
         ],
+        "parking":
+        {
+            "position":[-500,0,0],
+            "delta":[100,-100,0]
+        },
         "sounds":
         [
             {

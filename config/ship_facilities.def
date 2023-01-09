@@ -46,6 +46,19 @@
             "displayName":"Long Range Scanners",
             "icon":"",
             "description":"All in one standard sensor package.  Able to commuicate with the QET Network, scan at distances up to an AU, and detect a number of points of interest (life signs, energy signatures, resources, etc)",
+            "range":10,
+            "slot_type":"sensor",
+            "cost":
+            {   
+                "credits":50
+            },
+            "energyDraw":10
+        },
+        {
+            "name":"targeting_scanner1",
+            "displayName":"Targeting Scanners",
+            "icon":"",
+            "description":"This scanner package is designed with short range combat in mind.  This foregoes unnecessary scanning capabilities in order to be more precise with technology detection.  Standard targeting computer for fighters.",
             "range":1,
             "slot_type":"sensor",
             "cost":

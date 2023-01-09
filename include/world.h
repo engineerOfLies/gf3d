@@ -27,6 +27,9 @@ typedef struct
     Mix_Music *backgroundMusic;
     List    *entity_list;
     HashMap *sounds;
+    List    *parking_spots;//places that have been assigned
+    Vector3D parkingStart;//starting location for parking spots
+    Vector3D parkingDelta;//how much space between spots
 }World;
 
 /**
@@ -73,5 +76,31 @@ void world_run_updates(World *world);
 void world_add_entity(World *world,Entity *entity);
 
 ModelMat *world_get_model_mat(World *world,Uint32 index);
+
+/**
+ * @brief attempt to claim a spot by position (for loading purposes)
+ * @param spot the location you want
+ * @return the same location if you were successful, a different one if it was already taken
+ */
+Vector3D world_parking_claim_spot(Vector3D spot);
+
+/**
+ * @brief check if the spot is occupied
+ * @param spot the spot to check
+ * @return NULL if it is empty, or the pointer to the location otherwise
+ */
+Vector3D *world_parking_spot_get_by_location(Vector3D spot);
+
+/**
+ * @brief get an empty parking spot and claim it
+ * @return (-1,-1,-1) if the parking lot is full, or the position of your spot otherwise
+ */
+Vector3D world_parking_get_spot();
+
+/**
+ * @brief let the parking lot know that you are done with it
+ * @param spot the spot you are giving up
+ */
+void world_parking_vacate_spot(Vector3D spot);
 
 #endif

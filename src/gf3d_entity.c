@@ -81,7 +81,7 @@ void gf3d_entity_draw(Entity *self)
     if (self->hidden)return;
     if (self->draw)self->draw(self);
     if (!self->model)return;
-    gf3d_model_draw(self->model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4f(self->detailColor),vector4d(1,1,1,1));
+    gf3d_model_draw(self->model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
     if (self->selected)
     {
         gf3d_model_draw_highlight(
@@ -127,6 +127,20 @@ void gf3d_entity_think_all()
     }
 }
 
+Entity *gf3d_entity_get_by_name(const char *name)
+{
+    int i;
+    if (!entity_manager.initialized)return NULL;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)// not used yet
+        {
+            continue;// skip this iteration of the loop
+        }
+        if (gfc_strlcmp(entity_manager.entity_list[i].name,name)==0)return &entity_manager.entity_list[i];
+    }
+    return NULL;
+}
 
 void gf3d_entity_update(Entity *self)
 {
