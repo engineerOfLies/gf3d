@@ -19,7 +19,7 @@
 #include "gf2d_windows_common.h"
 
 #include "config_def.h"
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "resources.h"
 #include "player.h"
 #include "station.h"
@@ -346,12 +346,12 @@ void work_menu_setup(Window *win,WorkMenuData *data)
         {
             data->daysToComplete = -1;
             data->workPossible = 0;
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_RED);
         }
         else
         {
             data->daysToComplete = MAX(1,station_facility_get_build_time(data->what)/data->staffAssigned);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_WHITE);
         }
         gfc_line_sprintf(buffer,"Staff: %i / %i",data->staffAssigned,WORK_CREW_MAX);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
@@ -371,13 +371,13 @@ void work_menu_setup(Window *win,WorkMenuData *data)
             data->workPossible = 0;
             gfc_line_sprintf(buffer,"Time To Complete: Cannot Complete");
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_COLOR_RED);
         }
         else
         {
             gfc_line_sprintf(buffer,"Time To Complete: %i days",data->daysToComplete);
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_COLOR_WHITE);
         }
         return;
     }
@@ -393,12 +393,12 @@ void work_menu_setup(Window *win,WorkMenuData *data)
         {
             data->daysToComplete = -1;
             data->workPossible = 0;
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_RED);
         }
         else
         {
             data->daysToComplete = MAX(1,station_def_get_build_time_by_name(data->what)/data->staffAssigned);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_WHITE);
         }
         gfc_line_sprintf(buffer,"Staff: %i / %i",data->staffAssigned,WORK_CREW_MAX);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
@@ -418,13 +418,13 @@ void work_menu_setup(Window *win,WorkMenuData *data)
             data->workPossible = 0;
             gfc_line_sprintf(buffer,"Time To Complete: Cannot Complete");
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_COLOR_RED);
         }
         else
         {
             gfc_line_sprintf(buffer,"Time To Complete: %i days",data->daysToComplete);
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_COLOR_WHITE);
         }
         return;
     }
@@ -547,13 +547,13 @@ void work_menu_setup(Window *win,WorkMenuData *data)
             data->workPossible = 0;
             gfc_line_sprintf(buffer,"Time To Complete: Cannot Complete");
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_COLOR_RED);
         }
         else
         {
             gfc_line_sprintf(buffer,"Time To Complete: %i days",data->daysToComplete);
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"time"),GFC_COLOR_WHITE);
         }
 
         if (data->cost > 0)
@@ -562,15 +562,15 @@ void work_menu_setup(Window *win,WorkMenuData *data)
             gfc_line_sprintf(buffer,"%.2fcr",data->cost);
             if (resources_list_get_amount(supply,"credits") > data->cost)
             {
-                gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_WHITE);
+                gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_COLOR_WHITE);
             }
-            else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_RED);
+            else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_COLOR_RED);
         }
         else
         {
             data->workPossible = 0;
             gfc_line_sprintf(buffer,"Cannot Complete");
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"cost"),GFC_COLOR_RED);
         }
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"cost"),buffer);
 
@@ -579,11 +579,11 @@ void work_menu_setup(Window *win,WorkMenuData *data)
         if (data->staffAssigned < WORK_CREW_MIN)
         {
             data->workPossible = 0;
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_RED);
         }
         else
         {
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_WHITE);
         }
     }
     else
@@ -598,7 +598,7 @@ void work_menu_setup(Window *win,WorkMenuData *data)
             gfc_line_sprintf(buffer,"Time To Complete: %i days",mission->dayFinished - day);
             gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"time"),buffer);
         }
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_WHITE);
     }
 }
 

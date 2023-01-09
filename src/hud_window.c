@@ -15,7 +15,7 @@
 
 #include "gf3d_camera.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "camera_entity.h"
 #include "station.h"
 #include "world.h"
@@ -156,7 +156,7 @@ int hud_free(Window *win)
     if (!win->data)return 0;
     data = win->data;
     gf2d_window_free(data->messages);
-    entity_free(data->player);
+    gf3d_entity_free(data->player);
     free(data);
     slog("hud cleaned up");
     return 0;
@@ -332,9 +332,9 @@ int hud_draw(Window *win)
     position.y += spacing;
     cash = resources_list_get_amount(resources,"credits");
     lastCash = resources_list_get_amount(player->yesterday,"credits");
-    color = GFC_WHITE;
-    if (cash < lastCash)color = GFC_RED;
-    if (cash > lastCash)color = GFC_GREEN;
+    color = GFC_COLOR_WHITE;
+    if (cash < lastCash)color = GFC_COLOR_RED;
+    if (cash > lastCash)color = GFC_COLOR_GREEN;
     gfc_line_sprintf(buffer,"Credits: %iCr",(int)resources_list_get_amount(resources,"credits"));
     gf2d_font_draw_line_tag(buffer,FT_H6,color, position);
     return 0;

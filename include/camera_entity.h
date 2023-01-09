@@ -1,7 +1,7 @@
 #ifndef __CAMERA_ENTITY_H__
 #define __CAMERA_ENTITY_H__
 
-#include "entity.h"
+#include "gf3d_entity.h"
 
 typedef enum
 {

@@ -17,7 +17,7 @@
 #include "gf2d_message_buffer.h"
 #include "gf2d_windows_common.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "config_def.h"
 #include "camera_entity.h"
 #include "resources.h"
@@ -303,9 +303,9 @@ Element *market_menu_build_row(Window *win, const char *resource,int index, int 
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,resource,FT_H6,vector2d(200,24),gfc_color(1,1,1,1)));
     //supply
     lastAmount = (int)resources_list_get_amount(player->yesterday,resource);
-    color = GFC_WHITE;
-    if (lastAmount < amount)color = GFC_GREEN;
-    else if (lastAmount > amount)color = GFC_RED;
+    color = GFC_COLOR_WHITE;
+    if (lastAmount < amount)color = GFC_COLOR_GREEN;
+    else if (lastAmount > amount)color = GFC_COLOR_RED;
     gfc_line_sprintf(buffer,"%i",amount);
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),color));
     

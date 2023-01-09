@@ -1,7 +1,7 @@
 #ifndef __GATE_H__
 #define __GATE_H__
 
-#include "entity.h"
+#include "gf3d_entity.h"
 
 /**
  * @brief Create a new entity

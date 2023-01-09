@@ -320,7 +320,7 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
                 resource = gfc_list_get_nth(supply,i);
                 if (!resource)continue;
                 gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resources_get_display_name(resource->name));
-                gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,GFC_WHITE));
+                gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,GFC_COLOR_WHITE));
             }
         }
         else
@@ -330,9 +330,9 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
                 resource = gfc_list_get_nth(supply,i);
                 if (!resource)continue;
                 amount = resources_list_get_amount(last,resource->name);
-                if (resource->amount > amount)color = GFC_GREEN;
-                else if (resource->amount < amount)color = GFC_RED;
-                else color = GFC_WHITE;
+                if (resource->amount > amount)color = GFC_COLOR_GREEN;
+                else if (resource->amount < amount)color = GFC_COLOR_RED;
+                else color = GFC_COLOR_WHITE;
                 gfc_line_sprintf(buffer,"%.2f: %s",resource->amount,resources_get_display_name(resource->name));
                 gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,color));
             }
@@ -346,8 +346,8 @@ Element *resource_list_element_new(Window *win,const char *name, Vector2D offset
             resource = gfc_list_get_nth(cost,i);
             if (!resource)continue;
             amount = resources_list_get_amount(supply,resource->name);
-            if (amount >= resource->amount)color = GFC_GREEN;
-            else color = GFC_RED;
+            if (amount >= resource->amount)color = GFC_COLOR_GREEN;
+            else color = GFC_COLOR_RED;
             gfc_line_sprintf(buffer,"%.2f / %.2f: %s",resource->amount, amount,resources_get_display_name(resource->name));
             gf2d_element_list_add_item(e,gf2d_label_new_simple(win,10+i,buffer,FT_H6,color));
         }

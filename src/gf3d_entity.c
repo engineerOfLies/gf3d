@@ -3,7 +3,7 @@
 
 #include "simple_logger.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 
 typedef struct
 {
@@ -14,18 +14,18 @@ typedef struct
 
 static EntityManager entity_manager = {0};
 
-void entity_system_close()
+void gf3d_entity_system_close()
 {
     int i;
     for (i = 0; i < entity_manager.entity_count; i++)
     {
-        entity_free(&entity_manager.entity_list[i]);        
+        gf3d_entity_free(&entity_manager.entity_list[i]);        
     }
     free(entity_manager.entity_list);
     memset(&entity_manager,0,sizeof(EntityManager));
 }
 
-void entity_system_init(Uint32 maxEntities)
+void gf3d_entity_system_init(Uint32 maxEntities)
 {
     entity_manager.entity_list = gfc_allocate_array(sizeof(Entity),maxEntities);
     if (entity_manager.entity_list == NULL)
@@ -35,10 +35,10 @@ void entity_system_init(Uint32 maxEntities)
     }
     entity_manager.entity_count = maxEntities;
     entity_manager.initialized = 1;
-    atexit(entity_system_close);
+    atexit(gf3d_entity_system_close);
 }
 
-Entity *entity_new()
+Entity *gf3d_entity_new()
 {
     int i;
     if (!entity_manager.initialized)return NULL;
@@ -56,11 +56,11 @@ Entity *entity_new()
             return &entity_manager.entity_list[i];
         }
     }
-    slog("entity_new: no free space in the entity list");
+    slog("gf3d_entity_new: no free space in the entity list");
     return NULL;
 }
 
-void entity_free(Entity *self)
+void gf3d_entity_free(Entity *self)
 {
     if (!entity_manager.initialized)return;
     if (!self)return;
@@ -74,7 +74,7 @@ void entity_free(Entity *self)
 }
 
 
-void entity_draw(Entity *self)
+void gf3d_entity_draw(Entity *self)
 {
     if (!entity_manager.initialized)return;
     if (!self)return;
@@ -92,7 +92,7 @@ void entity_draw(Entity *self)
     }
 }
 
-void entity_draw_all()
+void gf3d_entity_draw_all()
 {
     int i;
     if (!entity_manager.initialized)return;
@@ -102,18 +102,18 @@ void entity_draw_all()
         {
             continue;// skip this iteration of the loop
         }
-        entity_draw(&entity_manager.entity_list[i]);
+        gf3d_entity_draw(&entity_manager.entity_list[i]);
     }
 }
 
-void entity_think(Entity *self)
+void gf3d_entity_think(Entity *self)
 {
     if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->think)self->think(self);
 }
 
-void entity_think_all()
+void gf3d_entity_think_all()
 {
     int i;
     if (!entity_manager.initialized)return;
@@ -123,12 +123,12 @@ void entity_think_all()
         {
             continue;// skip this iteration of the loop
         }
-        entity_think(&entity_manager.entity_list[i]);
+        gf3d_entity_think(&entity_manager.entity_list[i]);
     }
 }
 
 
-void entity_update(Entity *self)
+void gf3d_entity_update(Entity *self)
 {
     if (!entity_manager.initialized)return;
     if (!self)return;
@@ -143,7 +143,7 @@ void entity_update(Entity *self)
     if (self->update)self->update(self);
 }
 
-void entity_update_all()
+void gf3d_entity_update_all()
 {
     int i;
     if (!entity_manager.initialized)return;
@@ -153,7 +153,7 @@ void entity_update_all()
         {
             continue;// skip this iteration of the loop
         }
-        entity_update(&entity_manager.entity_list[i]);
+        gf3d_entity_update(&entity_manager.entity_list[i]);
     }
 }
 

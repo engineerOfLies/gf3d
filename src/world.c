@@ -199,7 +199,7 @@ void world_delete(World *world)
     {
         entity = gfc_list_get_nth(world->entity_list,i);
         if (!entity)continue;
-        entity_free(entity);
+        gf3d_entity_free(entity);
     }
     gfc_list_delete(world->entity_list);
     gfc_sound_pack_free(world->sounds);

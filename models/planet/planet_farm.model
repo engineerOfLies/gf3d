@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "obj":"models/planet/planet_farm.obj",
+        "texture":"models/planet/planet_farm.png"
+    }
+}

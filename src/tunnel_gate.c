@@ -23,7 +23,7 @@ Entity *gate_new(Vector3D position)
 {
     Entity *ent = NULL;    
     GateData *data = NULL;
-    ent = entity_new();
+    ent = gf3d_entity_new();
     if (!ent)
     {
         return NULL;

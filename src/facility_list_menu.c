@@ -17,7 +17,7 @@
 #include "gf2d_message_buffer.h"
 #include "gf2d_windows_common.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "camera_entity.h"
 #include "resources.h"
 #include "station_def.h"
@@ -186,14 +186,14 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     rowList = gf2d_element_new_full(
         NULL,0,(char *)facility->name,
         gfc_rect(0,0,1,1),
-        GFC_WHITE,0,
-        GFC_BLACK,0,win);
+        GFC_COLOR_WHITE,0,
+        GFC_COLOR_BLACK,0,win);
     gf2d_element_make_list(rowList,le);
     
     if ((facility->inactive)||(facility->disabled))
     {
         offline = 1;
-        color = GFC_RED;
+        color = GFC_COLOR_RED;
     }
     else
     {
@@ -213,31 +213,31 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         gfc_line_sprintf(buffer,"<uc>");
     }
     else gfc_line_sprintf(buffer,"%i",(int)(facility->damage * 100));
-    if (facility->damage > 0)color = GFC_RED;
-    else color = GFC_WHITE;
+    if (facility->damage > 0)color = GFC_COLOR_RED;
+    else color = GFC_COLOR_WHITE;
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));
     
     if (offline)
     {
         gfc_line_sprintf(buffer,"<offline>");
-        color = GFC_RED;
+        color = GFC_COLOR_RED;
     }
     else
     {
         if (facility->energyOutput > 0)
         {
             gfc_line_sprintf(buffer,"+ %i",(int)(facility->energyOutput * facility->productivity));
-            color = GFC_CYAN;
+            color = GFC_COLOR_CYAN;
         }
         else if (facility->energyDraw > 0)
         {
             gfc_line_sprintf(buffer,"- %i",facility->energyDraw);
-            color = GFC_RED;
+            color = GFC_COLOR_RED;
         }
         else
         {
             gfc_line_sprintf(buffer,"<none>");
-            color = GFC_WHITE;
+            color = GFC_COLOR_WHITE;
         }
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),color));
@@ -254,35 +254,35 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     {
         gfc_line_sprintf(buffer,"<unassigned>");
     }
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),GFC_WHITE));
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),GFC_COLOR_WHITE));
     
     if (facility->staffRequired == 0)
     {
         gfc_line_sprintf(buffer,"---");
-        color = GFC_WHITE;
+        color = GFC_COLOR_WHITE;
     }
     else if (facility->staffAssigned < facility->staffRequired)
     {
         gfc_line_sprintf(buffer,"%i / %i",facility->staffAssigned,facility->staffPositions);
-        color = GFC_RED;
+        color = GFC_COLOR_RED;
     }
     else
     {
         gfc_line_sprintf(buffer,"%i / %i",facility->staffAssigned,facility->staffPositions);
-        color = GFC_WHITE;
+        color = GFC_COLOR_WHITE;
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));
 
     if (facility->productivity == 0)
     {
         gfc_line_sprintf(buffer,"---");
-        color = GFC_WHITE;
+        color = GFC_COLOR_WHITE;
     }
     else 
     {
         gfc_line_sprintf(buffer,"%i%%",(int)(facility->productivity * 100.0));
-        if (facility->productivity < 1)color = GFC_RED;
-        else color = GFC_WHITE;
+        if (facility->productivity < 1)color = GFC_COLOR_RED;
+        else color = GFC_COLOR_WHITE;
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));
 
@@ -294,7 +294,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     {
         gfc_line_sprintf(buffer,"%iT",facility->storage);
     }
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),GFC_WHITE));
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),GFC_COLOR_WHITE));
     
     if (facility->housing == 0)
     {
@@ -304,22 +304,22 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     {
         gfc_line_sprintf(buffer,"%i",facility->housing);
     }
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(90,24),GFC_WHITE));
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(90,24),GFC_COLOR_WHITE));
 
     if (((!facility->operatingCost)&&(!facility->income))||(facility->operatingCost == facility->income))
     {
         gfc_line_sprintf(buffer,"---");
-        color = GFC_WHITE;
+        color = GFC_COLOR_WHITE;
     }
     else if (facility->operatingCost > facility->income)
     {
         gfc_line_sprintf(buffer,"-%i",facility->operatingCost - facility->income);
-        color = GFC_RED;
+        color = GFC_COLOR_RED;
     }
     else
     {
         gfc_line_sprintf(buffer,"+%i",facility->operatingCost - facility->income);
-        color = GFC_GREEN;
+        color = GFC_COLOR_GREEN;
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),color));
 
@@ -361,8 +361,8 @@ void facility_list_menu_update_resources(Window *win)
     {
     //populate bottom line
         gfc_line_sprintf(buffer,"%i",(int)station->energySupply);
-        if (station->energySupply > 0)color = GFC_CYAN;
-        else color = GFC_RED;
+        if (station->energySupply > 0)color = GFC_COLOR_CYAN;
+        else color = GFC_COLOR_RED;
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy_supply"),buffer);
         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy_supply"),color);
         

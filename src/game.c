@@ -29,7 +29,7 @@
 
 #include "config_def.h"
 #include "station_def.h"
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "gate.h"
 #include "resources.h"
 
@@ -93,7 +93,7 @@ int main(int argc,char *argv[])
     gf2d_draw_manager_init(1000);//2D
     gf2d_actor_init(1024);
     gf2d_mouse_load("actors/mouse.actor");
-    entity_system_init(1024);
+    gf3d_entity_system_init(1024);
     gf2d_windows_init(128,"config/windows.cfg");
     config_def_init();
     resources_list_load();  
@@ -118,8 +118,8 @@ int main(int argc,char *argv[])
         gf2d_mouse_update();
         gf2d_font_update();
         gf2d_windows_update_all();
-        entity_think_all();
-        entity_update_all();
+        gf3d_entity_think_all();
+        gf3d_entity_update_all();
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
 
@@ -127,7 +127,7 @@ int main(int argc,char *argv[])
 
             //3D draws
                 draw_origin();
-                entity_draw_all();
+                gf3d_entity_draw_all();
                 //2D draws
                 gf2d_windows_draw_all();
                 gf2d_mouse_draw();

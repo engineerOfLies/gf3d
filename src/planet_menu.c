@@ -15,7 +15,7 @@
 #include "gf2d_message_buffer.h"
 #include "gf2d_windows_common.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "camera_entity.h"
 #include "resources.h"
 #include "station.h"
@@ -222,7 +222,7 @@ void planet_menu_set_camera_at_site(Window *win,Vector2D site)
 
     vector2d_copy(data->worldPosition,site);
         
-    position = planet_position_to_position(data->planet->radius + 1000, site);
+    position = planet_position_to_position(data->planet->radius + 750, site);
     
     vector3d_add(data->viewPosition,position,mat->position);
     

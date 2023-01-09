@@ -305,7 +305,7 @@ Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,Fon
         gfc_color(1,1,1,1),0,win);
     
     gf2d_element_make_label(le,label);
-    gf2d_element_make_button(be,gf2d_element_button_new_full(le,NULL,GFC_WHITE,GFC_GREY,0));
+    gf2d_element_make_button(be,gf2d_element_button_new_full(le,NULL,GFC_COLOR_WHITE,GFC_COLOR_GREY,0));
     return be;
 }
 

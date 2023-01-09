@@ -18,7 +18,7 @@
 #include "gf2d_windows_common.h"
 
 #include "config_def.h"
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "resources.h"
 #include "player.h"
 #include "event_manager.h"

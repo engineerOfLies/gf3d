@@ -1,7 +1,7 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "world.h"
 #include "planet.h"
 #include "station.h"

@@ -14,7 +14,7 @@
 #include "gf2d_message_buffer.h"
 #include "gf2d_windows_common.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "camera_entity.h"
 #include "resources.h"
 #include "station_def.h"
@@ -429,8 +429,8 @@ void station_menu_select_segment(Window *win,int segment)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"station_hull"),buffer);
     if (data->station->hull < data->station->hullMax)
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"station_hull"),GFC_RED);
-    }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"station_hull"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"station_hull"),GFC_COLOR_RED);
+    }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"station_hull"),GFC_COLOR_WHITE);
 
     gfc_matrix4_from_vectors(
             mat,
@@ -480,7 +480,7 @@ void station_menu_select_segment(Window *win,int segment)
     {
         gfc_line_sprintf(buffer,"<Constructing>");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_COLOR_WHITE);
     }
     else
     {
@@ -488,8 +488,8 @@ void station_menu_select_segment(Window *win,int segment)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"hull"),buffer);
         if (data->selection->hull < data->selection->hullMax)
         {
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_RED);
-        }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_COLOR_RED);
+        }else gf2d_element_set_color(gf2d_window_get_element_by_name(win,"hull"),GFC_COLOR_WHITE);
     }
 
     gfc_line_sprintf(buffer,"Facility Slots: %i",data->selection->facilitySlots);

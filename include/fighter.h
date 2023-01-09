@@ -1,7 +1,7 @@
 #ifndef __FIGHTER_H__
 #define __FIGHTER_H__
 
-#include "entity.h"
+#include "gf3d_entity.h"
 
 /**
  * @brief Create a new fighter entity

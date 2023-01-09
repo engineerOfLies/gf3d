@@ -9,19 +9,19 @@
 
 typedef struct Entity_S
 {
-    Uint8       _inuse;     /**<keeps track of memory usage*/
+    Uint8       _inuse;         /**<keeps track of memory usage*/
     TextLine    name;
-    ModelMat    mat;   /**<orientation matrix for the model*/
-    Color       color;      /**<default color for the model*/
-    Color       detailColor;/**<detail color for the model*/
-    Model      *model;      /**<pointer to the entity model to draw  (optional)*/
-    Uint8       hidden;     /**<if true, not drawn*/
+    ModelMat    mat;            /**<orientation matrix for the model*/
+    Color       color;          /**<default color for the model*/
+    Color       detailColor;    /**<detail color for the model*/
+    Color       selectedColor;  /**<Color for highlighting*/
+    Model      *model;          /**<pointer to the entity model to draw  (optional)*/
+    Uint8       hidden;         /**<if true, not drawn*/
     Uint8       selected;
-    Color       selectedColor;      /**<Color for highlighting*/
     
-    Box         bounds; // for collisions
-    int         team;  //same team dont clip
-    int         clips;  // if false, skip collisions
+    Box         bounds;         // for collisions
+    int         team;           //same team dont clip
+    int         clips;          // if false, skip collisions
 
     void       (*think)(struct Entity_S *self); /**<pointer to the think function*/
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/
@@ -33,7 +33,7 @@ typedef struct Entity_S
     Vector3D    velocity;
     Vector3D    acceleration;
             
-    Uint32      health;     /**<entity dies when it reaches zero*/
+    Uint32      health;         /**<entity dies when it reaches zero*/
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
@@ -44,46 +44,46 @@ typedef struct Entity_S
  * @brief initializes the entity subsystem
  * @param maxEntities the limit on number of entities that can exist at the same time
  */
-void entity_system_init(Uint32 maxEntities);
+void gf3d_entity_system_init(Uint32 maxEntities);
 
 /**
  * @brief provide a pointer to a new empty entity
  * @return NULL on error or a valid entity pointer otherwise
  */
-Entity *entity_new();
+Entity *gf3d_entity_new();
 
 /**
  * @brief free a previously created entity from memory
  * @param self the entity in question
  */
-void entity_free(Entity *self);
+void gf3d_entity_free(Entity *self);
 
 
 /**
  * @brief Draw an entity in the current frame
  * @param self the entity in question
  */
-void entity_draw(Entity *self);
+void gf3d_entity_draw(Entity *self);
 
 /**
  * @brief draw ALL active entities
  */
-void entity_draw_all();
+void gf3d_entity_draw_all();
 
 /**
  * @brief Call an entity's think function if it exists
  * @param self the entity in question
  */
-void entity_think(Entity *self);
+void gf3d_entity_think(Entity *self);
 
 /**
  * @brief run the think functions for ALL active entities
  */
-void entity_think_all();
+void gf3d_entity_think_all();
 
 /**
  * @brief run the update functions for ALL active entities
  */
-void entity_update_all();
+void gf3d_entity_update_all();
 
 #endif

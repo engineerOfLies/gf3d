@@ -34,7 +34,7 @@ void main()
         baseColor.z = (detailColor.z * factor);
     }
 
-    vec4 ambient = clamp(vec4(fragAmbient.xyz * cosTheta * fragAmbient.w,0),0,1) +clamp(vec4(baseColor.xyz * cosTheta * fragAmbient.w,0),-1,0);;
+    vec4 ambient = clamp(vec4(fragAmbient.xyz * cosTheta * fragAmbient.w,0),-0.5,1) +clamp(vec4(baseColor.xyz * cosTheta * fragAmbient.w,0),-1,0);                                               //^make that -1 to get darker shadows from the sun
     
     vec3 h = normalize(lightDir + eyeDir);
     float intSpec = clamp(dot(h,normal), 0,1);

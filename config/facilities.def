@@ -371,8 +371,8 @@
         {
             "name":"planetary_farm",
             "displayName":"Planetary Farm",
-            "model":"models/planet/ore_mine.model",
-            "icon":"models/planet/ore_mine_icon.png",
+            "model":"models/planet/planet_farm.model",
+            "icon":"models/planet/planet_farm_icon.png",
             "description":"This is a planet side industrial green house.  It is designed to extract useful nutrients from the planet soil and use them to grow food.  Once up and running the facility is self sufficient as long as the site contains nutrients to extract.",
             "type":"planetary",
             "cost":

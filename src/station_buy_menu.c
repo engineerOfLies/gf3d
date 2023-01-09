@@ -70,9 +70,9 @@ void station_buy_menu_select_item(Window *win,int choice, const char *name)
     data = win->data;
     if (choice != data->choice)
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_YELLOW);
+        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_COLOR_YELLOW);
     }
-    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_CYAN);
+    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_COLOR_CYAN);
     data->choice = choice;
     if (data->selected == name)return;//nothing to do
     
@@ -210,7 +210,7 @@ void station_buy_menu_set_list(Window *win)
             choice = i;
             first = str;
         }
-        button = gf2d_button_new_label_simple(win,1000+i,str,FT_Small,vector2d(1,30),GFC_YELLOW);
+        button = gf2d_button_new_label_simple(win,1000+i,str,FT_Small,vector2d(1,30),GFC_COLOR_YELLOW);
         if (!button)continue;
         gf2d_element_list_add_item(item_list,button);
     }

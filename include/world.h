@@ -12,7 +12,7 @@
 #include "gf3d_particle.h"
 #include "gf3d_model.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 
 typedef struct
 {

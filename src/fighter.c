@@ -15,7 +15,7 @@ void fighter_free(Entity *self);
 Entity *fighter_new(Vector3D position)
 {
     Entity *ent = NULL;    
-    ent = entity_new();
+    ent = gf3d_entity_new();
     if (!ent)
     {
         return NULL;

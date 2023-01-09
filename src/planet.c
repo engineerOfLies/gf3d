@@ -278,7 +278,7 @@ Vector3D planet_position_to_position(float radius, Vector2D site)
     Vector3D position = {0};
     position.y = radius;
     vector3d_rotate_about_x(&position, site.y * 10 * GFC_DEGTORAD);
-    vector3d_rotate_about_z(&position, site.x * 10 * GFC_DEGTORAD);
+    vector3d_rotate_about_z(&position, (site.x * 10 * GFC_DEGTORAD)+GFC_PI);
     
     planet = player_get_planet();
     if (planet)

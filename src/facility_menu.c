@@ -78,10 +78,10 @@ void facility_menu_select_item(Window *win,int choice)
     }
     if (choice != data->choice)
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_YELLOW);
+        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_COLOR_YELLOW);
         data->choice = choice;
     }
-    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_CYAN);
+    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_COLOR_CYAN);
     data->facility = gfc_list_get_nth(data->facilityList,choice);
     facility_menu_refresh_view(win);
 }
@@ -112,7 +112,7 @@ void facility_menu_refresh_view(Window *win)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"mission"),"Action: ---");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),"Damage: ---");
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_COLOR_WHITE);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),"Storage Capacity: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),"Housing: 0");
         gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"),1);
@@ -125,13 +125,13 @@ void facility_menu_refresh_view(Window *win)
     planet_menu_set_camera_at_site(win->parent,data->facility->position);
     if ((!data->facility->inactive)&&(!data->facility->disabled))
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_COLOR_WHITE);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: Yes");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"disable_label"),"Disable");
     }
     else
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_RED);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"active"),GFC_COLOR_RED);
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"active"),"Active: No");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"disable_label"),"Enable");
     }
@@ -140,11 +140,11 @@ void facility_menu_refresh_view(Window *win)
     gfc_line_sprintf(buffer,"Staff: %i / %i",data->facility->staffAssigned,data->facility->staffPositions);
     if (data->facility->staffAssigned < data->facility->staffRequired)
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_RED);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_RED);
     }
     else
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),GFC_COLOR_WHITE);
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),buffer);
 
@@ -179,11 +179,11 @@ void facility_menu_refresh_view(Window *win)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"damage"),buffer);
     if (data->facility->damage > 0)
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_RED);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_COLOR_RED);
     }
     else
     {
-        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_WHITE);
+        gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_COLOR_WHITE);
     }
 
     gfc_line_sprintf(buffer,"Storage Capacity: %i",(int)data->facility->storage);
@@ -200,12 +200,12 @@ void facility_menu_refresh_view(Window *win)
         if (data->facility->productivity < 1)
         {
             gfc_line_sprintf(buffer,"Energy Ouput: %i",(int)(data->facility->energyOutput*data->facility->productivity));
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),GFC_RED);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),GFC_COLOR_RED);
         }
         else
         {
             gfc_line_sprintf(buffer,"Energy Ouput: %i",(int)(data->facility->energyOutput));
-            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),GFC_WHITE);
+            gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),GFC_COLOR_WHITE);
         }
     }
     else if (data->facility->energyDraw > 0 )
@@ -483,7 +483,7 @@ void facility_menu_set_list(Window *win)
         facility = gfc_list_get_nth(data->facilityList ,i);
         if (!facility)
         {
-            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",FT_Small,vector2d(1,30),GFC_YELLOW);
+            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",FT_Small,vector2d(1,30),GFC_COLOR_YELLOW);
             if (!button)continue;
             gf2d_element_list_add_item(item_list,button);
             continue;
@@ -492,7 +492,7 @@ void facility_menu_set_list(Window *win)
         if (str)
         {
             gfc_line_sprintf(buffer,"%s %i",str,facility->id);
-            button = gf2d_button_new_label_simple(win,1000+i,buffer,FT_Small,vector2d(1,30),GFC_YELLOW);
+            button = gf2d_button_new_label_simple(win,1000+i,buffer,FT_Small,vector2d(1,30),GFC_COLOR_YELLOW);
             if (!button)continue;
             gf2d_element_list_add_item(item_list,button);
         }

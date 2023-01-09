@@ -38,7 +38,7 @@ Entity *camera_entity_new(Vector3D position,Vector3D rotation)
         return camera_entity;
     }
     
-    ent = entity_new();
+    ent = gf3d_entity_new();
     if (!ent)
     {
         slog("UGH OHHHH, no camera_entity for you!");

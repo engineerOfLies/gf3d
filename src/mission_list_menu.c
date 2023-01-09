@@ -17,7 +17,7 @@
 #include "gf2d_message_buffer.h"
 #include "gf2d_windows_common.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "camera_entity.h"
 #include "resources.h"
 #include "station_def.h"
@@ -138,7 +138,7 @@ int mission_list_menu_draw(Window *win)
 
 Element *mission_list_menu_build_row(Window *win, Mission *mission, int index)
 {
-    Color color = GFC_WHITE;
+    Color color = GFC_COLOR_WHITE;
     Element *rowList;
     TextLine buffer;
     ListElement *le;
@@ -150,8 +150,8 @@ Element *mission_list_menu_build_row(Window *win, Mission *mission, int index)
     rowList = gf2d_element_new_full(
         NULL,0,(char *)mission->title,
         gfc_rect(0,0,1,1),
-        GFC_WHITE,0,
-        GFC_BLACK,0,win);
+        GFC_COLOR_WHITE,0,
+        GFC_COLOR_BLACK,0,win);
     gf2d_element_make_list(rowList,le);
     // title
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,mission->title,FT_H6,vector2d(200,24),color));

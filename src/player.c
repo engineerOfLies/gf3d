@@ -307,7 +307,7 @@ Entity *player_new(const char *file)
 
     if (!player_entity)
     {
-        ent = entity_new();
+        ent = gf3d_entity_new();
         if (!ent)
         {
             slog("UGH OHHHH, no player for you!");
@@ -317,8 +317,8 @@ Entity *player_new(const char *file)
     }
     else
     {
-        entity_free(player_entity);
-        ent = entity_new();
+        gf3d_entity_free(player_entity);
+        ent = gf3d_entity_new();
         if (!ent)
         {
             slog("UGH OHHHH, no player for you!");
@@ -330,7 +330,7 @@ Entity *player_new(const char *file)
     if (!data)
     {
         slog("failed to parse player data");
-        entity_free(ent);
+        gf3d_entity_free(ent);
         return NULL;
     }
     ent->data = data;
@@ -365,7 +365,7 @@ void player_free(Entity *self)
     if ((!self)||(!self->data))return;
     data = self->data;
     resources_list_free(data->resources);
-    entity_free(data->station);
+    gf3d_entity_free(data->station);
     world_delete(data->world);
     sj_free(data->history);
     free(data);

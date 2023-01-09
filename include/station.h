@@ -6,7 +6,7 @@
 #include "gfc_list.h"
 #include "gfc_config.h"
 
-#include "entity.h"
+#include "gf3d_entity.h"
 #include "mission.h"
 
 typedef struct StationSection_S

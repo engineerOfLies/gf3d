@@ -443,7 +443,7 @@ Entity *station_new(Vector3D position,SJson *config)
     StationData *data = NULL;
     StationSection *section;
     
-    ent = entity_new();
+    ent = gf3d_entity_new();
     if (!ent)
     {
         return NULL;
