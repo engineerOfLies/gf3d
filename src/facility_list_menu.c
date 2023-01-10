@@ -29,8 +29,6 @@
 
 typedef struct
 {
-    int offset;
-    int scrollCount;
     int updated;
 }FacilityListMenuData;
 
@@ -45,30 +43,6 @@ int facility_list_menu_free(Window *win)
     data = win->data;
     free(data);
     return 0;
-}
-
-void facility_list_menu_scroll_up(Window *win)
-{
-    FacilityListMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (data->offset > 0)
-    {
-        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"facilities"),--data->offset);
-        facility_list_menu_update_resources(win);
-    }
-}
-
-void facility_list_menu_scroll_down(Window *win)
-{
-    FacilityListMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (data->offset < data->scrollCount)
-    {
-        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"facilities"),++data->offset);
-        facility_list_menu_update_resources(win);
-    }
 }
 
 int facility_list_menu_update(Window *win,List *updateList)
@@ -94,16 +68,6 @@ int facility_list_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if (strcmp(e->name,"scroll_down")==0)
-        {
-            facility_list_menu_scroll_down(win);
-            return 1;
-        }
-        if (strcmp(e->name,"scroll_up")==0)
-        {
-            facility_list_menu_scroll_up(win);
-            return 1;
-        }
         if ((e->index >= 500)&&((e->index < 1000)))
         {
             //View
@@ -144,19 +108,6 @@ int facility_list_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"done")==0)
         {
             gf2d_window_free(win);
-            return 1;
-        }
-    }
-    if (gf2d_window_mouse_in(win))
-    {
-        if (gfc_input_mouse_wheel_up())
-        {
-            facility_list_menu_scroll_up(win);
-            return 1;
-        }
-        if (gfc_input_mouse_wheel_down())
-        {
-            facility_list_menu_scroll_down(win);
             return 1;
         }
     }
@@ -353,11 +304,6 @@ void facility_list_menu_update_resources(Window *win)
         if (!e)continue;
         gf2d_element_list_add_item(list,e);
     }
-    if (c > gf2d_element_list_get_row_count(list))
-    {
-        data->scrollCount = c - gf2d_element_list_get_row_count(list);
-    }
-    else data->scrollCount = 0;
     
     station = player_get_station_data();
     if (station)

@@ -30,8 +30,6 @@ typedef struct
 {
     TextLine entryText;
     int updated;
-    int offset;
-    int scrollCount;
     char *resource;
     List *playerSupply;
     List *stockpile;
@@ -101,30 +99,6 @@ void market_purchase_cancel(Window *win)
     win->child = NULL;
 }
 
-void market_menu_scroll_up(Window *win)
-{
-    MarketMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (data->offset > 0)
-    {
-        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"commodities"),--data->offset);
-        market_menu_update_resources(win);
-    }
-}
-
-void market_menu_scroll_down(Window *win)
-{
-    MarketMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (data->offset < data->scrollCount)
-    {
-        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"commodities"),++data->offset);
-        market_menu_update_resources(win);
-    }
-}
-
 int market_menu_facility_check()
 {
     StationFacility *facility;
@@ -170,16 +144,6 @@ int market_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if (strcmp(e->name,"scroll_down")==0)
-        {
-            market_menu_scroll_down(win);
-            return 1;
-        }
-        if (strcmp(e->name,"scroll_up")==0)
-        {
-            market_menu_scroll_up(win);
-            return 1;
-        }
         if ((e->index >= 500)&&(e->index < 600))
         {
             if (!market_menu_facility_check())return 1;
@@ -381,11 +345,6 @@ void market_menu_update_resources(Window *win)
         gf2d_element_list_add_item(list,e);
         count++;
     }
-    if (count > gf2d_element_list_get_row_count(list))
-    {
-        data->scrollCount = count - gf2d_element_list_get_row_count(list);
-    }
-    else data->scrollCount = 0;
 
     data->updated = player_get_day();
 }

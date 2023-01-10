@@ -29,8 +29,6 @@ extern int freeBuildMode;
 typedef struct
 {
     TextLine name;
-    int offset;
-    int scrollCount;
     Ship *ship;
 }ShipViewMenuData;
 
@@ -71,31 +69,6 @@ void onShipRenameOk(Window *win)
     gf2d_window_refresh(win->parent);
     return;
 }
-
-void ship_view_scroll_up(Window *win)
-{
-    ShipViewMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (data->offset > 0)
-    {
-        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"facilities_list"),--data->offset);
-        gf2d_window_refresh(win);
-    }
-}
-
-void ship_view_scroll_down(Window *win)
-{
-    ShipViewMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (data->offset < data->scrollCount)
-    {
-        gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"facilities_list"),++data->offset);
-        gf2d_window_refresh(win);
-    }
-}
-
 
 void ship_view_menu_refresh(Window *win)
 {
@@ -167,6 +140,7 @@ void ship_view_menu_refresh(Window *win)
     elist = gf2d_window_get_element_by_name(win,"facilities_list");
     if (elist)
     {
+        gf2d_element_list_free_items(elist);
         c = gfc_list_get_count(data->ship->facilities);
         for (i = 0; i < c; i++)
         {
@@ -177,11 +151,6 @@ void ship_view_menu_refresh(Window *win)
                 gf2d_label_new_simple_size(win,0,facility->displayName,FT_H6,vector2d(1,24),
                 GFC_COLOR_WHITE));
         }
-        if (c > gf2d_element_list_get_row_count(elist))
-        {
-            data->scrollCount = c - gf2d_element_list_get_row_count(elist);
-        }
-        else data->scrollCount = 0;
     }
 }
 
@@ -258,32 +227,9 @@ int ship_view_menu_update(Window *win,List *updateList)
                 (gfc_work_func*)onShipRenameCancel);
             return 1;
         }
-        if (strcmp(e->name,"scroll_down")==0)
-        {
-            ship_view_scroll_down(win);
-            return 1;
-        }
-        if (strcmp(e->name,"scroll_up")==0)
-        {
-            ship_view_scroll_up(win);
-            return 1;
-        }
         if (strcmp(e->name,"close")==0)
         {
             gf2d_window_free(win);
-            return 1;
-        }
-    }
-    if (gf2d_window_mouse_in(win))
-    {
-        if (gfc_input_mouse_wheel_up())
-        {
-            ship_view_scroll_up(win);
-            return 1;
-        }
-        if (gfc_input_mouse_wheel_down())
-        {
-            ship_view_scroll_down(win);
             return 1;
         }
     }

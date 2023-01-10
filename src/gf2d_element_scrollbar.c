@@ -255,7 +255,7 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
     }
     if (bar->list)
     {
-        e->bounds.x = bar->list->bounds.w - 32; 
+        e->bounds.x = bar->list->bounds.w - 40; 
         e->bounds.w = 32; 
         e->bounds.h = bar->list->bounds.h; 
     }
