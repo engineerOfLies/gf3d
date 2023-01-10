@@ -24,6 +24,7 @@
 #include "station_def.h"
 #include "station.h"
 #include "player.h"
+#include "ship_view_menu.h"
 #include "ship_list_view.h"
 
 typedef struct
@@ -35,7 +36,7 @@ typedef struct
     List *ships;
 }ShipListViewData;
 
-void ship_list_view_update_resources(Window *win);
+void ship_list_view_refresh(Window *win);
 
 int ship_list_view_free(Window *win)
 {
@@ -56,7 +57,7 @@ void ship_list_view_scroll_up(Window *win)
     if (data->offset > 0)
     {
         gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"commodities"),--data->offset);
-        ship_list_view_update_resources(win);
+        ship_list_view_refresh(win);
     }
 }
 
@@ -68,7 +69,7 @@ void ship_list_view_scroll_down(Window *win)
     if (data->offset < data->scrollCount)
     {
         gf2d_element_list_set_scroll_offset(gf2d_window_get_element_by_name(win,"commodities"),++data->offset);
-        ship_list_view_update_resources(win);
+        ship_list_view_refresh(win);
     }
 }
 
@@ -97,9 +98,7 @@ int ship_list_view_facility_check()
 int ship_list_view_update(Window *win,List *updateList)
 {
     int i,count;
-//    int choice;
-//    const char *name;
-//    TextLine buffer;
+    Ship *ship = NULL;;
     Element *e;
     ShipListViewData *data;
     if (!win)return 0;
@@ -108,7 +107,7 @@ int ship_list_view_update(Window *win,List *updateList)
 
     if (data->updated != player_get_day())
     {
-        ship_list_view_update_resources(win);
+        ship_list_view_refresh(win);
     }
 
     count = gfc_list_get_count(updateList);
@@ -126,8 +125,12 @@ int ship_list_view_update(Window *win,List *updateList)
             ship_list_view_scroll_up(win);
             return 1;
         }
-        if ((e->index >= 500)&&(e->index < 600))
+        if (e->index >= 500)
         {
+            if (win->child)return 1;
+            ship = gfc_list_get_nth(data->ships,e->index - 500);
+            if (!ship)return 1;
+            win->child = ship_view_menu(win,ship);
             return 1;
         }
         if (strcmp(e->name,"done")==0)
@@ -189,7 +192,11 @@ Element *ship_list_view_build_row(Window *win, Ship *ship,int index)
             ship->displayName,
             FT_H6,vector2d(200,24),color));
     //captain
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,ship->captain,FT_H6,vector2d(150,24),GFC_COLOR_WHITE));
+    if (strlen(ship->captain)<=0)
+    {
+        gfc_line_sprintf(buffer,"<none>");
+    }else gfc_line_cpy(buffer,ship->captain);
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(150,24),GFC_COLOR_WHITE));
     //HULL
     if (ship->hull < ship->hullMax)color = GFC_COLOR_RED;
     else color = GFC_COLOR_WHITE;
@@ -216,7 +223,7 @@ Element *ship_list_view_build_row(Window *win, Ship *ship,int index)
     return rowList;
 }
 
-void ship_list_view_update_resources(Window *win)
+void ship_list_view_refresh(Window *win)
 {
     int i,c;
     int count = 0;
@@ -271,7 +278,8 @@ Window *ship_list_view(Window *parent)
     win->update = ship_list_view_update;
     win->free_data = ship_list_view_free;
     win->draw = ship_list_view_draw;
-    ship_list_view_update_resources(win);
+    win->refresh = ship_list_view_refresh;
+    ship_list_view_refresh(win);
     message_buffer_bubble();
     return win;
 }

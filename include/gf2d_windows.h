@@ -38,10 +38,11 @@ typedef struct Window_S
     struct Window_S *parent;/**<pointer to a parent window*/
     struct Window_S *child; /**<pointer to a child window, used when only one at a time is allowed*/
     void (*close_child)(struct Window_S *win,struct Window_S *child);
-    int (*update)(struct Window_S *win,List *updateList);
-    int (*draw)(struct Window_S *win);
-    int (*free_data)(struct Window_S *win);
-    void *data;             /**<custom data*/
+    int (*update)(struct Window_S *win,List *updateList);//update function to be called whenever a window element is updated
+    int (*draw)(struct Window_S *win);                   //custom draw function, if it returns 1, skip the standard draw
+    void(*refresh)(struct Window_S *win);                //custom refresh function.  Called when window content is changed
+    int (*free_data)(struct Window_S *win);              //if you have custom data, you need to specify this to free it
+    void *data;             /**<custom data*/       
 }Window;
 
 /**
@@ -61,6 +62,11 @@ void gf2d_windows_draw_all();
  * @return 1 if a window handled input or 0 if everything was idle
  */
 int gf2d_windows_update_all();
+
+/**
+ * @brief call the window's refresh function, if one has been specified
+ */
+void gf2d_window_refresh(Window *win);
 
 /**
  * @brief get a new initialized window

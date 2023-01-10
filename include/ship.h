@@ -19,6 +19,7 @@ typedef struct
     TextLine    location;       // where is the ship
     Vector3D    position;       // more specifically
     int         housing;        //how much housing is provided by this S
+    int         passengers;     //how many people are being transported
     float       hull,hullMax;   //when hull <= 0 ship is destroyed
     TextLine    captain;        //who is in command of the ship (usually who is in the helm)
     Mission    *mission;        // if any mission is assigned to the section (mostly for repairs or building)
@@ -28,6 +29,7 @@ typedef struct
     int         staffAssigned;  //how many people are actually hired to this ship
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
     int         storageCapacity;//ship total
+    List       *cargo;          //a resources list of the cargo
     int         disabled;       // if the ship cannot run.  No crew, no power, no engines
     int         speed;          // top speed for the ship
     float       efficiency;     // factor for overal ship performance
@@ -44,7 +46,16 @@ Ship *ship_new();
  * @brief aggregate stats from facilities and check if everything is working
  * @param ship the ship to check;
  */
-void ship_ship_check(Ship *ship);
+void ship_check(Ship *ship);
+
+/**
+ * @brief change assigned staff to the ship
+ * @param ship the ship to assign
+ * @param amount how many staff
+ * @return > 0 if the ship couldn't handle any more, < 0 if ship didn't have enough to remove 0 otherwise
+ * @note the size of the return value is amount it couldn't handle
+ */
+int ship_change_staff(Ship *ship,int amount);
 
 /**
  * @brief free a ship from memory

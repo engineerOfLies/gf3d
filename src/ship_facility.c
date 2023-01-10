@@ -61,7 +61,7 @@ ShipFacility *ship_facility_new_by_name(const char *name,int id)
     str = sj_object_get_value_as_string(def,"slot_type");
     if (str)gfc_line_cpy(facility->slot_type,str);
     sj_object_get_value_as_int(def,"housing",&facility->housing);
-    sj_object_get_value_as_int(def,"storage",&facility->storage);
+    sj_object_get_value_as_int(def,"cargo",&facility->storage);
     sj_object_get_value_as_int(def,"staffRequired",&facility->staffRequired);
     sj_object_get_value_as_int(def,"staffPositions",&facility->staffPositions);
     sj_object_get_value_as_int(def,"energyDraw",&facility->energyDraw);

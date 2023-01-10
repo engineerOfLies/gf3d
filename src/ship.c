@@ -1,5 +1,7 @@
 #include "simple_logger.h"
 #include "config_def.h"
+#include "world.h"
+#include "resources.h"
 #include "ship_entity.h"
 #include "ship_facility.h"
 #include "ship.h"
@@ -36,14 +38,26 @@ Ship *ship_load(SJson *json)
     sj_object_get_value_as_uint32(json,"id",&id);
     ship = ship_new_by_name(str,id,0);
     if (!ship)return NULL;
+    str = sj_object_get_value_as_string(json,"displayName");
+    if (str)gfc_line_cpy(ship->displayName,str);
     str = sj_object_get_value_as_string(json,"captain");
     if (str)gfc_line_cpy(ship->captain,str);
     str = sj_object_get_value_as_string(json,"location");
     if (str)gfc_line_cpy(ship->location,str);
     sj_value_as_vector3d(sj_object_get_value(json,"position"),&ship->position);
     sj_object_get_value_as_uint32(json,"idPool",&ship->idPool);
+    sj_object_get_value_as_int(json,"passengers",&ship->passengers);
     sj_object_get_value_as_float(json,"hull",&ship->hull);
     sj_object_get_value_as_int(json,"staffAssigned",&ship->staffAssigned);    
+    item = sj_object_get_value(json,"cargo");
+    if (item)
+    {
+        ship->cargo = resources_list_parse(item);
+    }
+    else
+    {
+        ship->cargo = gfc_list_new();//empty
+    }
     if (sj_object_get_value_as_uint32(json,"mission",&id))
     {
         ship->mission = mission_get_by_id(id);
@@ -59,7 +73,12 @@ Ship *ship_load(SJson *json)
         if (!facility)continue;
         gfc_list_append(ship->facilities,facility);
     }
-    ship_ship_check(ship);
+    if (strcmp(ship->location,"parking")==0)
+    {
+        //register parking spot
+        ship->position = world_parking_claim_spot(ship->position);
+    }
+    ship_check(ship);
     return ship;
 }
 
@@ -77,10 +96,15 @@ SJson *ship_save(Ship *ship)
     sj_object_insert(json,"captain",sj_new_str(ship->captain));
     sj_object_insert(json,"id",sj_new_uint32(ship->id));
     sj_object_insert(json,"idPool",sj_new_uint32(ship->idPool));
+    sj_object_insert(json,"passengers",sj_new_int(ship->passengers));
     sj_object_insert(json,"location",sj_new_str(ship->location));
     sj_object_insert(json,"position",sj_vector3d_new(ship->position));
     sj_object_insert(json,"staffAssigned",sj_new_int(ship->staffAssigned));
     sj_object_insert(json,"hull",sj_new_float(ship->hull));
+    if (gfc_list_get_count(ship->cargo) > 0)
+    {
+        sj_object_insert(json,"cargo",resources_list_save(ship->cargo));
+    }
     if (ship->mission)
     {
         sj_object_insert(json,"mission",sj_new_uint32(ship->mission->id));
@@ -130,11 +154,11 @@ Ship *ship_new_by_name(const char *name,int id,int defaults)
             gfc_list_append(ship->facilities,ship_facility_new_by_name(str,++ship->idPool));
         }
     }
-    ship_ship_check(ship);
+    ship_check(ship);
     return ship;
 }
 
-void ship_ship_check(Ship *ship)
+void ship_check(Ship *ship)
 {
     int i,c;
     ShipFacility *facility;
@@ -181,6 +205,27 @@ void ship_set_location(Ship *ship,const char *location,Vector3D position)
     {
         vector3d_copy(ship->entity->mat.position,position);
     }
+}
+
+int ship_change_staff(Ship *ship,int amount)
+{
+    int diff;
+    if (!ship)return 0;
+    ship->staffAssigned += amount;
+    if (ship->staffAssigned > ship->staffPositions)
+    {
+        diff = ship->staffAssigned - ship->staffPositions;
+        ship->staffAssigned = ship->staffPositions;
+        return diff;//we had extra
+    }
+    if (ship->staffAssigned < 0)
+    {
+        diff = ship->staffAssigned;
+        ship->staffAssigned = 0;
+        return diff;
+    }
+    ship_check(ship);
+    return 0;
 }
 
 /*eol@eof*/

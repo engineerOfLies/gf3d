@@ -238,10 +238,17 @@ void world_play_sound(const char *sound)
 Vector3D world_parking_claim_spot(Vector3D spot)
 {
     Vector3D *location;
+    if (!the_world)
+    {
+        slog("no world");
+        return vector3d(-1,-1,-1);
+    }
     if (!world_parking_spot_get_by_location(spot))
     {
         location = gfc_allocate_array(sizeof(Vector3D),1);
-        vector3d_copy((*location),spot);
+        location->x = spot.x;
+        location->y = spot.y;
+        location->z = spot.z;
         gfc_list_append(the_world->parking_spots,location);
         return spot;
     }

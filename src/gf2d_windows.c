@@ -458,6 +458,12 @@ void gf2d_window_free(Window *win)
     memset(win,0,sizeof(Window));
 }
 
+void gf2d_window_refresh(Window *win)
+{
+    if ((!win)||(!win->refresh))return;
+    win->refresh(win);
+}
+
 void gf2d_window_set_dimensions(Window *win,Rect dimensions)
 {
     if (!win)return;
@@ -507,12 +513,11 @@ int gf2d_window_update(Window *win)
     int count,i;
     int retval = 0;
     Vector2D offset;
-    List *updateList = NULL;
+    List *updateList = gfc_list_new();
     List *updated = NULL;
     Element *e;
     if (!win)return 0;
     if (win->hidden)return 0;
-    updateList = gfc_list_new();
     offset.x = win->dimensions.x + win->canvas.x;
     offset.y = win->dimensions.y + win->canvas.y;
     count = gfc_list_get_count(win->elements);
@@ -523,10 +528,6 @@ int gf2d_window_update(Window *win)
         updated = gf2d_element_update(e, offset);
         if (updated)
         {
-            if (!updateList)
-            {
-                updateList = gfc_list_new();
-            }
             updateList = gfc_list_concat_free(updateList,updated);
         }
     }

@@ -149,12 +149,14 @@ void player_data_load_reputation(SJson *json, PlayerReputation *data)
     sj_object_get_value_as_float(json,"safety",&data->safety);
 }
 
-List *player_ships_load(SJson *list)
+List *player_ships_load(SJson *list,PlayerData *player)
 {
+    Ship *ship;
     List *ships;
     int i,c;
     SJson *item;
     if (!list)return NULL;
+    if (!player)return NULL;
     ships = gfc_list_new();
     if (!ships)return NULL;
     c = sj_array_get_count(list);
@@ -162,7 +164,10 @@ List *player_ships_load(SJson *list)
     {
         item = sj_array_get_nth(list,i);
         if (!item)continue;
-        gfc_list_append(ships,ship_load(item));
+        ship = ship_load(item);
+        if (!ship)continue;
+        ship->entity = ship_entity_new(ship->position,ship,player->detailColor);
+        gfc_list_append(ships,ship);
     }
     return ships;
 }
@@ -283,7 +288,7 @@ PlayerData *player_data_parse(SJson *json)
     res = sj_object_get_value(json,"ships");
     if (res)
     {
-        data->ships = player_ships_load(res);
+        data->ships = player_ships_load(res,data);
     }
     else
     {
@@ -297,6 +302,7 @@ Entity *player_new(const char *file)
     SJson *json,*res;
     Entity *ent = NULL;
     PlayerData *data;
+    World *world;
     
     if (!file)
     {
@@ -327,6 +333,7 @@ Entity *player_new(const char *file)
         }
         player_entity = ent;
     }
+    world = world_load("config/world.json");
     data = player_data_parse(sj_object_get_value(json,"player"));
     if (!data)
     {
@@ -337,7 +344,7 @@ Entity *player_new(const char *file)
     ent->data = data;
     //NOTE missions MUST be loaded before the planet or the station
     missions_load_from_config(sj_object_get_value(json,"missions"));
-    data->world = world_load("config/world.json");
+    data->world = world;
     data->station = station_new(vector3d(0,0,0),sj_object_get_value(json,"station"));
     gfc_color_copy(data->station->detailColor,data->detailColor);
     res = sj_object_get_value(json,"planet");
@@ -670,10 +677,6 @@ int player_get_facility_count()
     PlayerData *data;
     if (!player_entity)return 0;
     data = player_entity->data;
-    if (data->planet)
-    {
-        count = gfc_list_get_count(data->planet->facilities);
-    }
     station = player_get_station_data();
     if (station)
     {
@@ -684,6 +687,10 @@ int player_get_facility_count()
             if (!section)continue;
             count += gfc_list_get_count(section->facilities);
         }
+    }
+    if (data->planet)
+    {
+        count += gfc_list_get_count(data->planet->facilities);
     }
     return count;
 }
@@ -696,14 +703,6 @@ StationFacility *player_get_facility_nth(Uint32 index)
     PlayerData *data;
     if (!player_entity)return NULL;
     data = player_entity->data;
-    if (data->planet)
-    {
-        if (index < gfc_list_get_count(data->planet->facilities))
-        {
-            return gfc_list_get_nth(data->planet->facilities,index);
-        }
-        index -= gfc_list_get_count(data->planet->facilities);//remove the planety facilities from the seach
-    }
     station = player_get_station_data();
     if (station)
     {
@@ -718,6 +717,14 @@ StationFacility *player_get_facility_nth(Uint32 index)
             }
             index -= gfc_list_get_count(section->facilities);//remove the planety facilities from the seach
         }
+    }
+    if (data->planet)
+    {
+        if (index < gfc_list_get_count(data->planet->facilities))
+        {
+            return gfc_list_get_nth(data->planet->facilities,index);
+        }
+        index -= gfc_list_get_count(data->planet->facilities);//remove the planety facilities from the seach
     }
     return NULL;
 }
