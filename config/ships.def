@@ -78,6 +78,49 @@
             ]
         },
         {
+            "name":"cargo1",
+            "displayName":"Condor",
+            "model":"models/ships/cargo_ship.model",
+            "icon":"models/ships/cargo_ship_icon.png",
+            "description":"This is your basic model for a cargo transport ship.  It has decent armor in the hull, but not a lot of room for weapons.  It does pack up to 8 cargo holds.  Some pilots prefer to swap one out for a shield generator",
+            "type":"ship",
+            "scale":[5,5,5],
+            "buildTime":200,
+            "size":"small",
+            "hull":800,
+            "cost":
+            {
+                "credits":2000,
+                "alloys":200
+            },
+            "facility_slots":
+            {
+                "helm":1,
+                "small_power_core":1,
+                "small_weapon":1,
+                "small_thruster":4,
+                "sensor":1,
+                "small_auxiliary":8
+            },
+            "default_facilities":
+            [
+                "cockpit1",
+                "hdg_ship_core1",
+                "ion_thrusters1",
+                "ion_thrusters1",
+                "ion_thrusters1",
+                "ion_thrusters1",
+                "ion_cannon1",
+                "cargo1",
+                "cargo1",
+                "cargo1",
+                "cargo1",
+                "cargo1",
+                "cargo1",
+                "long_range_scanner1"
+            ]
+        },
+        {
             "name":"passenger",
             "displayName":"Pelican",
             "model":"models/ships/passenger_transport.model",

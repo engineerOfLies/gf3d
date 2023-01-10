@@ -26,6 +26,7 @@
 #include "personnel_menu.h"
 #include "resources_menu.h"
 #include "planet_menu.h"
+#include "ship_list_view.h"
 #include "mission_list_menu.h"
 #include "market_menu.h"
 #include "main_menu.h"
@@ -40,7 +41,7 @@ typedef struct
     Entity  *player;
     int     selection;
     Window  *messages;
-    World   *w;
+    World   *w;         //owned by player, not this menu
 }HUDWindowData;
 
 const char *options[] = 
@@ -251,7 +252,20 @@ int hud_update(Window *win,List *updateList)
             win->child = mission_list_menu(win);
             return 1;
         }
-        
+        if (strcmp(e->name,"fleet")==0)
+        {
+            if ((win->child)&&(gf2d_window_named(win->child,"ship_list_view")))
+            {
+                gf2d_window_free(win->child);
+                return 1;
+            }
+            if (win->child)
+            {
+                gf2d_window_free(win->child);
+            }
+            win->child = ship_list_view(win);
+            return 1;
+        }        
         if (strcmp(e->name,"freelook")==0)
         {
             if (win->child)return 1;// skip if a child window is open

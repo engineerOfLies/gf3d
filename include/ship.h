@@ -20,11 +20,17 @@ typedef struct
     Vector3D    position;       // more specifically
     int         housing;        //how much housing is provided by this S
     float       hull,hullMax;   //when hull <= 0 ship is destroyed
+    TextLine    captain;        //who is in command of the ship (usually who is in the helm)
     Mission    *mission;        // if any mission is assigned to the section (mostly for repairs or building)
-    Bool        working;  // if true, the ship is working
+    Bool        working;        // if true, the ship is working
+    int         staffPositions; // how many positions there are to work
+    int         staffRequired;  //how many people are needed to run the facility at a minimum
+    int         staffAssigned;  //how many people are actually hired to this ship
     float       energyOutput,energyDraw;//how much is produced, how much is needed, how much we have
-    int         storageCapacity;
-    int         staffAssigned,staffPositions; // how many staff have are working this section / how many positions there are to work
+    int         storageCapacity;//ship total
+    int         disabled;       // if the ship cannot run.  No crew, no power, no engines
+    int         speed;          // top speed for the ship
+    float       efficiency;     // factor for overal ship performance
     List       *facilities;     //list of ship facilities
     Entity     *entity;         // pointer to the ship entity
 }Ship;
@@ -33,6 +39,12 @@ typedef struct
  * @brief allocate a blank ship
  */
 Ship *ship_new();
+
+/**
+ * @brief aggregate stats from facilities and check if everything is working
+ * @param ship the ship to check;
+ */
+void ship_ship_check(Ship *ship);
 
 /**
  * @brief free a ship from memory

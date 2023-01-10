@@ -839,7 +839,11 @@ void player_give_new_ship(const char *name)
     player = player_get_data();
     if ((!player)||(!name))return;
     ship = ship_new_by_name(name,player_get_new_id(name),1);
-    if (!ship)return;
+    if (!ship)
+    {
+        slog("failed to make a new ship for the player by name %s",name);
+        return;
+    }
     gfc_list_append(player->ships,ship);
     ship->entity = ship_entity_new(vector3d(0,-1000,0),ship,player->detailColor);
     ship_set_location(ship,"parking",world_parking_get_spot());

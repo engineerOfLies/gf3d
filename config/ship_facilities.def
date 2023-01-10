@@ -80,20 +80,19 @@
             {   
                 "credits":50
             },
-            "energyDraw":10
+            "energyDraw":5
         },
         {
             "name":"cargo1",
             "displayName":"Small Cargo Hold",
             "icon":"",
-            "description":"A small cargo hold capable of storing up to 8 tons of a commodity.  Not very economical for commercial use, but can be used to hold a few tons of something if the event presents itself.",
-            "cargo":8,
+            "description":"A small cargo hold capable of storing up to 10 tons of a commodity.  Not very economical for commercial use, but can be used to hold a few tons of something if the event presents itself.",
+            "cargo":10,
             "slot_type":"small_auxiliary",
             "cost":
             {   
                 "credits":50
-            },
-            "energyDraw":10
+            }
         },
         {
             "name":"shields1",

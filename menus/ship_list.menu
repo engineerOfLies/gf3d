@@ -2,14 +2,14 @@
     "window":
     {
         "dimensions" : [0,80,900,490],
-        "name":"mission_list_menu",
+        "name":"ship_list_view",
         "justify" : "center",
         "elements":
         [
             {
                 "type": "label",
-                "bounds": [0,4,1,40],
-                "text":"Missions In Progress",
+                "bounds": [0,8,1,40],
+                "text":"Station Fleet",
                 "justify" : "center",
                 "align" : "middle",
                 "style":"H4"
@@ -47,63 +47,47 @@
                     {
                         "type": "label",
                         "bounds": [0,0,200,1],
+                        "text":"Ship",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,150,1],
+                        "text":"Captain",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,80,1],
+                        "text":"Hull",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"Crew",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
+                        "text":"Location",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,120,1],
                         "text":"Mission",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,60,1],
-                        "text":"ID",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,200,1],
-                        "text":"Target",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,100,1],
-                        "text":"Started",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,100,1],
-                        "text":"Finish on",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,60,1],
-                        "text":"Left",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,60,1],
-                        "text":"Staff",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
-                        "bounds": [0,0,60,1],
-                        "text":"View",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
@@ -113,7 +97,7 @@
             {
                 "type": "list",
                 "bounds": [10,65,880,350],
-                "name":"list_items",
+                "name":"item_list",
                 "style": "vertical",
                 "backgroundColor":[0,0,0,250],
                 "backgroundDraw":1,

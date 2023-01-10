@@ -52,7 +52,6 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     ent->selectedColor = gfc_color(0.9,0.7,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     gfc_color_copy(ent->detailColor,detailColor);
-    slog("color: %f,%f,%f,%f",ent->detailColor.r,ent->detailColor.g,ent->detailColor.b,ent->detailColor.a);
     ent->think = ship_entity_think;
     ent->draw = ship_entity_draw;
     ent->update = ship_entity_update;

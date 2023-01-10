@@ -147,15 +147,18 @@ int facility_list_menu_update(Window *win,List *updateList)
             return 1;
         }
     }
-    if (gfc_input_mouse_wheel_up())
+    if (gf2d_window_mouse_in(win))
     {
-        facility_list_menu_scroll_up(win);
-        return 1;
-    }
-    if (gfc_input_mouse_wheel_down())
-    {
-        facility_list_menu_scroll_down(win);
-        return 1;
+        if (gfc_input_mouse_wheel_up())
+        {
+            facility_list_menu_scroll_up(win);
+            return 1;
+        }
+        if (gfc_input_mouse_wheel_down())
+        {
+            facility_list_menu_scroll_down(win);
+            return 1;
+        }
     }
 
     return 0;
@@ -187,7 +190,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         NULL,0,(char *)facility->name,
         gfc_rect(0,0,1,1),
         GFC_COLOR_WHITE,0,
-        GFC_COLOR_BLACK,0,win);
+        GFC_COLOR_DARKGREY,index%2,win);
     gf2d_element_make_list(rowList,le);
     
     if ((facility->inactive)||(facility->disabled))

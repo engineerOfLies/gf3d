@@ -185,7 +185,7 @@ void world_draw(World *world)
     {
         m = gfc_list_get_nth(world->model_list,i);
         if (!m)continue;
-        gf3d_model_draw(m->model,0,m->mat,vector4d(1,1,1,1),vector4d(1,1,1,1),vector4d(1,1,1,0.5));
+        gf3d_model_draw(m->model,0,m->mat,vector4d(1,.9,.5,1),vector4d(1,1,1,1),vector4d(1,1,1,0));
     }
     gf3d_particle_draw(world->theSun);
 }

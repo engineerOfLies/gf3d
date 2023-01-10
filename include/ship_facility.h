@@ -17,10 +17,10 @@ typedef struct
     int         housing;        //how much housing is provided by this facility
     int         storage;        // how many commodities can be stored here
     int         staffRequired;  //how many people are needed to run the facility at a minimum
-    int         staffAssigned;  //how many people are actually hired to do so
     int         staffPositions; //how many people are CAN be hired to do so
     int         energyDraw;     //how much energy is needed for the facility to run
     int         energyOutput;   //how much energy is produced by the facility
+    int         speed;          //how much speed this facility produces
     int         inactive;       //if the facility cannot run
 }ShipFacility;
 

@@ -17,7 +17,6 @@ SJson *ship_facility_save(ShipFacility *facility)
     sj_object_insert(json,"displayName",sj_new_str(facility->displayName));
     sj_object_insert(json,"id",sj_new_int(facility->id));
     sj_object_insert(json,"damage",sj_new_float(facility->damage));
-    sj_object_insert(json,"staffAssigned",sj_new_int(facility->staffAssigned));
     sj_object_insert(json,"inactive",sj_new_int(facility->inactive));
     return json;
 }
@@ -34,7 +33,6 @@ ShipFacility *ship_facility_load(SJson *json)
     facility = ship_facility_new_by_name(str,id);
     if (!facility)return NULL;
     sj_object_get_value_as_float(json,"damage",&facility->damage);
-    sj_object_get_value_as_int(json,"staffAssigned",&facility->staffAssigned);    
     sj_object_get_value_as_int(json,"inactive",&facility->inactive);
     return facility;
 }
@@ -68,6 +66,7 @@ ShipFacility *ship_facility_new_by_name(const char *name,int id)
     sj_object_get_value_as_int(def,"staffPositions",&facility->staffPositions);
     sj_object_get_value_as_int(def,"energyDraw",&facility->energyDraw);
     sj_object_get_value_as_int(def,"energyOutput",&facility->energyOutput);    
+    sj_object_get_value_as_int(def,"speed",&facility->speed);    
     return facility;
 }
 

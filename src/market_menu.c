@@ -254,15 +254,18 @@ int market_menu_update(Window *win,List *updateList)
             return 1;
         }
     }
-    if (gfc_input_mouse_wheel_up())
+    if (gf2d_window_mouse_in(win))
     {
-        market_menu_scroll_up(win);
-        return 1;
-    }
-    if (gfc_input_mouse_wheel_down())
-    {
-        market_menu_scroll_down(win);
-        return 1;
+        if (gfc_input_mouse_wheel_up())
+        {
+            market_menu_scroll_up(win);
+            return 1;
+        }
+        if (gfc_input_mouse_wheel_down())
+        {
+            market_menu_scroll_down(win);
+            return 1;
+        }
     }
     return 0;
 }
@@ -296,11 +299,11 @@ Element *market_menu_build_row(Window *win, const char *resource,int index, int 
     rowList = gf2d_element_new_full(
         NULL,0,(char *)resource,
         gfc_rect(0,0,1,1),
-        gfc_color(1,1,1,1),0,
-        gfc_color(0,0,0,1),0,win);
+        GFC_COLOR_WHITE,0,
+        GFC_COLOR_DARKGREY,index%2,win);
     gf2d_element_make_list(rowList,le);
     //name
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,resource,FT_H6,vector2d(200,24),gfc_color(1,1,1,1)));
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,resource,FT_H6,vector2d(200,24),GFC_COLOR_WHITE));
     //supply
     lastAmount = (int)resources_list_get_amount(player->yesterday,resource);
     color = GFC_COLOR_WHITE;
