@@ -157,6 +157,7 @@ void gf2d_element_list_draw(Element *element,Vector2D offset)
         if (skip)continue;
         gf2d_element_draw(e, drawPosition);
     }
+    gf2d_element_draw(list->scrollbar, offset);
 }
 
 int gf2d_element_list_get_item_count(Element *element)
@@ -255,6 +256,7 @@ List *gf2d_element_list_update(Element *element,Vector2D offset)
             gfc_list_concat_free(ret,updated);
         }
     }
+    gf2d_element_update(list->scrollbar, position);
     return ret;
 }
 
@@ -435,5 +437,11 @@ void gf2d_element_load_list_from_config(Element *e,SJson *json,Window *win)
         if (!item)continue;
         gf2d_element_list_add_item(e,gf2d_element_load_from_config(item,e,win));
     }
+    value = sj_object_get_value(json,"scrollbar");
+    if (value)
+    {
+        list->scrollbar = gf2d_element_load_from_config(value,e,win);
+    }
+
 }
 /*eol@eof*/

@@ -5,7 +5,10 @@
 #include "gf2d_draw.h"
 #include "gf2d_mouse.h"
 #include "gf2d_elements.h"
+#include "gf2d_element_button.h"
 #include "gf2d_element_scrollbar.h"
+
+void gf2d_element_scrollbar_update_range(Element *element);
 
 
 void gf2d_element_scrollbar_draw(Element *element,Vector2D offset)
@@ -19,10 +22,10 @@ void gf2d_element_scrollbar_draw(Element *element,Vector2D offset)
     vector2d_add(position,offset,element->bounds);
     //draw background of the sliders
     gfc_rect_set(rect,
-        offset.x + element->bounds.x + element->bounds.w *0.2,
-        offset.y + element->bounds.y + element->bounds.h *0.2,
-        element->bounds.w * 0.6,
-        element->bounds.h * 0.6);
+        offset.x + element->bounds.x + 20,
+        offset.y + element->bounds.y + 20,
+        element->bounds.w -25,
+        element->bounds.h -40);
     gf2d_draw_rect_filled(rect,element->backgroundColor);
     
     gf2d_element_draw(data->scrollUp,position);
@@ -92,6 +95,7 @@ List *gf2d_element_scrollbar_update(Element *element,Vector2D offset)
         bounds = gf2d_element_get_absolute_bounds(data->list,offset);
         bounds.x = data->list->lastDrawPosition.x;
         bounds.y = data->list->lastDrawPosition.y;
+        gf2d_element_scrollbar_update_range(element);
     }
     else
     {   
@@ -114,19 +118,15 @@ List *gf2d_element_scrollbar_update(Element *element,Vector2D offset)
         gf2d_element_scrollbar_scroll_down(element);
         return NULL;        
     }
-    if (element->hasFocus)
+    if (gfc_input_command_pressed("panup"))
     {
-        element->state = ES_highlight;
-        if (gfc_input_command_pressed("panup"))
-        {
-            gf2d_element_scrollbar_scroll_up(element);
-            return NULL;
-        }
-        if (gfc_input_command_pressed("pandown"))
-        {
-            gf2d_element_scrollbar_scroll_up(element);
-            return NULL;
-        }
+        gf2d_element_scrollbar_scroll_up(element);
+        return NULL;
+    }
+    if (gfc_input_command_pressed("pandown"))
+    {
+        gf2d_element_scrollbar_scroll_down(element);
+        return NULL;
     }
     if (gf2d_mouse_hidden() <= 0)
     {
@@ -147,19 +147,27 @@ List *gf2d_element_scrollbar_update(Element *element,Vector2D offset)
     return NULL;
 }
 
-void gf2d_element_scrollbar_set_list_target(Element *scrollbar,Element *list)
+void gf2d_element_scrollbar_update_range(Element *element)
 {
     int total;
     ScrollbarElement *data;
-    if (!scrollbar)return;
+    if ((!element)||(!element->data))return;
+    data = (ScrollbarElement*)element->data;
+    if (!data->list)return;
+    total = gf2d_element_list_get_item_count(data->list);
+    data->scrollCount = total - gf2d_element_list_get_row_count(data->list);//the amount we have to scroll
+
+}
+
+void gf2d_element_scrollbar_set_list_target(Element *scrollbar,Element *list)
+{
+    ScrollbarElement *data;
+    if ((!scrollbar)||(!scrollbar->data))return;
     data = (ScrollbarElement*)scrollbar->data;
-    if (!data)return;
     data->list = list;
     if (data->list != NULL)
     {
-        data->position = 0;
-        total = gf2d_element_list_get_item_count(list);
-        data->scrollCount = total - gf2d_element_list_get_row_count(list);//the amount we have to scroll
+        gf2d_element_scrollbar_update_range(scrollbar);
     }
 }
 
@@ -233,7 +241,25 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
     gf2d_element_make_scrollbar(e,gf2d_element_scrollbar_new());
     bar = e->data;
     if (!bar)return;
-    
+    str = sj_object_get_value_as_string(json,"list_target");
+    if (str)
+    {
+        gf2d_element_scrollbar_set_list_target(e,gf2d_window_get_element_by_name(e->win,str));
+    }
+    else
+    {
+        if (e->parent->type == ET_List)
+        {
+            gf2d_element_scrollbar_set_list_target(e,e->parent);
+        }
+    }
+    if (bar->list)
+    {
+        e->bounds.x = bar->list->bounds.w - 32; 
+        e->bounds.w = 32; 
+        e->bounds.h = bar->list->bounds.h; 
+    }
+
     str = sj_object_get_value_as_string(json,"style");
     if (str)
     {
@@ -246,6 +272,27 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
             bar->scrollStyle = LS_Vertical;
         }
     }
+    //TODO: check if the config overrides default arrow buttons
+    bar->scrollUp = gf2d_button_new_simple(
+        e->win,
+        0,
+        "scrollup",
+        "actors/arrow_button_up.json",
+        " ",
+        vector2d(0.5,0.5),
+        vector2d(32,20),
+        GFC_COLOR_WHITE);
+    bar->scrollDown = gf2d_button_new_simple(
+        e->win,
+        0,
+        "scrolldown",
+        "actors/arrow_button_up.json",
+        " ",
+        vector2d(0.5,-0.5),
+        vector2d(32,20),
+        GFC_COLOR_WHITE);
+    bar->scrollDown->bounds.y = e->bounds.h - bar->scrollDown->bounds.h;
+
 
     str = sj_object_get_value_as_string(json,"list_target");
     if (str)

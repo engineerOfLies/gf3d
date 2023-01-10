@@ -22,6 +22,7 @@ typedef struct
     int   scrollOffset;     /**<offset for drawing based on scrolling position*/
     int   itemsPerLine;     /**<how many items will fit per line*/
     int   itemsPerColumn;   /**<how many items will fit per columns*/
+    Element *scrollbar;     /**<sub_element*/
 }ListElement;
 
 

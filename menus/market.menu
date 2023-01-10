@@ -104,13 +104,14 @@
                 "cropped":true,
                 "scrolls":true,
                 "item_size" : [1,25],
+                "scrollbar":
+                {
+                    "type": "scrollbar",
+                    "backgroundColor":[20,200,255,255],
+                    "style": "vertical"
+                },
                 "elements":
                 []
-            },
-            {
-                "type": "scrollbar",
-                "list_target":"commodities",
-                "style": "vertical"
             }
         ]
     }

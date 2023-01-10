@@ -254,19 +254,6 @@ int market_menu_update(Window *win,List *updateList)
             return 1;
         }
     }
-    if (gf2d_window_mouse_in(win))
-    {
-        if (gfc_input_mouse_wheel_up())
-        {
-            market_menu_scroll_up(win);
-            return 1;
-        }
-        if (gfc_input_mouse_wheel_down())
-        {
-            market_menu_scroll_down(win);
-            return 1;
-        }
-    }
     return 0;
 }
 
