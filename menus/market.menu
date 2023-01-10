@@ -108,30 +108,9 @@
                 []
             },
             {
-                "type": "button",
-                "name":"scroll_up",
-                "bounds": [854,65,32,20],
-                "hotkey":"scroll_up",
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,32,20],
-                    "scale":[0.5,0.5],
-                    "actor" : "actors/arrow_button_up.json"
-                }
-            },
-            {
-                "type": "button",
-                "name":"scroll_down",
-                "bounds": [854,385,32,20],
-                "hotkey":"scroll_down",
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,-32,32,20],
-                    "scale":[0.5,-0.5],
-                    "actor" : "actors/arrow_button_up.json"
-                }
+                "type": "scrollbar",
+                "list_target":"commodities",
+                "style": "vertical"
             }
         ]
     }

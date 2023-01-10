@@ -162,11 +162,14 @@ Element *gf2d_button_get_next(Element *element, Element *from)
     button = (ButtonElement*)element->data;
     if (element == from)
     {
-        return button->label;
+        if (button->label)return button->label;
+        if (button->actor)return button->actor;
+        return from;
     }
     if (from == button->label)
     {
         return button->actor;
+        return from;
     }
     if (from == button->actor)return from;//search item was my last child, return me
     return NULL;

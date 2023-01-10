@@ -93,6 +93,13 @@ void gf2d_element_list_set_scroll_offset(Element *element,int offset);
 int gf2d_element_list_get_row_count(Element *element);
 
 /**
+ * @brief get the number of items in the element list
+ * @param element the element list
+ * @return the number of items in the list
+ */
+int gf2d_element_list_get_item_count(Element *element);
+
+/**
  * @brief get the number of items that fit per line in a wrapping list
  * @param e the list element to check
  * @returns 0 on error, the number of items otherwise

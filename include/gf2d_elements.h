@@ -37,7 +37,8 @@ typedef enum
     ET_Actor,
     ET_Button,
     ET_Entry,
-    ET_Percent
+    ET_Percent,
+    ET_Scrollbar
 }ElementTypes;
 
 struct Element_S

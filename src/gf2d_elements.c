@@ -5,12 +5,13 @@
 #include "gfc_shape.h"
 
 #include "gf2d_draw.h"
-#include "gf2d_elements.h"
 #include "gf2d_element_actor.h"
 #include "gf2d_element_button.h"
 #include "gf2d_element_entry.h"
 #include "gf2d_element_list.h"
 #include "gf2d_element_label.h"
+#include "gf2d_element_scrollbar.h"
+#include "gf2d_elements.h"
 
 extern int __DEBUG;
 
@@ -173,6 +174,7 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     if (!sj_is_object(json))return NULL;
     e = gf2d_element_new();
     if (!e)return NULL;
+    e->parent = parent;
     value = sj_object_get_value(json,"name");
     if (value)
     {
@@ -208,10 +210,9 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     }
     gf2d_element_calibrate(e,parent, win);
     
-    value = sj_object_get_value(json,"type");
-    if (value)
+    type = sj_object_get_value_as_string(json,"type");
+    if (type)
     {
-        type = sj_get_string_value(value);
         if (strcmp(type,"list") == 0)
         {
             gf2d_element_load_list_from_config(e,json,win);
@@ -231,6 +232,10 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
         else if (strcmp(type,"entry") == 0)
         {
             gf2d_element_load_entry_from_config(e,json,win);
+        }
+        else if (strcmp(type,"scrollbar") == 0)
+        {
+            gf2d_element_scrollbar_load_from_config(e,json,win);
         }
     }
     else

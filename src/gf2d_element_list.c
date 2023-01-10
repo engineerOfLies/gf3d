@@ -159,6 +159,15 @@ void gf2d_element_list_draw(Element *element,Vector2D offset)
     }
 }
 
+int gf2d_element_list_get_item_count(Element *element)
+{
+    ListElement *list;
+    if (!element)return 0;
+    list = (ListElement*)element->data;
+    if (!list)return 0;
+    return gfc_list_get_count(list->list);
+}
+
 Element *gf2d_list_get_next(Element *element,Element *from)
 {
     ListElement *list;
