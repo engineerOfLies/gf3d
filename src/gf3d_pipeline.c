@@ -62,6 +62,23 @@ void gf3d_pipeline_close()
     if (__DEBUG)slog("pipeline system closed");
 }
 
+void gf3d_pipeline_call_render(
+    Pipeline *pipe,
+    VkDescriptorSet * descriptorSet,
+    VkBuffer vertexBuffer,
+    Uint32 vertexCount,
+    VkBuffer indexBuffer)
+{
+    VkDeviceSize offsets[] = {0};
+    if ((!pipe)||(!descriptorSet))return;
+    vkCmdBindVertexBuffers(pipe->commandBuffer, 0, 1, &vertexBuffer, offsets);    
+    vkCmdBindIndexBuffer(pipe->commandBuffer, indexBuffer, 0, pipe->indexType);
+    vkCmdBindDescriptorSets(pipe->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
+    vkCmdDrawIndexed(pipe->commandBuffer, vertexCount, 1, 0, 0, 0);
+}
+
+
+
 Pipeline *gf3d_pipeline_new()
 {
     int i;
@@ -216,7 +233,9 @@ Pipeline *gf3d_pipeline_create_from_config(
     const VkVertexInputBindingDescription* vertexInputDescription,
     const VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
     Uint32 vertexAttributeCount,
-    VkDeviceSize bufferSize)
+    VkDeviceSize bufferSize,
+    VkIndexType indexType
+)
 {
     SJson *config,*file, *item;
     const char *str;
@@ -417,7 +436,7 @@ Pipeline *gf3d_pipeline_create_from_config(
     }
     
     pipe->uboList = gf3d_uniform_buffer_list_new(device,bufferSize,draw_calls,gf3d_swapchain_get_swap_image_count());
-    
+    pipe->uboDataSize = bufferSize;
     if (__DEBUG)slog("pipeline created from file '%s'",configFile);
     return pipe;
 }

@@ -35,7 +35,7 @@ typedef struct
 
 typedef struct
 {
-    Uint32  verts[3];
+    Uint16  verts[3];
 }SpriteFace;
 
 typedef struct
@@ -144,7 +144,8 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
         gf2d_sprite_get_bind_description(),
         gf2d_sprite_get_attribute_descriptions(NULL),
         count,
-        sizeof(SpriteUBO)
+        sizeof(SpriteUBO),
+        VK_INDEX_TYPE_UINT16
     );     
     
     if(__DEBUG)slog("sprite manager initiliazed");
@@ -285,7 +286,6 @@ void gf2d_sprite_delete(Sprite *sprite)
 
 void gf2d_sprite_render(Sprite *sprite,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    VkDeviceSize offsets[] = {0};
     Pipeline *pipe;
     if (!sprite)
     {
@@ -293,13 +293,12 @@ void gf2d_sprite_render(Sprite *sprite,VkCommandBuffer commandBuffer, VkDescript
         return;
     }
     pipe = gf2d_sprite_get_pipeline();
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &sprite->buffer, offsets);
-    
-    vkCmdBindIndexBuffer(commandBuffer, gf2d_sprite.faceBuffer, 0, VK_INDEX_TYPE_UINT32);
-    
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-    
-    vkCmdDrawIndexed(commandBuffer, 6, 1, 0, 0, 0);
+        gf3d_pipeline_call_render(
+            pipe,
+            descriptorSet,
+            sprite->buffer,
+            6,
+            gf2d_sprite.faceBuffer);
 }
 
 

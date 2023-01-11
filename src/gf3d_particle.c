@@ -74,7 +74,8 @@ void gf3d_particle_manager_init(Uint32 max_particles)
         &gf3d_particle_manager.bindingDescription,
         gf3d_particle_manager.attributeDescriptions,
         PARTICLE_ATTRIBUTE_COUNT,
-        sizeof(ParticleUBO)
+        sizeof(ParticleUBO),
+        VK_INDEX_TYPE_UINT16
     );
     if(__DEBUG)slog("particle manager initiliazed");
     atexit(gf3d_particles_manager_close);

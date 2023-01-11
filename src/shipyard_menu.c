@@ -116,7 +116,6 @@ Element *shipyard_menu_build_row(Window *win, SJson *ship,int index)
     SJson *item;
     const char *str;
     TextLine buffer;
-    Color color;
     Element *rowList;
     List *costs;
     ListElement *le;

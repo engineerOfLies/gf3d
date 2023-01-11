@@ -10,6 +10,15 @@
 
 typedef struct
 {
+    VkDescriptorSet * descriptorSet;
+    VkBuffer vertexBuffer;
+    Uint32 vertexCount;
+    VkBuffer indexBuffer;
+    void *uboData;
+}PipelineDrawCall;
+
+typedef struct
+{
     Bool                    inUse;
     VkPipeline              pipeline;               /**<pipeline handle*/
     VkRenderPass            renderPass;
@@ -28,8 +37,10 @@ typedef struct
     Uint32                  descriptorPoolCount;
     Uint32                  descriptorSetCount;
     UniformBufferList      *uboList;                /**<for draw calls sent through this pipeline*/
+    PipelineDrawCall       *drawCallList;           /**<cached draw calls for this frame*/
+    size_t                  uboDataSize;            /**<size of a single UBO for this pipeline*/
     VkCommandBuffer         commandBuffer;          /**<for current command*/
-
+    VkIndexType             indexType;              /**<size of the indices in the index buffer*/
 }Pipeline;
 
 /**
@@ -64,6 +75,7 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,const char *vertFile,const
  * @param vertextInputAttributeDescriptions list of how the attributes are described
  * @param vertexAttributeCount how many of the above are provided in the list
  * @param bufferSize the sizeof() the ubo to be used with this pipeline
+ * @param indexType VK_INDEX_TYPE_UINT16, VK_INDEX_TYPE_UINT32, or VK_INDEX_TYPE_UINT8_EXT
  * @returns NULL on error (see logs) or a pointer to a pipeline
 */
 Pipeline *gf3d_pipeline_create_from_config(
@@ -74,7 +86,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     const VkVertexInputBindingDescription* vertexInputDescription,
     const VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
     Uint32 vertexAttributeCount,
-    VkDeviceSize bufferSize);
+    VkDeviceSize bufferSize,
+    VkIndexType indexType);
 
 /**
  * @brief setup a pipeline for rendering a basic sprite
@@ -100,6 +113,16 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
  * @param frame the swap chain rendering frame to reset the cursor for
  */
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame);
+
+/**
+ * @brief bind a draw call to the current command
+ */
+void gf3d_pipeline_call_render(
+    Pipeline *pipe,
+    VkDescriptorSet * descriptorSet,
+    VkBuffer vertexBuffer,
+    Uint32 vertexCount,
+    VkBuffer indexBuffer);
 
 /**
  * @brief resets ALL pipelines currently in use

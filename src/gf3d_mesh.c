@@ -75,7 +75,8 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(SkyUBO)
+        sizeof(SkyUBO),
+        VK_INDEX_TYPE_UINT16
     );
 
     gf3d_mesh.pipe = gf3d_pipeline_create_from_config(
@@ -86,7 +87,8 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO)
+        sizeof(MeshUBO),
+        VK_INDEX_TYPE_UINT16
     );
 
     gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
@@ -97,7 +99,8 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO)
+        sizeof(MeshUBO),
+        VK_INDEX_TYPE_UINT16
     );
 
     gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
@@ -108,7 +111,8 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(HighlightUBO)
+        sizeof(HighlightUBO),
+        VK_INDEX_TYPE_UINT16
     );
 
     if (__DEBUG)slog("mesh system initialized");
@@ -297,7 +301,6 @@ void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descr
 {
     int i,c;
     MeshPrimitive *primitive;
-    VkDeviceSize offsets[] = {0};
     if (!mesh)
     {
         slog("cannot render a NULL mesh");
@@ -318,14 +321,12 @@ void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descr
     {
         primitive = gfc_list_get_nth(mesh->primitives,i);
         if (!primitive)continue;
-
-        vkCmdBindVertexBuffers(pipe->commandBuffer, 0, 1, &primitive->vertexBuffer, offsets);
-        
-        vkCmdBindIndexBuffer(pipe->commandBuffer, primitive->faceBuffer, 0, VK_INDEX_TYPE_UINT16);
-        
-        vkCmdBindDescriptorSets(pipe->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-        
-        vkCmdDrawIndexed(pipe->commandBuffer, primitive->faceCount * 3, 1, 0, 0, 0);
+        gf3d_pipeline_call_render(
+            pipe,
+            descriptorSet,
+            primitive->vertexBuffer,
+            primitive->faceCount * 3,
+            primitive->faceBuffer);
     }
 }
 
