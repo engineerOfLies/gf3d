@@ -2,14 +2,14 @@
     "window":
     {
         "dimensions" : [0,80,900,490],
-        "name":"ship_list_view",
+        "name":"shipyard_menu",
         "justify" : "center",
         "elements":
         [
             {
                 "type": "label",
                 "bounds": [0,8,1,40],
-                "text":"Station Fleet",
+                "text":"Shipyard",
                 "justify" : "center",
                 "align" : "middle",
                 "style":"H4"
@@ -37,28 +37,6 @@
                 }
             },
             {
-                "type": "button",
-                "name":"shipyard",
-                "bounds": [580,440,160,42],
-                "hotkey":"shipyard",
-                "sound":"confirm",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Shipyard",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,160,48],
-                    "actor" : "actors/button.actor"
-                }
-            },
-            {
                 "type": "list",
                 "bounds": [10,38,880,30],
                 "style": "horizontal",
@@ -68,7 +46,7 @@
 
                     {
                         "type": "label",
-                        "bounds": [0,0,200,1],
+                        "bounds": [0,0,180,1],
                         "text":"Ship",
                         "justify" : "left",
                         "align" : "middle",
@@ -76,16 +54,8 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,150,1],
-                        "text":"Captain",
-                        "justify" : "left",
-                        "align" : "middle",
-                        "style":"small"
-                    },
-                    {
-                        "type": "label",
                         "bounds": [0,0,80,1],
-                        "text":"Hull",
+                        "text":"Size",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
@@ -100,16 +70,40 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
-                        "text":"Location",
+                        "bounds": [0,0,60,1],
+                        "text":"Hull",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,120,1],
-                        "text":"Mission",
+                        "bounds": [0,0,80,1],
+                        "text":"Speed",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,100,1],
+                        "text":"Weapons",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,80,1],
+                        "text":"Cargo",
+                        "justify" : "left",
+                        "align" : "middle",
+                        "style":"small"
+                    },
+                    {
+                        "type": "label",
+                        "bounds": [0,0,60,1],
+                        "text":"Cost",
                         "justify" : "left",
                         "align" : "middle",
                         "style":"small"

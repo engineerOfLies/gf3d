@@ -102,7 +102,7 @@ void item_list_menu_add_option(Window *win, const char *option,int index)
         1000+index,
         (char *)option,
         gfc_rect(0,0,336,24),
-        gfc_color(0.9,0.9,0.6,1),
+        GFC_COLOR_LIGHTCYAN,
         0,
         gfc_color(.5,.5,.5,1),0,win);
     le = gf2d_element_new_full(
@@ -110,7 +110,7 @@ void item_list_menu_add_option(Window *win, const char *option,int index)
         2000+index,
         (char *)option,
         gfc_rect(0,0,336,24),
-        gfc_color(0.9,0.9,0.6,1),
+        GFC_COLOR_LIGHTCYAN,
         0,
         gfc_color(1,1,1,1),0,win);
     

@@ -128,6 +128,19 @@
             "energyDraw":10
         },
         {
+            "name":"impulse_thrusters1",
+            "displayName":"Small Impulse Thrusters",
+            "icon":"",
+            "description":"Maneuvering thrusters designed to work with small ships.  These use a scaled down FST Drive to power it.  It can't open a tunnel to fourth space, but it can generate thrust by manipulating the gravity fields around the exhaust port.  The result is more momentum with less mass from the exhaust.  Ship go faster.",
+            "speed":15,
+            "slot_type":"small_thruster",
+            "cost":
+            {   
+                "credits":100
+            },
+            "energyDraw":20
+        },
+        {
             "name":"pulse_cannon1",
             "displayName":"Pulse Cannon 1S",
             "icon":"",

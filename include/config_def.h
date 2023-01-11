@@ -57,13 +57,6 @@ SJson *config_def_get_by_name(const char *resource,const char *name);
 const char *config_def_get_name_by_index(const char *resource,Uint8 index);
 
 /**
- * @brief get definition name for a given resource by the "display_name" key
- * @param section the display name of the resource
- * @return NULL if not found or error, the name otherwise
- */
-const char *station_def_get_name_by_display(const char *section);
-
-/**
  * @brief get definition information for a given resource by the parameter key and name value
  * @param resource the name of the resource list
  * @param parameter the field to match with

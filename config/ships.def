@@ -12,6 +12,10 @@
             "buildTime":150,
             "size":"small",
             "hull":500,
+            "crew":7,
+            "speed":30,
+            "weapons":3,
+            "cargo":0,
             "cost":
             {
                 "credits":2000,
@@ -30,8 +34,8 @@
             [
                 "cockpit1",
                 "hdg_ship_core1",
-                "ion_thrusters1",
-                "ion_thrusters1",
+                "impulse_thrusters1",
+                "impulse_thrusters1",
                 "pulse_cannon1",
                 "pulse_cannon1",
                 "long_range_scanner1"
@@ -46,7 +50,11 @@
             "type":"ship",
             "scale":[5,5,5],
             "buildTime":150,
+            "crew":9,
+            "speed":20,
             "size":"small",
+            "weapons":4,
+            "cargo":0,
             "hull":500,
             "cost":
             {
@@ -87,7 +95,11 @@
             "scale":[5,5,5],
             "buildTime":200,
             "size":"small",
+            "crew":6,
             "hull":800,
+            "speed":20,
+            "weapons":1,
+            "cargo":60,
             "cost":
             {
                 "credits":2000,
@@ -130,7 +142,11 @@
             "scale":[10,10,10],
             "buildTime":150,
             "size":"small",
+            "speed":10,
+            "crew":17,
             "hull":500,
+            "weapons":2,
+            "cargo":0,
             "cost":
             {
                 "credits":2500,

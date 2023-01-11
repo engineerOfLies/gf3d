@@ -156,7 +156,7 @@ void ship_view_menu_refresh(Window *win)
             gf2d_element_list_add_item(
                 elist,
                 gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(1,24),
-                GFC_COLOR_LIGHTORANGE));
+                GFC_COLOR_LIGHTBLUE));
 
             count = 0;
             c = gfc_list_get_count(data->ship->facilities);
@@ -170,7 +170,7 @@ void ship_view_menu_refresh(Window *win)
                     gf2d_button_new_label_simple(
                         win,500+i,
                         facility->displayName,
-                        FT_H6,vector2d(200,24),gfc_color(0.9,0.9,0.8,1)));
+                        FT_H6,vector2d(200,24),GFC_COLOR_LIGHTCYAN));
                 count++;
             }
             for (i = count; i < limit; i++)
@@ -180,7 +180,7 @@ void ship_view_menu_refresh(Window *win)
                     gf2d_button_new_label_simple(
                         win,600+j,
                         "<empty>",
-                        FT_H6,vector2d(200,24),gfc_color(0.9,0.9,0.8,1)));
+                        FT_H6,vector2d(200,24),GFC_COLOR_LIGHTCYAN));
             }
         }
     }

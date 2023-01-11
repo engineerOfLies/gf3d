@@ -144,6 +144,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         GFC_COLOR_DARKGREY,index%2,win);
     gf2d_element_make_list(rowList,le);
     
+    //name
     if ((facility->inactive)||(facility->disabled))
     {
         offline = 1;
@@ -152,9 +153,8 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     else
     {
         offline = 0;
-        color = gfc_color(.9,.9,.8,1);
+        color = GFC_COLOR_LIGHTCYAN;
     }
-    
     gf2d_element_list_add_item(
         rowList,
         gf2d_button_new_label_simple(
@@ -162,6 +162,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
             facility->displayName,
             FT_H6,vector2d(200,24),color));
 
+    //damag
     if (facility->damage < 0)
     {
         gfc_line_sprintf(buffer,"<uc>");
@@ -170,7 +171,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
     if (facility->damage > 0)color = GFC_COLOR_RED;
     else color = GFC_COLOR_WHITE;
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));
-    
+    //energy
     if (offline)
     {
         gfc_line_sprintf(buffer,"<offline>");
@@ -195,7 +196,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         }
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),color));
-    
+    //officer
     if (!station_facility_supports_officer(facility->name))
     {
         gfc_line_sprintf(buffer,"---");
@@ -209,7 +210,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         gfc_line_sprintf(buffer,"<unassigned>");
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),GFC_COLOR_WHITE));
-    
+    //staff
     if (facility->staffRequired == 0)
     {
         gfc_line_sprintf(buffer,"---");
@@ -226,7 +227,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         color = GFC_COLOR_WHITE;
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));
-
+    //productivity
     if (facility->productivity == 0)
     {
         gfc_line_sprintf(buffer,"---");
@@ -239,7 +240,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         else color = GFC_COLOR_WHITE;
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(60,24),color));
-
+    //storage
     if (facility->storage == 0)
     {
         gfc_line_sprintf(buffer,"---");
@@ -249,7 +250,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         gfc_line_sprintf(buffer,"%iT",facility->storage);
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),GFC_COLOR_WHITE));
-    
+    //housing
     if (facility->housing == 0)
     {
         gfc_line_sprintf(buffer,"---");
@@ -259,7 +260,7 @@ Element *facility_list_menu_build_row(Window *win, StationFacility *facility, in
         gfc_line_sprintf(buffer,"%i",facility->housing);
     }
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(90,24),GFC_COLOR_WHITE));
-
+    //revenue
     if (((!facility->operatingCost)&&(!facility->income))||(facility->operatingCost == facility->income))
     {
         gfc_line_sprintf(buffer,"---");

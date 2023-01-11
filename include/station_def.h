@@ -85,5 +85,11 @@ const char *station_def_get_mount_type(const char *section);
  */
 int station_def_get_build_time_by_name(const char *name);
 
+/**
+ * @brief get definition name for a given resource by the "display_name" key
+ * @param section the display name of the resource
+ * @return NULL if not found or error, the name otherwise
+ */
+const char *station_def_get_name_by_display(const char *section);
 
 #endif
