@@ -158,6 +158,73 @@ Ship *ship_new_by_name(const char *name,int id,int defaults)
     return ship;
 }
 
+int ship_get_slot_count_by_type(Ship *ship,const char *slot_type)
+{
+    SJson *def;
+    int count = 0;
+    SJson *slots;
+    if ((!ship)||(!slot_type))return 0;
+    def = config_def_get_by_name("ships",ship->name);
+    if (!def)return 0;
+    slots = sj_object_get_value(def,"facility_slots");
+    if (!slots)return 0;
+    sj_object_get_value_as_int(slots,slot_type,&count);
+    return count;
+}
+
+int ship_get_slot_name_count(Ship *ship)
+{
+    SJson *def;
+    SJList *keyList;
+    SJson *slots;
+    int count = 0;
+    if (!ship)return 0;
+    def = config_def_get_by_name("ships",ship->name);
+    if (!def)return 0;
+    slots = sj_object_get_value(def,"facility_slots");
+    if (!slots)return 0;
+    keyList = sj_object_get_keys_list(slots);
+    if (!keyList)return 0;
+    count = sj_list_get_count(keyList);
+    sj_list_delete(keyList);
+    return count;
+}
+
+const char *ship_get_slot_name_by_index(Ship *ship, Uint32 index)
+{
+    SJson *def;
+    SJList *keyList;
+    SJson *slots;
+    const char *name;
+    if (!ship)return NULL;
+    def = config_def_get_by_name("ships",ship->name);
+    if (!def)return 0;
+    slots = sj_object_get_value(def,"facility_slots");
+    if (!slots)return NULL;
+    keyList = sj_object_get_keys_list(slots);
+    if (!keyList)return NULL;
+    name = sj_list_get_nth(keyList,index);
+    sj_list_delete(keyList);
+    return name;
+}
+
+int ship_get_slot_usage_by_type(Ship *ship,const char *slot_type)
+{
+    int i,c;
+    int count = 0;
+    ShipFacility *facility;
+    if ((!ship)||(!slot_type))return 0;
+    c = gfc_list_get_count(ship->facilities);
+    for (i =0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(ship->facilities,i);
+        if (facility)continue;
+        if (gfc_strlcmp(facility->slot_type,slot_type) == 0)count++;
+    }
+    return count;
+}
+
+
 void ship_check(Ship *ship)
 {
     int i,c;

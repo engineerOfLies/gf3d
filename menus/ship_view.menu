@@ -114,6 +114,15 @@
                                 "style":"H6"
                             },
                             {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"model",
+                                "text":"Model :",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
                                 "type": "list",
                                 "bounds": [0,0,1,30],
                                 "style": "horizontal",
@@ -256,6 +265,15 @@
                             {
                                 "type": "label",
                                 "bounds": [0,0,1,25],
+                                "name":"speed",
+                                "text":"Speed: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
                                 "name":"efficiency",
                                 "text":"efficiency: 100%",
                                 "justify" : "left",
@@ -314,15 +332,6 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [0,0,1,25],
-                                "name":"model",
-                                "text":"Model :",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            {
-                                "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
                                 "bounds": [0,0,1,180],
@@ -341,7 +350,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [0,0,1,100],
+                                "bounds": [0,0,1,125],
                                 "name":"cargo_list",
                                 "style": "vertical",
                                 "backgroundColor":[0,0,0,250],
@@ -361,7 +370,7 @@
                     },
                     {
                         "type": "list",
-                        "bounds": [5,0,290,1],
+                        "bounds": [10,0,280,1],
                         "style": "vertical",
                         "packed":true,
                         "item_size" : [1,45],
@@ -377,7 +386,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [0,0,1,200],
+                                "bounds": [0,0,1,355],
                                 "name":"facilities_list",
                                 "style": "vertical",
                                 "backgroundColor":[0,0,0,250],

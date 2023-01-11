@@ -76,6 +76,8 @@ void ship_view_menu_refresh(Window *win)
     Color color;
     ShipFacility *facility;
     int i,c;
+    int j,k;
+    int count,limit;
     TextLine buffer;
     const char *str;
     Element *elist;
@@ -130,6 +132,9 @@ void ship_view_menu_refresh(Window *win)
     gfc_line_sprintf(buffer,"Energy: %i/%i",(int)data->ship->energyDraw,(int)data->ship->energyOutput);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
     gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),color);
+    //speed
+    gfc_line_sprintf(buffer,"Speed: %iMm/s",data->ship->speed);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"speed"),buffer);
     //efficiency
     gfc_line_sprintf(buffer,"Efficiency: %.2f%%",data->ship->efficiency);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"efficiency"),buffer);
@@ -141,23 +146,52 @@ void ship_view_menu_refresh(Window *win)
     if (elist)
     {
         gf2d_element_list_free_items(elist);
-        c = gfc_list_get_count(data->ship->facilities);
-        for (i = 0; i < c; i++)
+        k = ship_get_slot_name_count(data->ship);
+        for (j = 0; j < k;j++)
         {
-            facility = gfc_list_get_nth(data->ship->facilities,i);
-            if (!facility)continue;
+            str = ship_get_slot_name_by_index(data->ship, j);
+            if (!str)continue;
+            limit = ship_get_slot_count_by_type(data->ship,str);
+            gfc_line_sprintf(buffer,"%s slots: %i",str,limit);
             gf2d_element_list_add_item(
                 elist,
-                gf2d_label_new_simple_size(win,0,facility->displayName,FT_H6,vector2d(1,24),
-                GFC_COLOR_WHITE));
+                gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(1,24),
+                GFC_COLOR_LIGHTORANGE));
+
+            count = 0;
+            c = gfc_list_get_count(data->ship->facilities);
+            for (i = 0; i < c; i++)
+            {
+                facility = gfc_list_get_nth(data->ship->facilities,i);
+                if (!facility)continue;
+                if (gfc_strlcmp(facility->slot_type,str)!= 0)continue;//skip, not a match
+                gf2d_element_list_add_item(
+                    elist,
+                    gf2d_button_new_label_simple(
+                        win,500+i,
+                        facility->displayName,
+                        FT_H6,vector2d(200,24),gfc_color(0.9,0.9,0.8,1)));
+                count++;
+            }
+            for (i = count; i < limit; i++)
+            {
+                gf2d_element_list_add_item(
+                    elist,
+                    gf2d_button_new_label_simple(
+                        win,600+j,
+                        "<empty>",
+                        FT_H6,vector2d(200,24),gfc_color(0.9,0.9,0.8,1)));
+            }
         }
     }
 }
 
 int ship_view_menu_update(Window *win,List *updateList)
 {
+    const char *str;
     int i,count;
     Element *e;
+    ShipFacility *facility;
     PlayerData *player;
     ShipViewMenuData* data;
     if ((!win)||(!win->data))return 0;
@@ -172,6 +206,20 @@ int ship_view_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (e->index >= 600)
+        {
+            if (win->child)return 1;
+            str = ship_get_slot_name_by_index(data->ship,e->index - 600);
+            if (str)slog("Free slot for %s",str);
+            return 1;
+        }
+        if (e->index >= 500)
+        {
+            if (win->child)return 1;
+            facility = gfc_list_get_nth(data->ship->facilities,e->index - 500);
+            if (facility)slog("facility: %s",facility->displayName);
+            return 1;
+        }
         if (strcmp(e->name,"staff_assign")==0)
         {
             if (!data->ship)return 1;//nothing selected
