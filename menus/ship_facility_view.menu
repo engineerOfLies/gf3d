@@ -1,0 +1,214 @@
+{
+    "window":
+    {
+        "dimensions" : [0,80,900,490],
+        "name":"ship_facility_view_menu",
+        "justify" : "center",
+        "elements":
+        [
+            {
+                "type": "button",
+                "name":"sell",
+                "bounds": [420,440,160,42],
+                "hotkey":"sell",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Remove",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/red_button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"repair",
+                "bounds": [580,440,160,42],
+                "hotkey":"repair",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Repair",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"close",
+                "bounds": [740,440,160,42],
+                "hotkey":"close",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Close",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "label",
+                "bounds": [0,8,1,40],
+                "text":"Ship Facility View",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
+                "type": "list",
+                "bounds": [0,40,1,1],
+                "style": "horizontal",
+                "item_size" : [220,1],
+                "packed":true,
+                "elements":
+                [
+                    {
+                        "type": "list",
+                        "bounds": [10,5,250,1],
+                        "style": "vertical",
+                        "item_size" : [1,30],
+                        "packed":true,
+                        "elements":
+                        [
+                            {
+                                "type":"actor",
+                                "name":"item_picture",
+                                "justify":"center",
+                                "align":"middle",
+                                "bounds":[35,0,128,128],
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "text":" ",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"facility_type",
+                                "text":"type: <>",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "name":"staff",
+                                "text":"Staff Needed: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"damage",
+                                "text":"damage: None",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"cargo",
+                                "text":"Cargo: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"energy",
+                                "text":"Energy Supply: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"speed",
+                                "text":"Speed: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"passengers",
+                                "text":"passengers: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,0,350,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "name":"item_name",
+                                "bounds": [0,0,1,30],
+                                "text":"Display Ship Name",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "name":"item_description",
+                                "wraps":true,
+                                "bounds": [0,0,1,180],
+                                "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
+                                "justify" : "left",
+                                "align" : "top",
+                                "style":"H6"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -22,6 +22,7 @@
 #include "work_menu.h"
 #include "ship.h"
 #include "ship_facility.h"
+#include "ship_facility_view.h"
 #include "ship_view_menu.h"
 
 extern int freeBuildMode;
@@ -217,7 +218,7 @@ int ship_view_menu_update(Window *win,List *updateList)
         {
             if (win->child)return 1;
             facility = gfc_list_get_nth(data->ship->facilities,e->index - 500);
-            if (facility)slog("facility: %s",facility->displayName);
+            if (facility)win->child = ship_facility_view(win,data->ship, facility);
             return 1;
         }
         if (strcmp(e->name,"staff_assign")==0)

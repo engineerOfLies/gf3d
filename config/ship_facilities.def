@@ -33,8 +33,8 @@
             "icon":"",
             "description":"A small form factor HDG reactor designed for smaller ships.  Doesn't produce the power needed for open an FST Drive, but it more than adequate to run basic ship systems on a ship designed to use one of the FST Gates for interstellar travel.",
             "slot_type":"small_power_core",
-            "staffPositions":5,
-            "staffRequired":5,
+            "staffPositions":1,
+            "staffRequired":1,
             "cost":
             {   
                 "credits":200
@@ -106,8 +106,8 @@
                 "ionic":20
             },
             "slot_type":"small_auxiliary",
-            "staffPositions":5,
-            "staffRequired":5,
+            "staffPositions":1,
+            "staffRequired":1,
             "cost":
             {   
                 "credits":50
