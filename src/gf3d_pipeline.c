@@ -71,13 +71,143 @@ void gf3d_pipeline_call_render(
 {
     VkDeviceSize offsets[] = {0};
     if ((!pipe)||(!descriptorSet))return;
-    vkCmdBindVertexBuffers(pipe->commandBuffer, 0, 1, &vertexBuffer, offsets);    
-    vkCmdBindIndexBuffer(pipe->commandBuffer, indexBuffer, 0, pipe->indexType);
+    vkCmdBindVertexBuffers(pipe->commandBuffer, 0, 1, &vertexBuffer, offsets);
+    if (indexBuffer != VK_NULL_HANDLE)vkCmdBindIndexBuffer(pipe->commandBuffer, indexBuffer, 0, pipe->indexType);
     vkCmdBindDescriptorSets(pipe->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
     vkCmdDrawIndexed(pipe->commandBuffer, vertexCount, 1, 0, 0, 0);
 }
 
+void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawCall)
+{
+    int count = 1;
+    int frame;
+    UniformBuffer *buffer;
+    VkDescriptorImageInfo imageInfo = {0};
+    VkWriteDescriptorSet descriptorWrite[2] = {0};
+    VkDescriptorBufferInfo bufferInfo = {0};
+    if ((!pipe)||(!drawCall))return;    
 
+    frame = gf3d_vgraphics_get_current_buffer_frame();
+    buffer = gf3d_uniform_buffer_list_get_nth_buffer(pipe->uboBigBuffer, 0, frame);
+    bufferInfo.buffer = buffer->uniformBuffer;
+    bufferInfo.offset = drawCall->index * pipe->uboDataSize;
+    bufferInfo.range = pipe->uboDataSize;
+
+    descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite[0].dstSet = *drawCall->descriptorSet;
+    descriptorWrite[0].dstBinding = 0;
+    descriptorWrite[0].dstArrayElement = 0;
+    descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    descriptorWrite[0].descriptorCount = 1;
+    descriptorWrite[0].pBufferInfo = &bufferInfo;
+
+    if (drawCall->texture)
+    {
+        count = 2;
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = drawCall->texture->textureImageView;
+        imageInfo.sampler = drawCall->texture->textureSampler;
+        descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrite[1].dstSet = *drawCall->descriptorSet;
+        descriptorWrite[1].dstBinding = 1;
+        descriptorWrite[1].dstArrayElement = 0;
+        descriptorWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrite[1].descriptorCount = 1;                        
+        descriptorWrite[1].pImageInfo = &imageInfo;
+        descriptorWrite[1].pTexelBufferView = NULL; // Optional
+    }
+    vkUpdateDescriptorSets(pipe->device, count, descriptorWrite, 0, NULL);
+}
+
+void gf3d_pipeline_render_drawcall(Pipeline *pipe,PipelineDrawCall *drawCall)
+{
+    if ((!pipe)||(!drawCall))return;
+    gf3d_pipeline_call_render(
+        pipe,
+        drawCall->descriptorSet,
+        drawCall->vertexBuffer,
+        drawCall->vertexCount,
+        drawCall->indexBuffer);
+}
+
+void gf3d_pipeline_render_all_drawcalls(Pipeline *pipe)
+{
+    int i;
+    if (!pipe)return;
+    for (i = 0; i < pipe->drawCallCount; i++)
+    {
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_render_drawcall(pipe,&pipe->drawCallList[i]);
+    }
+}
+
+
+void gf3d_pipeline_update_descriptor_sets(Pipeline *pipe)
+{
+    int i;
+    for (i = 0;i < pipe->drawCallCount;i++)
+    {
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_update_descriptor_set(pipe, &pipe->drawCallList[i]);
+    }    
+}
+
+PipelineDrawCall *gf3d_pipeline_draw_call_new(Pipeline *pipe)
+{
+    int i;
+    char *ptr;
+    if (!pipe)return NULL;
+    ptr = pipe->uboData;
+    for (i = 0;i < pipe->descriptorSetCount;i++)
+    {
+        if (pipe->drawCallList[i].inuse)continue;
+        pipe->drawCallList[i].inuse = 1;
+        ptr = ptr + (i * pipe->uboDataSize);
+        pipe->drawCallList[i].uboData = ptr;
+        pipe->drawCallCount++;
+        pipe->drawCallList[i].index = i;
+        return &pipe->drawCallList[i];
+    }
+    if (__DEBUG)slog("cannot queue up any more draw calls this frame");
+    return NULL;
+}
+
+void gf3d_pipeline_queue_render(
+    Pipeline *pipe,
+    VkBuffer vertexBuffer,
+    Uint32 vertexCount,
+    VkBuffer indexBuffer,
+    void *uboData,
+    Texture *texture)
+{
+    PipelineDrawCall *drawCall;
+    if (!pipe)return;
+    drawCall = gf3d_pipeline_draw_call_new(pipe);
+    if (!drawCall)return;
+    drawCall->descriptorSet = gf3d_pipeline_get_descriptor_set(pipe, gf3d_vgraphics_get_current_buffer_frame());
+    drawCall->vertexBuffer = vertexBuffer;
+    drawCall->vertexCount = vertexCount;
+    drawCall->indexBuffer = indexBuffer;
+    drawCall->texture = texture;
+    memcpy(drawCall->uboData,uboData,pipe->uboDataSize);
+}
+
+void gf3_pipeline_update_ubos(Pipeline *pipe)
+{
+    int frame;
+    void *data;
+    UniformBuffer *buffer;
+    VkDevice device;
+    if ((!pipe)||(!pipe->drawCallCount))return;//skip if there are no queued calls
+    
+    device = gf3d_vgraphics_get_default_logical_device();
+    frame = gf3d_vgraphics_get_current_buffer_frame();
+    buffer = gf3d_uniform_buffer_list_get_nth_buffer(pipe->uboBigBuffer, 0, frame);
+    
+    vkMapMemory(device, buffer->uniformBufferMemory, 0, buffer->bufferSize, 0, &data);
+        memcpy(data, pipe->uboData, buffer->bufferSize);
+    vkUnmapMemory(device, buffer->uniformBufferMemory);
+}
 
 Pipeline *gf3d_pipeline_new()
 {
@@ -242,7 +372,6 @@ Pipeline *gf3d_pipeline_create_from_config(
     Pipeline *pipe;
     const char *vertFile = NULL;
     const char *fragFile = NULL;
-    Uint32 draw_calls = 1024;
     VkRect2D scissor = {0};
     VkViewport viewport = {0};
     VkGraphicsPipelineCreateInfo pipelineInfo = {0};
@@ -434,9 +563,10 @@ Pipeline *gf3d_pipeline_create_from_config(
         gf3d_pipeline_free(pipe);
         return NULL;
     }
-    
-    pipe->uboList = gf3d_uniform_buffer_list_new(device,bufferSize,draw_calls,gf3d_swapchain_get_swap_image_count());
+    pipe->drawCallList = gfc_allocate_array(sizeof(PipelineDrawCall),descriptorCount);
+    pipe->uboData = gfc_allocate_array(bufferSize,descriptorCount);
     pipe->uboDataSize = bufferSize;
+    pipe->uboBigBuffer = gf3d_uniform_buffer_list_new(device,bufferSize*descriptorCount,1,gf3d_swapchain_get_swap_image_count());
     if (__DEBUG)slog("pipeline created from file '%s'",configFile);
     return pipe;
 }
@@ -446,11 +576,15 @@ void gf3d_pipeline_free(Pipeline *pipe)
     int i;
     if (!pipe)return;
     if (!pipe->inUse)return;
-    if (pipe->uboList)
+    if (pipe->drawCallList)
     {
-        gf3d_uniform_buffer_list_free(pipe->uboList);
+        free(pipe->drawCallList);
     }
-
+    if (pipe->uboBigBuffer)
+    {
+        gf3d_uniform_buffer_list_free(pipe->uboBigBuffer);
+    }
+    if (pipe->uboData)free(pipe->uboData);
     if (pipe->descriptorCursor)
     {
         free(pipe->descriptorCursor);
@@ -585,14 +719,17 @@ void gf3d_pipeline_reset_all_pipes()
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame)
 {
     if (!pipe)return;
-    gf3d_uniform_buffer_list_clear(pipe->uboList,frame);
     if (frame >= gf3d_pipeline.chainLength)
     {
         slog("frame %i outside the range of supported descriptor Pools (%i)",frame,gf3d_pipeline.chainLength);
         return;
     }
     pipe->descriptorCursor[frame] = 0;
+    
     pipe->commandBuffer = gf3d_command_rendering_begin(frame,pipe);
+    pipe->drawCallCount = 0;
+    memset(pipe->drawCallList,0,sizeof(PipelineDrawCall)*pipe->descriptorSetCount);//clear this out
+    memset(pipe->uboData,0,pipe->uboDataSize*pipe->descriptorSetCount);
 }
 
 void gf3d_pipeline_submit_commands(Pipeline *pipe)
@@ -607,6 +744,13 @@ void gf3d_pipeline_submit_all_pipe_commands()
     for (i = 0; i < gf3d_pipeline.maxPipelines;i++)
     {
         if (!gf3d_pipeline.pipelineList[i].inUse)continue;
+        //Update UBOS
+        gf3_pipeline_update_ubos(&gf3d_pipeline.pipelineList[i]);
+        //Update Descriptor sets
+        gf3d_pipeline_update_descriptor_sets(&gf3d_pipeline.pipelineList[i]);
+        //Set commands
+        gf3d_pipeline_render_all_drawcalls(&gf3d_pipeline.pipelineList[i]);
+        //submit commands
         gf3d_pipeline_submit_commands(&gf3d_pipeline.pipelineList[i]);
     }
 }

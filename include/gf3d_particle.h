@@ -1,6 +1,7 @@
 #ifndef __GF3D_PARTICLES_H__
 #define __GF3D_PARTICLES_H__
 
+#include <stdalign.h>
 #include <vulkan/vulkan.h>
 
 #include "gfc_vector.h"

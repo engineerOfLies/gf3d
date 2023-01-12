@@ -6,15 +6,18 @@
 #include "gfc_types.h"
 
 #include "gf3d_uniform_buffers.h"
-
+#include "gf3d_texture.h"
 
 typedef struct
 {
-    VkDescriptorSet * descriptorSet;
-    VkBuffer vertexBuffer;
-    Uint32 vertexCount;
-    VkBuffer indexBuffer;
-    void *uboData;
+    Uint8                   inuse;
+    Uint32                  index;          //which index in the UBO are we
+    VkDescriptorSet        *descriptorSet;
+    VkBuffer                vertexBuffer;
+    Uint32                  vertexCount;
+    VkBuffer                indexBuffer;
+    void                   *uboData;        //pointer to corresponding memory in the pipeline uboData
+    Texture                *texture;        //optional!!
 }PipelineDrawCall;
 
 typedef struct
@@ -36,9 +39,11 @@ typedef struct
     VkDescriptorSet       **descriptorSets;
     Uint32                  descriptorPoolCount;
     Uint32                  descriptorSetCount;
-    UniformBufferList      *uboList;                /**<for draw calls sent through this pipeline*/
+    Uint32                  drawCallCount;          /**<how many drawCalls have been queued*/
     PipelineDrawCall       *drawCallList;           /**<cached draw calls for this frame*/
+    char                   *uboData;                /**<pre-allocated cpu side UBO data*/
     size_t                  uboDataSize;            /**<size of a single UBO for this pipeline*/
+    UniformBufferList      *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
     VkCommandBuffer         commandBuffer;          /**<for current command*/
     VkIndexType             indexType;              /**<size of the indices in the index buffer*/
 }Pipeline;
@@ -70,7 +75,7 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,const char *vertFile,const
  * @param device the logical device to create the pipeline for
  * @param configFile the filepath to the config file
  * @param extent the screen resolution this pipeline will be working towards
- * @param descriptorCount the number of concurrent descriptSets to be suppert per command, ie: how many models you want to support for a draw call  This should be based on maximum number of supported entities or graphic assets
+ * @param descriptorCount the number of concurrent descriptSets to be supported per command, ie: how many models you want to support for a draw call  This should be based on maximum number of supported entities or graphic assets
  * @param vertexInputDescription the vertex input description to use
  * @param vertextInputAttributeDescriptions list of how the attributes are described
  * @param vertexAttributeCount how many of the above are provided in the list
@@ -113,6 +118,23 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
  * @param frame the swap chain rendering frame to reset the cursor for
  */
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame);
+
+/**
+ * @brief queue up a render for a pipeline
+ * @param pipe the pipeline to queue up for
+ * @param vertexBuffer which buffer to bind
+ * @param vertexCount how many vertices to draw (usually 3 per face)
+ * @param indexBuffer which face buffer to use for the draw
+ * @param uboData the UBO data to draw with.  Note this is copied by the function, feel free to change it after use
+ * @param texture [optional] if you have a texture to render with, provide it here.  Note if the pipeline needs one, you MUST provide one
+ */
+void gf3d_pipeline_queue_render(
+    Pipeline *pipe,
+    VkBuffer vertexBuffer,
+    Uint32 vertexCount,
+    VkBuffer indexBuffer,
+    void *uboData,
+    Texture *texture);
 
 /**
  * @brief bind a draw call to the current command

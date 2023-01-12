@@ -1,6 +1,7 @@
 #ifndef __GF3D_MESH_H__
 #define __GF3D_MESH_H__
 
+#include <stdalign.h>
 #include <vulkan/vulkan.h>
 
 #include "gfc_vector.h"
@@ -31,7 +32,7 @@ typedef struct
     Vector4D detailColor; //color mod
     Vector4D cameraPosition;
     MeshLights dynamicLights[MESH_LIGHTS_MAX];
-    float    dynamicLightCount;//how many
+    alignas(64) Uint32    dynamicLightCount;//how many
 }MeshUBO;
 
 /**
@@ -149,6 +150,15 @@ VkCommandBuffer gf3d_mesh_get_model_command_buffer();
 VkCommandBuffer gf3d_mesh_get_alph_model_command_buffer();
 VkCommandBuffer gf3d_mesh_get_highlight_command_buffer();
 VkCommandBuffer gf3d_mesh_get_sky_command_buffer();
+
+/**
+ * @brief queue up a render for the current draw frame
+ * @param mesh the mesh to render
+ * @param pipe the pipeline to use
+ * @param uboData the data to use to draw the mesh
+ * @param texture texture data to use
+ */
+void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture);
 
 
 /**

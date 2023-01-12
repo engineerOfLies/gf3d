@@ -297,6 +297,40 @@ void gf3d_mesh_scene_add(Mesh *mesh)
     if (!mesh)return;
 }
 
+void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture)
+{
+    int i,c;
+    MeshPrimitive *primitive;
+    if (!mesh)
+    {
+        slog("cannot render a NULL mesh");
+        return;
+    }
+    if (!pipe)
+    {
+        slog("cannot render with NULL pipe");
+        return;
+    }
+    if (!uboData)
+    {
+        slog("cannot render with NULL descriptor set");
+        return;
+    }
+    c = gfc_list_get_count(mesh->primitives);
+    for (i = 0; i < c; i++)
+    {
+        primitive = gfc_list_get_nth(mesh->primitives,i);
+        if (!primitive)continue;
+        gf3d_pipeline_queue_render(
+            pipe,
+            primitive->vertexBuffer,
+            primitive->faceCount * 3,
+            primitive->faceBuffer,
+            uboData,
+            texture);
+    }
+}
+
 void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descriptorSet)
 {
     int i,c;

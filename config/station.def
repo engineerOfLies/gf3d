@@ -310,6 +310,42 @@
             ]
         },
         {
+            "name":"expansion_cargo_bay",
+            "buildTime":60,
+            "display_name":"Expansion Cargo Bay",
+            "icon":"models/station/expansion_cargo_bay_icon.png",
+            "model":"models/station/expansion_cargo_bay.model",
+            "description":"A small expansion bay optimized for storage.  ",
+            "position":[0,0,0],
+            "rotates":0,
+            "mountType":"s",
+            "facility_slots":3,
+            "hull":200,
+            "cost":
+            {
+                "credits":250,
+                "alloys":25
+            },
+            "facility_types":
+            [
+                "small_storage",
+                "large_storage"
+            ],
+            "scale":[1,1,1],
+            "extensions":[
+                {
+                    "mountType":"e",
+                    "offset":[0,-0.7,-1],
+                    "rotation":[0,90,0]
+                },
+                {
+                    "mountType":"e",
+                    "offset":[0,-0.7,1],
+                    "rotation":[180,-90,0]
+                }
+            ]
+        },
+        {
             "name":"expansion_bay",
             "buildTime":60,
             "display_name":"Expansion Bay",

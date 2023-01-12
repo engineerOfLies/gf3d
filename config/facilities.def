@@ -198,7 +198,7 @@
             "name":"cargo_hold_small",
             "displayName":"Small Cargo Hold",
             "icon":"",
-            "description":"This facility is equipped to store and make available limited amounts of commodities.  It's capacity is merely 500 tons",
+            "description":"This facility is equipped to store and make available limited amounts of commodities.  It's capacity is merely 1000 tons",
             "type":"small_storage",
             "cost":
             {   
@@ -206,7 +206,7 @@
                 "alloys":50
             },
             "crimeRate":5,
-            "storage":100,
+            "storage":1000,
             "buildTime":30,
             "officerSlot":false
         },

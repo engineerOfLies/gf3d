@@ -268,14 +268,14 @@
         ]
       },
       {
-        "name":"expansion_bay",
+        "name":"expansion_cargo_bay",
         "id":"7",
         "hull":"100",
         "parent":"0",
         "slot":"5",
         "facilities":[
           {
-            "name":"cargo_hold_small",
+            "name":"cargo_hold_large",
             "id":"1",
             "position":[
               "0.000000",

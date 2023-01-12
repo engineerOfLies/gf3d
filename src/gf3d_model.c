@@ -464,151 +464,64 @@ HighlightUBO gf3d_model_get_highlight_ubo(
     return modelUBO;
 }
 
-UniformBuffer *gf3d_model_get_uniform_buffer(
-    Pipeline *pipe,
-    void *uboData,
-    size_t uboSize)
-{
-    void *data;
-    UniformBuffer *ubo;
-    if (!gf3d_model.initiliazed)return NULL;
-    
-    ubo = gf3d_uniform_buffer_list_get_buffer(pipe->uboList, gf3d_vgraphics_get_current_buffer_frame());
-    if (!ubo)
-    {
-        slog("failed to get a free uniform buffer for draw call");
-        return NULL;
-    }
-            
-    vkMapMemory(gf3d_model.device, ubo->uniformBufferMemory, 0, uboSize, 0, &data);
-        memcpy(data, uboData, uboSize);
-    vkUnmapMemory(gf3d_model.device, ubo->uniformBufferMemory);
-    ubo->bufferSize = uboSize;
-    return ubo;
-}
-
-VkDescriptorSet *gf3d_model_get_descriptor_set(
-    Model *model,
-    Pipeline *pipe,
-    UniformBuffer *ubo)
-{
-    Texture *texture = NULL;
-    VkDescriptorSet *descriptorSet= NULL;
-    VkDescriptorImageInfo imageInfo = {0};
-    VkWriteDescriptorSet descriptorWrite[2] = {0};
-    VkDescriptorBufferInfo bufferInfo = {0};
-    if (!gf3d_model.initiliazed)return NULL;
-
-    if (!model)
-    {
-        slog("no model provided for descriptor set update");
-        return NULL;
-    }
-    if (!pipe)
-    {
-        slog("no pipe provided for descriptor set update");
-        return NULL;
-    }
-    if (!ubo)
-    {
-        slog("failed to get a free uniform buffer for draw call");
-        return NULL;
-    }
-    
-    descriptorSet = gf3d_pipeline_get_descriptor_set(pipe, gf3d_vgraphics_get_current_buffer_frame());
-
-    if (model->texture)texture = model->texture;
-    else texture = gf3d_model.defaultTexture;
-    
-    if (texture)
-    {
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = texture->textureImageView;
-        imageInfo.sampler = texture->textureSampler;
-    }
-
-    bufferInfo.buffer = ubo->uniformBuffer;
-    bufferInfo.offset = 0;
-    bufferInfo.range = ubo->bufferSize;
-    
-    descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[0].dstSet = *descriptorSet;
-    descriptorWrite[0].dstBinding = 0;
-    descriptorWrite[0].dstArrayElement = 0;
-    descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptorWrite[0].descriptorCount = 1;
-    descriptorWrite[0].pBufferInfo = &bufferInfo;
-
-    descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[1].dstSet = *descriptorSet;
-    descriptorWrite[1].dstBinding = 1;
-    descriptorWrite[1].dstArrayElement = 0;
-    descriptorWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    descriptorWrite[1].descriptorCount = 1;                        
-    descriptorWrite[1].pImageInfo = &imageInfo;
-    descriptorWrite[1].pTexelBufferView = NULL; // Optional
-
-    vkUpdateDescriptorSets(gf3d_model.device, 2, descriptorWrite, 0, NULL);
-    return descriptorSet;
-}
-
-void gf3d_model_draw_generic(
-    Model *model,
-    Uint32 index,
-    Pipeline *pipe,
-    UniformBuffer *ubo)
-{
-    Mesh *mesh;
-    VkDescriptorSet *descriptorSet;
-    if (!gf3d_model.initiliazed)return;
-    if ((!model)||(!pipe))
-    {
-        return;
-    }
-    descriptorSet = gf3d_model_get_descriptor_set(model,pipe,ubo);
-    mesh = gfc_list_get_nth(model->mesh_list,index);
-    gf3d_mesh_render_generic(mesh,pipe,descriptorSet);
-}
-
 void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight)
 {
+    Mesh *mesh;
     MeshUBO uboData = {0};
-    UniformBuffer *ubo;
+    Texture *texture;
     if (!gf3d_model.initiliazed)return;
+    if (!model)return;
     uboData = gf3d_model_get_mesh_ubo(
         modelMat,
         colorMod,
         ambientLight,
         detailColor);
     
-    ubo = gf3d_model_get_uniform_buffer(gf3d_model.pipe,&uboData,sizeof(MeshUBO));
-    gf3d_model_draw_generic(model,index,gf3d_model.pipe,ubo);
-    
-    ubo = gf3d_model_get_uniform_buffer(gf3d_mesh_get_alpha_pipeline(),&uboData,sizeof(MeshUBO));
-    gf3d_model_draw_generic(model,index,gf3d_mesh_get_alpha_pipeline(),ubo);
+    if (!model->texture)
+    {
+        texture = gf3d_model.defaultTexture;
+    }
+    else texture = model->texture;
+    // queue up a render for batch rendering
+    mesh = gfc_list_get_nth(model->mesh_list,index);
+    gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
+    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
 }
 
 void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector4D highlight)
 {
+    Mesh *mesh;
+    Texture *texture;
     HighlightUBO uboData = {0};
-    UniformBuffer *ubo;
     
     if (!gf3d_model.initiliazed)return;
     uboData = gf3d_model_get_highlight_ubo(modelMat,highlight);
-    
-    ubo = gf3d_model_get_uniform_buffer(gf3d_mesh_get_highlight_pipeline(),&uboData,sizeof(HighlightUBO));
-    gf3d_model_draw_generic(model,index,gf3d_mesh_get_highlight_pipeline(),ubo);
+    if (!model->texture)
+    {
+        texture = gf3d_model.defaultTexture;
+    }
+    else texture = model->texture;
+    // queue up a render for batch rendering
+    mesh = gfc_list_get_nth(model->mesh_list,index);
+    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,texture);
 }
 
 void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
 {
+    Mesh *mesh;
+    Texture *texture;
     SkyUBO uboData = {0};
-    UniformBuffer *ubo;
     if (!gf3d_model.initiliazed)return;
     uboData = gf3d_model_get_sky_ubo(modelMat,gfc_color_to_vector4f(color));
+    if (!model->texture)
+    {
+        texture = gf3d_model.defaultTexture;
+    }
+    else texture = model->texture;
+    // queue up a render for batch rendering
+    mesh = gfc_list_get_nth(model->mesh_list,0);
     
-    ubo = gf3d_model_get_uniform_buffer(gf3d_mesh_get_sky_pipeline(),&uboData,sizeof(SkyUBO));
-    gf3d_model_draw_generic(model,0,gf3d_mesh_get_sky_pipeline(),ubo);
+    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_sky_pipeline(),&uboData,texture);
 }
 
 /*eol@eof*/

@@ -126,7 +126,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
-                draw_origin();
+            //    draw_origin();
                 gf3d_entity_draw_all();
                 //2D draws
                 gf2d_windows_draw_all();
