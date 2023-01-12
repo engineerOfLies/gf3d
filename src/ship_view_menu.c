@@ -23,6 +23,7 @@
 #include "ship.h"
 #include "ship_facility.h"
 #include "ship_facility_view.h"
+#include "shipyard_facilities_menu.h"
 #include "ship_view_menu.h"
 
 extern int freeBuildMode;
@@ -211,7 +212,10 @@ int ship_view_menu_update(Window *win,List *updateList)
         {
             if (win->child)return 1;
             str = ship_get_slot_name_by_index(data->ship,e->index - 600);
-            if (str)slog("Free slot for %s",str);
+            if (str)
+            {
+                win->child = shipyard_facilities_menu(win,str);
+            }
             return 1;
         }
         if (e->index >= 500)
