@@ -232,6 +232,8 @@
             "scale":[1,1,1],
             "rotates":1,
             "hull":1500,
+            "dockPosition":[0,-1,0],
+            "guidStrip":[0,-2,0],
             "cost":
             {
                 "credits":2000,
@@ -426,6 +428,8 @@
             "mountType":"e",
             "rotates":0,
             "hull":200,
+            "dockPosition":[0,-1.2,0],
+            "guidStrip":[0,-3,0],
             "cost":
             {
                 "credits":300,

@@ -195,4 +195,9 @@ void gf3d_particle_draw(Particle particle)
 }
 
 
+void gf3d_particle_trail_draw(Color color, float size, Edge3D tail)
+{
+    
+}
+
 /*eol@eof*/
