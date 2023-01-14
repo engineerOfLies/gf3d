@@ -3,6 +3,7 @@
 #include "world.h"
 #include "resources.h"
 #include "ship_entity.h"
+#include "player.h"
 #include "ship_facility.h"
 #include "ship.h"
 
@@ -80,6 +81,31 @@ Ship *ship_load(SJson *json)
     }
     ship_check(ship);
     return ship;
+}
+
+void ship_remove_facility(Ship *ship, Uint32 id)
+{
+    int i,c;
+    ShipFacility *facility;
+    if (!ship)return;
+    c = gfc_list_get_count(ship->facilities);
+    for (i = 0; i < c;i++)
+    {
+        facility = gfc_list_get_nth(ship->facilities,i);
+        if (!facility)continue;
+        if (facility->id == id)
+        {
+            gfc_list_delete_nth(ship->facilities,i);
+            ship_facility_free(facility);
+            ship_check(ship);
+            if (ship->staffAssigned > ship->staffPositions)
+            {
+                player_return_staff(ship->staffAssigned - ship->staffPositions);
+                ship->staffAssigned = ship->staffPositions;
+            }
+            return;
+        }
+    }
 }
 
 void ship_give_new_facility(Ship *ship, const char *facilityName)

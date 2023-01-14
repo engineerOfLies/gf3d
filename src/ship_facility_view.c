@@ -137,6 +137,30 @@ void ship_facility_view_refresh(Window *win)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"passengers"),buffer);    //efficiency
 }
 
+void ship_facility_remove_cancel(Window *win)
+{
+    if ((!win)||(!win->data))return;
+    win->child = NULL;
+}
+
+void ship_facility_remove_ok(Window *win)
+{
+    SJson *def;
+    List *cost;
+    ShipFacilityViewData* data;
+    if ((!win)||(!win->data))return;
+    data = win->data;
+    win->child = NULL;
+    def = config_def_get_by_name("ship_facilities",data->facility->name);
+    if (!def)return;
+    cost = resources_list_parse(sj_object_get_value(def,"cost"));
+    resource_list_sell(player_get_resources(), cost,0.9);
+    resources_list_free(cost);
+    ship_remove_facility(data->ship, data->facility->id);
+    gf2d_window_free(win);
+    gf2d_window_refresh_by_name("ship_view_menu");
+}
+
 int ship_facility_view_update(Window *win,List *updateList)
 {
     int i,count;
@@ -155,6 +179,12 @@ int ship_facility_view_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"sell")==0)
+        {
+            if (win->child)return 1;
+            win->child = window_yes_no("Sell Facility?", (gfc_work_func*)ship_facility_remove_ok,(gfc_work_func*)ship_facility_remove_cancel,win);
+            return 1;
+        }        
         if (strcmp(e->name,"close")==0)
         {
             gf2d_window_free(win);

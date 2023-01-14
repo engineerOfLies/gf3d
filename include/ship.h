@@ -101,6 +101,10 @@ int ship_get_slot_count_by_type(Ship *ship,const char *slot_type);
  */
 void ship_give_new_facility(Ship *ship, const char *facilityName);
 
+/**
+ * @brief remove a ship facility from the ship
+ */
+void ship_remove_facility(Ship *ship, Uint32 id);
 
 /**
  * @brief get how many facility types the ship can have
