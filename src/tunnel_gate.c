@@ -2,6 +2,7 @@
 
 #include "gfc_list.h"
 
+#include "gf3d_particle.h"
 #include "gf3d_draw.h"
 
 #include "gate.h"
@@ -38,6 +39,7 @@ Entity *gate_new(Vector3D position)
     ent->draw = gate_draw;
     ent->update = gate_update;
     ent->free = gate_free;
+    ent->mat.rotation.z = GFC_PI;
     ent->mat.scale = vector3d(100,100,100);
     vector3d_copy(ent->mat.position,position);
     //ent->mat.rotation.z = GFC_PI;
@@ -74,6 +76,7 @@ void gate_draw(Entity *self)
         vector3d(self->mat.scale.x,self->mat.scale.y * data->frame,self->mat.scale.z));
     
     gf3d_model_draw(data->tunnel,0,mat,vector4d(255,255,255,128),vector4d(0,0,0,0),vector4d(0,0,0,1));
+    draw_guiding_lights(self->mat.position,self->mat.rotation,150, 500);
 }
 
 void gate_think(Entity *self)
