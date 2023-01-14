@@ -246,7 +246,6 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
         //set myself up as a child of the parent
         section->parent = parent;
         parent->children = gfc_list_append(parent->children,section);
-        
         gfc_matrix_multiply(mat,mat,parent->mat.mat);
         
     }
@@ -256,6 +255,13 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     gfc_matrix_multiply(section->mat.mat,section->mat.mat,mat);
     
     sj_object_get_value_as_float(sectionDef,"rotates",&section->rotates);
+    item = sj_object_get_value(sectionDef,"guideStrip");
+    if (item)
+    {
+        
+        section->drawGuideStrip = 1;
+        sj_value_as_vector3d(item,&section->guideStrip);
+    }    
     section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     
     if (id < 0)
@@ -561,10 +567,11 @@ void station_draw(Entity *self)
     float damage = 1;
     Vector4D color;
     Vector4D detailColor;
-    Matrix4 mat,mat1;
+    Matrix4 mat,mat1,guideMat;
     StationSection *section;
     StationData *data;
     Vector3D rotation;
+    Vector3D position;
     if ((!self)||(!self->data))return;
     data = (StationData *)self->data;
     
@@ -622,7 +629,17 @@ void station_draw(Entity *self)
         {
             gf3d_model_draw_highlight(section->mat.model,0,mat,vector4d(1,0.67,0,1));
         }
-        
+        if(section->drawGuideStrip)
+        {
+            mat_from_parent(
+                guideMat,
+                mat,
+                section->guideStrip,
+                vector3d(0,0,0),
+                vector3d(1,1,1));            
+            gfc_matrix4_to_vectors(guideMat,&position,&rotation,NULL);
+            draw_guiding_lights(position,rotation,0.3 * self->mat.scale.x, 2 * self->mat.scale.x);
+        }
     }
 }
 

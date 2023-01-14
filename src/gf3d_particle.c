@@ -195,9 +195,54 @@ void gf3d_particle_draw(Particle particle)
 }
 
 
-void gf3d_particle_trail_draw(Color color, float size, Edge3D tail)
+void gf3d_particle_trail_draw(Color color, float size, Uint8 count, Edge3D trail)
 {
+    int i;
+    Particle particle;
+    Vector3D position;
+    Vector3D step;
+    vector3d_copy(position,trail.a);
+    vector3d_sub(step,trail.b,trail.a);//vector to b
+    gfc_color_copy(particle.color,color);
+    particle.size = size;
+    if (count > 1)
+    {
+        vector3d_scale(step,step,1/(float)count);
+    }
+    for (i = 0; i < count; i++)
+    {
+        vector3d_copy(particle.position,position);
+        vector3d_add(position,position,step);
+        gf3d_particle_draw(particle);
+    }
+}
+
+void draw_guiding_lights(Vector3D position,Vector3D rotation,float width, float length)
+{
+    Vector3D start = {0};
+    Vector3D forward = {0};
+    Vector3D right = {0};
+    Vector3D offset= {0};
+        //draw guiding lights
+    vector3d_angle_vectors(rotation, &right, &forward,NULL);
+    vector3d_scale(right,right,width);
+    vector3d_copy(offset,forward);
+    vector3d_scale(offset,offset,10 * fabs(cos(SDL_GetTicks()*0.001)));
+    vector3d_add(start,position,offset);
+
+    vector3d_scale(forward,forward,length);
+    vector3d_add(forward,forward,offset);
+    vector3d_add(forward,forward,position);
+    vector3d_add(forward,forward,right);
+    vector3d_add(start,start,right);
     
+    gf3d_particle_trail_draw(GFC_COLOR_LIGHTRED, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
+    
+    vector3d_scale(right,right,-2);
+    vector3d_add(forward,forward,right);
+    vector3d_add(start,start,right);
+    gf3d_particle_trail_draw(GFC_COLOR_LIGHTGREEN, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
+
 }
 
 /*eol@eof*/

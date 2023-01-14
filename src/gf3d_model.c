@@ -27,6 +27,7 @@ typedef struct
     VkDevice                device;
     Pipeline            *   pipe;           /**<the pipeline associated with model rendering*/
     Texture             *   defaultTexture; /**<if a model has no texture, use this one*/
+    Texture             *   defaultNormal;  /**<if a model has no normal map, use this one*/
 }ModelManager;
 
 static ModelManager gf3d_model = {0};
@@ -80,6 +81,7 @@ void gf3d_model_manager_init(Uint32 max_models)
     gf3d_model.device = gf3d_vgraphics_get_default_logical_device();
     gf3d_model.pipe = gf3d_mesh_get_pipeline();
     gf3d_model.defaultTexture = gf3d_texture_load("images/default.png");
+    gf3d_model.defaultNormal = gf3d_texture_load("images/defaultNormalMap.png");
     gf3d_model.initiliazed = 1;
     if(__DEBUG)slog("model manager initiliazed");
     atexit(gf3d_model_manager_close);
@@ -177,6 +179,12 @@ Model *gf3d_model_load_from_config(SJson *json)
     model = gf3d_model_new();
     if (!model)return NULL;
     
+    textureFile = sj_get_string_value(sj_object_get_value(json,"normalMap"));
+    if (textureFile)
+    {
+        model->normalMap = gf3d_texture_load(textureFile);
+    }
+
     textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
     if (textureFile)
     {
@@ -373,6 +381,19 @@ SJson *gf3d_model_mat_save(ModelMat *mat,Bool updateFirst)
     return json;
 }
 
+void mat_from_parent(
+    Matrix4 out,
+    Matrix4 parent,
+    Vector3D position,
+    Vector3D rotation,
+    Vector3D scale)
+{
+    Matrix4 temp;
+    gfc_matrix4_from_vectors(temp,position,rotation,scale);
+    gfc_matrix_multiply(out,temp,parent);
+}
+
+
 void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
 {
     if (!mat)return;
@@ -482,7 +503,7 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
         texture = gf3d_model.defaultTexture;
     }
     else texture = model->texture;
-    // queue up a render for batch rendering
+        // queue up a render for batch rendering
     mesh = gfc_list_get_nth(model->mesh_list,index);
     gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);

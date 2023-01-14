@@ -29,6 +29,9 @@ typedef struct StationSection_S
     float       rotates;//if it rotates
     int         storageCapacity;
     int         staffAssigned,staffPositions; // how many staff have are working this section / how many positions there are to work
+    Vector3D    dockPosition;
+    Bool        drawGuideStrip;
+    Vector3D    guideStrip;
     Uint8       slot;                      // where the section is mounted on the parent
     Uint8       expansionSlots;            // how many sections can link off of this
     List       *children;

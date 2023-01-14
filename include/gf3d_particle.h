@@ -7,6 +7,7 @@
 #include "gfc_vector.h"
 #include "gfc_color.h"
 #include "gfc_list.h"
+#include "gfc_primitives.h"
 
 #include "gf3d_pipeline.h"
 
@@ -46,6 +47,15 @@ void gf3d_particle_submit_pipe_commands();
 void gf3d_particle_draw(Particle particle);
 
 /**
+ * @brief draw a trail particles from tail.a to tail.b
+ * @param color the color of the particles to draw
+ * @param size the size of the particles to draw
+ * @param count how many particles to fill in
+ * @param trail the path of particles to draw
+ */
+void gf3d_particle_trail_draw(Color color, float size, Uint8 count, Edge3D trail);
+
+/**
  * @brief draw an array of particles
  */
 void gf3d_particle_draw_array(Particle *particle,Uint32 count);
@@ -61,5 +71,14 @@ void gf3d_particle_draw_list(List *list);
  * @return NULL if not set, or the pipeline
  */
 Pipeline *gf3d_particle_get_pipeline();
+
+/**
+ * @brief draw a line of red and green particles in parallel from the position, based on the rotation provided.
+ * @param postion where to center the lines on
+ * @param rotation used to determine rotation of the lines
+ * @param width how far apart the lines will be
+ * @param length how long the lines will be
+ */
+void draw_guiding_lights(Vector3D position,Vector3D rotation,float width, float length);
 
 #endif

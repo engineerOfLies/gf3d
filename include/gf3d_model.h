@@ -44,6 +44,7 @@ typedef struct
     
     List               *mesh_list;
     Texture            *texture;
+    Texture            *normalMap;
 }Model;
 
 typedef struct
@@ -133,6 +134,22 @@ void gf3d_model_free(Model *model);
  * @param config the json to find the information
  */
 void gf3d_model_mat_parse(ModelMat *mat,SJson *config);
+
+/**
+ * @brief used to make a matrix when something is a child of another matrix
+ * @param out the output parameter
+ * @param parent the matrix used to multiply the new matrix
+ * @param position used to make this matrix
+ * @param rotation used to make this matrix
+ * @param scale used to make this matrix
+ */
+void mat_from_parent(
+    Matrix4 out,
+    Matrix4 parent,
+    Vector3D position,
+    Vector3D rotation,
+    Vector3D scale);
+
 
 /**
  * @brief save a modelMat to config
