@@ -82,6 +82,15 @@ Ship *ship_load(SJson *json)
     return ship;
 }
 
+void ship_give_new_facility(Ship *ship, const char *facilityName)
+{
+    ShipFacility *facility;
+    if ((!ship)||(!facilityName))return;
+    facility = ship_facility_new_by_name(facilityName,++ship->idPool);
+    if (!facility)return;
+    gfc_list_append(ship->facilities,facility);
+}
+
 SJson *ship_save(Ship *ship)
 {
     int i,c;

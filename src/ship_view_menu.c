@@ -214,7 +214,7 @@ int ship_view_menu_update(Window *win,List *updateList)
             str = ship_get_slot_name_by_index(data->ship,e->index - 600);
             if (str)
             {
-                win->child = shipyard_facilities_menu(win,str);
+                win->child = shipyard_facilities_menu(win,data->ship,str);
             }
             return 1;
         }

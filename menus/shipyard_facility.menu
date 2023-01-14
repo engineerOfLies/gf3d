@@ -54,7 +54,7 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,80,1],
+                        "bounds": [0,0,130,1],
                         "text":"Type",
                         "justify" : "left",
                         "align" : "middle",
@@ -78,7 +78,7 @@
                     },
                     {
                         "type": "label",
-                        "bounds": [0,0,100,1],
+                        "bounds": [0,0,120,1],
                         "text":"Damage",
                         "justify" : "left",
                         "align" : "middle",

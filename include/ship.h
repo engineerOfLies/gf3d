@@ -95,6 +95,14 @@ void ship_set_location(Ship *ship,const char *location,Vector3D position);
 int ship_get_slot_count_by_type(Ship *ship,const char *slot_type);
 
 /**
+ * @brief give a ship a new facility.  does not check if its full. 
+ * @param ship the ship to add to
+ * @param facilityName the name of the facility to add;
+ */
+void ship_give_new_facility(Ship *ship, const char *facilityName);
+
+
+/**
  * @brief get how many facility types the ship can have
  * @param ship the ship to check
  * @return how many

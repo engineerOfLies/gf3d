@@ -464,6 +464,16 @@ void gf2d_window_refresh(Window *win)
     win->refresh(win);
 }
 
+void gf2d_window_refresh_by_name(const char *name)
+{
+    Window *win;
+    if (!name)return;
+    win = gf2d_window_get_by_name(name);
+    if (!win)return;
+    win->refresh(win);
+}
+
+
 void gf2d_window_set_dimensions(Window *win,Rect dimensions)
 {
     if (!win)return;

@@ -25,11 +25,13 @@
 #include "station.h"
 #include "player.h"
 #include "ship_view_menu.h"
+#include "ship_facility_buy_menu.h"
 #include "shipyard_facilities_menu.h"
 
 typedef struct
 {
     const char *filter;
+    Ship *ship;
     int updated;
 }ShipyardFacilitiesMenuData;
 
@@ -71,6 +73,8 @@ int shipyard_facilities_menu_facility_check()
 int shipyard_facilities_menu_update(Window *win,List *updateList)
 {
     int i,count;
+    SJson *def;
+    const char *name;
     Element *e;
     ShipyardFacilitiesMenuData *data;
     if (!win)return 0;
@@ -90,6 +94,11 @@ int shipyard_facilities_menu_update(Window *win,List *updateList)
         if (e->index >= 500)
         {
             if (win->child)return 1;
+            def = config_def_get_by_parameter("ship_facilities","displayName",e->name);
+            if (!def)return 1;
+            name = sj_object_get_value_as_string(def,"name");
+            if (!name)return 1;
+            win->child = ship_facility_buy_menu(win,data->ship, name);
             return 1;
         }
         if (strcmp(e->name,"done")==0)
@@ -138,8 +147,8 @@ Element *shipyard_facilities_menu_build_row(Window *win, SJson *facility,int ind
             str,
             FT_H6,vector2d(180,24),GFC_COLOR_LIGHTCYAN));
     //size
-    str = sj_object_get_value_as_string(facility,"size");
-    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,str,FT_H6,vector2d(80,24),GFC_COLOR_WHITE));
+    str = sj_object_get_value_as_string(facility,"slot_type");
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,str,FT_H6,vector2d(130,24),GFC_COLOR_WHITE));
     //crew
     sj_object_get_value_as_int(facility,"staffPositions",&count);
     gfc_line_sprintf(buffer,"%i",count);
@@ -148,8 +157,17 @@ Element *shipyard_facilities_menu_build_row(Window *win, SJson *facility,int ind
     sj_object_get_value_as_int(facility,"speed",&count);
     gfc_line_sprintf(buffer,"%i Mm/s",count);
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),GFC_COLOR_WHITE));
-    //weapons
+    //damage
+    str = sj_object_get_value_as_string(facility,"damageType");
+    sj_object_get_value_as_int(facility,"damage",&count);
+    if (str)
+    {
+        gfc_line_sprintf(buffer,"%i %s",count,str);
+    }
+    else gfc_line_sprintf(buffer,"<n/a>");
+    gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(120,24),GFC_COLOR_WHITE));
     //cargo
+    count = 0;
     sj_object_get_value_as_int(facility,"cargo",&count);
     gfc_line_sprintf(buffer,"%i T",count);
     gf2d_element_list_add_item(rowList,gf2d_label_new_simple_size(win,0,buffer,FT_H6,vector2d(80,24),GFC_COLOR_WHITE));
@@ -201,7 +219,7 @@ void shipyard_facilities_menu_refresh(Window *win)
     data->updated = player_get_day();
 }
 
-Window *shipyard_facilities_menu(Window *parent,const char *filter)
+Window *shipyard_facilities_menu(Window *parent,Ship *ship,const char *filter)
 {
     Window *win;
     ShipyardFacilitiesMenuData *data;
@@ -225,6 +243,7 @@ Window *shipyard_facilities_menu(Window *parent,const char *filter)
     win->draw = shipyard_facilities_menu_draw;
     win->refresh = shipyard_facilities_menu_refresh;
     data->filter = filter;
+    data->ship = ship;
     shipyard_facilities_menu_refresh(win);
     message_buffer_bubble();
     return win;

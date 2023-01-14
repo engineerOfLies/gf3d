@@ -2,42 +2,20 @@
     "window":
     {
         "dimensions" : [0,80,900,490],
-        "name":"ship_facility_view_menu",
+        "name":"ship_facility_buy_menu",
         "justify" : "center",
         "elements":
         [
             {
                 "type": "button",
-                "name":"sell",
-                "bounds": [420,440,160,42],
-                "hotkey":"sell",
-                "sound":"cancel",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Remove",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,160,48],
-                    "actor" : "actors/red_button.actor"
-                }
-            },
-            {
-                "type": "button",
-                "name":"repair",
+                "name":"purchase",
                 "bounds": [580,440,160,42],
-                "hotkey":"repair",
+                "hotkey":"purchase",
                 "sound":"confirm",
                 "label" :
                 {
                     "type": "label",
-                    "text":"Repair",
+                    "text":"Purchase",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
@@ -75,7 +53,7 @@
             {
                 "type": "label",
                 "bounds": [0,8,1,40],
-                "text":"Ship Facility View",
+                "text":"Buy Ship Facility",
                 "justify" : "center",
                 "align" : "middle",
                 "style":"H4"
@@ -127,15 +105,6 @@
                                 "bounds": [0,0,1,30],
                                 "name":"staff",
                                 "text":"Staff Needed: 0",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [0,0,1,25],
-                                "name":"damage",
-                                "text":"damage: None",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
@@ -204,6 +173,26 @@
                                 "justify" : "left",
                                 "align" : "top",
                                 "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,40],
+                                "text":"Price:",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,400,90],
+                                "name":"costs",
+                                "style": "vertical",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
+                                "item_size" : [1,200],
+                                "packed":true,
+                                "elements":
+                                []
                             }
                         ]
                     }

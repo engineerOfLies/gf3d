@@ -145,10 +145,8 @@
             "displayName":"Pulse Cannon 1S",
             "icon":"",
             "description":"This is the most basic energy based weapon for small ships.  Does decent energy damage.  Energy damage deals split damage to both hull and internal systems.",
-            "damage":
-            {
-                "energy":10
-            },
+            "damageType":"energy",
+            "damage":10,
             "slot_type":"small_weapon",
             "staffPositions":1,
             "staffRequired":1,
@@ -165,10 +163,8 @@
             "description":"A gauss cannon accelerates a solid metal slug up to hypersonic velocites very quickly without the need for chemical accelerants.  Kinetic weapon damage deals damage first to the hull, then internal systems after pentration.",
             "staffPositions":1,
             "staffRequired":1,
-            "damage":
-            {
-                "kinetic":10
-            },
+            "damageType":"kinetic",
+            "damage":10,
             "slot_type":"small_weapon",
             "cost":
             {   
@@ -183,10 +179,8 @@
             "description":"Ionic weapons fire small projectiles that generate intense ionic fields at the point of impact.  These do little damage in the way of hull or system damage.  However, they overload shields faster than energy or kinetic weapons and can disrupt (not damage) systems making the target vulnerable to other attack types.",
             "staffPositions":1,
             "staffRequired":1,
-            "damage":
-            {
-                "ionic":20
-            },
+            "damageType":"ionic",
+            "damage":10,
             "slot_type":"small_weapon",
             "cost":
             {   

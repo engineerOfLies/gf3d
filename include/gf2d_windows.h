@@ -69,6 +69,12 @@ int gf2d_windows_update_all();
 void gf2d_window_refresh(Window *win);
 
 /**
+ * @brief find the first window by the name provided and run its refresh function if provided
+ * @param name the name of the window to refresh
+ */
+void gf2d_window_refresh_by_name(const char *name);
+
+/**
  * @brief get a new initialized window
  * @return NULL on error or a window pointer
  */
