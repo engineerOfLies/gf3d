@@ -188,6 +188,32 @@ void ship_view_menu_refresh(Window *win)
     }
 }
 
+void ship_view_sell_ok(Window *win)
+{
+    List *cost;
+    SJson *def;
+    ShipViewMenuData* data;
+    if ((!win)||(!win->data))return;
+    win->child = NULL;
+    data = win->data;
+    def = config_def_get_by_name("ships",data->ship->name);
+    if (!def)return;
+    cost = resources_list_parse(sj_object_get_value(def,"cost"));
+    resource_list_sell(player_get_resources(), cost,0.9);
+    resources_list_free(cost);
+    //give the people back to the player
+    player_return_staff(data->ship->staffAssigned);
+    player_ship_remove(data->ship);
+    gf2d_window_refresh_by_name("ship_list_view");
+    gf2d_window_free(win);
+}
+
+void ship_view_sell_cancel(Window *win)
+{
+    if ((!win)||(!win->data))return;
+    win->child = NULL;
+}
+
 int ship_view_menu_update(Window *win,List *updateList)
 {
     const char *str;
@@ -266,6 +292,12 @@ int ship_view_menu_update(Window *win,List *updateList)
                     gf2d_window_refresh(win->parent);
                 }
             }
+            return 1;
+        }
+        if (strcmp(e->name,"sell")==0)
+        {
+            if (win->child)return 1;
+            win->child = window_yes_no("Sell Ship?", (gfc_work_func*)ship_view_sell_ok,(gfc_work_func*)ship_view_sell_cancel,win);
             return 1;
         }
         if (strcmp(e->name,"rename")==0)

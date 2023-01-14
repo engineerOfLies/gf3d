@@ -154,14 +154,16 @@ void ship_facility_buy_cancel(Window *win)
 
 void ship_facility_buy_ok(Window *win)
 {
+    Window *parent;
     ShipFacilityBuyMenueData* data;
     if ((!win)||(!win->data))return;
     data = win->data;
     win->child = NULL;
     resource_list_buy(player_get_resources(), data->cost);
     ship_give_new_facility(data->ship, data->facility);
-    gf2d_window_free(win->parent);
-    gf2d_window_free(win);
+    parent = win->parent;
+    gf2d_window_free(win);    
+    gf2d_window_free(parent);
     gf2d_window_refresh_by_name("ship_view_menu");
 }
 

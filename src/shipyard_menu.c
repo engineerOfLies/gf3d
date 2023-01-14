@@ -24,6 +24,7 @@
 #include "station_def.h"
 #include "station.h"
 #include "player.h"
+#include "ship_buy_menu.h"
 #include "ship_view_menu.h"
 #include "shipyard_menu.h"
 
@@ -69,7 +70,9 @@ int shipyard_menu_facility_check()
 
 int shipyard_menu_update(Window *win,List *updateList)
 {
+    const char *str;
     int i,count;
+    SJson *def;
     Element *e;
     ShipyardMenuData *data;
     if (!win)return 0;
@@ -89,6 +92,10 @@ int shipyard_menu_update(Window *win,List *updateList)
         if (e->index >= 500)
         {
             if (win->child)return 1;
+            def = config_def_get_by_parameter("ships","displayName",e->name);
+            str = sj_object_get_value_as_string(def,"name");
+            if (!str)return 1;
+            win->child = ship_buy_menu(win,str);
             return 1;
         }
         if (strcmp(e->name,"done")==0)

@@ -1,5 +1,5 @@
-#ifndef __SHIP_FACILITY_VIEW_H__
-#define __SHIP_FACILITY_VIEW_H__
+#ifndef __SHIP_FACILITY_BUY_MENU_H__
+#define __SHIP_FACILITY_BUY_MENU_H__
 
 #include "gf2d_windows.h"
 #include "ship.h"

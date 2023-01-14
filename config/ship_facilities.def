@@ -6,7 +6,6 @@
             "displayName":"Cockpit",
             "icon":"",
             "description":"This is a standard cockpit for small craft.  Designed for a single pilot, this helm controls the rest of the ships systems from a single seat.",
-            "officers":1,
             "slot_type":"helm",
             "cost":
             {   
@@ -19,7 +18,6 @@
             "displayName":"Dual Cockpit",
             "icon":"",
             "description":"This is a standard cockpit for small craft.  Designed for a pilot and a co-pilot, this helm controls the rest of the ships systems from one of two different seats.",
-            "officers":2,
             "slot_type":"helm",
             "cost":
             {   

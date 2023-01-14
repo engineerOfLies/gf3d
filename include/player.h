@@ -184,6 +184,12 @@ int player_has_working_dock();
 int player_get_facility_count();
 
 /**
+ * @brief remove a ship from the player's data.  Use after a ship is destroyed or sold
+ * @param ship the ship to remove
+ */
+void player_ship_remove(Ship *ship);
+
+/**
  * @brief get the nth facility that the player owns (index should be less than the count provided above
  * @param index which facility to get (first the planet facilities, then each section facility.  In memory order
  * @return NULL if not found or the facility otherwise

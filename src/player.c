@@ -667,6 +667,16 @@ void player_hour_advance()
     event_manager_update();
 }
 
+void player_ship_remove(Ship *ship)
+{    
+    PlayerData *player;
+    if (!ship)return;
+    player = player_get_data();
+    if (!player)return;
+    gfc_list_delete_data(player->ships,ship);
+    ship_free(ship);
+}
+
 
 int player_get_facility_count()
 {

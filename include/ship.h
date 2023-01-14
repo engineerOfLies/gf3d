@@ -95,6 +95,14 @@ void ship_set_location(Ship *ship,const char *location,Vector3D position);
 int ship_get_slot_count_by_type(Ship *ship,const char *slot_type);
 
 /**
+ * @brief get how many slots a ship has for facilities of the specified type
+ * @param shipName the name of the ship to check
+ * @param slot_type the facility slot to check for
+ * @return how many
+ */
+int ship_name_get_slot_count_by_type(const char *shipName,const char *slot_type);
+
+/**
  * @brief give a ship a new facility.  does not check if its full. 
  * @param ship the ship to add to
  * @param facilityName the name of the facility to add;
@@ -114,12 +122,27 @@ void ship_remove_facility(Ship *ship, Uint32 id);
 int ship_get_slot_name_count(Ship *ship);
 
 /**
+ * @brief get how many facility types the ship can have
+ * @param shipName the name of the ship to check
+ * @return how many
+ */
+int ship_name_get_slot_name_count(const char *shipName);
+
+/**
  * @brief get the name of the nth facility slot for the ship
  * @param ship the ship to check
  * @param index which one
  * @return NULL if not found or error.  Or the name of it otherwise
  */
 const char *ship_get_slot_name_by_index(Ship *ship, Uint32 index);
+
+/**
+ * @brief get the name of the nth facility slot for the ship
+ * @param shipName the name of the ship to check
+ * @param index which one
+ * @return NULL if not found or error.  Or the name of it otherwise
+ */
+const char *ship_name_get_slot_name_by_index(const char *shipName, Uint32 index);
 
 /**
  * @brief get how many facilities are installed to a ship of a given slot type

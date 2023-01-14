@@ -1,0 +1,240 @@
+{
+    "window":
+    {
+        "dimensions" : [0,80,900,490],
+        "name":"ship_buy_menu",
+        "justify" : "center",
+        "elements":
+        [
+            {
+                "type": "button",
+                "name":"buy",
+                "bounds": [580,440,160,42],
+                "hotkey":"buy",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Buy",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"close",
+                "bounds": [740,440,160,42],
+                "hotkey":"close",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Close",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "label",
+                "bounds": [0,8,1,40],
+                "text":"Ship Detail View",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
+                "type": "list",
+                "bounds": [0,40,1,1],
+                "style": "horizontal",
+                "item_size" : [220,1],
+                "packed":true,
+                "elements":
+                [
+                    {
+                        "type": "list",
+                        "bounds": [10,5,250,1],
+                        "style": "vertical",
+                        "item_size" : [1,30],
+                        "packed":true,
+                        "elements":
+                        [
+                            {
+                                "type":"actor",
+                                "name":"item_picture",
+                                "justify":"center",
+                                "align":"middle",
+                                "bounds":[35,0,128,128],
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "text":" ",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "name":"officers",
+                                "text":"Officers: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "name":"crew",
+                                "text":"Crew: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"hull",
+                                "text":"hull: None",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"cargo",
+                                "text":"Cargo: 0T",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"speed",
+                                "text":"Speed: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"passengers",
+                                "text":"passengers: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,0,350,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "name":"item_name",
+                                "bounds": [0,0,1,30],
+                                "text":"Display Ship Name",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "label",
+                                "name":"item_description",
+                                "wraps":true,
+                                "bounds": [0,0,1,220],
+                                "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
+                                "justify" : "left",
+                                "align" : "top",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,40],
+                                "text":"Price:",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,90],
+                                "name":"costs",
+                                "style": "vertical",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
+                                "item_size" : [1,200],
+                                "packed":true,
+                                "elements":
+                                []
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [10,0,280,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "text":"Ship Systems",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,355],
+                                "name":"facilities_list",
+                                "style": "vertical",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
+                                "item_size" : [1,24],
+                                "cropped":true,
+                                "scrolls":true,
+                                "scrollbar":
+                                {
+                                    "type": "scrollbar",
+                                    "backgroundColor":[20,200,255,255],
+                                    "style": "vertical"
+                                },
+                                "elements":
+                                []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
