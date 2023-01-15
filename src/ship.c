@@ -316,6 +316,10 @@ void ship_check(Ship *ship)
     {
         ship->efficiency = ship->staffAssigned/(float)MIN(1,ship->staffPositions);
     }
+    if (ship->entity)
+    {
+        ship->entity->speed = ship->speed;
+    }
 }
 
 void ship_set_location(Ship *ship,const char *location,Vector3D position)

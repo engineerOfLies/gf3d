@@ -31,6 +31,10 @@ typedef struct Entity_S
         
     Vector3D    velocity;
     Vector3D    acceleration;
+    Vector3D    targetPosition;
+    
+    float       speed;// how fast it moves
+    Bool        targetComplete;
             
     Uint32      health;         /**<entity dies when it reaches zero*/
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES

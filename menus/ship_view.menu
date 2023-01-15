@@ -9,7 +9,7 @@
             {
                 "type": "button",
                 "name":"sell",
-                "bounds": [420,440,160,42],
+                "bounds": [260,440,160,42],
                 "hotkey":"sell",
                 "sound":"cancel",
                 "label" :
@@ -31,13 +31,35 @@
             {
                 "type": "button",
                 "name":"repair",
-                "bounds": [580,440,160,42],
+                "bounds": [420,440,160,42],
                 "hotkey":"repair",
-                "sound":"confirm",
+                "sound":"cancel",
                 "label" :
                 {
                     "type": "label",
                     "text":"Repair",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"orders",
+                "bounds": [580,440,160,42],
+                "hotkey":"orders",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Orders",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
@@ -118,6 +140,15 @@
                                 "bounds": [0,0,1,25],
                                 "name":"model",
                                 "text":"Model :",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"location",
+                                "text":"Location :",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
@@ -267,15 +298,6 @@
                                 "bounds": [0,0,1,25],
                                 "name":"speed",
                                 "text":"Speed: 0",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [0,0,1,25],
-                                "name":"efficiency",
-                                "text":"efficiency: 100%",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"

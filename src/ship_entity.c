@@ -13,6 +13,7 @@
 void ship_entity_update(Entity *self);
 void ship_entity_draw(Entity *self);
 void ship_entity_think(Entity *self);
+void ship_entity_think_moving(Entity *self);
 void ship_entity_free(Entity *self);
 
 Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
@@ -61,6 +62,14 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     return ent;
 }
 
+void ship_entity_move_to(Entity *ent,Vector3D position)
+{
+    if (!ent)return;
+    vector3d_copy(ent->targetPosition,position);
+    ent->targetComplete = 0;
+    ent->think = ship_entity_think_moving;
+}
+
 void ship_entity_free(Entity *self)
 {
     // the ship entity doesn't own the Ship data, ship data owns this
@@ -87,6 +96,23 @@ void ship_entity_draw(Entity *self)
         return;// inside the station
     }
     self->hidden = 0;
+}
+
+void ship_entity_think_moving(Entity *self)
+{
+    Vector3D dir;
+    if (!self)return;
+    // do maintenance
+    if (vector3d_distance_between_less_than(self->mat.position,self->targetPosition,1))
+    {
+        self->think = ship_entity_think;
+        self->targetComplete = 1;
+        vector3d_clear(self->velocity);
+        return;
+    }
+    vector3d_sub(dir,self->targetPosition,self->mat.position);
+    vector3d_normalize(&dir);
+    vector3d_scale(self->velocity,dir,self->speed);
 }
 
 void ship_entity_think(Entity *self)
