@@ -33,8 +33,8 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     str = sj_object_get_value_as_string(def,"model");
     if (str)
     {
-        ent->model = gf3d_model_load(str);
-        if (!ent->model)
+        ent->mat.model = gf3d_model_load(str);
+        if (!ent->mat.model)
         {
             slog("SHIP MODEL DID NOT LOAD");
         }

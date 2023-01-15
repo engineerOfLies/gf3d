@@ -7,9 +7,8 @@
 #include "gf3d_lights.h"
 
 #include "camera_entity.h"
-#include "fighter.h"
-#include "gate.h"
 #include "player.h"
+#include "spawns.h"
 #include "world.h"
 
 #define PARKING_WIDTH 10
@@ -17,8 +16,11 @@
 
 static World *the_world = NULL;
 
+
+
 World *world_load(char *filename)
 {
+    Entity *ent;
     Vector4D globalColor = {0};
     Vector3D globalDir  = {0};
     Vector3D position,rotation;
@@ -126,7 +128,16 @@ World *world_load(char *filename)
     }
     sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
     w->entity_list = gfc_list_new();
-    gfc_list_append(w->entity_list,gate_new(vector3d(0,-3000,0)));
+    list = sj_object_get_value(wjson,"entities");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        ent = spawn_call(item);
+        if (!ent)continue;
+        gfc_list_append(w->entity_list,ent);
+    }
     w->parking_spots = gfc_list_new();
     item = sj_object_get_value(wjson,"parking");
     if (item)

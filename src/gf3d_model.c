@@ -396,10 +396,12 @@ void mat_from_parent(
 
 void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
 {
+    const char *str;
     if (!mat)return;
     if (!config)return;
     gfc_matrix_identity(mat->mat);
-    mat->model = gf3d_model_load(sj_object_get_value_as_string(config,"model"));
+    str = sj_object_get_value_as_string(config,"model");
+    if (str)mat->model= gf3d_model_load(str);
     sj_value_as_vector3d(sj_object_get_value(config,"position"),&mat->position);
     sj_value_as_vector3d(sj_object_get_value(config,"rotation"),&mat->rotation);
     sj_value_as_vector3d(sj_object_get_value(config,"positionDelta"),&mat->positionDelta);

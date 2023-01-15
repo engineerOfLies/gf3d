@@ -15,7 +15,6 @@ typedef struct Entity_S
     Color       color;          /**<default color for the model*/
     Color       detailColor;    /**<detail color for the model*/
     Color       selectedColor;  /**<Color for highlighting*/
-    Model      *model;          /**<pointer to the entity model to draw  (optional)*/
     Uint8       hidden;         /**<if true, not drawn*/
     Uint8       selected;
     

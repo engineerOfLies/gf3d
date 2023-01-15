@@ -20,29 +20,29 @@ void gate_draw(Entity *self);
 void gate_think(Entity *self);
 void gate_free(Entity *self);
 
-Entity *gate_new(Vector3D position)
+Entity *gate_new(SJson *def)
 {
     Entity *ent = NULL;    
     GateData *data = NULL;
+    if (!def)return NULL;
     ent = gf3d_entity_new();
     if (!ent)
     {
         return NULL;
     }
     data = gfc_allocate_array(sizeof(GateData),1);
-    data->tunnel = gf3d_model_load("models/tunnel_gate/tunnel.model");
     ent->data = data;
-    ent->model = gf3d_model_load("models/tunnel_gate/gate.model");
+    
+    data->tunnel = gf3d_model_load("models/tunnel_gate/tunnel.model");
+    
+    gf3d_model_mat_parse(&ent->mat,def);
+    ent->mat.model = gf3d_model_load("models/tunnel_gate/gate.model");
     ent->selectedColor = gfc_color(0.9,0.7,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->think = gate_think;
     ent->draw = gate_draw;
     ent->update = gate_update;
     ent->free = gate_free;
-    ent->mat.rotation.z = GFC_PI;
-    ent->mat.scale = vector3d(100,100,100);
-    vector3d_copy(ent->mat.position,position);
-    //ent->mat.rotation.z = GFC_PI;
     return ent;
 }
 

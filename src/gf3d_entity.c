@@ -69,7 +69,7 @@ void gf3d_entity_free(Entity *self)
     {
         self->free(self);
     }
-    gf3d_model_free(self->model);
+    gf3d_model_free(self->mat.model);
     memset(self,0,sizeof(Entity));
 }
 
@@ -80,12 +80,12 @@ void gf3d_entity_draw(Entity *self)
     if (!self)return;
     if (self->hidden)return;
     if (self->draw)self->draw(self);
-    if (!self->model)return;
-    gf3d_model_draw(self->model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
+    if (!self->mat.model)return;
+    gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
     if (self->selected)
     {
         gf3d_model_draw_highlight(
-            self->model,
+            self->mat.model,
             0,
             self->mat.mat,
             gfc_color_to_vector4f(self->selectedColor));

@@ -22,8 +22,8 @@ Entity *fighter_new(Vector3D position)
     }
     gfc_line_cpy(ent->name,"FIGHTER");
 //    ent->model = gf3d_model_load("models/fighter/fighter.model");
-    ent->model = gf3d_model_load("models/ships/passenger_transport.model");
-    if (!ent->model)
+    ent->mat.model = gf3d_model_load("models/ships/passenger_transport.model");
+    if (!ent->mat.model)
     {
         slog("FIGHTER MODEL DID NOT LOAD");
     }

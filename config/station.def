@@ -233,6 +233,7 @@
             "rotates":1,
             "hull":1500,
             "dockPosition":[0,-1,0],
+            "approach":[0,-3,0],
             "guideStrip":[0,-2,0],
             "cost":
             {
