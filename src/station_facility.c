@@ -51,8 +51,6 @@ void station_facility_draw_highlight(StationFacility *facility)
     gf3d_model_draw_highlight(facility->mat.model,0,facility->mat.mat,vector4d(1,.7,0.1,1));
 }
 
-
-
 int station_facility_types_valid(SJson *array,const char *check)
 {
     int i,c;

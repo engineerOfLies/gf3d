@@ -14,6 +14,7 @@
 #include "gf2d_draw.h"
 #include "gf2d_mouse.h"
 #include "gf2d_windows_common.h"
+#include "gf2d_item_list_menu.h"
 #include "gf2d_message_buffer.h"
 
 #include "player.h"
@@ -32,6 +33,8 @@ typedef struct
 {
     TextLine name;
     Ship *ship;
+    List *orders_list;
+    int choice;
 }ShipViewMenuData;
 
 int ship_view_menu_free(Window *win)
@@ -39,6 +42,7 @@ int ship_view_menu_free(Window *win)
     ShipViewMenuData *data;
     if ((!win)||(!win->data))return 0;
     data = win->data;
+    if (data->orders_list)gfc_list_delete(data->orders_list);
     gf2d_window_close_child(win->parent,win);
     free(data);
     return 0;
@@ -76,7 +80,9 @@ void ship_view_menu_refresh(Window *win)
 {
     SJson *def;
     Color color;
+    static const char *parking = "Parking";
     ShipFacility *facility;
+    StationFacility *sFacility;
     int i,c;
     int j,k;
     int count,limit;
@@ -135,7 +141,7 @@ void ship_view_menu_refresh(Window *win)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
     gf2d_element_set_color(gf2d_window_get_element_by_name(win,"energy"),color);
     //speed
-    gfc_line_sprintf(buffer,"Speed: %iMm/s",data->ship->speed);
+    gfc_line_sprintf(buffer,"Speed: %iMm/s",(int)data->ship->speed);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"speed"),buffer);
     //efficiency
     gfc_line_sprintf(buffer,"Efficiency: %.2f%%",data->ship->efficiency);
@@ -186,6 +192,19 @@ void ship_view_menu_refresh(Window *win)
             }
         }
     }
+    //build orders list
+    if (data->orders_list)gfc_list_clear(data->orders_list);
+    if (gfc_line_cmp(data->ship->location,"parking")!=0)
+    {
+        gfc_list_append(data->orders_list,(void*)parking);
+    }
+    c = player_get_dock_count();
+    for (i = 0;i < c; i++)
+    {
+        sFacility = player_get_dock_nth(i);
+        if (!sFacility)continue;
+        gfc_list_append(data->orders_list,sFacility->displayName);
+    }
 }
 
 void ship_view_sell_ok(Window *win)
@@ -212,6 +231,26 @@ void ship_view_sell_cancel(Window *win)
 {
     if ((!win)||(!win->data))return;
     win->child = NULL;
+}
+
+void ship_view_menu_list_choice(Window *win)
+{
+    const char *choice;
+    ShipViewMenuData* data;
+    if ((!win)||(!win->data))return;
+    win->child = NULL;
+    data = win->data;
+    if (data->choice < 0)return;
+    choice = gfc_list_get_nth(data->orders_list,data->choice);
+    if (!choice)return;
+    if (gfc_strlcmp(choice, "Parking") == 0)
+    {
+        slog("heading to parking");
+        return;
+    }
+    ship_order_to_dock(data->ship, choice);
+    gf2d_window_free(win);
+    gf2d_window_free(gf2d_window_get_by_name("ship_list_view"));
 }
 
 int ship_view_menu_update(Window *win,List *updateList)
@@ -294,6 +333,12 @@ int ship_view_menu_update(Window *win,List *updateList)
             }
             return 1;
         }
+        if (strcmp(e->name,"orders")==0)
+        {
+            if (win->child)return 1;
+            win->child = item_list_menu(win,vector2d(e->lastDrawPosition.x,e->lastDrawPosition.y - 100),250,"Select Destination",data->orders_list,(gfc_work_func*)ship_view_menu_list_choice,win,&data->choice);
+            return 1;
+        }
         if (strcmp(e->name,"sell")==0)
         {
             if (win->child)return 1;
@@ -341,6 +386,7 @@ Window *ship_view_menu(Window *parent,Ship *ship)
     win->draw = ship_view_menu_draw;
     //setup this window
     data->ship = ship;
+    data->orders_list = gfc_list_new();
     ship_view_menu_refresh(win);
     message_buffer_bubble();
     return win;

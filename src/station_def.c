@@ -101,6 +101,15 @@ int station_def_get_extension_count_by_name(const char *name)
     return station_def_get_extension_count(config_def_get_by_name("sections",name));
 }
 
+Vector3D station_def_get_approach_vector(const char *name)
+{
+    SJson *def;
+    Vector3D approach = {0};
+    if (!name)return approach;
+    def = config_def_get_by_name("sections",name);
+    sj_value_as_vector3d(sj_object_get_value(def,"approach"),&approach);
+    return approach;
+}
 
 SJson *station_def_get_extension_by_index(SJson *section,Uint8 index)
 {

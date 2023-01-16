@@ -28,6 +28,13 @@ SJson *station_def_get_by_name(const char *name);
 SJson *station_def_get_extension_by_index(SJson *section,Uint8 index);
 
 /**
+ * @brief get the approach vector for a station section by name
+ * @param name the name of the section
+ * @return a Zero vector if not specified, the vector in section space otherwise
+ */
+Vector3D station_def_get_approach_vector(const char *name);
+
+/**
  * @brief get the number of extension points by section name
  * @param name the name to search for
  * @return the number of extensions

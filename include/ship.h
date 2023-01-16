@@ -31,9 +31,11 @@ typedef struct
     int         storageCapacity;//ship total
     List       *cargo;          //a resources list of the cargo
     int         disabled;       // if the ship cannot run.  No crew, no power, no engines
-    int         speed;          // top speed for the ship
+    float       speed;          // top speed for the ship
     float       efficiency;     // factor for overal ship performance
     List       *facilities;     //list of ship facilities
+    List       *flightPath;     //Describes a list of way points from beginning to end of a journey
+    TextLine    dockName;       //when approaching or leaving a dock, ship should align to this dock.
     Entity     *entity;         // pointer to the ship entity
 }Ship;
 
@@ -151,5 +153,8 @@ const char *ship_name_get_slot_name_by_index(const char *shipName, Uint32 index)
  * @return how many facilities are installed
  */
 int ship_get_slot_usage_by_type(Ship *ship,const char *slot_type);
+
+
+void ship_order_to_dock(Ship *ship, const char *dock);
 
 #endif

@@ -9,7 +9,10 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor);
 
 /**
  * @brief set the ship to move towards the given location at its speed;
+ * @param ent the ship entity to move
+ * @param pathIndex the part of the flightpath to move towards
+ * @param dockName if we are moving to a dock, then set the name so we can calibrate to it
  */
-void ship_entity_move_to(Entity *ent,Vector3D position);
+void ship_entity_move_to(Entity *ent,Uint32 pathIndex,const char *dockName);
 
 #endif

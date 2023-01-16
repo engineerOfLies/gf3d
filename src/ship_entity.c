@@ -6,6 +6,8 @@
 #include "gf3d_draw.h"
 
 #include "config_def.h"
+#include "player.h"
+#include "station.h"
 #include "ship.h"
 #include "ship_entity.h"
 
@@ -62,11 +64,24 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     return ent;
 }
 
-void ship_entity_move_to(Entity *ent,Vector3D position)
+void ship_entity_move_to(Entity *ent,Uint32 pathIndex,const char *dockName)
 {
-    if (!ent)return;
-    vector3d_copy(ent->targetPosition,position);
+    Vector3D *v;
+    Ship *ship;
+    if ((!ent)||(!ent->data))return;
+    ship = ent->data;
+    v = gfc_list_get_nth(ship->flightPath,pathIndex);
+    if (!v)
+    {
+        slog("Path Complete");
+        ent->think = ship_entity_think;
+        return;
+    }
+    if ((dockName)&&(strlen(dockName)))gfc_line_cpy(ship->dockName,dockName);
+    else gfc_line_clear(ship->dockName);
+    vector3d_copy(ent->targetPosition,(*v));
     ent->targetComplete = 0;
+    ent->counter = pathIndex;
     ent->think = ship_entity_think_moving;
 }
 
@@ -100,19 +115,48 @@ void ship_entity_draw(Entity *self)
 
 void ship_entity_think_moving(Entity *self)
 {
+    StationSection *section;
     Vector3D dir;
+    Ship *ship;
+    StationData *station;
     if (!self)return;
+    ship = self->data;
     // do maintenance
     if (vector3d_distance_between_less_than(self->mat.position,self->targetPosition,1))
     {
         self->think = ship_entity_think;
         self->targetComplete = 1;
         vector3d_clear(self->velocity);
+        ship_entity_move_to(self,++self->counter,ship->dockName);
+        return;
+    }
+    if (vector3d_distance_between_less_than(self->mat.position,self->targetPosition,self->speed *0.01))
+    {
+        self->think = ship_entity_think;
+        self->targetComplete = 1;
+        vector3d_clear(self->velocity);
+        vector3d_set_magnitude(&self->velocity,vector3d_magnitude_between(self->mat.position,self->targetPosition));
         return;
     }
     vector3d_sub(dir,self->targetPosition,self->mat.position);
     vector3d_normalize(&dir);
-    vector3d_scale(self->velocity,dir,self->speed);
+    vector3d_scale(self->velocity,dir,(self->speed*0.01));
+    //check if we need to set our rotations
+    if (strlen(ship->dockName)>0)
+    {
+        station = player_get_station_data();
+        section = station_get_section_by_display_name(station,ship->dockName);
+        if ((section)&&(section->rotates))
+        {
+            if (vector3d_compare(self->targetPosition,station_section_get_docking_position(section)))
+            {
+                //if our next position is the docking position, lets match the station rotation
+                self->roll = -station->sectionRotation * section->rotates;
+                //hack: if our y position is positive, we are approaching from opposite, reverse the rotation
+                if (self->mat.position.y > 0)self->roll *= -1;
+            }
+        }
+    }
 }
 
 void ship_entity_think(Entity *self)

@@ -233,7 +233,7 @@
             "rotates":1,
             "hull":1500,
             "dockPosition":[0,-1,0],
-            "approach":[0,-3,0],
+            "approach":[0,-5,0],
             "guideStrip":[0,-2,0],
             "cost":
             {
@@ -429,8 +429,9 @@
             "mountType":"e",
             "rotates":0,
             "hull":200,
-            "dockPosition":[0,-1,0],
+            "dockPosition":[0,-1,0.05],
             "guideStrip":[0,-2.3,0],
+            "approach":[0,-5,0.05],
             "cost":
             {
                 "credits":300,

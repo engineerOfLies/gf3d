@@ -12,6 +12,7 @@ Ship *ship_new()
     Ship *ship = gfc_allocate_array(sizeof(Ship),1);
     if (!ship)return NULL;
     
+    ship->flightPath = gfc_list_new();
     ship->facilities = gfc_list_new();
     return ship;
 }
@@ -21,6 +22,10 @@ void ship_free(Ship *ship)
     if (!ship)return;
     gfc_list_foreach(ship->facilities,(gfc_work_func*)ship_facility_free);
     gfc_list_delete(ship->facilities);
+    
+    gfc_list_foreach(ship->flightPath,(gfc_work_func*)free);
+    gfc_list_delete(ship->flightPath);
+    
     if (ship->entity)gf3d_entity_free(ship->entity);
     free(ship);
 }
@@ -316,10 +321,45 @@ void ship_check(Ship *ship)
     {
         ship->efficiency = ship->staffAssigned/(float)MIN(1,ship->staffPositions);
     }
+    
     if (ship->entity)
     {
         ship->entity->speed = ship->speed;
     }
+}
+
+void ship_order_to_dock(Ship *ship, const char *dock)
+{
+    Vector3D *v_ptr;
+    Vector3D approach;
+    Vector3D dockPosition;
+    StationSection *section;
+    if ((!ship)||(!dock))return;
+    section = station_section_get_by_facility(dock);
+    if (!section)return;
+    
+    section = station_section_get_by_facility(dock);
+    if (!section)
+    {
+        slog("section not found by name %s",dock);
+        return;
+    }
+    ship_check(ship);
+    gfc_list_foreach(ship->flightPath,(gfc_work_func*)free);//delete the old vectors
+    gfc_list_clear(ship->flightPath);//clear the list
+    
+    approach = station_section_get_approach_vector(section);
+    v_ptr = gfc_allocate_array(sizeof(Vector3D),1);
+    vector3d_copy((*v_ptr),approach);
+    gfc_list_append(ship->flightPath,v_ptr);
+
+    dockPosition = station_section_get_docking_position(section);
+    v_ptr = gfc_allocate_array(sizeof(Vector3D),1);
+    vector3d_copy((*v_ptr),dockPosition);
+    gfc_list_append(ship->flightPath,v_ptr);
+
+    ship_set_location(ship,"in_transit",ship->position);
+    ship_entity_move_to(ship->entity,0,section->displayName);
 }
 
 void ship_set_location(Ship *ship,const char *location,Vector3D position)

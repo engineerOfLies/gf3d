@@ -178,6 +178,19 @@ StationSection *player_get_section_by_facility(StationFacility *facilityTarget);
 int player_has_working_dock();
 
 /**
+ * @brief get how many working docks the player has
+ * @return the count of docks
+ */
+int player_get_dock_count();
+
+/**
+ * @brief get the nth working dock of the player's station
+ * @param n which one, numerically speaking
+ * @return NULL if not found, or the dock facility in question
+ */
+StationFacility *player_get_dock_nth(int n);
+
+/**
  * @brief get the count of the number of facilities that a player has between the planet and the station
  * @return the count or 0 if a problem
  */

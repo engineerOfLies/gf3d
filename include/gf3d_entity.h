@@ -29,12 +29,14 @@ typedef struct Entity_S
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     void       (*free)(struct Entity_S *self); /**<pointer to the custom free function, necessar when there is custom data*/
         
+    float       roll;           //kept separate 
     Vector3D    velocity;
     Vector3D    acceleration;
     Vector3D    targetPosition;
     
     float       speed;// how fast it moves
     Bool        targetComplete;
+    int         counter;//generic counting variable
             
     Uint32      health;         /**<entity dies when it reaches zero*/
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES

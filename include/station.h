@@ -29,9 +29,10 @@ typedef struct StationSection_S
     float       rotates;//if it rotates
     int         storageCapacity;
     int         staffAssigned,staffPositions; // how many staff have are working this section / how many positions there are to work
-    Vector3D    dockPosition;
-    Bool        drawGuideStrip;
-    Vector3D    guideStrip;
+    Vector3D    dockPosition;       //docking position before ship stops rendering / begins exit
+    Vector3D    approach;           //relay point before making final docking approach
+    Bool        drawGuideStrip;     //if we draw a guidesStrip for the section (only docks)
+    Vector3D    guideStrip;         //position where the guide strip starts at
     Uint8       slot;                      // where the section is mounted on the parent
     Uint8       expansionSlots;            // how many sections can link off of this
     List       *children;
@@ -94,6 +95,14 @@ SJson *station_save_data(StationData *data);
 StationSection *station_get_section_by_id(StationData *data,int id);
 
 /**
+ * @brief get a station section by it's unique displayName
+ * @param data the station to poll
+ * @param displayName the searcch item
+ * @return NULL if not not found, or a pointer to the station section
+ */
+StationSection *station_get_section_by_display_name(StationData *data,const char *displayName);
+
+/**
  * @brief get a station section's child by its mounting slot
  * @param section the station section to query
  * @param slot the slot to check
@@ -139,5 +148,26 @@ void station_section_repair(StationSection *section);
  * @return 0 if there are no active jobs, 1 if there are at least one
  */
 int station_section_facility_working(StationSection *section);
+
+/**
+ * @brief get the station seciton by its facility displayName
+ * @param facilityName the displayName of the facility to search for
+ * @return NULL if not found, otherwise the station section
+ */
+StationSection *station_section_get_by_facility(const char *facilityName);
+
+/**
+ * @brief get the approach vector for the given station section in world space
+ * @param seciton the station section in question
+ * @return a zero vector if not specified or error.  The position in space you should head to first otherwise
+ */
+Vector3D station_section_get_approach_vector(StationSection *section);
+
+/**
+ * @brief get the position of the dock for the given station section in world space
+ * @param seciton the station section in question
+ * @return a zero vector if not specified or error.  The position in space you should head to finally otherwise
+ */
+Vector3D station_section_get_docking_position(StationSection *section);
 
 #endif

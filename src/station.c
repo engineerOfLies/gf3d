@@ -38,6 +38,22 @@ StationSection *station_get_section_by_id(StationData *data,int id)
     return NULL;
 }
 
+StationSection *station_get_section_by_display_name(StationData *data,const char *displayName)
+{
+    int i,c;
+    StationSection *section;
+    if ((!data)||(!displayName))return NULL;
+    c = gfc_list_get_count(data->sections);
+    for (i = 0; i < c; i++)
+    {
+        section = gfc_list_get_nth(data->sections,i);
+        if (!section)continue;
+        if (gfc_line_cmp(displayName,section->displayName)==0)return section;
+    }
+    return NULL;
+}
+
+
 SJson *station_section_to_json(StationSection *section)
 {
     int i,c;
@@ -261,7 +277,9 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
         
         section->drawGuideStrip = 1;
         sj_value_as_vector3d(item,&section->guideStrip);
-    }    
+    }
+    sj_value_as_vector3d(sj_object_get_value(sectionDef,"dockPosition"),&section->dockPosition);
+    sj_value_as_vector3d(sj_object_get_value(sectionDef,"approach"),&section->approach);
     section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     
     if (id < 0)
@@ -561,6 +579,107 @@ void station_update(Entity *self)
     data->sectionRotation += 0.0005;
 }
 
+int station_section_has_facility_by_name(StationSection *section,const char *name)
+{
+    int i,c;
+    StationFacility *facility;
+    if ((!section)||(!name))return 0;   
+    c = gfc_list_get_count(section->facilities);
+    for (i = 0; i < c; i++)
+    {
+        facility = gfc_list_get_nth(section->facilities,i);
+        if (!facility)continue;
+        if (gfc_line_cmp(facility->displayName,name) == 0)return 1;
+    }
+    return 0;
+}
+
+Vector3D station_section_to_world_space(StationSection *section, Vector3D in)
+{
+    Vector3D out = {0};
+    Vector3D rotation;
+    PlayerData *player;
+    StationData *stationData;
+    Matrix4 VectorMat,StationMat,SectionMat,FinalMat;
+    Entity *station;
+    if (!section)return out;
+    player = player_get_data();
+    stationData = player_get_station_data();
+    if ((!player)||(!player->station))return out;
+    station = player->station;//for short hand
+    
+    vector3d_copy(rotation,station->mat.rotation);
+    rotation.x += (stationData->sectionRotation * section->rotates);
+//rotate outselves based on station rotation
+    gfc_matrix4_from_vectors(
+        SectionMat,
+        vector3d(0,0,0),
+        rotation,
+        vector3d(1,1,1));
+
+    gfc_matrix4_from_vectors(
+        StationMat,
+        station->mat.position,
+        station->mat.rotation,
+        station->mat.scale);
+    
+    gfc_matrix4_from_vectors(
+        VectorMat,
+        in,
+        vector3d(0,0,0),
+        vector3d(1,1,1));
+    
+    gfc_matrix_multiply(VectorMat,SectionMat,VectorMat);
+    
+    gfc_matrix_multiply(SectionMat,VectorMat,section->mat.mat);//get the local rotation
+    
+    gfc_matrix_multiply(FinalMat,SectionMat,StationMat);
+    
+    gfc_matrix4_to_vectors(FinalMat,&out,NULL,NULL);
+
+    return out;
+}
+
+Vector3D station_section_get_docking_position(StationSection *section)
+{
+    PlayerData *player;
+    Vector3D dockPosition = {0};
+    if (!section)return dockPosition;
+    player = player_get_data();
+    if ((!player)||(!player->station))return dockPosition;
+    if (vector3d_is_zero(section->dockPosition)) return dockPosition;
+    return station_section_to_world_space(section, section->dockPosition);
+}
+
+Vector3D station_section_get_approach_vector(StationSection *section)
+{
+    PlayerData *player;
+    Vector3D approach = {0};
+    if (!section)return approach;
+    player = player_get_data();
+    if ((!player)||(!player->station))return approach;
+    if (vector3d_is_zero(section->approach)) return approach;
+    return station_section_to_world_space(section, section->approach);
+}
+
+StationSection *station_section_get_by_facility(const char *facilityName)
+{
+    int i,c;
+    StationData *station;
+    StationSection *section;
+    if (!facilityName)return NULL;
+    station = player_get_station_data();
+    if (!station)return NULL;
+    c = gfc_list_get_count(station->sections);
+    for (i = 0;i < c; i++)
+    {
+        section = gfc_list_get_nth(station->sections,i);
+        if (!section)continue;
+        if (station_section_has_facility_by_name(section,facilityName))return section;
+    }
+    return NULL;
+}
+
 void station_draw(Entity *self)
 {
     int i,c;
@@ -572,6 +691,7 @@ void station_draw(Entity *self)
     StationData *data;
     Vector3D rotation;
     Vector3D position;
+    Vector3D position2;
     if ((!self)||(!self->data))return;
     data = (StationData *)self->data;
     
@@ -624,6 +744,7 @@ void station_draw(Entity *self)
                 detailColor.z *= damage;
             }
         }
+        gfc_matrix4_to_vectors(mat,&position2,NULL,NULL);
         gf3d_model_draw(section->mat.model,0,mat,color,detailColor,vector4d(1,1,1,1));
         if (data->sectionHighlight == section->id)
         {
@@ -639,6 +760,9 @@ void station_draw(Entity *self)
                 vector3d(1,1,1));            
             gfc_matrix4_to_vectors(guideMat,&position,&rotation,NULL);
             draw_guiding_lights(position,rotation,0.3 * self->mat.scale.x, 2 * self->mat.scale.x);
+            
+            position = station_section_get_approach_vector(section);
+            gf3d_particle_trail_draw(GFC_COLOR_LIGHTBLUE, 10, 10, gfc_edge3d_from_vectors(position2,position));
         }
     }
 }

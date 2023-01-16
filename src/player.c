@@ -739,6 +739,54 @@ StationFacility *player_get_facility_nth(Uint32 index)
     return NULL;
 }
 
+StationFacility *player_get_dock_nth(int n)
+{
+    int count = 0;
+    int i,c;
+    StationFacility *facility;
+    c = player_get_facility_count();
+    for (i =0; i < c; i++)
+    {
+        facility = player_get_facility_nth(i);
+        if (!facility)continue;
+        if ((strcmp(facility->facilityType,"small_docking_bay")==0)||
+            (strcmp(facility->facilityType,"medium_docking_bay")==0)||
+            (strcmp(facility->facilityType,"large_docking_bay")==0))
+        {
+            if ((!facility->inactive)&&(!facility->disabled))
+            {
+                if (n == count)return facility;
+                count++;
+            }
+        }
+    }    
+    return NULL;    
+    
+}
+
+int player_get_dock_count()
+{
+    int count = 0;
+    int i,c;
+    StationFacility *facility;
+    c = player_get_facility_count();
+    for (i =0; i < c; i++)
+    {
+        facility = player_get_facility_nth(i);
+        if (!facility)continue;
+        if ((strcmp(facility->facilityType,"small_docking_bay")==0)||
+            (strcmp(facility->facilityType,"medium_docking_bay")==0)||
+            (strcmp(facility->facilityType,"large_docking_bay")==0))
+        {
+            if ((!facility->inactive)&&(!facility->disabled))
+            {
+                count++;
+            }
+        }
+    }    
+    return count;    
+}
+
 int player_has_working_dock()
 {
     int i,c;

@@ -46,6 +46,7 @@ Entity *gf3d_entity_new()
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet, so we can!
         {
+            memset(&entity_manager.entity_list[i],0,sizeof(Entity));
             entity_manager.entity_list[i]._inuse = 1;
             
             gf3d_model_mat_reset(&entity_manager.entity_list[i].mat);
@@ -76,18 +77,26 @@ void gf3d_entity_free(Entity *self)
 
 void gf3d_entity_draw(Entity *self)
 {
+    Matrix4 mat;
     if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->hidden)return;
     if (self->draw)self->draw(self);
     if (!self->mat.model)return;
-    gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
+    
+    gfc_matrix4_from_vectors(mat,vector3d(0,0,0),vector3d(self->roll,0,0),vector3d(1,1,1));
+    
+    gf3d_model_mat_set_matrix(&self->mat);
+    
+    gfc_matrix_multiply(mat,mat,self->mat.mat);
+    
+    gf3d_model_draw(self->mat.model,0,mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
     if (self->selected)
     {
         gf3d_model_draw_highlight(
             self->mat.model,
             0,
-            self->mat.mat,
+            mat,
             gfc_color_to_vector4f(self->selectedColor));
     }
 }
@@ -147,12 +156,16 @@ void gf3d_entity_update(Entity *self)
     if (!entity_manager.initialized)return;
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
-    
-    gf3d_model_mat_move(&self->mat,self->velocity);
+
     vector3d_add(self->velocity,self->acceleration,self->velocity);
-    
-    gf3d_model_mat_set_matrix(&self->mat);
-    
+    if (!vector3d_is_zero(self->velocity))
+    {
+        vector3d_add(self->mat.position,self->mat.position,self->velocity);
+        vector3d_angles (self->velocity, &self->mat.rotation);
+        self->mat.rotation.y = self->mat.rotation.x;
+        self->mat.rotation.x = 0;
+        self->mat.rotation.z += GFC_HALF_PI;
+    }
     
     if (self->update)self->update(self);
 }
