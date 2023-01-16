@@ -12,6 +12,7 @@ Ship *ship_new()
     Ship *ship = gfc_allocate_array(sizeof(Ship),1);
     if (!ship)return NULL;
     
+    ship->thrust = gfc_list_new();
     ship->flightPath = gfc_list_new();
     ship->facilities = gfc_list_new();
     return ship;
@@ -25,6 +26,9 @@ void ship_free(Ship *ship)
     
     gfc_list_foreach(ship->flightPath,(gfc_work_func*)free);
     gfc_list_delete(ship->flightPath);
+    
+    gfc_list_foreach(ship->thrust,(gfc_work_func*)gf3d_model_mat_free);
+    gfc_list_delete(ship->thrust);
     
     if (ship->entity)gf3d_entity_free(ship->entity);
     free(ship);
@@ -83,7 +87,7 @@ Ship *ship_load(SJson *json)
     {
         //register parking spot
         ship->position = world_parking_claim_spot(ship->position);
-    }
+    }    
     ship_check(ship);
     return ship;
 }
@@ -165,6 +169,7 @@ SJson *ship_save(Ship *ship)
 Ship *ship_new_by_name(const char *name,int id,int defaults)
 {
     const char *str;
+    ModelMat *mat;
     Ship *ship;
     int i,c;
     SJson *def,*list,*item;
@@ -194,6 +199,19 @@ Ship *ship_new_by_name(const char *name,int id,int defaults)
             gfc_list_append(ship->facilities,ship_facility_new_by_name(str,++ship->idPool));
         }
     }
+    list = sj_object_get_value(def,"thrust");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        //pull thrust data
+        mat = gf3d_model_mat_new();
+        if (!mat)continue;
+        gf3d_model_mat_parse(mat,item);
+        gfc_list_append(ship->thrust,mat);
+    }    
+
     ship_check(ship);
     return ship;
 }

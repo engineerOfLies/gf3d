@@ -58,6 +58,33 @@
             "weapons":4,
             "cargo":0,
             "hull":500,
+            "thrust":
+            [
+                {
+                    "model":"models/ships/thrust.model",
+                    "position":[-2.3,3.8,-0.2],
+                    "scale":[0.7,0.7,0.7],
+                    "rotation":[0,0,180]
+                },
+                {
+                    "model":"models/ships/thrust.model",
+                    "position":[2.3,3.8,-0.2],
+                    "scale":[0.7,0.7,0.7],
+                    "rotation":[0,0,180]
+                },
+                {
+                    "model":"models/ships/thrust.model",
+                    "position":[-0.6,3.8,0.5],
+                    "scale":[0.7,0.7,0.7],
+                    "rotation":[0,0,180]
+                },
+                {
+                    "model":"models/ships/thrust.model",
+                    "position":[0.6,3.8,0.5],
+                    "scale":[0.7,0.7,0.7],
+                    "rotation":[0,0,180]
+                }
+            ],
             "cost":
             {
                 "credits":2000,

@@ -101,6 +101,9 @@ void ship_entity_update(Entity *self)
 
 void ship_entity_draw(Entity *self)
 {
+    int i,c;
+    ModelMat *mat;
+    Matrix4 thrustMatrix;
     Ship *data;
     if ((!self)||(!self->data))return;
     data = self->data;
@@ -111,6 +114,23 @@ void ship_entity_draw(Entity *self)
         return;// inside the station
     }
     self->hidden = 0;
+    if (!vector3d_is_zero(self->velocity))
+    {
+        //draw thrust
+        c = gfc_list_get_count(data->thrust);
+        for (i = 0;i < c; i++)
+        {
+            mat = gfc_list_get_nth(data->thrust,i);
+            if (!mat)continue;
+            mat_from_parent(
+                thrustMatrix,
+                self->mat.mat,
+                mat->position,
+                mat->rotation,
+                mat->scale);            
+            gf3d_model_draw(mat->model,0,thrustMatrix,vector4d(1,.9,.5,1),vector4d(1,1,1,1),vector4d(1,1,1,1));
+        }
+    }
 }
 
 void ship_entity_think_moving(Entity *self)

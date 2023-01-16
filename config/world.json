@@ -11,33 +11,7 @@
             "position":[-1123.226318,-1096.660156,314.309998],
             "rotation":[3.261595,0.000000,-0.720787]
         },
-        "models":
-        [
-            {
-                "model":"models/ships/thrust.model",
-                "position":[-511,20,-1],
-                "scale":[3,3,3],
-                "rotation":[0,0,180]
-            },
-            {
-                "model":"models/ships/thrust.model",
-                "position":[-489,20,-1],
-                "scale":[3,3,3],
-                "rotation":[0,0,180]
-            }
-            {
-                "model":"models/ships/thrust.model",
-                "position":[-503,20,2],
-                "scale":[3,3,3],
-                "rotation":[0,0,180]
-            },
-            {
-                "model":"models/ships/thrust.model",
-                "position":[-498,20,2],
-                "scale":[3,3,3],
-                "rotation":[0,0,180]
-            }
-        ],
+        "models":[],
         "entities":
         [
             {
