@@ -125,6 +125,9 @@ void mission_build_facility(Mission *mission)
             facility->staffAssigned = facility->staffPositions;
         }
     }
+    gf2d_window_refresh_by_name("section_view_menu");
+    gf2d_window_refresh_by_name("station_facility_menu");
+    gf2d_window_refresh_by_name("facility_list_menu");
     message_printf("Construction of Facility %s complete",facility->displayName);
 }
 
@@ -138,6 +141,8 @@ void mission_build_section(Mission *mission)
     section->hull = section->hullMax;
     section->mission = NULL;
     message_printf("Construction of Station Section %s complete",section->displayName);
+    gf2d_window_refresh_by_name("section_view_menu");
+    gf2d_window_refresh_by_name("section_list_menu");
 }
 
 void mission_remove_facility(Mission *mission)
@@ -151,6 +156,9 @@ void mission_remove_facility(Mission *mission)
     resource_list_sell(player_get_resources(), cost,0.9);
     resources_list_free(cost);
     station_facility_remove(facility);
+    gf2d_window_refresh_by_name("section_view_menu");
+    gf2d_window_refresh_by_name("station_facility_menu");
+    gf2d_window_refresh_by_name("facility_list_menu");
     message_printf("Facility %s removal complete",facility->displayName);
 }
 
@@ -166,6 +174,8 @@ void mission_remove_section(Mission *mission)
     resources_list_free(cost);
     station_remove_section(player_get_station_data(),section);
     message_printf("Section %s removal complete",section->displayName);
+    gf2d_window_refresh_by_name("section_view_menu");
+    gf2d_window_refresh_by_name("section_list_menu");
 }
 
 void mission_buy_commodity(Mission *mission)
@@ -185,6 +195,8 @@ void mission_repair_section(Mission *mission)
     section = station_get_section_by_id(player_get_station_data(),mission->targetId);
     if (!section)return;
     station_section_repair(section);
+    gf2d_window_refresh_by_name("section_view_menu");
+    gf2d_window_refresh_by_name("section_list_menu");
 }
 
 void mission_repair_facility(Mission *mission)
@@ -197,6 +209,9 @@ void mission_repair_facility(Mission *mission)
         slog("no facility found by name of %s id %i",station_facility_get_name_from_display(mission->missionTarget),mission->targetId);
         return;
     }
+    gf2d_window_refresh_by_name("section_view_menu");
+    gf2d_window_refresh_by_name("station_facility_menu");
+    gf2d_window_refresh_by_name("facility_list_menu");
     station_facility_repair(facility);
 }
 

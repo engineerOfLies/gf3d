@@ -29,12 +29,7 @@
 
 typedef struct
 {
-    int   facilityLimit;
-    List *facilityList;
-    List *typeList;
     StationFacility *facility;
-    const char *selected;
-    int choice;
     int lastUpdated;
 }FacilityMenuData;
 
@@ -45,7 +40,6 @@ int facility_menu_free(Window *win)
     FacilityMenuData *data;
     if ((!win)||(!win->data))return 0;
     data = win->data;
-    if (data->typeList)gfc_list_delete(data->typeList);
     gf2d_window_close_child(win,win->child);
     gf2d_window_close_child(win->parent,win);
     free(data);
@@ -54,36 +48,8 @@ int facility_menu_free(Window *win)
 
 int facility_menu_draw(Window *win)
 {
-//    int hidden;
-//     FacilityMenuData *data;
     if ((!win)||(!win->data))return 0;
-    facility_menu_refresh_view(win);
-//     data = win->data;
-/*    if (gfc_list_get_count(data->facilityList)< data->facilityLimit)hidden = 0;
-    else hidden = 1;
-    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"), hidden);*/
     return 0;
-}
-
-void facility_menu_select_item(Window *win,int choice)
-{
-    FacilityMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    station_facility_check(data->facility);
-
-    if (choice < 0)
-    {
-        choice = data->choice;
-    }
-    if (choice != data->choice)
-    {
-        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_COLOR_YELLOW);
-        data->choice = choice;
-    }
-    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_COLOR_CYAN);
-    data->facility = gfc_list_get_nth(data->facilityList,choice);
-    facility_menu_refresh_view(win);
 }
 
 void facility_menu_refresh_view(Window *win)
@@ -121,7 +87,6 @@ void facility_menu_refresh_view(Window *win)
     }
     station_facility_check(data->facility);
     gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"sell"),0);
-    gf2d_element_set_hidden(gf2d_window_get_element_by_name(win,"buy"),1);
     planet_menu_set_camera_at_site(win->parent,data->facility->position);
     if ((!data->facility->inactive)&&(!data->facility->disabled))
     {
@@ -136,7 +101,7 @@ void facility_menu_refresh_view(Window *win)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"disable_label"),"Enable");
     }
     
-    name = data->selected = station_facility_get_display_name(data->facility->name);
+    name = station_facility_get_display_name(data->facility->name);
     gfc_line_sprintf(buffer,"Staff: %i / %i",data->facility->staffAssigned,data->facility->staffPositions);
     if (data->facility->staffAssigned < data->facility->staffRequired)
     {
@@ -213,13 +178,12 @@ void facility_menu_refresh_view(Window *win)
     if (!def)return;
     str = sj_object_get_value_as_string(def,"description");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),str);
-    data->selected = name;
     str = sj_object_get_value_as_string(def,"icon");
     if (str)
     {
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     }
-
+    //upkeep
     resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"upkeep");
     e = gf2d_window_get_element_by_name(win,"upkeep");
     gf2d_element_list_free_items(e);
@@ -229,6 +193,7 @@ void facility_menu_refresh_view(Window *win)
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
     }
+    //features
     resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"produces");
     e = gf2d_window_get_element_by_name(win,"features_list");
     gf2d_element_list_free_items(e);
@@ -262,28 +227,23 @@ void facility_menu_yes(void *Data)
 {
     Window *win;
     TextLine buffer;
-    StationFacility *facility;
     FacilityMenuData *data;
     win = Data;
     if (!win)return;
     win->child = NULL;
     data = win->data;
     if (!data)return;
-    if (!data->selected)return;
     
-    facility = gfc_list_get_nth(data->facilityList,data->choice);
-    if (!facility)return;
-    
-    gfc_line_sprintf(buffer,"%i",facility->id);
-    facility->mission = mission_begin(
+    gfc_line_sprintf(buffer,"%i",data->facility->id);
+    data->facility->mission = mission_begin(
         "Facility Removal",
         NULL,
         "removal",
         "facility",
-        station_facility_get_display_name(facility->name),
-        facility->id,
+        station_facility_get_display_name(data->facility->name),
+        data->facility->id,
         player_get_day(),
-        station_facility_get_build_time(facility->name)/2,
+        station_facility_get_build_time(data->facility->name)/2,
         0);//TODO make this staffed
 
     facility_menu_refresh_view(win);
@@ -375,7 +335,7 @@ int facility_menu_update(Window *win,List *updateList)
                 return 1;
             }
             if (win->child)return 1;
-            win->child = work_menu(win,NULL,NULL,data->facility,"repair",NULL,vector2d(0,0));
+            win->child = work_menu(win,NULL,NULL,data->facility,"repair",NULL,vector2d(0,0),NULL,NULL);
             return 1;
         }
         if (strcmp(e->name,"sell")==0)
@@ -387,7 +347,7 @@ int facility_menu_update(Window *win,List *updateList)
             }
             if (!data->facility)return 1;
             if (win->child)return 1;
-            win->child = work_menu(win,NULL,NULL,data->facility,"remove",NULL,vector2d(0,0));
+            win->child = work_menu(win,NULL,NULL,data->facility,"remove",NULL,vector2d(0,0),(gfc_work_func*)gf2d_window_free,win);
             return 1;
         }
 
@@ -436,74 +396,16 @@ int facility_menu_update(Window *win,List *updateList)
             facility_menu_refresh_view(win);
             return 1;
         }
-        if (strcmp(e->name,"buy")==0)
-        {
-            if (win->child)return 1;
-            win->child = facility_buy_menu(win,data->facilityList, data->typeList,vector2d(0,0));
-            return 1;
-        }
-        if (e->index >= 1000)
-        {
-            facility_menu_select_item(win,e->index - 1000);
-            return 1;
-        }
     }
     if (gfc_input_command_released("cancel"))
     {
         gf2d_window_free(win);
         return 1;
     }
-    if ((gf2d_mouse_button_state(0))||(gf2d_mouse_button_state(1)))
-    {
-        if (!gf2d_window_mouse_in(win))
-        {
-            gf2d_window_free(win);
-            return 1;
-        }
-    }
     return 0;
 }
 
-void facility_menu_set_list(Window *win)
-{
-    TextLine buffer;
-    const char *str;
-    StationFacility *facility;
-    Element *button;
-    Element *item_list;
-    int i,c;
-    FacilityMenuData *data;
-    if ((!win)||(!win->data))return;
-    if (strcmp(win->name,"station_facility_menu")!= 0)return;
-    data = win->data;
-    if (!data->facilityList)return;
-    c = data->facilityLimit;
-    item_list = gf2d_window_get_element_by_name(win,"item_list");
-    if (!item_list)return;
-    gf2d_element_list_free_items(item_list);
-    for (i = 0; i < c; i++)
-    {
-        facility = gfc_list_get_nth(data->facilityList ,i);
-        if (!facility)
-        {
-            button = gf2d_button_new_label_simple(win,1000+i,"<Empty>",FT_Small,vector2d(1,30),GFC_COLOR_YELLOW);
-            if (!button)continue;
-            gf2d_element_list_add_item(item_list,button);
-            continue;
-        }
-        str = station_facility_get_display_name(facility->name);
-        if (str)
-        {
-            gfc_line_sprintf(buffer,"%s %i",str,facility->id);
-            button = gf2d_button_new_label_simple(win,1000+i,buffer,FT_Small,vector2d(1,30),GFC_COLOR_YELLOW);
-            if (!button)continue;
-            gf2d_element_list_add_item(item_list,button);
-        }
-    }
-    facility_menu_select_item(win,0);
-}
-
-Window *facility_menu(Window *parent, List *facility_list,int slot_limit, List *type_list)
+Window *facility_menu(Window *parent, StationFacility *facility)
 {
     Window *win;
     FacilityMenuData* data;
@@ -520,10 +422,8 @@ Window *facility_menu(Window *parent, List *facility_list,int slot_limit, List *
     data = (FacilityMenuData*)gfc_allocate_array(sizeof(FacilityMenuData),1);
     win->data = data;
     win->parent = parent;
-    data->typeList = type_list;
-    data->facilityList = facility_list;
-    data->facilityLimit = slot_limit;
-    facility_menu_set_list(win);
+    data->facility = facility;
+    facility_menu_refresh_view(win);
     message_buffer_bubble();
     return win;
 }

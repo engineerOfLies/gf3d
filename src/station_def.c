@@ -13,6 +13,64 @@ void station_def_load(const char *filename)
     config_def_load(filename);
 }
 
+int station_def_get_section_mountType_count(const char *name,const char *mountType)
+{
+    int count = 0;
+    int i,c;
+    const char *str;
+    SJson *def,*list,*item;
+    if (!name)return 0;
+    def = config_def_get_by_name("sections",name);
+    if (!def)return 0;
+    list = sj_object_get_value(def,"extensions");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"mountType");
+        if (!str)continue;
+        if (gfc_strlcmp(str,mountType)== 0)count++;
+    }
+    return count;
+}
+
+List *station_def_get_section_extension_types(const char *name)
+{
+    int i,c;
+    int j,k;
+    const char *str;
+    const char *str2;
+    SJson *def,*list,*item;
+    List *extTypes;
+    if (!name)return NULL;
+    def = config_def_get_by_name("sections",name);
+    if (!def)return NULL;
+    extTypes = gfc_list_new();
+    list = sj_object_get_value(def,"extensions");
+    c = sj_array_get_count(list);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"mountType");
+        if (!str)continue;
+        k = gfc_list_get_count(extTypes);
+        for (j = 0; j<k;j++)
+        {
+            str2 = gfc_list_get_nth(extTypes,j);
+            if (!str2)continue;
+            if (gfc_strlcmp(str,str2)==0)
+            {
+                goto end;//break out of this loop and skip to the end of the outer loop
+            }
+        }
+        gfc_list_append(extTypes,(void *)str);
+        end: continue;
+    }
+    return extTypes;
+}
+
 List *station_def_get_section_list()
 {
     int i,c;

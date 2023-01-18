@@ -13,6 +13,8 @@
  * @param facility you need this for a facility remove or repair order
  * @param action what is happening "repair","remove","build_facility","build_section"
  * @param where if this a planet facility to be build, where to build it
+ * @param callback (optional) if set, this function will be called when the menu closes
+ * @param callbackData data provided to the callback
  * @return a pointer to the new window, NULL if failed
  */
 Window *work_menu(
@@ -22,7 +24,9 @@ Window *work_menu(
     StationFacility *facility,
     const char *action,
     const char *what,
-    Vector2D where);
+    Vector2D where,
+    void (*callback)(void *),
+    void *callbackData);
 
 
 #endif

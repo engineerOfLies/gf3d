@@ -26,6 +26,7 @@
 #include "facility_menu.h"
 #include "work_menu.h"
 #include "facility_list_menu.h"
+#include "section_list_menu.h"
 #include "station_menu.h"
 
 typedef struct
@@ -140,7 +141,7 @@ void station_menu_child_build(void *Data)
         message_new("cannot build on that extension slot, it is already in use");
         return;
     }
-    win->child = station_buy_menu(win,data->station,data->selection,data->choice,station_def_get_section_list());
+    win->child = station_buy_menu(win,data->station,data->selection,data->choice);
 }
 
 void station_menu_yes(void *Data)
@@ -193,7 +194,8 @@ int station_menu_update(Window *win,List *updateList)
         
         if (strcmp(e->name,"sections")==0)
         {
-            station_menu_section_list(win);
+            if (win->child)return 1;
+            win->child = section_list_menu(win);
             return 1;
         }
         if (strcmp(e->name,"facilities_view")==0)
@@ -271,7 +273,7 @@ int station_menu_update(Window *win,List *updateList)
                     message_new("cannot sell section, it's facilities have active jobs");
                     return 1;
                 }
-                win->child = work_menu(win,NULL,data->selection,NULL,"remove",NULL,vector2d(0,0));
+                win->child = work_menu(win,NULL,data->selection,NULL,"remove",NULL,vector2d(0,0),(gfc_work_func*)gf2d_window_free,win);
             }
             return 1;
         }
@@ -299,30 +301,6 @@ int station_menu_update(Window *win,List *updateList)
             }
             return 1;
         }
-        if (strcmp(e->name,"facilities")==0)
-        {
-            if (win->child)//if already open now close it
-            {
-                return 1;
-            }
-            if (data->selection->hull < 0)
-            {
-                message_new("under construction");
-                return 1;
-            }
-            if ((data->selection)&&(data->selection->facilitySlots > 0))
-            {
-                win->child = facility_menu(
-                    win,
-                    data->selection->facilities,
-                    data->selection->facilitySlots,
-                    station_facility_get_possible_list(data->selection));
-            }
-            else
-            {
-                message_new("Station section cannot support facilities");
-            }
-        }
         if (strcmp(e->name,"repair")==0)
         {
             if (!data->selection)return 1;
@@ -342,7 +320,7 @@ int station_menu_update(Window *win,List *updateList)
                 return 1;
             }
             if (win->child)return 1;
-            win->child = work_menu(win,NULL,data->selection,NULL,"repair",NULL,vector2d(0,0));
+            win->child = work_menu(win,NULL,data->selection,NULL,"repair",NULL,vector2d(0,0),NULL,NULL);
             return 1;
         }
         if (strcmp(e->name,"build")==0)

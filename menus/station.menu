@@ -7,7 +7,7 @@
         {
             "type": "list",
             "name": "list",
-            "bounds": [10,0,1,1],
+            "bounds": [10,0,220,1],
             "style": "vertical",
             "item_size" : [1,40],
             "packed":true,
@@ -16,16 +16,66 @@
                 {
                     "type": "label",
                     "bounds": [0,0,1,32],
-                    "text":"Station",
+                    "text":"Station Overview",
                     "justify" : "center",
                     "align" : "middle",
                     "style":"H4"
                 },
                 {
                     "type": "label",
+                    "name":"station_name",
+                    "bounds": [0,0,1,25],
+                    "text":"Antioch Station",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "button",
+                    "name":"rename",
+                    "bounds": [130,0,80,21],
+                    "hotkey":"rename",
+                    "sound":"confirm",
+                    "label" :
+                    {
+                        "type": "label",
+                        "text":"rename",
+                        "bounds": [0,0,80,24],
+                        "justify" : "center",
+                        "align" : "middle",
+                        "style":"H6"
+                    },
+                    "actor" :
+                    {
+                        "type": "actor",
+                        "bounds": [0,0,40,24],
+                        "scale":[0.5,0.5],
+                        "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                    "type": "label",
                     "name":"station_hull",
-                    "bounds": [0,0,130,25],
+                    "bounds": [0,0,1,25],
                     "text":"Station Hull: 1000/1000",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "name":"energy_draw",
+                    "bounds": [0,0,1,25],
+                    "text":"Energy Draw: 4",
+                    "justify" : "left",
+                    "align" : "middle",
+                    "style":"H6"
+                },
+                {
+                    "type": "label",
+                    "name":"energy_output",
+                    "bounds": [0,0,1,25],
+                    "text":"Energy Output: 4",
                     "justify" : "left",
                     "align" : "middle",
                     "style":"H6"
@@ -56,7 +106,7 @@
                             "label" :
                             {
                                 "type": "label",
-                                "text":"select",
+                                "text":"view all",
                                 "bounds": [0,0,80,24],
                                 "justify" : "center",
                                 "align" : "middle",
@@ -116,13 +166,18 @@
                 },
                 {
                     "type": "label",
+                    "bounds": [0,0,1,25],
+                    "text":" "
+                },
+                {
+                    "type": "label",
                     "name":"section_name",
-                    "bounds": [0,0,0.9565,40],
+                    "bounds": [0,0,1,25],
                     "text":"Station Core",
                     "wraps":true,
                     "justify" : "center",
                     "align" : "middle",
-                    "style":"H5"
+                    "style":"H6"
                 },
                 {
                     "type": "label",
@@ -155,142 +210,6 @@
                         "scale":[0.5,0.5],
                         "actor" : "actors/button.actor"
                     }
-                },
-                {
-                    "type": "label",
-                    "bounds": [0,0,1,30],
-                    "text":"Stats",
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H6"
-                },
-                {
-                    "type": "list",
-                    "bounds": [0,0,1,25],
-                    "style": "horizontal",
-                    "packed":true,
-                    "item_size" : [80,1],
-                    "elements":
-                    [
-                        {
-                            "type": "label",
-                            "name":"hull",
-                            "bounds": [0,0,130,25],
-                            "text":"Hull: 1000/1000",
-                            "justify" : "left",
-                            "align" : "middle",
-                            "style":"H6"
-                        },
-                        {
-                            "type": "button",
-                            "name":"repair",
-                            "bounds": [0,0,80,21],
-                            "hotkey":"none",
-                            "sound":"confirm",
-                            "label" :
-                            {
-                                "type": "label",
-                                "text":"Repair",
-                                "bounds": [0,0,80,24],
-                                "justify" : "center",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            "actor" :
-                            {
-                                "type": "actor",
-                                "bounds": [0,0,40,24],
-                                "scale":[0.5,0.5],
-                                "actor" : "actors/button.actor"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "label",
-                    "name":"energy_draw",
-                    "bounds": [0,0,1,25],
-                    "text":"Energy Draw: 4",
-                    "justify" : "left",
-                    "align" : "middle",
-                    "style":"H6"
-                },
-                {
-                    "type": "label",
-                    "name":"energy_output",
-                    "bounds": [0,0,1,25],
-                    "text":"Energy Output: 4",
-                    "justify" : "left",
-                    "align" : "middle",
-                    "style":"H6"
-                },
-                {
-                    "type": "label",
-                    "name":"storage",
-                    "bounds": [0,0,1,25],
-                    "text":"Storage Capacity: 0",
-                    "justify" : "left",
-                    "align" : "middle",
-                    "style":"H6"
-                },
-                {
-                    "type": "label",
-                    "bounds": [0,0,1,30],
-                    "text":"Facilities",
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H6"
-                },
-                {
-                    "type": "label",
-                    "name":"facility_slots",
-                    "bounds": [0,0,1,25],
-                    "text":"Facility Slots: 4",
-                    "justify" : "left",
-                    "align" : "middle",
-                    "style":"H6"
-                },
-                {
-                    "type": "list",
-                    "bounds": [0,0,1,25],
-                    "style": "horizontal",
-                    "packed":true,
-                    "item_size" : [80,1],
-                    "elements":
-                    [
-                        {
-                            "type": "label",
-                            "bounds": [0,0,130,25],
-                            "name":"section_facility_count",
-                            "text":"Facilities : 1",
-                            "justify" : "left",
-                            "align" : "middle",
-                            "style":"H6"
-                        },
-                        {
-                            "type": "button",
-                            "name":"facilities",
-                            "bounds": [0,0,80,21],
-                            "hotkey":"none",
-                            "sound":"confirm",
-                            "label" :
-                            {
-                                "type": "label",
-                                "text":"view",
-                                "bounds": [0,0,80,24],
-                                "justify" : "center",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            "actor" :
-                            {
-                                "type": "actor",
-                                "bounds": [0,0,40,24],
-                                "scale":[0.5,0.5],
-                                "actor" : "actors/button.actor"
-                            }
-                        }
-                    ]
                 },
                 {
                     "type": "label",
@@ -350,52 +269,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "type": "button",
-                    "name":"build",
-                    "bounds": [130,0,80,21],
-                    "hotkey":"none",
-                    "sound":"confirm",
-                    "label" :
-                    {
-                        "type": "label",
-                        "text":"build",
-                        "bounds": [0,0,80,24],
-                        "justify" : "center",
-                        "align" : "middle",
-                        "style":"H6"
-                    },
-                    "actor" :
-                    {
-                        "type": "actor",
-                        "bounds": [0,0,40,24],
-                        "scale":[0.5,0.5],
-                        "actor" : "actors/button.actor"
-                    }
-                },
-                {
-                    "type": "button",
-                    "name":"sell",
-                    "bounds": [5,0,80,21],
-                    "hotkey":"none",
-                    "sound":"confirm",
-                    "label" :
-                    {
-                        "type": "label",
-                        "text":"sell",
-                        "bounds": [0,0,80,24],
-                        "justify" : "center",
-                        "align" : "middle",
-                        "style":"H6"
-                    },
-                    "actor" :
-                    {
-                        "type": "actor",
-                        "bounds": [0,0,40,24],
-                        "scale":[0.5,0.5],
-                        "actor" : "actors/red_button.actor"
-                    }
                 }
             ]
         }

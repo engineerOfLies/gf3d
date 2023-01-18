@@ -197,7 +197,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
             if (win->child)return 1;
             if (facility_buy_check_possible(win))
             {
-                win->child = work_menu(win, data->facilityList, NULL, NULL,"build_facility",station_facility_get_name_from_display(data->selected),data->position);
+                win->child = work_menu(win, data->facilityList, NULL, NULL,"build_facility",station_facility_get_name_from_display(data->selected),data->position,(gfc_work_func*)gf2d_window_free,win);
                 return 1;
             }
             return 1;

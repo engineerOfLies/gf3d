@@ -45,7 +45,7 @@ int station_buy_menu_free(Window *win)
     StationBuyMenuData *data;
     if ((!win)||(!win->data))return 0;
     data = win->data;
-    resources_list_free(data->cost);
+    if (data->cost)resources_list_free(data->cost);
     gf2d_window_close_child(win->parent,win);
     free(data);
     return 0;
@@ -132,27 +132,8 @@ int station_buy_menu_update(Window *win,List *updateList)
                     NULL,
                     "build_section",
                     station_def_get_name_by_display(data->selected),
-                    vector2d(data->slot,0));
-/*                resource_list_buy(player_get_resources(), data->cost);
-                newSection = station_add_section(data->station,station_def_get_name_by_display(data->selected),-1,data->parent,data->slot);
-                if (!freeBuildMode)
-                {
-                    newSection->working = 1;
-                    newSection->hull = -1;
-                    gfc_line_sprintf(buffer,"%i",newSection->id);
-                    newSection->mission = mission_begin(
-                        "Section Construction",
-                        NULL,
-                        "build",
-                        "section",
-                        newSection->name,
-                        newSection->id,
-                        player_get_day(),
-                        station_def_get_build_time_by_name(newSection->name),
-                        0);
-                }
-                station_menu_select_segment(win->parent,newSection->id);
-                gf2d_window_free(win);*/
+                    vector2d(data->slot,0),
+                (gfc_work_func*)gf2d_window_free,win);
                 return 1;
             }
             else
@@ -217,7 +198,7 @@ void station_buy_menu_set_list(Window *win)
     station_buy_menu_select_item(win,choice,first);
 }
 
-Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,Uint8 slot,List *list)
+Window *station_buy_menu(Window *parent,StationData *station, StationSection *parentSection,Uint8 slot)
 {
     Window *win;
     StationBuyMenuData* data;
@@ -233,7 +214,7 @@ Window *station_buy_menu(Window *parent,StationData *station, StationSection *pa
     data = (StationBuyMenuData*)gfc_allocate_array(sizeof(StationBuyMenuData),1);
     win->data = data;
     win->parent = parent;
-    data->list = list;
+    data->list = station_def_get_section_list();
     data->station = station;
     data->parent = parentSection;
     data->slot = slot;

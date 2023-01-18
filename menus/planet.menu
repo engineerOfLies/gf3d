@@ -44,29 +44,6 @@
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
-                            },
-                            {
-                                "type": "button",
-                                "name":"facilities",
-                                "bounds": [0,0,80,21],
-                                "hotkey":"facilities",
-                                "sound":"confirm",
-                                "label" :
-                                {
-                                    "type": "label",
-                                    "text":"view",
-                                    "bounds": [0,0,80,24],
-                                    "justify" : "center",
-                                    "align" : "middle",
-                                    "style":"H6"
-                                },
-                                "actor" :
-                                {
-                                    "type": "actor",
-                                    "bounds": [0,0,40,24],
-                                    "scale":[0.5,0.5],
-                                    "actor" : "actors/button.actor"
-                                }
                             }
                         ]
                     },

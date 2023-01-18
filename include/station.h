@@ -103,6 +103,14 @@ StationSection *station_get_section_by_id(StationData *data,int id);
 StationSection *station_get_section_by_display_name(StationData *data,const char *displayName);
 
 /**
+ * @brief get the nth child of a section of the given slot type
+ * @param parent the section to check
+ * @param n the nth 
+ * @param slot_type the filter
+ */
+StationSection *station_section_get_nth_child_by_slot_type(StationSection *parent,Uint8 n,const char *slot_type);
+
+/**
  * @brief get a station section's child by its mounting slot
  * @param section the station section to query
  * @param slot the slot to check

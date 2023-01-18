@@ -99,4 +99,18 @@ int station_def_get_build_time_by_name(const char *name);
  */
 const char *station_def_get_name_by_display(const char *section);
 
+/**
+ * @brief get how many of a particular extension mount type there is for a station section
+ * @param name the section to check
+ * @param mountType the extension mount type
+ */
+int station_def_get_section_mountType_count(const char *name,const char *mountType);
+
+/**
+ * @brief get the list of mount types for a given station section
+ * @param name the section to check
+ * @return a list of strings.  the list should be deleted, the strings should NOT
+ */
+List *station_def_get_section_extension_types(const char *name);
+
 #endif

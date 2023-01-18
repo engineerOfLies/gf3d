@@ -48,9 +48,7 @@ int facility_list_menu_free(Window *win)
 int facility_list_menu_update(Window *win,List *updateList)
 {
     int i,count;
-//    TextLine buffer;
     Element *e;
-    PlanetData *planet;
     StationFacility *facility;
     StationSection *section;
     FacilityListMenuData *data;
@@ -79,13 +77,7 @@ int facility_list_menu_update(Window *win,List *updateList)
                 //planet based facility
                 if (!win->child)
                 {
-                    planet = player_get_planet();
-                    win->child = facility_menu(
-                        win,
-                        planet->facilities,
-                        gfc_list_get_count(planet->facilities),
-                        NULL);
-                    facility_menu_select_item(win->child,gfc_list_get_item_index(planet->facilities,facility));
+                    win->child = facility_menu(win,facility);
                 }
                 return 1;
             }
@@ -94,12 +86,7 @@ int facility_list_menu_update(Window *win,List *updateList)
             {
                 if (!win->child)
                 {
-                    win->child = facility_menu(
-                        win,
-                        section->facilities,
-                        section->facilitySlots,
-                        station_facility_get_possible_list(section));
-                    facility_menu_select_item(win->child,gfc_list_get_item_index(section->facilities,facility));
+                    win->child = facility_menu(win,facility);
                 }
                 return 1;
             }
@@ -350,6 +337,7 @@ Window *facility_list_menu(Window *parent)
     win->update = facility_list_menu_update;
     win->free_data = facility_list_menu_free;
     win->draw = facility_list_menu_draw;
+    win->refresh = facility_list_menu_update_resources;
     facility_list_menu_update_resources(win);
     message_buffer_bubble();
     return win;

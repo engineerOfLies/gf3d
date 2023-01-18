@@ -38,6 +38,28 @@ StationSection *station_get_section_by_id(StationData *data,int id)
     return NULL;
 }
 
+StationSection *station_section_get_nth_child_by_slot_type(StationSection *parent,Uint8 n,const char *slot_type)
+{
+    int i,c;
+    int count = 0;
+    StationSection *child;
+    const char *str;
+    if ((!parent)||(!slot_type))return NULL;
+    c = gfc_list_get_count(parent->children);
+    for (i = 0; i < c; i++)
+    {
+        child = gfc_list_get_nth(parent->children,i);
+        if (!child)continue;
+        str = station_def_get_mount_type(child->name);
+        if (gfc_strlcmp(str,slot_type)==0)
+        {
+            if (count == n)return child;
+            count++;
+        }
+    }
+    return NULL;
+}
+
 StationSection *station_get_section_by_display_name(StationData *data,const char *displayName)
 {
     int i,c;

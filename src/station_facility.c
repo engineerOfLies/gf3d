@@ -302,7 +302,7 @@ void station_facility_remove(StationFacility *facility)
         //station section
         gfc_list_delete_data(section->facilities,facility);
         station_facility_free(facility);
-        facility_menu_set_list(gf2d_window_get_by_name("station_facility_menu"));
+        gf2d_window_refresh_by_name("station_facility_menu");
         return;
     }
     planet = player_get_planet();
@@ -313,13 +313,13 @@ void station_facility_remove(StationFacility *facility)
             gfc_list_delete_data(planet->facilities,facility);
             slog("planet facility %s removed",facility->displayName);
             station_facility_free(facility);
-            facility_menu_set_list(gf2d_window_get_by_name("station_facility_menu"));
+            gf2d_window_refresh_by_name("station_facility_menu");
             return;
         }
     }
     // any other place where a facility may be
     station_facility_free(facility);//couldn't find it anywhere, but still delete it
-    facility_menu_set_list(gf2d_window_get_by_name("station_facility_menu"));
+    gf2d_window_refresh_by_name("station_facility_menu");
 }
 
 Uint32 station_facility_get_build_time(const char *name)
@@ -620,7 +620,7 @@ void station_facility_build(const char *name,Vector2D position,List *parentList,
             buildTime,
             staff);
     }
-    facility_menu_set_list(gf2d_window_get_by_name("facility_menu"));
+    gf2d_window_refresh_by_name("station_facility_menu");
     resources_list_free(cost);
 }
 
@@ -737,18 +737,12 @@ List *station_facility_get_resource_cost(const char *name,const char *resource_t
 
 void station_facility_repair(StationFacility *facility)
 {
-    Window *win;
     if (!facility)return;
     message_printf("Facility %s has been repaired!",facility->displayName);
     facility->working = 0;
     facility->damage = 0;
     facility->mission = NULL;
-    win = gf2d_window_get_by_name("station_facility_menu");
-    if (win)
-    {
-        facility_menu_select_item(win,-1);
-    }
-
+    gf2d_window_refresh_by_name("station_facility_menu");
 }
 
 

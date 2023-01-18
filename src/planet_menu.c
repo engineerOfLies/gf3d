@@ -71,27 +71,11 @@ int planet_menu_update(Window *win,List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if (strcmp(e->name,"facilities")==0)
-        {
-            if (win->child)return 1;
-            if (gfc_list_get_count(data->planet->facilities) <= 0)return 1;
-            win->child = facility_menu(
-                win,
-                data->planet->facilities,
-                gfc_list_get_count(data->planet->facilities),
-                NULL);
-            return 1;
-        }
         if (strcmp(e->name,"facility_view")==0)
         {
             if (win->child)return 1;
             if (!data->facility)return 1;
-            win->child = facility_menu(
-                win,
-                data->planet->facilities,
-                gfc_list_get_count(data->planet->facilities),
-                NULL);
-            facility_menu_select_item(win->child,gfc_list_get_item_index(data->planet->facilities,data->facility));
+            win->child = facility_menu(win,data->facility);
             return 1;
         }
         if (strcmp(e->name,"build")==0)

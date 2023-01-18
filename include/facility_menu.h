@@ -4,12 +4,7 @@
 #include "gf2d_windows.h"
 #include "station_facility.h"
 
-Window *facility_menu(Window *parent, List *facility_list,int slot_limit, List *type_list);
-
-void facility_menu_set_list(Window *win);
-
-void facility_menu_select_item(Window *win,int choice);
-void facility_menu_refresh_view(Window *win);
+Window *facility_menu(Window *parent, StationFacility *facility);
 
 
 #endif

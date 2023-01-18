@@ -48,6 +48,7 @@ typedef struct
     StationFacility *facility;
     List *facilityList;
     Vector2D position;
+    Callback callback;
 }WorkMenuData;
 
 void work_menu_setup(Window *win,WorkMenuData *data);
@@ -59,6 +60,7 @@ int work_menu_free(Window *win)
     data = win->data;
     resources_list_free(data->costs);
     gf2d_window_close_child(win->parent,win);
+    gfc_callback_call(&data->callback);
     free(data);
     return 0;
 }
@@ -81,14 +83,6 @@ void work_mission(Window *win)
         station_facility_build(data->what,data->position,data->facilityList,data->staffAssigned,data->daysToComplete);
 
         message_new("Build Mission Begin!");
-        if (win->parent)
-        {
-            if ((strcmp(win->parent->name,"station_buy_menu") == 0)||
-                (strcmp(win->parent->name,"facility_buy_menu") == 0))
-            {
-                gf2d_window_free(win->parent);
-            }
-        }
         gf2d_window_free(win);
         return;
     }
@@ -116,14 +110,7 @@ void work_mission(Window *win)
             data->daysToComplete,
             data->staffAssigned);
         message_new("Build Mission Begin!");
-        if (win->parent)
-        {
-            if ((strcmp(win->parent->name,"station_buy_menu") == 0)||
-                (strcmp(win->parent->name,"facility_buy_menu") == 0))
-            {
-                gf2d_window_free(win->parent);
-            }
-        }
+        gf2d_window_refresh_by_name("section_view_menu");
         station_menu_select_segment(gf2d_window_get_by_name("station_menu"),newSection->id);
         gf2d_window_free(win);
         return;
@@ -175,7 +162,6 @@ void work_mission(Window *win)
             }
         }
         data->facility->working = 1;
-        facility_menu_refresh_view(gf2d_window_get_by_name("station_facility_menu"));
     }
     else if (data->section)
     {
@@ -205,7 +191,7 @@ void work_mission(Window *win)
                 data->section->mission = mission_begin(
                     "Section Remove",
                     NULL,
-                    "remove",
+                    "removal",
                     "section",
                     data->section->displayName,
                     data->section->id,
@@ -609,7 +595,10 @@ Window *work_menu(
     StationFacility *facility,
     const char *action,
     const char *what,
-    Vector2D where)
+    Vector2D where,
+    void (*callback)(void *),
+    void *callbackData
+)
 {
     Window *win;
     WorkMenuData *data;
@@ -646,6 +635,8 @@ Window *work_menu(
     data->facilityList = facilityList;
     data->section = section;
     data->facility = facility;
+    data->callback.callback = callback;
+    data->callback.data = callbackData;
     vector2d_copy(data->position,where);
     work_menu_setup(win,data);
     message_buffer_bubble();
