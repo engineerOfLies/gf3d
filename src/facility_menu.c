@@ -104,7 +104,7 @@ void facility_menu_refresh_view(Window *win)
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),"Empty Slot");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),"This slot is free for new facility installation");
         gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),NULL);
-        gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"produces"));
+        gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"features"));
         gf2d_element_list_free_items(gf2d_window_get_element_by_name(win,"upkeep"));
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productivity"),"Productivity: 0");
         gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"staff"),"Staff: 0 / 0");
@@ -185,14 +185,7 @@ void facility_menu_refresh_view(Window *win)
     {
         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"damage"),GFC_COLOR_WHITE);
     }
-
-    gfc_line_sprintf(buffer,"Storage Capacity: %i",(int)data->facility->storage);
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"storage"),buffer);
-
-    gfc_line_sprintf(buffer,"Housing: %i",(int)data->facility->housing);
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"housing"),buffer);
-
-    gfc_line_sprintf(buffer,"productivity: %i",(int)(data->facility->productivity * 100));
+    gfc_line_sprintf(buffer,"productivity: %i %%",(int)(data->facility->productivity * 100));
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productivity"),buffer);
     
     if (data->facility->energyOutput > 0 )
@@ -237,21 +230,31 @@ void facility_menu_refresh_view(Window *win)
         resources_list_free(resources);
     }
     resources = station_facility_get_resource_cost(sj_object_get_value_as_string(def,"name"),"produces");
-    e = gf2d_window_get_element_by_name(win,"produces");
+    e = gf2d_window_get_element_by_name(win,"features_list");
     gf2d_element_list_free_items(e);
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productionNext"),"Next Production Day: ---");
     if (resources)
     {
         cost_list = resource_list_element_new(win,"produces_list", vector2d(0,0),resources,NULL,NULL);        
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
+        gfc_line_sprintf(buffer2,"Next Production Day: ---");
         if ((!data->facility->inactive)&&(!data->facility->disabled))
         {
             workTime = station_facility_get_work_time(data->facility->name);
             get_date_of(buffer2,data->facility->lastProduction + workTime);
             gfc_line_sprintf(buffer,"Next Production on: %s",buffer2);
-            gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"productionNext"),buffer);
         }
+        gf2d_element_list_add_item(e,gf2d_label_new_simple(win,0,buffer2,FT_H6,GFC_COLOR_CYAN));
+    }
+    if (data->facility->storage > 0)
+    {
+        gfc_line_sprintf(buffer,"Storage Capacity: %i",(int)data->facility->storage);
+        gf2d_element_list_add_item(e,gf2d_label_new_simple(win,0,buffer,FT_H6,GFC_COLOR_WHITE));
+    }
+    if (data->facility->housing > 0)
+    {
+        gfc_line_sprintf(buffer,"Housing: %i",(int)data->facility->housing);
+        gf2d_element_list_add_item(e,gf2d_label_new_simple(win,0,buffer,FT_H6,GFC_COLOR_WHITE));
     }
 }
 
@@ -513,6 +516,7 @@ Window *facility_menu(Window *parent, List *facility_list,int slot_limit, List *
     win->update = facility_menu_update;
     win->free_data = facility_menu_free;
     win->draw = facility_menu_draw;
+    win->refresh = facility_menu_refresh_view;
     data = (FacilityMenuData*)gfc_allocate_array(sizeof(FacilityMenuData),1);
     win->data = data;
     win->parent = parent;

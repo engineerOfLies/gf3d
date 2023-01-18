@@ -8,8 +8,8 @@
     "salesTaxRate":"0.090000",
     "staff":"50",
     "population":"300",
-    "detailColorB":[0.05,0.05,0.75,1],
-    "detailColor":[0.2,0.6,0.2,1],
+    "detailColor":[0.05,0.05,0.75,1],
+    "detailColorB":[0.2,0.6,0.2,1],
     "hour":"0",
     "day":"0",
     "reputation":{

@@ -7,36 +7,6 @@
         "elements":
         [
             {
-                "type": "label",
-                "bounds": [8,8,200,40],
-                "text":"Facilities",
-                "justify" : "center",
-                "align" : "middle",
-                "style":"H4"
-            },
-            {
-                "type": "button",
-                "name":"buy",
-                "bounds": [420,440,160,42],
-                "hotkey":"buy",
-                "sound":"cancel",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"New",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,160,48],
-                    "actor" : "actors/button.actor"
-                }
-            },
-            {
                 "type": "button",
                 "name":"sell",
                 "bounds": [420,440,160,42],
@@ -45,7 +15,7 @@
                 "label" :
                 {
                     "type": "label",
-                    "text":"Remove",
+                    "text":"Sell",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
@@ -63,7 +33,7 @@
                 "name":"repair",
                 "bounds": [580,440,160,42],
                 "hotkey":"repair",
-                "sound":"confirm",
+                "sound":"cancel",
                 "label" :
                 {
                     "type": "label",
@@ -103,8 +73,16 @@
                 }
             },
             {
+                "type": "label",
+                "bounds": [0,8,1,40],
+                "text":"Facility Detail View",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
                 "type": "list",
-                "bounds": [0,0,1,1],
+                "bounds": [0,40,1,1],
                 "style": "horizontal",
                 "item_size" : [220,1],
                 "packed":true,
@@ -112,20 +90,7 @@
                 [
                     {
                         "type": "list",
-                        "name":"item_list",
-                        "bounds": [8,43,275,440],
-                        "style": "vertical",
-                        "backgroundColor":[0,0,0,250],
-                        "backgroundDraw":1,
-                        "packed":true,
-                        "item_size" : [1,45],
-                        "elements":
-                        [
-                        ]
-                    },
-                    {
-                        "type": "list",
-                        "bounds": [0,40,200,1],
+                        "bounds": [10,5,250,1],
                         "style": "vertical",
                         "item_size" : [1,30],
                         "packed":true,
@@ -142,85 +107,33 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [20,0,1,40],
-                                "text":"Produces",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H5"
-                            },
-                            {
-                                "type": "list",
-                                "bounds": [20,0,200,80],
-                                "name":"produces",
-                                "backgroundColor":[0,0,0,250],
-                                "backgroundDraw":1,
-                                "style": "vertical",
-                                "item_size" : [250,80],
-                                "packed":true,
-                                "elements":
-                                []
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [20,0,1,30],
-                                "name":"productionNext",
-                                "text":"Next Production: 4 days",
+                                "bounds": [0,0,1,25],
+                                "text":" ",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "bounds": [20,0,1,40],
-                                "text":"Upkeep",
+                                "bounds": [0,0,1,25],
+                                "name":"model",
+                                "text":"Model :",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
-                            },
-                            {
-                                "type": "list",
-                                "bounds": [20,0,200,80],
-                                "name":"upkeep",
-                                "style": "vertical",
-                                "backgroundColor":[0,0,0,250],
-                                "backgroundDraw":1,
-                                "item_size" : [250,80],
-                                "packed":true,
-                                "elements":
-                                []
-                            }
-                        ]
-                    },
-                    {
-                        "type": "list",
-                        "bounds": [0,20,230,1],
-                        "style": "vertical",
-                        "packed":true,
-                        "item_size" : [1,45],
-                        "elements":
-                        [
-                            {
-                                "type": "label",
-                                "name":"item_name",
-                                "bounds": [0,0,1,40],
-                                "text":"Display Facility Name",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H4"
+                                "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "name":"item_description",
-                                "wraps":true,
-                                "bounds": [0,0,432,140],
-                                "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
+                                "bounds": [0,0,1,25],
+                                "name":"location",
+                                "text":"Location :",
                                 "justify" : "left",
-                                "align" : "top",
+                                "align" : "middle",
                                 "style":"H6"
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,1,30],
+                                "bounds": [0,0,1,30],
                                 "style": "horizontal",
                                 "packed":true,
                                 "item_size" : [100,1],
@@ -228,14 +141,13 @@
                                 [
                                     {
                                         "type": "button",
-                                        "name":"office_hire",
+                                        "name":"officer_assign",
                                         "bounds": [0,0,80,21],
-                                        "hotkey":"none",
                                         "sound":"confirm",
                                         "label" :
                                         {
                                             "type": "label",
-                                            "text":"Assign",
+                                            "text":"Officer",
                                             "bounds": [0,0,80,24],
                                             "justify" : "center",
                                             "align" : "middle",
@@ -252,8 +164,8 @@
                                     {
                                         "type": "label",
                                         "bounds": [10,0,1,30],
-                                        "name":"officer",
-                                        "text":"Officer: <none>",
+                                        "name":"captain",
+                                        "text":"<none>",
                                         "justify" : "left",
                                         "align" : "middle",
                                         "style":"H6"
@@ -262,7 +174,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,1,30],
+                                "bounds": [0,0,1,30],
                                 "style": "horizontal",
                                 "packed":true,
                                 "item_size" : [80,1],
@@ -272,7 +184,6 @@
                                         "type": "button",
                                         "name":"staff_assign",
                                         "bounds": [0,0,40,21],
-                                        "hotkey":"none",
                                         "sound":"confirm",
                                         "label" :
                                         {
@@ -295,7 +206,6 @@
                                         "type": "button",
                                         "name":"staff_remove",
                                         "bounds": [0,0,40,21],
-                                        "hotkey":"none",
                                         "sound":"confirm",
                                         "label" :
                                         {
@@ -327,7 +237,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,1,30],
+                                "bounds": [0,0,1,30],
                                 "style": "horizontal",
                                 "packed":true,
                                 "item_size" : [80,1],
@@ -370,16 +280,7 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"mission",
-                                "text":"Mission: None",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [80,0,1,25],
+                                "bounds": [0,0,1,25],
                                 "name":"damage",
                                 "text":"Damage: None",
                                 "justify" : "left",
@@ -388,39 +289,122 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"storage",
-                                "text":"Storage: 0",
+                                "bounds": [0,0,1,25],
+                                "name":"mission",
+                                "text":"Mission: None",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"energy",
-                                "text":"Energy Draw: 0",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"H6"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [80,0,1,25],
+                                "bounds": [0,0,1,25],
                                 "name":"productivity",
-                                "text":"Productivity: 100%",
+                                "text":"Productivity: 0",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"housing",
-                                "text":"Housing: 0",
+                                "bounds": [0,0,1,25],
+                                "name":"energy",
+                                "text":"Energy Supply: 0",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,0,350,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "name":"item_name",
+                                "bounds": [0,0,1,30],
+                                "text":"Display Ship Name",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"normal"
+                            },
+                            {
+                                "type": "label",
+                                "name":"item_description",
+                                "wraps":true,
+                                "bounds": [0,0,1,180],
+                                "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
+                                "justify" : "left",
+                                "align" : "top",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "text":"Upkeep",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,144],
+                                "name":"upkeep",
+                                "style": "vertical",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
+                                "item_size" : [1,24],
+                                "packed":true,
+                                "scrollbar":
+                                {
+                                    "type": "scrollbar",
+                                    "backgroundColor":[20,200,255,255],
+                                    "style": "vertical"
+                                },
+                                "elements":
+                                []
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [10,0,280,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "text":"Facility Features",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,355],
+                                "name":"features_list",
+                                "style": "vertical",
+                                "backgroundColor":[0,0,0,250],
+                                "backgroundDraw":1,
+                                "item_size" : [1,24],
+                                "cropped":true,
+                                "scrolls":true,
+                                "scrollbar":
+                                {
+                                    "type": "scrollbar",
+                                    "backgroundColor":[20,200,255,255],
+                                    "style": "vertical"
+                                },
+                                "elements":
+                                []
                             }
                         ]
                     }
@@ -429,3 +413,4 @@
         ]
     }
 }
+
