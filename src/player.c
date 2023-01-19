@@ -18,6 +18,8 @@
 #include "event_manager.h"
 #include "player.h"
 
+extern int freeBuildMode;
+
 #define rollWeight 0.9
 
 static Entity *player_entity = NULL;
@@ -387,6 +389,11 @@ void player_draw(Entity *self)
 
 void player_think(Entity *self)
 {
+    PlayerData *data;
+    if ((!self)||(!self->data))return;
+    data = self->data;
+    if (!freeBuildMode)world_run_updates(data->world);
+
 }
 
 void player_update(Entity *self)

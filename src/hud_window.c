@@ -170,7 +170,6 @@ int hud_update(Window *win,List *updateList)
     if (!win)return 0;
     if (!updateList)return 0;
     data = (HUDWindowData*)win->data;
-    if ((!freeBuildMode)&&(!data->paused))world_run_updates(data->w);
     
     count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)

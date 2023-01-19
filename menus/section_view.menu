@@ -124,18 +124,40 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [0,0,1,25],
-                                "name":"mission",
-                                "text":"Mission: None",
+                                "bounds": [0,0,125,30],
+                                "name":"parent",
+                                "text":"Parent:",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
                             },
                             {
+                                "type": "button",
+                                "name":"parent_view",
+                                "bounds": [125,0,80,21],
+                                "sound":"confirm",
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"Parent",
+                                    "bounds": [0,0,80,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H6"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,80,24],
+                                    "scale":[0.5,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            },
+                            {
                                 "type": "label",
                                 "bounds": [0,0,1,25],
-                                "name":"parent",
-                                "text":"Parent Connection:",
+                                "name":"mission",
+                                "text":"Mission: None",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H6"
@@ -189,8 +211,8 @@
                             {
                                 "type": "label",
                                 "name":"item_name",
-                                "bounds": [0,0,1,30],
-                                "text":"Display Ship Name",
+                                "bounds": [0,0,1,40],
+                                "text":"Display Section Name",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"H5"
@@ -215,7 +237,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [0,0,1,144],
+                                "bounds": [0,0,1,134],
                                 "name":"extensions",
                                 "style": "vertical",
                                 "backgroundColor":[0,0,0,250],

@@ -241,7 +241,7 @@
                 "alloys":200
             },
             "buildTime":150,
-            "facility_slots":12,
+            "facility_slots":6,
             "facility_types":
             [
                 "operations",

@@ -74,6 +74,16 @@ void section_view_menu_refresh(Window *win)
     gf2d_element_actor_set_actor(gf2d_window_get_element_by_name(win,"item_picture"),str);
     //name
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),data->section->displayName);
+    //parent
+    if (data->section->parent)
+    {
+        gfc_line_sprintf(buffer,"Parent: %s",data->section->parent->displayName);
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"parent"),buffer);
+    }
+    else
+    {
+        gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"parent"),"Parent: <none>");   
+    }
     //model
     gfc_line_sprintf(buffer,"Model: %s",data->section->name);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"model"),buffer);
@@ -258,6 +268,13 @@ int section_view_menu_update(Window *win,List *updateList)
             facility = gfc_list_get_nth(data->section->facilities,e->index - 500);
             if (!facility) return 1;
             win->child = facility_menu(win, facility);
+            return 1;
+        }
+        if (strcmp(e->name,"parent_view")==0)
+        {
+            if (!data->section->parent)return 1;
+            data->section = data->section->parent;
+            gf2d_window_refresh(win);
             return 1;
         }
         if (strcmp(e->name,"repair")==0)

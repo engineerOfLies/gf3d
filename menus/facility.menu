@@ -327,8 +327,8 @@
                             {
                                 "type": "label",
                                 "name":"item_name",
-                                "bounds": [0,0,1,30],
-                                "text":"Display Ship Name",
+                                "bounds": [0,0,1,40],
+                                "text":"Display Facility Name",
                                 "justify" : "left",
                                 "align" : "middle",
                                 "style":"normal"
@@ -353,7 +353,7 @@
                             },
                             {
                                 "type": "list",
-                                "bounds": [0,0,1,144],
+                                "bounds": [0,0,1,134],
                                 "name":"upkeep",
                                 "style": "vertical",
                                 "backgroundColor":[0,0,0,250],

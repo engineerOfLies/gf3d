@@ -7,23 +7,37 @@
         "elements":
         [
             {
-                "type": "label",
-                "bounds": [8,8,200,40],
-                "text":"Buy Facility",
-                "justify" : "center",
-                "align" : "middle",
-                "style":"H4"
-            },
-            {
                 "type": "button",
-                "name":"buy",
-                "bounds": [580,440,160,42],
-                "hotkey":"repair",
-                "sound":"buy",
+                "name":"sell",
+                "bounds": [420,440,160,42],
+                "hotkey":"sell",
+                "sound":"cancel",
                 "label" :
                 {
                     "type": "label",
-                    "text":"Buy",
+                    "text":"Sell",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/red_button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"repair",
+                "bounds": [580,440,160,42],
+                "hotkey":"repair",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Repair",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",
@@ -59,8 +73,16 @@
                 }
             },
             {
+                "type": "label",
+                "bounds": [0,8,1,50],
+                "text":"Purchase Facility",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
                 "type": "list",
-                "bounds": [0,0,1,1],
+                "bounds": [0,40,1,1],
                 "style": "horizontal",
                 "item_size" : [220,1],
                 "packed":true,
@@ -68,9 +90,9 @@
                 [
                     {
                         "type": "list",
-                        "bounds": [0,0,200,1],
+                        "bounds": [10,5,250,1],
                         "style": "vertical",
-                        "item_size" : [1,45],
+                        "item_size" : [1,30],
                         "packed":true,
                         "elements":
                         [
@@ -79,55 +101,224 @@
                                 "name":"item_picture",
                                 "justify":"center",
                                 "align":"middle",
-                                "bounds":[35,40,128,128],
+                                "bounds":[35,0,128,128],
                                 "backgroundColor":[0,0,0,250],
                                 "backgroundDraw":1
                             },
                             {
                                 "type": "label",
-                                "bounds": [20,40,1,40],
-                                "text":"Produces",
+                                "bounds": [0,0,1,25],
+                                "text":" ",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
-                            },
-                            {
-                                "type": "list",
-                                "bounds": [20,40,200,80],
-                                "name":"produces",
-                                "style": "vertical",
-                                "backgroundColor":[0,0,0,250],
-                                "backgroundDraw":1,
-                                "item_size" : [250,100],
-                                "packed":true,
-                                "elements":
-                                []
+                                "style":"H6"
                             },
                             {
                                 "type": "label",
-                                "bounds": [20,40,1,40],
-                                "text":"Upkeep",
+                                "bounds": [0,0,1,25],
+                                "name":"model",
+                                "text":"Model :",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H5"
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"location",
+                                "text":"Location :",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
                             },
                             {
                                 "type": "list",
-                                "bounds": [20,40,200,80],
-                                "name":"upkeep",
-                                "style": "vertical",
-                                "backgroundColor":[0,0,0,250],
-                                "backgroundDraw":1,
-                                "item_size" : [250,100],
+                                "bounds": [0,0,1,30],
+                                "style": "horizontal",
                                 "packed":true,
+                                "item_size" : [100,1],
                                 "elements":
-                                []
+                                [
+                                    {
+                                        "type": "button",
+                                        "name":"officer_assign",
+                                        "bounds": [0,0,80,21],
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"Officer",
+                                            "bounds": [0,0,80,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H6"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,80,24],
+                                            "scale":[0.5,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "label",
+                                        "bounds": [10,0,1,30],
+                                        "name":"captain",
+                                        "text":"<none>",
+                                        "justify" : "left",
+                                        "align" : "middle",
+                                        "style":"H6"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,30],
+                                "style": "horizontal",
+                                "packed":true,
+                                "item_size" : [80,1],
+                                "elements":
+                                [
+                                    {
+                                        "type": "button",
+                                        "name":"staff_assign",
+                                        "bounds": [0,0,40,21],
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"+",
+                                            "bounds": [0,0,40,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H5"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,40,24],
+                                            "scale":[0.25,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "button",
+                                        "name":"staff_remove",
+                                        "bounds": [0,0,40,21],
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "text":"-",
+                                            "bounds": [0,0,40,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H5"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,40,24],
+                                            "scale":[0.25,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "label",
+                                        "bounds": [10,0,1,30],
+                                        "name":"staff",
+                                        "text":"Staff: 0 / 0",
+                                        "justify" : "left",
+                                        "align" : "middle",
+                                        "style":"H6"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,30],
+                                "style": "horizontal",
+                                "packed":true,
+                                "item_size" : [80,1],
+                                "elements":
+                                [
+                                    {
+                                        "type": "button",
+                                        "name":"disable",
+                                        "bounds": [0,0,80,21],
+                                        "hotkey":"none",
+                                        "sound":"confirm",
+                                        "label" :
+                                        {
+                                            "type": "label",
+                                            "name":"disable_label",
+                                            "text":"Disable",
+                                            "bounds": [0,0,80,24],
+                                            "justify" : "center",
+                                            "align" : "middle",
+                                            "style":"H6"
+                                        },
+                                        "actor" :
+                                        {
+                                            "type": "actor",
+                                            "bounds": [0,0,80,24],
+                                            "scale":[0.5,0.5],
+                                            "actor" : "actors/button.actor"
+                                        }
+                                    },
+                                    {
+                                        "type": "label",
+                                        "bounds": [10,0,1,30],
+                                        "name":"active",
+                                        "text":"Active: Yes",
+                                        "justify" : "left",
+                                        "align" : "middle",
+                                        "style":"H6"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"damage",
+                                "text":"Damage: None",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"mission",
+                                "text":"Mission: None",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"productivity",
+                                "text":"Productivity: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,25],
+                                "name":"energy",
+                                "text":"Energy Supply: 0",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
                             }
                         ]
                     },
                     {
                         "type": "list",
-                        "bounds": [0,20,200,1],
+                        "bounds": [0,0,350,1],
                         "style": "vertical",
                         "packed":true,
                         "item_size" : [1,45],
@@ -137,16 +328,16 @@
                                 "type": "label",
                                 "name":"item_name",
                                 "bounds": [0,0,1,40],
-                                "text":"Display Facility Name",
+                                "text":"Display Ship Name",
                                 "justify" : "left",
                                 "align" : "middle",
-                                "style":"H4"
+                                "style":"normal"
                             },
                             {
                                 "type": "label",
                                 "name":"item_description",
                                 "wraps":true,
-                                "bounds": [0,0,450,140],
+                                "bounds": [0,0,1,180],
                                 "text":"Item decription will go here asljkdflkjasdl;fkjasd;ljf alsjdflasjdflkajsddflkjasdfkljha sdkdjfhaskjfhh kjasdhflkjashf kljahsdfkjhasdfkjh",
                                 "justify" : "left",
                                 "align" : "top",
@@ -154,57 +345,64 @@
                             },
                             {
                                 "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"officer",
-                                "text":"Officer Needed: No",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"small"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"staff",
-                                "text":"Staff Required: 0",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"small"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"energy",
-                                "text":"Energy Draw: 0",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"small"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [80,0,1,25],
-                                "name":"storage",
-                                "text":"Storage Provided: No",
-                                "justify" : "left",
-                                "align" : "middle",
-                                "style":"small"
-                            },
-                            {
-                                "type": "label",
-                                "bounds": [80,0,1,30],
-                                "text":"Install Price",
-                                "justify" : "left",
+                                "bounds": [0,0,1,30],
+                                "text":"Upkeep",
+                                "justify" : "center",
                                 "align" : "middle",
                                 "style":"H5"
                             },
                             {
                                 "type": "list",
-                                "bounds": [80,0,350,100],
-                                "name":"costs",
+                                "bounds": [0,0,1,134],
+                                "name":"upkeep",
+                                "style": "vertical",
+                                "backgroundColor":[0,0,0,240],
+                                "backgroundDraw":1,
+                                "item_size" : [1,24],
+                                "packed":true,
+                                "scrollbar":
+                                {
+                                    "type": "scrollbar",
+                                    "backgroundColor":[20,200,255,255],
+                                    "style": "vertical"
+                                },
+                                "elements":
+                                []
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [10,0,280,1],
+                        "style": "vertical",
+                        "packed":true,
+                        "item_size" : [1,45],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "bounds": [0,0,1,30],
+                                "text":"Facility Features",
+                                "justify" : "center",
+                                "align" : "middle",
+                                "style":"H5"
+                            },
+                            {
+                                "type": "list",
+                                "bounds": [0,0,1,355],
+                                "name":"features_list",
                                 "style": "vertical",
                                 "backgroundColor":[0,0,0,250],
                                 "backgroundDraw":1,
-                                "item_size" : [320,90],
-                                "packed":true,
+                                "item_size" : [1,24],
+                                "cropped":true,
+                                "scrolls":true,
+                                "scrollbar":
+                                {
+                                    "type": "scrollbar",
+                                    "backgroundColor":[20,200,255,255],
+                                    "style": "vertical"
+                                },
                                 "elements":
                                 []
                             }
@@ -215,3 +413,4 @@
         ]
     }
 }
+
