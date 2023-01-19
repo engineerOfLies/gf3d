@@ -23,6 +23,7 @@
 #include "resources.h"
 #include "work_menu.h"
 #include "facility_menu.h"
+#include "facility_shop_list.h"
 #include "station_buy_menu.h"
 #include "section_view_menu.h"
 
@@ -248,6 +249,7 @@ int section_view_menu_update(Window *win,List *updateList)
         {
             if (win->child)return 1;
             //facility_buy_menu
+            win->child = facility_shop_list(win,station_facility_get_possible_list(data->section),data->section->facilities,vector2d(0,0));
             return 1;
         }
         if (e->index >= 500)

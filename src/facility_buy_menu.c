@@ -28,11 +28,9 @@
 
 typedef struct
 {
-    List *facilityList;
-    const char *selected;
-    List *list;
+    const char *name;   //name of the facility in question
+    List *facilityList; //where the purchase is to go
     List *cost;
-    int choice;
     Vector2D position;
 }FacilityBuyMenuData;
 
@@ -42,7 +40,6 @@ int facility_buy_menu_free(Window *win)
     if ((!win)||(!win->data))return 0;
     data = win->data;
     resources_list_free(data->cost);
-    gf2d_window_close_child(win,win->child);
     gf2d_window_close_child(win->parent,win);
     free(data);
     return 0;
@@ -56,7 +53,7 @@ int facility_buy_menu_draw(Window *win)
     return 0;
 }
 
-void facility_buy_menu_select_item(Window *win,int choice)
+void facility_buy_menu_refresh(Window *win)
 {
     TextLine buffer;
     SJson *def;
@@ -67,30 +64,19 @@ void facility_buy_menu_select_item(Window *win,int choice)
     int staff = 0;
     Bool officer = 0;
     int storage = 0;
-    const char *str,*name,*displayName;
+    const char *str,*displayName;
     FacilityBuyMenuData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
     
-    if (choice < 0)
-    {
-        choice = data->choice;
-    }
-    if (choice != data->choice)
-    {
-        gf2d_element_set_color(gf2d_window_get_element_by_id(win,data->choice + 1000),GFC_COLOR_YELLOW);
-        data->choice = choice;
-    }
-    gf2d_element_set_color(gf2d_window_get_element_by_id(win,choice + 1000),GFC_COLOR_CYAN);
-    name = gfc_list_get_nth(data->list,choice);
-    displayName = station_facility_get_display_name(name);
+    displayName = station_facility_get_display_name(data->name);
     
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_name"),displayName);
     def = config_def_get_by_parameter("facilities","displayName",displayName);
     if (!def)return;
     str = sj_object_get_value_as_string(def,"description");
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"item_description"),str);
-    data->selected = displayName;
+    
     str = sj_object_get_value_as_string(def,"icon");
     if (str)
     {
@@ -124,7 +110,7 @@ void facility_buy_menu_select_item(Window *win,int choice)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"energy"),buffer);
 
     resources_list_free(data->cost);
-    data->cost = station_facility_get_resource_cost(name,"cost");
+    data->cost = station_facility_get_resource_cost(data->name,"cost");
     e = gf2d_window_get_element_by_name(win,"costs");
     if (!e)return;
     gf2d_element_list_free_items(e);
@@ -133,7 +119,7 @@ void facility_buy_menu_select_item(Window *win,int choice)
         cost_list = resource_list_element_new(win,"cost_list", vector2d(0,0),player_get_resources(),data->cost,NULL);
         gf2d_element_list_add_item(e,cost_list);
     }
-    resources = station_facility_get_resource_cost(name,"upkeep");
+    resources = station_facility_get_resource_cost(data->name,"upkeep");
     e = gf2d_window_get_element_by_name(win,"upkeep");
     if (!e)return;
     gf2d_element_list_free_items(e);
@@ -143,7 +129,7 @@ void facility_buy_menu_select_item(Window *win,int choice)
         gf2d_element_list_add_item(e,cost_list);
         resources_list_free(resources);
     }
-    resources = station_facility_get_resource_cost(name,"produces");
+    resources = station_facility_get_resource_cost(data->name,"produces");
     e = gf2d_window_get_element_by_name(win,"produces");
     if (!e)return;
     gf2d_element_list_free_items(e);
@@ -157,14 +143,12 @@ void facility_buy_menu_select_item(Window *win,int choice)
 
 int facility_buy_check_possible(Window *win)
 {
-    const char *name;
     FacilityBuyMenuData* data;
     if ((!win)||(!win->data))return 0;
     data = (FacilityBuyMenuData*)win->data;
-    name = station_facility_get_name_from_display(data->selected);
-    if (station_facility_is_singleton(name))
+    if (station_facility_is_singleton(data->name))
     {
-        if (player_get_facility_by_name(name) != NULL)
+        if (player_get_facility_by_name(data->name) != NULL)
         {
             message_printf("Cannot buy another facility of this type.");
             return 0;
@@ -197,7 +181,7 @@ int facility_buy_menu_update(Window *win,List *updateList)
             if (win->child)return 1;
             if (facility_buy_check_possible(win))
             {
-                win->child = work_menu(win, data->facilityList, NULL, NULL,"build_facility",station_facility_get_name_from_display(data->selected),data->position,(gfc_work_func*)gf2d_window_free,win);
+                win->child = work_menu(win, data->facilityList, NULL, NULL,"build_facility",data->name,data->position,(gfc_work_func*)gf2d_window_free,win);
                 return 1;
             }
             return 1;
@@ -205,11 +189,6 @@ int facility_buy_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"close")==0)
         {
             gf2d_window_free(win);
-            return 1;
-        }
-        if (e->index >= 1000)
-        {
-            facility_buy_menu_select_item(win,e->index - 1000);
             return 1;
         }
     }
@@ -229,32 +208,8 @@ int facility_buy_menu_update(Window *win,List *updateList)
     return 0;
 }
 
-void facility_buy_menu_set_list(Window *win)
-{
-    const char *str;
-    const char *name;
-    Element *button;
-    Element *item_list;
-    int i,c;
-    FacilityBuyMenuData *data;
-    if ((!win)||(!win->data))return;
-    data = win->data;
-    if (!data->facilityList)return;
-    item_list = gf2d_window_get_element_by_name(win,"item_list");
-    if (!item_list)return;
-    c = gfc_list_get_count(data->list);
-    for (i = 0; i < c; i++)
-    {
-        name = gfc_list_get_nth(data->list,i);
-        str = station_facility_get_display_name(name);
-        button = gf2d_button_new_label_simple(win,1000+i,str,FT_Small,vector2d(1,30),GFC_COLOR_YELLOW);
-        if (!button)continue;
-        gf2d_element_list_add_item(item_list,button);
-    }
-    facility_buy_menu_select_item(win,0);
-}
 
-Window *facility_buy_menu(Window *parent,List *facility_list, List *type_list,Vector2D position)
+Window *facility_buy_menu(Window *parent,const char *name, List *facility_list,Vector2D position)
 {
     Window *win;
     FacilityBuyMenuData* data;
@@ -264,16 +219,17 @@ Window *facility_buy_menu(Window *parent,List *facility_list, List *type_list,Ve
         slog("failed to load facility buy menu");
         return NULL;
     }
+    data = (FacilityBuyMenuData*)gfc_allocate_array(sizeof(FacilityBuyMenuData),1);
     win->update = facility_buy_menu_update;
     win->free_data = facility_buy_menu_free;
     win->draw = facility_buy_menu_draw;
-    data = (FacilityBuyMenuData*)gfc_allocate_array(sizeof(FacilityBuyMenuData),1);
+    win->refresh = facility_buy_menu_refresh;
     win->data = data;
     win->parent = parent;
+    data->name = name;
     vector2d_copy(data->position,position);
     data->facilityList = facility_list;
-    data->list = type_list;
-    facility_buy_menu_set_list(win);
+    facility_buy_menu_refresh(win);
     message_buffer_bubble();
     return win;
 }

@@ -21,9 +21,9 @@
 #include "station.h"
 #include "player.h"
 #include "hud_window.h"
-#include "facility_buy_menu.h"
 #include "facility_menu.h"
 #include "planet.h"
+#include "facility_shop_list.h"
 #include "planet_menu.h"
 
 typedef struct
@@ -50,7 +50,6 @@ int planet_menu_free(Window *win)
     {
         gf2d_window_free(win->child);
     }
-    gfc_list_delete(data->typeList);
     hud_reset_camera(win->parent);
     gf2d_window_close_child(win->parent,win);
     free(data);
@@ -81,7 +80,7 @@ int planet_menu_update(Window *win,List *updateList)
         if (strcmp(e->name,"build")==0)
         {
             if (win->child)return 1;
-            win->child = facility_buy_menu(win,data->planet->facilities, data->typeList,data->worldPosition);
+            win->child = facility_shop_list(win, data->typeList,data->planet->facilities,data->worldPosition);
             return 1;
         }
         if (strcmp(e->name,"north")==0)
