@@ -2,12 +2,13 @@
 #define __HUD_WINDOW_H__
 
 #include "gf2d_windows.h"
+#include "gf3d_entity.h"
 
 /**
  * @brief create the hud window and load the provided save file
- * @param savefile the game to load
+ * @param player the player entity pointer
  */
-Window *hud_window(const char *savefile);
+Window *hud_window(Entity *player);
 
 /**
  * @brief reset the camera back to hud standard view

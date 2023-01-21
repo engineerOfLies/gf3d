@@ -650,7 +650,7 @@ StationFacility *station_facility_new_by_name(const char *name,int id)
     {
         gf3d_model_mat_reset(&facility->mat);
         facility->mat.model = gf3d_model_load(str);
-        vector3d_set(facility->mat.scale,50,50,50);
+        vector3d_set(facility->mat.scale,10,10,10);
     }
 
     str = sj_object_get_value_as_string(facilityDef,"name");

@@ -89,6 +89,7 @@ void planet_draw(PlanetData *planet)
         gf3d_model_mat_set_matrix(&planet->mat);
         gf3d_model_draw(planet->mat.model,0,planet->mat.mat,vector4d(1,1,1,1),vector4d(1,1,1,1),vector4d(1,1,1,1));
     }
+    planet_draw_facilities(planet);
 }
 
 SiteData *planet_get_site_data_by_position(PlanetData *planet,Vector2D position)

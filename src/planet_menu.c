@@ -121,7 +121,6 @@ int planet_menu_draw(Window *win)
     data = win->data;
     
     planet_menu_set_camera_at_site(win,data->worldPosition);
-    planet_draw_facilities(data->planet);
     data->facility = station_facility_get_by_position(data->planet->facilities,data->worldPosition);
     
     if (data->facility)
@@ -205,7 +204,7 @@ void planet_menu_set_camera_at_site(Window *win,Vector2D site)
 
     vector2d_copy(data->worldPosition,site);
         
-    position = planet_position_to_position(data->planet->radius + 750, site);
+    position = planet_position_to_position(data->planet->radius + 300, site);
     
     vector3d_add(data->viewPosition,position,mat->position);
     

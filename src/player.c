@@ -16,6 +16,7 @@
 #include "ship_entity.h"
 #include "event_menu.h"
 #include "event_manager.h"
+#include "hud_window.h"
 #include "player.h"
 
 extern int freeBuildMode;
@@ -366,6 +367,7 @@ Entity *player_new(const char *file)
     ent->free = player_free;
     station_recalc_values(player_get_station_data());
 
+    hud_window(ent);
     return ent;
 }
 

@@ -124,6 +124,7 @@ void hud_options_select(void *Data)
             break;
         case 3:
             //exit to main menu
+            gf3d_entity_free(data->player);
             gf2d_window_free(win);
             main_menu();
             break;
@@ -157,7 +158,6 @@ int hud_free(Window *win)
     if (!win->data)return 0;
     data = win->data;
     gf2d_window_free(data->messages);
-    gf3d_entity_free(data->player);
     free(data);
     return 0;
 }
@@ -352,7 +352,7 @@ int hud_draw(Window *win)
     return 0;
 }
 
-Window *hud_window(const char *savefile)
+Window *hud_window(Entity *player)
 {
     Window *win;
     HUDWindowData *data;
@@ -368,13 +368,7 @@ Window *hud_window(const char *savefile)
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
-    data->player = player_new(savefile);
-    if (!data->player)
-    {
-        gf2d_window_free(win);
-        main_menu();
-        return NULL;
-    }
+    data->player = player;
     data->messages = window_message_buffer(5, 1000, gfc_color8(0,255,100,255));
     data->w = player_get_world();
     hud_reset_camera(win);

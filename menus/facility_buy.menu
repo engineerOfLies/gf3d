@@ -8,36 +8,14 @@
         [
             {
                 "type": "button",
-                "name":"sell",
-                "bounds": [420,440,160,42],
-                "hotkey":"sell",
-                "sound":"cancel",
-                "label" :
-                {
-                    "type": "label",
-                    "text":"Sell",
-                    "bounds": [0,0,160,48],
-                    "justify" : "center",
-                    "align" : "middle",
-                    "style":"H5"
-                },
-                "actor" :
-                {
-                    "type": "actor",
-                    "bounds": [0,0,160,48],
-                    "actor" : "actors/red_button.actor"
-                }
-            },
-            {
-                "type": "button",
-                "name":"repair",
+                "name":"buy",
                 "bounds": [580,440,160,42],
-                "hotkey":"repair",
+                "hotkey":"buy",
                 "sound":"cancel",
                 "label" :
                 {
                     "type": "label",
-                    "text":"Repair",
+                    "text":"Buy",
                     "bounds": [0,0,160,48],
                     "justify" : "center",
                     "align" : "middle",

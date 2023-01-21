@@ -15,7 +15,7 @@
 #include "player.h"
 #include "planet.h"
 #include "ship_entity.h"
-#include "hud_window.h"
+#include "player.h"
 #include "main_menu.h"
 
 extern void exitGame();
@@ -33,7 +33,7 @@ typedef struct
 void main_menu_start_new_game()
 {
     PlanetData *planet;
-    hud_window("saves/default.save");    
+    player_new("saves/default.save");    
     planet = player_get_planet();
     if (!planet)return;
     planet_reset_resource_map(planet);
@@ -64,7 +64,7 @@ void onFileLoadOk(void *Data)
     data = Data;
     gfc_line_sprintf(filepath,"saves/%s.save",data->filename);
 
-    hud_window(filepath);    
+    player_new(filepath);    
     gf2d_window_free(data->win);
     return;
 }
@@ -119,7 +119,7 @@ int main_menu_update(Window *win,List *updateList)
         }
         else if (strcmp(e->name,"continue")==0)
         {
-            hud_window("saves/quick.save");
+            player_new("saves/quick.save");
             gf2d_window_free(win);
             return 1;
         }
