@@ -74,6 +74,7 @@ void ship_entity_move_to(Entity *ent,Uint32 pathIndex,const char *dockName)
     if (!v)
     {
         slog("Path Complete");
+        gfc_line_sprintf(ship->location,"docked");
         ent->think = ship_entity_think;
         return;
     }
@@ -148,18 +149,21 @@ void ship_entity_think_moving(Entity *self)
     if (!self)return;
     ship = self->data;
     // do maintenance
+    ship_check(ship);
     if (vector3d_distance_between_less_than(self->mat.position,self->targetPosition,1))
     {
         self->think = ship_entity_think;
         self->targetComplete = 1;
         vector3d_clear(self->velocity);
         ship_entity_move_to(self,++self->counter,ship->dockName);
+        slog("at waypoint");
         return;
     }
     if (vector3d_distance_between_less_than(self->mat.position,self->targetPosition,self->speed *0.01))
     {
         self->think = ship_entity_think;
         self->targetComplete = 1;
+        slog("closing distance");
         vector3d_clear(self->velocity);
         vector3d_set_magnitude(&self->velocity,vector3d_magnitude_between(self->mat.position,self->targetPosition));
         return;
@@ -167,6 +171,7 @@ void ship_entity_think_moving(Entity *self)
     vector3d_sub(dir,self->targetPosition,self->mat.position);
     vector3d_normalize(&dir);
     vector3d_scale(self->velocity,dir,(self->speed*0.01));
+
     //check if we need to set our rotations
     if (strlen(ship->dockName)>0)
     {

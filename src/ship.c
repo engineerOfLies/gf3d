@@ -166,6 +166,7 @@ SJson *ship_save(Ship *ship)
    
     sj_object_insert(json,"name",sj_new_str(ship->name));
     sj_object_insert(json,"displayName",sj_new_str(ship->displayName));
+    sj_object_insert(json,"dockName",sj_new_str(ship->dockName));
     sj_object_insert(json,"captain",sj_new_str(ship->captain));
     sj_object_insert(json,"id",sj_new_uint32(ship->id));
     sj_object_insert(json,"idPool",sj_new_uint32(ship->idPool));

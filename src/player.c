@@ -170,11 +170,15 @@ List *player_ships_load(SJson *list,PlayerData *player)
         ship = ship_load(item);
         if (!ship)continue;
         ship->entity = ship_entity_new(ship->position,ship,player->detailColor);
+        gfc_list_append(ships,ship);
         if (strcmp(ship->location,"in_transit")==0)
         {
+            slog("ship is loaded in transit");
+            slog("current flight step is %i",ship->flightStep);
+            slog("headed to %s",ship->dockName);
             ship_entity_move_to(ship->entity,ship->flightStep,ship->dockName);
+            slog("target position: %f,%f,%f",ship->entity->targetPosition.x,ship->entity->targetPosition.y,ship->entity->targetPosition.z);
         }
-        gfc_list_append(ships,ship);
     }
     return ships;
 }
