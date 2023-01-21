@@ -209,10 +209,10 @@ void mission_repair_facility(Mission *mission)
         slog("no facility found by name of %s id %i",station_facility_get_name_from_display(mission->missionTarget),mission->targetId);
         return;
     }
+    station_facility_repair(facility);
     gf2d_window_refresh_by_name("section_view_menu");
     gf2d_window_refresh_by_name("station_facility_menu");
     gf2d_window_refresh_by_name("facility_list_menu");
-    station_facility_repair(facility);
 }
 
 void mission_facility_produce(Mission *mission)

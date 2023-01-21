@@ -170,6 +170,10 @@ List *player_ships_load(SJson *list,PlayerData *player)
         ship = ship_load(item);
         if (!ship)continue;
         ship->entity = ship_entity_new(ship->position,ship,player->detailColor);
+        if (strcmp(ship->location,"in_transit")==0)
+        {
+            ship_entity_move_to(ship->entity,ship->flightStep,ship->dockName);
+        }
         gfc_list_append(ships,ship);
     }
     return ships;

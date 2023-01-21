@@ -7,6 +7,16 @@
 #include "ship_facility.h"
 #include "ship.h"
 
+void ship_add_flightpath_point(Ship *ship,Vector3D point)
+{
+    Vector3D *v_ptr;
+    if (!ship)return;
+    v_ptr = gfc_allocate_array(sizeof(Vector3D),1);
+    if (!v_ptr)return;
+    vector3d_copy((*v_ptr),point);
+    gfc_list_append(ship->flightPath,v_ptr);
+}
+
 Ship *ship_new()
 {
     Ship *ship = gfc_allocate_array(sizeof(Ship),1);
@@ -37,6 +47,7 @@ void ship_free(Ship *ship)
 Ship *ship_load(SJson *json)
 {
     Uint32 id = 0;
+    Vector3D tempV;
     int i,c;
     const char *str;
     Ship *ship;
@@ -47,6 +58,7 @@ Ship *ship_load(SJson *json)
     if (!str)return NULL;
     sj_object_get_value_as_uint32(json,"id",&id);
     ship = ship_new_by_name(str,id,0);
+    
     if (!ship)return NULL;
     str = sj_object_get_value_as_string(json,"displayName");
     if (str)gfc_line_cpy(ship->displayName,str);
@@ -83,11 +95,27 @@ Ship *ship_load(SJson *json)
         if (!facility)continue;
         gfc_list_append(ship->facilities,facility);
     }
+    list = sj_object_get_value(json,"flightPath");
+    if (list)
+    {
+        c = sj_array_get_count(list);
+        for (i = 0; i < c; i++)
+        {
+            item = sj_array_get_nth(list,i);
+            if (!item)continue;
+            if (!sj_value_as_vector3d(item,&tempV))continue;
+            ship_add_flightpath_point(ship,tempV);
+        }
+        sj_object_get_value_as_int(json,"flightStep",&ship->flightStep);
+    }
+    str = sj_object_get_value_as_string(json,"dockName");
+    if (str)gfc_line_cpy(ship->dockName,str);
+
     if (strcmp(ship->location,"parking")==0)
     {
         //register parking spot
         ship->position = world_parking_claim_spot(ship->position);
-    }    
+    }
     ship_check(ship);
     return ship;
 }
@@ -129,6 +157,7 @@ void ship_give_new_facility(Ship *ship, const char *facilityName)
 SJson *ship_save(Ship *ship)
 {
     int i,c;
+    Vector3D *v_ptr;
     ShipFacility *facility;
     SJson *json,*array;
     if (!ship)return NULL;
@@ -143,6 +172,19 @@ SJson *ship_save(Ship *ship)
     sj_object_insert(json,"passengers",sj_new_int(ship->passengers));
     sj_object_insert(json,"location",sj_new_str(ship->location));
     sj_object_insert(json,"position",sj_vector3d_new(ship->position));
+    c = gfc_list_get_count(ship->flightPath);
+    if (c)
+    {
+        array = sj_array_new();
+        for(i = 0; i < c; i++)
+        {
+            v_ptr = gfc_list_get_nth(ship->flightPath,i);
+            if (!v_ptr)continue;
+            sj_array_append(array,sj_vector3d_new(*v_ptr));
+        }
+        sj_object_insert(json,"flightPath",array);
+        sj_object_insert(json,"flightstep",sj_new_int(ship->flightStep));
+    }
     sj_object_insert(json,"staffAssigned",sj_new_int(ship->staffAssigned));
     sj_object_insert(json,"hull",sj_new_float(ship->hull));
     if (gfc_list_get_count(ship->cargo) > 0)
@@ -348,7 +390,6 @@ void ship_check(Ship *ship)
 
 void ship_order_to_dock(Ship *ship, const char *dock)
 {
-    Vector3D *v_ptr;
     Vector3D approach;
     Vector3D dockPosition;
     StationSection *section;
@@ -367,14 +408,10 @@ void ship_order_to_dock(Ship *ship, const char *dock)
     gfc_list_clear(ship->flightPath);//clear the list
     
     approach = station_section_get_approach_vector(section);
-    v_ptr = gfc_allocate_array(sizeof(Vector3D),1);
-    vector3d_copy((*v_ptr),approach);
-    gfc_list_append(ship->flightPath,v_ptr);
+    ship_add_flightpath_point(ship,approach);
 
     dockPosition = station_section_get_docking_position(section);
-    v_ptr = gfc_allocate_array(sizeof(Vector3D),1);
-    vector3d_copy((*v_ptr),dockPosition);
-    gfc_list_append(ship->flightPath,v_ptr);
+    ship_add_flightpath_point(ship,dockPosition);
 
     ship_set_location(ship,"in_transit",ship->position);
     ship_entity_move_to(ship->entity,0,section->displayName);

@@ -35,7 +35,7 @@ typedef struct
     float       efficiency;     // factor for overal ship performance
     List       *facilities;     //list of ship facilities
     List       *flightPath;     //Describes a list of way points from beginning to end of a journey
-    Vector3D    flightTarget;   //current target along the flight path
+    int         flightStep;     //current step along the flight path
     List       *thrust;         // list of modelMats for thrust
     TextLine    dockName;       //when approaching or leaving a dock, ship should align to this dock.
     Entity     *entity;         // pointer to the ship entity

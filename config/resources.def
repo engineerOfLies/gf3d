@@ -101,15 +101,6 @@
             "units":"T"
         },
         {
-            "name":"exotic_deposits",
-            "displayName":"Exotic Deposits",
-            "description":"Extremely rare complex minerals whose conditions for forming are not well known.  Likely due to remnants of a long since gone space faring species.",
-            "precision":0,
-            "negative":false,
-            "value":200,
-            "units":"T"
-        },
-        {
             "name":"luxury_food",
             "displayName":"Luxury Food",
             "description":"Rare and enhanced food items.  The results are highly sought after and can demand a higher price.  Use of it will improve moral.",

@@ -79,6 +79,7 @@ void ship_entity_move_to(Entity *ent,Uint32 pathIndex,const char *dockName)
     }
     if ((dockName)&&(strlen(dockName)))gfc_line_cpy(ship->dockName,dockName);
     else gfc_line_clear(ship->dockName);
+    ship->flightStep = pathIndex;
     vector3d_copy(ent->targetPosition,(*v));
     ent->targetComplete = 0;
     ent->counter = pathIndex;
@@ -101,7 +102,7 @@ void ship_entity_update(Entity *self)
     ship = self->data;
     //sync to data
     vector3d_copy(ship->position,self->mat.position);
-    vector3d_copy(ship->flightTarget,self->targetPosition);
+    ship->flightStep = self->counter;
 }
 
 void ship_entity_draw(Entity *self)

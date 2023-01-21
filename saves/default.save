@@ -8,8 +8,9 @@
     "salesTaxRate":"0.090000",
     "staff":"50",
     "population":"300",
-    "detailColor":[0.05,0.05,0.75,1],
+    "detailColor":[0.75,0.05,0.05,1],
     "detailColorB":[0.2,0.6,0.2,1],
+    "detailColorC":[0.05,0.05,0.75,1],
     "hour":"0",
     "day":"0",
     "reputation":{
@@ -43,20 +44,20 @@
     },
     "history":{},
     "idPools":{
-      "command_and_control":"1",
-      "security":"1",
-      "quarters_command":"1",
-      "mineral_mine1":"1",
-      "quarters1":"2",
-      "aggriculture1":"1",
-      "cargo_hold_large":"1",
-      "hdg_reactor1":"1",
-      "docking_bay":"1",
-      "solar_processor1":"2",
-      "cargo_hold_small":"1",
-      "docking_bay_small":"1",
-      "station":"8",
-      "commodities_market":"1"
+      "command_and_control":1,
+      "security":1,
+      "quarters_command":1,
+      "mineral_mine1":1,
+      "quarters1":2,
+      "aggriculture1":1,
+      "cargo_hold_large":1,
+      "hdg_reactor1":1,
+      "docking_bay":1,
+      "solar_processor1":2,
+      "cargo_hold_small":1,
+      "docking_bay_small":1,
+      "commodities_market":1,
+      "station":8
       },
       "ships":[
           {
@@ -350,7 +351,7 @@
             "location":"parking",
             "position":[
                 "-500.000000",
-                "-400.000000",
+                "-300.000000",
                 "0.000000"
             ],
             "staffAssigned":"0",
