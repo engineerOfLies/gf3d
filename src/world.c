@@ -16,11 +16,29 @@
 
 static World *the_world = NULL;
 
-
+CombatZone *combat_zone_parse(SJson *def)
+{
+    const char * str;
+    CombatZone *combatZone = NULL;
+    if (!def)return NULL;
+    combatZone =  gfc_allocate_array(sizeof(CombatZone),1);
+    if (!combatZone)return NULL;
+    str = sj_object_get_value_as_string(def,"name");
+    if (str)gfc_line_cpy(combatZone->name,str);
+    str = sj_object_get_value_as_string(def,"backgroundMusic");
+    if (str)gfc_line_cpy(combatZone->backgroundMusic,str);
+    sj_object_get_value_as_bool(def,"draw_home",&combatZone->draw_home);
+    sj_value_as_vector3d(sj_object_get_value(def,"center"),&combatZone->center);
+    sj_value_as_vector3d(sj_object_get_value(def,"camera"),&combatZone->camera);
+    sj_value_as_vector3d(sj_object_get_value(def,"a_side"),&combatZone->a_side);
+    sj_value_as_vector3d(sj_object_get_value(def,"b_side"),&combatZone->b_side);
+    return combatZone;
+}
 
 World *world_load(char *filename)
 {
     Entity *ent;
+    CombatZone *combatZone;
     Vector4D globalColor = {0};
     Vector3D globalDir  = {0};
     Vector3D position,rotation;
@@ -145,9 +163,40 @@ World *world_load(char *filename)
         sj_value_as_vector3d(sj_object_get_value(item,"position"),&w->parkingStart);
         sj_value_as_vector3d(sj_object_get_value(item,"delta"),&w->parkingDelta);
     }
+    
+    list = sj_object_get_value(wjson,"combat_zones");
+    if (list)
+    {
+        w->combatZones = gfc_list_new();
+        c = sj_array_get_count(list);
+        for (i = 0;i < c;i++)
+        {
+            item = sj_array_get_nth(list,i);
+            if (!item)continue;
+            combatZone = combat_zone_parse(item);
+            if (!combatZone)continue;
+            gfc_list_append(w->combatZones,combatZone);
+        }
+    }
     sj_free(json);
     the_world = w;
     return w;
+}
+
+CombatZone *world_get_combat_zone_by_name(const char *name)
+{
+    CombatZone *combatZone = NULL;
+    int i,c;
+    if (!the_world)return NULL;
+    if (!name)return NULL;
+    c = gfc_list_get_count(the_world->combatZones);
+    for (i = 0;i < c; i++)
+    {
+        combatZone = gfc_list_get_nth(the_world->combatZones,i);
+        if (!combatZone)continue;
+        if (gfc_line_cmp(name,combatZone->name)==0)return combatZone;
+    }
+    return NULL;
 }
 
 void get_date_of(char *output,Uint32 day)
@@ -223,6 +272,8 @@ void world_delete(World *world)
         gf3d_entity_free(entity);
     }
     gfc_list_delete(world->entity_list);
+    gfc_list_foreach(world->combatZones,free);
+    if (world->combatZones)gfc_list_delete(world->combatZones);
     gfc_sound_pack_free(world->sounds);
     free(world);
     the_world = NULL;

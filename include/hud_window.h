@@ -6,9 +6,13 @@
 
 /**
  * @brief create the hud window and load the provided save file
- * @param player the player entity pointer
  */
-Window *hud_window(Entity *player);
+Window *hud_window();
+
+/**
+ * @brief open the options list select menu
+ */
+void hud_open_options_menu(Window *win);
 
 /**
  * @brief reset the camera back to hud standard view

@@ -37,9 +37,8 @@ void mission_list_menu_update_resources(Window *win);
 int mission_list_menu_free(Window *win)
 {
     MissionListMenuData *data;
-    if (!win)return 0;
+    if ((!win)||(!win->data))return 0;
     gf2d_window_close_child(win->parent,win);
-    if (!win->data)return 0;
     data = win->data;
     free(data);
     return 0;

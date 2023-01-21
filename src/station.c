@@ -302,8 +302,8 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     }
     sj_value_as_vector3d(sj_object_get_value(sectionDef,"dockPosition"),&section->dockPosition);
     sj_value_as_vector3d(sj_object_get_value(sectionDef,"approach"),&section->approach);
-    section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     
+    section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     if (id < 0)
     {
         list = sj_object_get_value(sectionDef,"default_facilities");
@@ -783,8 +783,8 @@ void station_draw(Entity *self)
             gfc_matrix4_to_vectors(guideMat,&position,&rotation,NULL);
             draw_guiding_lights(position,rotation,0.3 * self->mat.scale.x, 2 * self->mat.scale.x);
             
-            position = station_section_get_approach_vector(section);
-            gf3d_particle_trail_draw(GFC_COLOR_LIGHTBLUE, 10, 10, gfc_edge3d_from_vectors(position2,position));
+//            position = station_section_get_approach_vector(section);
+//            gf3d_particle_trail_draw(GFC_COLOR_LIGHTBLUE, 10, 10, gfc_edge3d_from_vectors(position2,position));
         }
     }
 }

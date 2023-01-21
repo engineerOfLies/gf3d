@@ -16,20 +16,32 @@
 
 typedef struct
 {
-    List    *model_list;
-    Vector3D cameraPosition;
-    Uint32   now;
-    Uint32   hourTime;   //how many ticks must pass before a new day happens
-    Uint32   lastHour;   //when did the last day begin
-    Matrix4 skyMat;
-    Particle theSun;
-    Model *sky;
-    Mix_Music *backgroundMusic;
-    List    *entity_list;
-    HashMap *sounds;
-    List    *parking_spots;//places that have been assigned
-    Vector3D parkingStart;//starting location for parking spots
-    Vector3D parkingDelta;//how much space between spots
+    TextLine name;
+    Bool     draw_home;
+    TextLine backgroundMusic;
+    Vector3D center;
+    Vector3D camera;
+    Vector3D a_side;
+    Vector3D b_side;
+}CombatZone;
+
+typedef struct
+{
+    List       *model_list;
+    Vector3D    cameraPosition;
+    Uint32      now;
+    Uint32      hourTime;   //how many ticks must pass before a new day happens
+    Uint32      lastHour;   //when did the last day begin
+    Matrix4     skyMat;
+    Particle    theSun;
+    Model      *sky;
+    Mix_Music  *backgroundMusic;
+    List       *entity_list;
+    HashMap    *sounds;
+    List       *parking_spots;//places that have been assigned
+    Vector3D    parkingStart;//starting location for parking spots
+    Vector3D    parkingDelta;//how much space between spots
+    List       *combatZones;
 }World;
 
 /**
@@ -102,5 +114,13 @@ Vector3D world_parking_get_spot();
  * @param spot the spot you are giving up
  */
 void world_parking_vacate_spot(Vector3D spot);
+
+/**
+ * @brief get combat zone information by its name
+ * @param name the name of the combat zone (see the def file for options)
+ * @return NULL if not found, the CombatZone data otherwise
+ */
+CombatZone *world_get_combat_zone_by_name(const char *name);
+
 
 #endif

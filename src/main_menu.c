@@ -39,12 +39,6 @@ void main_menu_start_new_game()
     planet_reset_resource_map(planet);
     planet_generate_resource_map(planet);
     planet_site_survey(planet,vector2d(0,0));
-    player_give_new_ship("fighter");
-    player_give_new_ship("scout");
-    player_give_new_ship("cargo1");
-    player_give_new_ship("cargo1");
-    player_give_new_ship("passenger");
-    player_give_new_ship("fighter");
 }
 
 void onFileLoadCancel(void *Data)

@@ -978,6 +978,11 @@ World *player_get_world()
     return data->world;
 }
 
+Entity *player_get_entity()
+{
+    return player_entity;
+}
+
 PlayerData *player_get_data()
 {
     if (!player_entity)return NULL;

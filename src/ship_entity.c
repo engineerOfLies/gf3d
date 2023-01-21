@@ -92,11 +92,16 @@ void ship_entity_free(Entity *self)
 
 void ship_entity_update(Entity *self)
 {
-    if (!self)
+    Ship *ship;
+    if ((!self)||(!self->data))
     {
         slog("self pointer not provided");
         return;
     }
+    ship = self->data;
+    //sync to data
+    vector3d_copy(ship->position,self->mat.position);
+    vector3d_copy(ship->flightTarget,self->targetPosition);
 }
 
 void ship_entity_draw(Entity *self)

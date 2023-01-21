@@ -30,6 +30,7 @@
 #include "mission_list_menu.h"
 #include "market_menu.h"
 #include "main_menu.h"
+#include "combat_window.h"
 #include "hud_window.h"
 
 extern int freeBuildMode;
@@ -41,6 +42,7 @@ typedef struct
     Entity  *player;
     int     selection;
     Window  *messages;
+    Window  *combat;
     World   *w;         //owned by player, not this menu
 }HUDWindowData;
 
@@ -124,8 +126,8 @@ void hud_options_select(void *Data)
             break;
         case 3:
             //exit to main menu
-            gf3d_entity_free(data->player);
             gf2d_window_free(win);
+            gf3d_entity_free(player_get_entity());
             main_menu();
             break;
     }
@@ -276,6 +278,15 @@ int hud_update(Window *win,List *updateList)
 
             return 1;
         }
+        if (strcmp(e->name,"combat")==0)
+        {
+            if (win->child)gf2d_window_free(win->child);
+            data->paused = 1;
+            win->hidden = 1;
+            data->combat = combat_window(win,"gateway");
+            hud_reset_camera(win);
+            return 1;
+        }
         if (strcmp(e->name,"pause")==0)
         {
             data->paused = !data->paused;
@@ -352,7 +363,7 @@ int hud_draw(Window *win)
     return 0;
 }
 
-Window *hud_window(Entity *player)
+Window *hud_window()
 {
     Window *win;
     HUDWindowData *data;
@@ -368,7 +379,6 @@ Window *hud_window(Entity *player)
     win->free_data = hud_free;
     win->draw = hud_draw;
     win->data = data;
-    data->player = player;
     data->messages = window_message_buffer(5, 1000, gfc_color8(0,255,100,255));
     data->w = player_get_world();
     hud_reset_camera(win);

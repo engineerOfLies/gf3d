@@ -55,6 +55,12 @@ typedef struct
 Entity *player_new(const char *file);
 
 /**
+ * @brief get the current player's entity
+ * @return NULL if no player loaded, or the entity for the player
+ */
+Entity *player_get_entity();
+
+/**
  * @brief get the current player's game data
  * @return NULL if no player loaded, or the playerdata for the player
  */

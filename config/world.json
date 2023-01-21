@@ -16,7 +16,7 @@
         [
             {
                 "name":"tunnel_gate",
-                "position":[0,-3000,0],
+                "position":[0,-5000,0],
                 "rotation":[0,0,180],
                 "scale":[100,100,100]
             }
@@ -27,6 +27,36 @@
                 "type":"global",
                 "color":[1,1,0.9,1],
                 "direction":[-1,-1,0]
+            }
+        ],
+        "combat_zones":
+        [
+            {
+                "name":"incursion",
+                "draw_home":true,
+                "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
+                "center":[-1000,-1000,0],
+                "camera":[-1400,-1400,0],
+                "a_side":[-1000,-900,0],
+                "b_side":[-1000,-1100,0]
+            },
+            {
+                "name":"gateway",
+                "draw_home":true,
+                "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
+                "center":[0,-2500,0],
+                "camera":[-400,-2500,0],
+                "a_side":[0,-2400,0],
+                "b_side":[0,-2600,0]
+            },
+            {
+                "name":"remote",
+                "draw_home":false,
+                "backgroundMusic":"music/370801__romariogrande__space-chase.wav",
+                "center":[0,0,0],
+                "camera":[-400,-400,0],
+                "a_side":[0,100,0],
+                "b_side":[0,-100,0]
             }
         ],
         "parking":
