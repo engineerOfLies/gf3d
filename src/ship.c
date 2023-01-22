@@ -420,6 +420,21 @@ Vector3D ship_get_egress_vector(Ship *ship)
     return vector3d(-1,-1,-1);
 }
 
+void ship_vacate_location(Ship *ship)
+{
+    if (!ship)return;
+    if (gfc_line_cmp(ship->location,"parking")==0)
+    {
+        world_parking_vacate_spot(ship->position);
+        return;
+    }
+    if (gfc_line_cmp(ship->location,"docked")==0)
+    {
+        // TODO: update the docking facility that we are not taking up a slot
+        return;
+    }
+}
+
 void ship_clear_flight_path(Ship *ship)
 {
     if (!ship)return;
@@ -441,6 +456,7 @@ void ship_order_to_parking(Ship *ship)
         message_new("parking lot is full");
         return;
     }
+    ship_vacate_location(ship);
     
     ship_check(ship);
     ship_clear_flight_path(ship);
@@ -460,15 +476,38 @@ void ship_order_to_parking(Ship *ship)
     ship_entity_move_to(ship->entity,0);
 }
 
-void ship_vacate_location(Ship *ship)
+void ship_order_to_planet_site(Ship *ship, StationFacility *facility)
 {
-    if (!ship)return;
-    if (gfc_line_cmp(ship->location,"parking")==0)
+    PlanetData *planet;
+    Vector3D waypoint;
+    planet = player_get_planet();
+    if ((!ship)||(!facility)||(!planet))return;
+    ship_check(ship);
+    ship_clear_flight_path(ship);
+
+    waypoint = ship_get_egress_vector(ship);
+    if (!((waypoint.x == -1)&&(waypoint.y == -1)&&(waypoint.z == -1)))
     {
-        world_parking_vacate_spot(Vector3D spot);
-        return;
+        ship_add_flightpath_point(ship,waypoint);
     }
+    
+    waypoint = planet_site_get_relay(facility->position);
+    ship_add_flightpath_point(ship,waypoint);
+    
+    waypoint = planet_site_get_approach(facility->position);
+    ship_add_flightpath_point(ship,waypoint);
+    
+    waypoint =  planet_position_to_position(planet->radius, facility->position);
+    ship_add_flightpath_point(ship,waypoint);
+    
+    ship_vacate_location(ship);
+    ship_set_location(ship,"in_transit",ship->position);
+    gfc_line_cpy(ship->dockName,facility->displayName);
+    gfc_line_cpy(ship->sectionName,"planet");
+    gfc_line_sprintf(ship->destination,"docked");
+    ship_entity_move_to(ship->entity,0);
 }
+
 
 void ship_order_to_dock(Ship *ship, const char *dock)
 {
@@ -498,6 +537,7 @@ void ship_order_to_dock(Ship *ship, const char *dock)
     dockPosition = station_section_get_docking_position(section);
     ship_add_flightpath_point(ship,dockPosition);
 
+    ship_vacate_location(ship);
     ship_set_location(ship,"in_transit",ship->position);
     ship_entity_move_to(ship->entity,0);
     gfc_line_sprintf(ship->destination,"docked");

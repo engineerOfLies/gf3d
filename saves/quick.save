@@ -22,11 +22,11 @@
          "entertainment":0.500000,
          "safety":0.500000
       },
-      "hour":9,
-      "day":18,
+      "hour":5,
+      "day":19,
       "resources":{
          "credits":9050.000000,
-         "fuel":482.000000,
+         "fuel":481.000000,
          "food":500.000000,
          "ores":0.000000,
          "minerals":0.000000,
@@ -40,7 +40,7 @@
       },
       "yesterday":{
          "credits":9050.000000,
-         "fuel":483.000000,
+         "fuel":482.000000,
          "food":500.000000,
          "ores":0.000000,
          "minerals":0.000000,
@@ -138,8 +138,6 @@
          {
             "name":"fighter",
             "displayName":"Osprey 1",
-            "dockName":"",
-            "captain":"",
             "id":1,
             "idPool":11,
             "passengers":0,
@@ -235,8 +233,6 @@
          {
             "name":"scout",
             "displayName":"Raven 1",
-            "dockName":"",
-            "captain":"",
             "id":1,
             "idPool":7,
             "passengers":0,
@@ -304,8 +300,6 @@
          {
             "name":"cargo1",
             "displayName":"Condor 1",
-            "dockName":"",
-            "captain":"",
             "id":1,
             "idPool":14,
             "passengers":0,
@@ -422,32 +416,32 @@
          {
             "name":"passenger",
             "displayName":"Pelican 1",
-            "sectionName":"Docking Port 4",
             "dockName":"Medium Docking Bay 1",
-            "captain":"",
+            "sectionName":"Docking Port 4",
+            "destination":"parking",
             "id":1,
             "idPool":9,
             "passengers":0,
-            "location":"docked",
+            "location":"in_transit",
             "position":[
-               0.443496,
-               -400.887970,
-               -0.000392
+               -2.877498,
+               -452.979645,
+               -0.000341
             ],
             "flightPath":[
                [
-                  -400.000000,
-                  0.000000,
-                  -200.000000
-               ],
-               [
-                  200.000000,
+                  -25.000000,
                   -800.000000,
                   0.000000
                ],
                [
-                  0.000000,
                   -400.000000,
+                  0.000000,
+                  200.000000
+               ],
+               [
+                  -500.000000,
+                  -300.000000,
                   0.000000
                ]
             ],

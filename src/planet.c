@@ -273,6 +273,40 @@ void planet_generate_resource_map(PlanetData *planet)
     }
 }
 
+Vector3D planet_site_get_relay(Vector2D site)
+{
+    Vector3D approach,delta;
+    Vector3D position,dir;
+    PlanetData *planet;
+    planet = player_get_planet();
+    if (!planet)return vector3d(-1,-1,-1);
+    approach = planet_site_get_approach(site);
+    vector3d_copy(position,planet->mat.position);
+    if (vector3d_magnitude_squared(approach) < vector3d_magnitude_squared(planet->mat.position))
+    {
+        //if we are on the side of the planet facing the station, just set the position to a point near the station
+        vector3d_copy(position,planet->mat.position);
+        vector3d_set_magnitude(&position,500);
+        return position;
+    }
+    //else we need to move parallel
+    vector3d_copy(delta,approach);
+    vector3d_normalize (&position);//planet 
+    vector3d_normalize (&delta);//site
+    vector3d_sub(dir,delta,position);
+    vector3d_scale(dir,dir,planet->radius + 100);
+    vector3d_add(position,approach,dir);
+    return position;
+}
+
+Vector3D planet_site_get_approach(Vector2D site)
+{
+    PlanetData *planet;
+    planet = player_get_planet();
+    if (!planet)return vector3d(-1,-1,-1);
+    return planet_position_to_position(planet->radius + 100, site);
+}
+
 Vector3D planet_position_to_position(float radius, Vector2D site)
 {
     PlanetData *planet;

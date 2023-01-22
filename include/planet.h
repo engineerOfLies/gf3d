@@ -131,4 +131,19 @@ void planet_site_survey(PlanetData *planet,Vector2D position);
  */
 int planet_site_surveyed(PlanetData *planet,Vector2D position);
 
+/**
+ * @brief get a relay point to/from the planet site
+ * @param site the location of the site
+ * @return a halfway point between the planet and the station
+ */
+Vector3D planet_site_get_relay(Vector2D site);
+
+/**
+ * @brief get the approach vector for the given site
+ * @param site the location of the site
+ * @return a position, 100 meters above the site
+ */
+Vector3D planet_site_get_approach(Vector2D site);
+
+
 #endif
