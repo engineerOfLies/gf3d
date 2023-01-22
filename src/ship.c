@@ -1,4 +1,7 @@
 #include "simple_logger.h"
+
+#include "gf2d_message_buffer.h"
+
 #include "config_def.h"
 #include "world.h"
 #include "resources.h"
@@ -108,8 +111,12 @@ Ship *ship_load(SJson *json)
         }
         sj_object_get_value_as_int(json,"flightStep",&ship->flightStep);
     }
+    str = sj_object_get_value_as_string(json,"destination");
+    if (str)gfc_line_cpy(ship->destination,str);
     str = sj_object_get_value_as_string(json,"dockName");
     if (str)gfc_line_cpy(ship->dockName,str);
+    str = sj_object_get_value_as_string(json,"sectionName");
+    if (str)gfc_line_cpy(ship->sectionName,str);
 
     if (strcmp(ship->location,"parking")==0)
     {
@@ -166,12 +173,14 @@ SJson *ship_save(Ship *ship)
    
     sj_object_insert(json,"name",sj_new_str(ship->name));
     sj_object_insert(json,"displayName",sj_new_str(ship->displayName));
-    sj_object_insert(json,"dockName",sj_new_str(ship->dockName));
-    sj_object_insert(json,"captain",sj_new_str(ship->captain));
+    if (strlen(ship->dockName))sj_object_insert(json,"dockName",sj_new_str(ship->dockName));
+    if (strlen(ship->sectionName))sj_object_insert(json,"sectionName",sj_new_str(ship->sectionName));
+    if (strlen(ship->destination))sj_object_insert(json,"destination",sj_new_str(ship->destination));
+    if (strlen(ship->captain))sj_object_insert(json,"captain",sj_new_str(ship->captain));
     sj_object_insert(json,"id",sj_new_uint32(ship->id));
     sj_object_insert(json,"idPool",sj_new_uint32(ship->idPool));
     sj_object_insert(json,"passengers",sj_new_int(ship->passengers));
-    sj_object_insert(json,"location",sj_new_str(ship->location));
+    if (strlen(ship->location))sj_object_insert(json,"location",sj_new_str(ship->location));
     sj_object_insert(json,"position",sj_vector3d_new(ship->position));
     c = gfc_list_get_count(ship->flightPath);
     if (c)
@@ -389,14 +398,84 @@ void ship_check(Ship *ship)
     }
 }
 
+
+Vector3D ship_get_egress_vector(Ship *ship)
+{
+    StationSection *section;
+    if (!ship)return vector3d(-1,-1,-1);
+    if (gfc_line_cmp(ship->location,"parking")==0)
+    {
+        return world_get_parking_egress();//if I am parked, then 
+    }
+    if (gfc_line_cmp(ship->location,"docked")==0)
+    {
+        section = station_get_section_by_display_name(player_get_station_data(),ship->sectionName);
+        if (!section)return vector3d(-1,-1,-1);
+        return station_section_get_egress_vector(section);
+    }
+    if (gfc_line_cmp(ship->location,"interstellar")==0)//returning from fourth space
+    {
+        return world_get_gate_egress(   );
+    }
+    return vector3d(-1,-1,-1);
+}
+
+void ship_clear_flight_path(Ship *ship)
+{
+    if (!ship)return;
+    gfc_list_foreach(ship->flightPath,(gfc_work_func*)free);//delete the old vectors
+    gfc_list_clear(ship->flightPath);//clear the list
+}
+
+void ship_order_to_parking(Ship *ship)
+{
+    Vector3D approach,egress;
+    Vector3D spot;
+    if (!ship)return;
+    if (gfc_line_cmp(ship->location,"parking")==0)return;//already there
+
+    gfc_line_sprintf(ship->destination,"parking");
+    spot = world_parking_get_spot();
+    if ((spot.x == -1)&&(spot.y == -1)&&(spot.z == -1))
+    {
+        message_new("parking lot is full");
+        return;
+    }
+    
+    ship_check(ship);
+    ship_clear_flight_path(ship);
+    
+    egress = ship_get_egress_vector(ship);
+    if (!((egress.x == -1)&&(egress.y == -1)&&(egress.z == -1)))
+    {
+        ship_add_flightpath_point(ship,egress);
+    }
+
+    approach = world_get_parking_approach();
+    ship_add_flightpath_point(ship,approach);
+    
+    ship_add_flightpath_point(ship,spot);
+    
+    ship_set_location(ship,"in_transit",ship->position);
+    ship_entity_move_to(ship->entity,0);
+}
+
+void ship_vacate_location(Ship *ship)
+{
+    if (!ship)return;
+    if (gfc_line_cmp(ship->location,"parking")==0)
+    {
+        world_parking_vacate_spot(Vector3D spot);
+        return;
+    }
+}
+
 void ship_order_to_dock(Ship *ship, const char *dock)
 {
-    Vector3D approach;
+    Vector3D approach,egress;
     Vector3D dockPosition;
     StationSection *section;
     if ((!ship)||(!dock))return;
-    section = station_section_get_by_facility(dock);
-    if (!section)return;
     
     section = station_section_get_by_facility(dock);
     if (!section)
@@ -405,8 +484,13 @@ void ship_order_to_dock(Ship *ship, const char *dock)
         return;
     }
     ship_check(ship);
-    gfc_list_foreach(ship->flightPath,(gfc_work_func*)free);//delete the old vectors
-    gfc_list_clear(ship->flightPath);//clear the list
+    ship_clear_flight_path(ship);
+    
+    egress = ship_get_egress_vector(ship);
+    if (!((egress.x == -1)&&(egress.y == -1)&&(egress.z == -1)))
+    {
+        ship_add_flightpath_point(ship,egress);
+    }
     
     approach = station_section_get_approach_vector(section);
     ship_add_flightpath_point(ship,approach);
@@ -415,7 +499,10 @@ void ship_order_to_dock(Ship *ship, const char *dock)
     ship_add_flightpath_point(ship,dockPosition);
 
     ship_set_location(ship,"in_transit",ship->position);
-    ship_entity_move_to(ship->entity,0,section->displayName);
+    ship_entity_move_to(ship->entity,0);
+    gfc_line_sprintf(ship->destination,"docked");
+    gfc_line_cpy(ship->dockName,dock);
+    gfc_line_cpy(ship->sectionName,section->displayName);
 }
 
 void ship_set_location(Ship *ship,const char *location,Vector3D position)

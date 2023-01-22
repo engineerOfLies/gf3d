@@ -16,8 +16,6 @@ typedef struct
     TextLine    displayName;    //its name as displayed to the user, editable by the user
     Uint32      id;             //unique ID for the station section
     Uint32      idPool;         // for facilities on this ship
-    TextLine    location;       // where is the ship
-    Vector3D    position;       // more specifically
     int         housing;        //how much housing is provided by this S
     int         passengers;     //how many people are being transported
     float       hull,hullMax;   //when hull <= 0 ship is destroyed
@@ -31,13 +29,21 @@ typedef struct
     int         storageCapacity;//ship total
     List       *cargo;          //a resources list of the cargo
     int         disabled;       // if the ship cannot run.  No crew, no power, no engines
-    float       speed;          // top speed for the ship
+    float       interstellarSpeed;   // top speed for the ship in interstellar space
+    float       stellarSpeed;   // top speed for the ship in stellar space
+    float       speed;          // top speed for the ship in local space
     float       efficiency;     // factor for overal ship performance
     List       *facilities;     //list of ship facilities
     List       *flightPath;     //Describes a list of way points from beginning to end of a journey
     int         flightStep;     //current step along the flight path
     List       *thrust;         // list of modelMats for thrust
-    TextLine    dockName;       //when approaching or leaving a dock, ship should align to this dock.
+    //light path stuff
+    int         parkingSpot;    // index where parked.
+    TextLine    location;       // where is the ship
+    Vector3D    position;       // more specifically
+    TextLine    destination;    // once the ship has completed its path, it will set its location to this
+    TextLine    sectionName;    // if set, where the ship is docked at or headed to.
+    TextLine    dockName;       // If set, where the ship is docked at, or headed to.
     Entity     *entity;         // pointer to the ship entity
 }Ship;
 
@@ -156,7 +162,23 @@ const char *ship_name_get_slot_name_by_index(const char *shipName, Uint32 index)
  */
 int ship_get_slot_usage_by_type(Ship *ship,const char *slot_type);
 
+/**
+ * @brief clear the flight path for a ship after it is completed
+ */
+void ship_clear_flight_path(Ship *ship);
 
+/**
+ * @brief have a ship set up a flight path to the given dock
+ * @param ship the ship to send
+ * @param dock the name of the section with the dock in question
+ */
 void ship_order_to_dock(Ship *ship, const char *dock);
+
+/**
+ * @brief have a ship set up a flight path to the parking area
+ * @param ship the ship to send
+ */
+void ship_order_to_parking(Ship *ship);
+
 
 #endif

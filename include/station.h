@@ -31,6 +31,7 @@ typedef struct StationSection_S
     int         staffAssigned,staffPositions; // how many staff have are working this section / how many positions there are to work
     Vector3D    dockPosition;       //docking position before ship stops rendering / begins exit
     Vector3D    approach;           //relay point before making final docking approach
+    Vector3D    egress;             //relay point before exiting the dock
     Bool        drawGuideStrip;     //if we draw a guidesStrip for the section (only docks)
     Vector3D    guideStrip;         //position where the guide strip starts at
     Uint8       slot;                      // where the section is mounted on the parent
@@ -166,10 +167,17 @@ StationSection *station_section_get_by_facility(const char *facilityName);
 
 /**
  * @brief get the approach vector for the given station section in world space
- * @param seciton the station section in question
+ * @param section the station section in question
  * @return a zero vector if not specified or error.  The position in space you should head to first otherwise
  */
 Vector3D station_section_get_approach_vector(StationSection *section);
+
+/**
+ * @brief get the exit vector for the given station section in world space
+ * @param section the station section in question
+ * @return a zero vector if not specified or error.  The position in space you should head to first otherwise
+ */
+Vector3D station_section_get_egress_vector(StationSection *section);
 
 /**
  * @brief get the position of the dock for the given station section in world space

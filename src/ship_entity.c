@@ -64,7 +64,7 @@ Entity *ship_entity_new(Vector3D position,Ship *data,Color detailColor)
     return ent;
 }
 
-void ship_entity_move_to(Entity *ent,Uint32 pathIndex,const char *dockName)
+void ship_entity_move_to(Entity *ent,Uint32 pathIndex)
 {
     Vector3D *v;
     Ship *ship;
@@ -73,13 +73,12 @@ void ship_entity_move_to(Entity *ent,Uint32 pathIndex,const char *dockName)
     v = gfc_list_get_nth(ship->flightPath,pathIndex);
     if (!v)
     {
-        slog("Path Complete");
-        gfc_line_sprintf(ship->location,"docked");
+        gfc_line_cpy(ship->location,ship->destination);//TODO this needs to be based on the path destination
+        gfc_line_clear(ship->destination);
         ent->think = ship_entity_think;
+        ship_clear_flight_path(ship);
         return;
     }
-    if ((dockName)&&(strlen(dockName)))gfc_line_cpy(ship->dockName,dockName);
-    else gfc_line_clear(ship->dockName);
     ship->flightStep = pathIndex;
     vector3d_copy(ent->targetPosition,(*v));
     ent->targetComplete = 0;
@@ -104,6 +103,12 @@ void ship_entity_update(Entity *self)
     //sync to data
     vector3d_copy(ship->position,self->mat.position);
     ship->flightStep = self->counter;
+    if ((strcmp(ship->location,"docked")==0)||
+        (strcmp(ship->location,"interstellar")==0))
+    {
+        self->hidden = 1;
+    }
+    else self->hidden = 0;
 }
 
 void ship_entity_draw(Entity *self)
@@ -114,13 +119,6 @@ void ship_entity_draw(Entity *self)
     Ship *data;
     if ((!self)||(!self->data))return;
     data = self->data;
-    if ((strcmp(data->location,"docked")==0)||
-        (strcmp(data->location,"interstellar")==0))
-    {
-        self->hidden = 1;
-        return;// inside the station
-    }
-    self->hidden = 0;
     if (!vector3d_is_zero(self->velocity))
     {
         //draw thrust
@@ -155,8 +153,7 @@ void ship_entity_think_moving(Entity *self)
         self->think = ship_entity_think;
         self->targetComplete = 1;
         vector3d_clear(self->velocity);
-        ship_entity_move_to(self,++self->counter,ship->dockName);
-        slog("at waypoint");
+        ship_entity_move_to(self,++self->counter);
         return;
     }
     if (vector3d_distance_between_less_than(self->mat.position,self->targetPosition,self->speed *0.01))

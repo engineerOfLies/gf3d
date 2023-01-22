@@ -302,6 +302,7 @@ StationSection *station_add_section(StationData *data,const char *sectionName,in
     }
     sj_value_as_vector3d(sj_object_get_value(sectionDef,"dockPosition"),&section->dockPosition);
     sj_value_as_vector3d(sj_object_get_value(sectionDef,"approach"),&section->approach);
+    sj_value_as_vector3d(sj_object_get_value(sectionDef,"egress"),&section->egress);
     
     section->expansionSlots = sj_array_get_count(sj_object_get_value(sectionDef,"extensions"));
     if (id < 0)
@@ -682,6 +683,17 @@ Vector3D station_section_get_approach_vector(StationSection *section)
     if ((!player)||(!player->station))return approach;
     if (vector3d_is_zero(section->approach)) return approach;
     return station_section_to_world_space(section, section->approach);
+}
+
+Vector3D station_section_get_egress_vector(StationSection *section)
+{
+    PlayerData *player;
+    Vector3D egress = {0};
+    if (!section)return egress;
+    player = player_get_data();
+    if ((!player)||(!player->station))return egress;
+    if (vector3d_is_zero(section->egress)) return egress;
+    return station_section_to_world_space(section, section->egress);
 }
 
 StationSection *station_section_get_by_facility(const char *facilityName)

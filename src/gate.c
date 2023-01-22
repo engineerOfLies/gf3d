@@ -76,7 +76,7 @@ void gate_draw(Entity *self)
         vector3d(self->mat.scale.x,self->mat.scale.y * data->frame,self->mat.scale.z));
     
     gf3d_model_draw(data->tunnel,0,mat,vector4d(255,255,255,128),vector4d(0,0,0,0),vector4d(0,0,0,1));
-    draw_guiding_lights(self->mat.position,self->mat.rotation,150, 500);
+    draw_guiding_lights(self->mat.position,self->mat.rotation,1.5*self->mat.scale.x, 5*self->mat.scale.y);
 }
 
 void gate_think(Entity *self)

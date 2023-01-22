@@ -145,6 +145,11 @@ World *world_load(char *filename)
         w->sounds = gfc_sound_pack_parse(item);
     }
     sj_object_get_value_as_uint32(wjson,"hourTime",&w->hourTime);
+    
+    sj_value_as_vector3d(sj_object_get_value(wjson,"gateApproach"),&w->gateApproach);
+    sj_value_as_vector3d(sj_object_get_value(wjson,"gateEgress"),&w->gateEgress);
+
+    
     w->entity_list = gfc_list_new();
     list = sj_object_get_value(wjson,"entities");
     c = sj_array_get_count(list);
@@ -162,6 +167,8 @@ World *world_load(char *filename)
     {
         sj_value_as_vector3d(sj_object_get_value(item,"position"),&w->parkingStart);
         sj_value_as_vector3d(sj_object_get_value(item,"delta"),&w->parkingDelta);
+        sj_value_as_vector3d(sj_object_get_value(item,"approach"),&w->parkingApproach);
+        sj_value_as_vector3d(sj_object_get_value(item,"egress"),&w->parkingEgress);
     }
     
     list = sj_object_get_value(wjson,"combat_zones");
@@ -289,6 +296,30 @@ void world_run_updates(World *w)
         w->lastHour = now;
         player_hour_advance();
     }
+}
+
+Vector3D world_get_parking_approach()
+{
+    if (!the_world)return vector3d(0,0,0);
+    return the_world->parkingApproach;
+}
+
+Vector3D world_get_parking_egress()
+{
+    if (!the_world)return vector3d(0,0,0);
+    return the_world->parkingEgress;
+}
+
+Vector3D world_get_gate_approach()
+{
+    if (!the_world)return vector3d(0,0,0);
+    return the_world->gateApproach;
+}
+
+Vector3D world_get_gate_egress()
+{
+    if (!the_world)return vector3d(0,0,0);
+    return the_world->gateEgress;
 }
 
 void world_play_sound(const char *sound)

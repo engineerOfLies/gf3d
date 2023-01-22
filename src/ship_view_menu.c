@@ -246,6 +246,7 @@ void ship_view_menu_list_choice(Window *win)
     if (gfc_strlcmp(choice, "Parking") == 0)
     {
         slog("heading to parking");
+        ship_order_to_parking(data->ship);
         return;
     }
     ship_order_to_dock(data->ship, choice);

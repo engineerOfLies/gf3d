@@ -41,6 +41,10 @@ typedef struct
     List       *parking_spots;//places that have been assigned
     Vector3D    parkingStart;//starting location for parking spots
     Vector3D    parkingDelta;//how much space between spots
+    Vector3D    parkingApproach;//relay point for going to parking
+    Vector3D    parkingEgress;//relay point for leaving parking
+    Vector3D    gateApproach;//relay point for going to the stargate
+    Vector3D    gateEgress;//relay point for leaving the stargate
     List       *combatZones;
 }World;
 
@@ -56,7 +60,6 @@ void get_date(char *output);
  * @param day the day to use
  */
 void get_date_of(char *output,Uint32 day);
-
 
 /**
  * @brief convert a specific time to datetime
@@ -108,6 +111,26 @@ Vector3D *world_parking_spot_get_by_location(Vector3D spot);
  * @return (-1,-1,-1) if the parking lot is full, or the position of your spot otherwise
  */
 Vector3D world_parking_get_spot();
+
+/**
+ * @brief get the approach vector for the parking lot
+ */
+Vector3D world_get_parking_approach();
+
+/**
+ * @brief get the exit vector for the parking lot
+ */
+Vector3D world_get_parking_egress();
+
+/**
+ * @brief get the approach vector for the FSD gate
+ */
+Vector3D world_get_gate_approach();
+
+/**
+ * @brief get the exit vector for the FSD Gate
+ */
+Vector3D world_get_gate_egress();
 
 /**
  * @brief let the parking lot know that you are done with it
