@@ -283,8 +283,8 @@ int hud_update(Window *win,List *updateList)
             if (win->child)gf2d_window_free(win->child);
             data->paused = 1;
             win->hidden = 1;
-            data->combat = combat_window(win,"gateway");
             hud_reset_camera(win);
+            data->combat = combat_window(win,"gateway");
             return 1;
         }
         if (strcmp(e->name,"pause")==0)
