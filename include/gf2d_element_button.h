@@ -2,6 +2,7 @@
 #define __GF2D_ELEMENT_BUTTON_H__
 
 #include "gf2d_elements.h"
+#include "gf2d_font.h"
 
 typedef enum
 {
@@ -66,5 +67,38 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win);
  */
 Element *gf2d_element_button_get_by_id(Element *e,int id);
 
+/**
+ * @brief quickly make a label button based on name and color of the text
+ * @param win the window to add this to
+ * @param index the index for the button
+ * @param text the text for the label
+ * @param ft the font to use
+ * @param size the width and height of the button
+ * @param color the color of the text
+ * @return NULL on error, or a button element.  It will need to be parented or placed still
+ */
+Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, Vector2D size, Color color);
+
+/**
+ * @brief quickly make an actor button based on actor, name and color of the text
+ * @param win the window to add this to
+ * @param index the index for the button
+ * @param name the name of the button element for update checks
+ * @param actorFile the path to the file where the actor is described
+ * @param text the text for the label
+ * @param scale how to scale the actor (1,1) is no scale
+ * @param size the width and height of the button
+ * @param color the color of the text
+ * @return NULL on error, or a button element.  It will need to be parented or placed still
+ */
+Element *gf2d_button_new_simple(
+    Window *win,
+    int index,
+    const char *name,
+    const char *actorFile,
+    const char *text,
+    Vector2D scale,
+    Vector2D size,
+    Color color);
 
 #endif

@@ -22,6 +22,7 @@ typedef struct
     int   scrollOffset;     /**<offset for drawing based on scrolling position*/
     int   itemsPerLine;     /**<how many items will fit per line*/
     int   itemsPerColumn;   /**<how many items will fit per columns*/
+    Element *scrollbar;     /**<sub_element*/
 }ListElement;
 
 
@@ -84,6 +85,20 @@ Element *gf2d_element_list_get_item_by_id(Element *e,int id);
  * @brief set the scroll offset
  */
 void gf2d_element_list_set_scroll_offset(Element *element,int offset);
+
+/**
+ * @brief get the number of rows that can be drawn at once based on itemSize
+ * @param element the list element
+ * @return 0 on error or zero itemSize.y, number of items that can be drawn otherwise
+ */
+int gf2d_element_list_get_row_count(Element *element);
+
+/**
+ * @brief get the number of items in the element list
+ * @param element the element list
+ * @return the number of items in the list
+ */
+int gf2d_element_list_get_item_count(Element *element);
 
 /**
  * @brief get the number of items that fit per line in a wrapping list

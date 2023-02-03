@@ -10,8 +10,9 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_mesh.h"
 
-
 #define ATTRIBUTE_COUNT 3
+
+extern int __DEBUG;
 
 typedef struct
 {
@@ -19,6 +20,7 @@ typedef struct
     Pipeline *pipe;
     Pipeline *highlight_pipe;
     Pipeline *sky_pipe;
+    Pipeline *alpha_pipe;
     Uint32 mesh_max;
     VkVertexInputAttributeDescription attributeDescriptions[ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription bindingDescription;
@@ -64,17 +66,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     gf3d_mesh.mesh_list = gfc_allocate_array(sizeof(Mesh),mesh_max);
     
     gf3d_mesh_get_attribute_descriptions(&count);
-    gf3d_mesh.pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/model_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        sizeof(MeshUBO)
-    );
-
+    
     gf3d_mesh.sky_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/sky_pipeline.cfg",
@@ -83,10 +75,35 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(SkyUBO)
+        sizeof(SkyUBO),
+        VK_INDEX_TYPE_UINT16
     );
 
-        gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
+    gf3d_mesh.pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/model_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        sizeof(MeshUBO),
+        VK_INDEX_TYPE_UINT16
+    );
+
+    gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/model_alpha_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        sizeof(MeshUBO),
+        VK_INDEX_TYPE_UINT16
+    );
+
+    gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/highlight_pipeline.cfg",
         gf3d_vgraphics_get_view_extent(),
@@ -94,15 +111,21 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(HighlightUBO)
+        sizeof(HighlightUBO),
+        VK_INDEX_TYPE_UINT16
     );
 
-    slog("mesh system initialized");
+    if (__DEBUG)slog("mesh system initialized");
 }
 
 Pipeline *gf3d_mesh_get_pipeline()
 {
     return gf3d_mesh.pipe;
+}
+
+Pipeline *gf3d_mesh_get_alpha_pipeline()
+{
+    return gf3d_mesh.alpha_pipe;
 }
 
 Pipeline *gf3d_mesh_get_highlight_pipeline()
@@ -119,8 +142,9 @@ void gf3d_mesh_reset_pipes()
 {
     Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     
-    gf3d_pipeline_reset_frame(gf3d_mesh.sky_pipe,bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh.pipe,bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_mesh.sky_pipe,bufferFrame);
+    gf3d_pipeline_reset_frame(gf3d_mesh.alpha_pipe,bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh.highlight_pipe,bufferFrame);
 }
 
@@ -128,6 +152,7 @@ void gf3d_mesh_submit_pipe_commands()
 {
     gf3d_pipeline_submit_commands(gf3d_mesh.sky_pipe);
     gf3d_pipeline_submit_commands(gf3d_mesh.pipe);
+    gf3d_pipeline_submit_commands(gf3d_mesh.alpha_pipe);
     gf3d_pipeline_submit_commands(gf3d_mesh.highlight_pipe);
 }
 
@@ -137,15 +162,21 @@ VkCommandBuffer gf3d_mesh_get_model_command_buffer()
     return gf3d_mesh.pipe->commandBuffer;
 }
 
+VkCommandBuffer gf3d_mesh_get_alph_model_command_buffer()
+{
+    if (!gf3d_mesh.alpha_pipe)return VK_NULL_HANDLE;
+    return gf3d_mesh.alpha_pipe->commandBuffer;
+}
+
 VkCommandBuffer gf3d_mesh_get_highlight_command_buffer()
 {
-    if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
+    if (!gf3d_mesh.highlight_pipe)return VK_NULL_HANDLE;
     return gf3d_mesh.highlight_pipe->commandBuffer;
 }
 
 VkCommandBuffer gf3d_mesh_get_sky_command_buffer()
 {
-    if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
+    if (!gf3d_mesh.sky_pipe)return VK_NULL_HANDLE;
     return gf3d_mesh.sky_pipe->commandBuffer;
 }
 
@@ -219,7 +250,6 @@ void gf3d_mesh_free_all()
 
 void gf3d_mesh_close()
 {
-    slog("cleaning up mesh data");
     if (gf3d_mesh.mesh_list)
     {
         gf3d_mesh_free_all();
@@ -227,7 +257,7 @@ void gf3d_mesh_close()
         free(gf3d_mesh.mesh_list);
         gf3d_mesh.mesh_list = NULL;
     }
-    slog("mesh system closed");
+    if (__DEBUG)slog("mesh system closed");
 }
 
 void gf3d_mesh_delete(Mesh *mesh)
@@ -267,89 +297,92 @@ void gf3d_mesh_scene_add(Mesh *mesh)
     if (!mesh)return;
 }
 
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
+void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture)
 {
     int i,c;
     MeshPrimitive *primitive;
-    VkDeviceSize offsets[] = {0};
-    Pipeline *pipe;
     if (!mesh)
     {
         slog("cannot render a NULL mesh");
         return;
     }
-    pipe = gf3d_mesh_get_pipeline();
-    
+    if (!pipe)
+    {
+        slog("cannot render with NULL pipe");
+        return;
+    }
+    if (!uboData)
+    {
+        slog("cannot render with NULL descriptor set");
+        return;
+    }
     c = gfc_list_get_count(mesh->primitives);
     for (i = 0; i < c; i++)
     {
         primitive = gfc_list_get_nth(mesh->primitives,i);
         if (!primitive)continue;
-
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, &primitive->vertexBuffer, offsets);
-        
-        vkCmdBindIndexBuffer(commandBuffer, primitive->faceBuffer, 0, VK_INDEX_TYPE_UINT16);
-        
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-        
-        vkCmdDrawIndexed(commandBuffer, primitive->faceCount * 3, 1, 0, 0, 0);
+        gf3d_pipeline_queue_render(
+            pipe,
+            primitive->vertexBuffer,
+            primitive->faceCount * 3,
+            primitive->faceBuffer,
+            uboData,
+            texture);
     }
+}
+
+void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descriptorSet)
+{
+    int i,c;
+    MeshPrimitive *primitive;
+    if (!mesh)
+    {
+        slog("cannot render a NULL mesh");
+        return;
+    }
+    if (!pipe)
+    {
+        slog("cannot render with NULL pipe");
+        return;
+    }
+    if (!descriptorSet)
+    {
+        slog("cannot render with NULL descriptor set");
+        return;
+    }
+    c = gfc_list_get_count(mesh->primitives);
+    for (i = 0; i < c; i++)
+    {
+        primitive = gfc_list_get_nth(mesh->primitives,i);
+        if (!primitive)continue;
+        gf3d_pipeline_call_render(
+            pipe,
+            descriptorSet,
+            primitive->vertexBuffer,
+            primitive->faceCount * 3,
+            primitive->faceBuffer);
+    }
+}
+
+
+void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
+{
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.pipe, descriptorSet);
+}
+
+void gf3d_mesh_alpha_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
+{
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.alpha_pipe, descriptorSet);
 }
 
 void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    int i,c;
-    MeshPrimitive *primitive;
-    VkDeviceSize offsets[] = {0};
-    Pipeline *pipe;
-    if (!mesh)
-    {
-        slog("cannot render a NULL mesh");
-        return;
-    }
-    pipe = gf3d_mesh.highlight_pipe;
-    c = gfc_list_get_count(mesh->primitives);
-    for (i = 0; i < c; i++)
-    {
-        primitive = gfc_list_get_nth(mesh->primitives,i);
-        if (!primitive)continue;
-
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, &primitive->vertexBuffer, offsets);
-        
-        vkCmdBindIndexBuffer(commandBuffer, primitive->faceBuffer, 0, VK_INDEX_TYPE_UINT16);
-        
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-        
-        vkCmdDrawIndexed(commandBuffer, primitive->faceCount * 3, 1, 0, 0, 0);
-    }
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.highlight_pipe, descriptorSet);
 }
 
 void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
-    int i,c;
-    MeshPrimitive *primitive;
-    VkDeviceSize offsets[] = {0};
-    Pipeline *pipe;
-    if (!mesh)
-    {
-        slog("cannot render a NULL mesh");
-        return;
-    }
-    pipe = gf3d_mesh.sky_pipe;
-    c = gfc_list_get_count(mesh->primitives);
-    for (i = 0; i < c; i++)
-    {
-        primitive = gfc_list_get_nth(mesh->primitives,i);
-        if (!primitive)continue;
-
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, &primitive->vertexBuffer, offsets);
-        
-        vkCmdBindIndexBuffer(commandBuffer, primitive->faceBuffer, 0, VK_INDEX_TYPE_UINT16);
-        
-        vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-        
-        vkCmdDrawIndexed(commandBuffer, primitive->faceCount * 3, 1, 0, 0, 0);
-    }
+    gf3d_mesh_render_generic(mesh,gf3d_mesh.sky_pipe,descriptorSet);
 }
 
 

@@ -53,7 +53,7 @@ void gf2d_draw_window_border_generic(Rect rect,Color color)
 void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color color)
 {
     int i;
-    Vector4D clip = {0,0,1,1};
+    Vector4D clip = {0,0,0,0};
     Vector2D count = {0};
     Vector2D fraction = {0};
     Vector2D scale = {0};
@@ -105,8 +105,8 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     }
     if (fraction.x > 0)
     {
-        clip.z = fraction.x;
-        clip.w = 1;
+        clip.z = (1.0 - fraction.x)*border->frameWidth;
+        clip.w = 0;
         gf2d_sprite_draw(
             border,
             vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y - border->frameWidth/2),
@@ -157,8 +157,8 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     {
         clip.x = 0;
         clip.y = 0;
-        clip.z = 1;
-        clip.w = fraction.y;
+        clip.z = 0;
+        clip.w = (1- fraction.y)*border->frameHeight;
         gf2d_sprite_draw(
             border,
             vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
@@ -351,7 +351,11 @@ void gf2d_windows_close()
         }
     }
     gfc_list_delete(window_manager.window_deque);
-    slog("window system closed");
+    
+    gf2d_sprite_free(window_manager.generic_border);
+    gf2d_sprite_free(window_manager.generic_background);
+    gfc_sound_pack_free(window_manager.sounds);
+    memset(&window_manager,0,sizeof(WindowManager));
 }
 
 void gf2d_windows_init(int max_windows,const char *config)
@@ -412,8 +416,17 @@ void gf2d_windows_init(int max_windows,const char *config)
     window_manager.generic_background = gf2d_sprite_load_image(background);
     window_manager.generic_border = gf2d_sprite_load(border,borderSize.x,borderSize.y,borderFPL);
     window_manager.drawbounds = 0;
-    slog("window system initilized");
     atexit(gf2d_windows_close);
+}
+
+int gf2d_window_check(Window *win,const char *name)
+{
+    if ((!win)||(!win->data))return 0;
+    if (name)
+    {
+        if (gfc_strlcmp(win->name,name)!= 0)return 0;
+    }
+    return 1;
 }
 
 void gf2d_window_close_child(Window *parent,Window *child)
@@ -433,6 +446,7 @@ void gf2d_window_free(Window *win)
     {
         win->free_data(win);
     }
+    if (win->child)gf2d_window_free(win->child);
     gfc_list_delete_data(window_manager.window_deque,win);
     count = gfc_list_get_count(win->elements);
     for (i = 0;i < count;i++)
@@ -441,10 +455,24 @@ void gf2d_window_free(Window *win)
     }
     gfc_list_delete(win->elements);
     gfc_list_delete(win->focus_elements);// only delete the list, the data is handled by the other list
-    gf2d_sprite_free(win->background);
-    gf2d_sprite_free(win->border);
     memset(win,0,sizeof(Window));
 }
+
+void gf2d_window_refresh(Window *win)
+{
+    if ((!win)||(!win->refresh))return;
+    win->refresh(win);
+}
+
+void gf2d_window_refresh_by_name(const char *name)
+{
+    Window *win;
+    if (!name)return;
+    win = gf2d_window_get_by_name(name);
+    if (!win)return;
+    win->refresh(win);
+}
+
 
 void gf2d_window_set_dimensions(Window *win,Rect dimensions)
 {
@@ -495,12 +523,11 @@ int gf2d_window_update(Window *win)
     int count,i;
     int retval = 0;
     Vector2D offset;
-    List *updateList = NULL;
+    List *updateList = gfc_list_new();
     List *updated = NULL;
     Element *e;
     if (!win)return 0;
     if (win->hidden)return 0;
-    updateList = gfc_list_new();
     offset.x = win->dimensions.x + win->canvas.x;
     offset.y = win->dimensions.y + win->canvas.y;
     count = gfc_list_get_count(win->elements);
@@ -511,10 +538,6 @@ int gf2d_window_update(Window *win)
         updated = gf2d_element_update(e, offset);
         if (updated)
         {
-            if (!updateList)
-            {
-                updateList = gfc_list_new();
-            }
             updateList = gfc_list_concat_free(updateList,updated);
         }
     }
@@ -685,6 +708,18 @@ Window *gf2d_window_new()
     return NULL;
 }
 
+Window *gf2d_window_get_by_name(const char *name)
+{
+    int i;
+    if (!name)return NULL;
+    for (i = 0;i < window_manager.window_max;i++)
+    {
+        if (!window_manager.window_list[i]._inuse)continue;
+        if (strcmp(window_manager.window_list[i].name,name) == 0)return &window_manager.window_list[i];
+    }
+    return NULL;
+}
+
 void gf2d_window_add_element(Window *win,Element *e)
 {
     if (!win)return;
@@ -803,8 +838,20 @@ Window *gf2d_window_load(char *filename)
     json = sj_load(filename);
     win = gf2d_window_load_from_json(json);
     sj_free(json);
-    if (win)gf2d_window_make_focus_list(win);
+    if (win)
+    {
+        if (!strlen(win->name))gfc_line_cpy(win->name,filename);
+        gf2d_window_make_focus_list(win);
+    }
     return win;
+}
+
+int gf2d_window_named(Window *win,const char *name)
+{
+    if (!win)return 0;
+    if (!name)return 0;
+    if (strcmp(win->name,name)==0)return 1;
+    return 0;
 }
 
 Window *gf2d_window_load_from_json(SJson *json)
@@ -833,7 +880,8 @@ Window *gf2d_window_load_from_json(SJson *json)
         return NULL;
     }
     
-    
+    buffer = sj_object_get_value_as_string(json,"name");
+    if (buffer)gfc_line_cpy(win->name,buffer);
     sj_get_bool_value(sj_object_get_value(json,"no_draw_generic"),&buul);
     if (buul)win->no_draw_generic = 1;
     sj_value_as_vector4d(sj_object_get_value(json,"color"),&vector);

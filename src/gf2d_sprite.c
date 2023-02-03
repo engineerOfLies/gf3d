@@ -1,3 +1,5 @@
+#include <stdalign.h>
+
 #include "simple_logger.h"
 
 #include "gfc_types.h"
@@ -11,6 +13,8 @@
 
 #define SPRITE_ATTRIBUTE_COUNT 2
 
+extern int __DEBUG;
+
 typedef struct
 {
     Matrix4 rotation;
@@ -22,7 +26,7 @@ typedef struct
     Vector2D scale;
     Vector2D frame_offset;
     Vector2D center;
-    float drawOrder;
+    alignas(64) float drawOrder;
 }SpriteUBO;
 
 typedef struct
@@ -33,7 +37,7 @@ typedef struct
 
 typedef struct
 {
-    Uint32  verts[3];
+    Uint16  verts[3];
 }SpriteFace;
 
 typedef struct
@@ -50,10 +54,9 @@ typedef struct
     float           drawOrder;
 }SpriteManager;
 
-void gf2d_sprite_update_basic_descriptor_set(
+
+SpriteUBO gf2d_sprite_get_uniform_buffer(
     Sprite *sprite,
-    VkDescriptorSet descriptorSet,
-    Uint32 chainIndex,
     Vector2D position,
     Vector2D scale,
     Vector3D rotation,
@@ -88,7 +91,7 @@ void gf2d_sprite_manager_close()
     }
 
     memset(&gf2d_sprite,0,sizeof(SpriteManager));
-    slog("sprite manager closed");
+    if(__DEBUG)slog("sprite manager closed");
 }
 
 void gf2d_sprite_manager_init(Uint32 max_sprites)
@@ -142,10 +145,11 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
         gf2d_sprite_get_bind_description(),
         gf2d_sprite_get_attribute_descriptions(NULL),
         count,
-        sizeof(SpriteUBO)
+        sizeof(SpriteUBO),
+        VK_INDEX_TYPE_UINT16
     );     
     
-    slog("sprite manager initiliazed");
+    if(__DEBUG)slog("sprite manager initiliazed");
     atexit(gf2d_sprite_manager_close);
 }
 
@@ -280,27 +284,6 @@ void gf2d_sprite_delete(Sprite *sprite)
     memset(sprite,0,sizeof(Sprite));
 }
 
-
-void gf2d_sprite_render(Sprite *sprite,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
-{
-    VkDeviceSize offsets[] = {0};
-    Pipeline *pipe;
-    if (!sprite)
-    {
-        slog("cannot render a NULL sprite");
-        return;
-    }
-    pipe = gf2d_sprite_get_pipeline();
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &sprite->buffer, offsets);
-    
-    vkCmdBindIndexBuffer(commandBuffer, gf2d_sprite.faceBuffer, 0, VK_INDEX_TYPE_UINT32);
-    
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-    
-    vkCmdDrawIndexed(commandBuffer, 6, 1, 0, 0, 0);
-}
-
-
 void gf2d_sprite_draw_full(
     Sprite   * sprite,
     Vector2D   position,
@@ -322,6 +305,21 @@ void gf2d_sprite_draw_full(
         &colorShift,
         &clip,
        frame);
+}
+
+void gf2d_sprite_draw_image(
+    Sprite   * sprite,
+    Vector2D   position)
+{
+    gf2d_sprite_draw(
+        sprite,
+        position,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,0);
 }
 
 void gf2d_sprite_draw_simple(
@@ -353,9 +351,7 @@ void gf2d_sprite_draw(
     Vector4D * clip,
     Uint32     frame)
 {
-    VkDescriptorSet *descriptorSet = NULL;
-    Uint32 buffer_frame;
-    VkCommandBuffer commandBuffer;
+    SpriteUBO spriteUBO = {0};
     Vector2D drawScale = {1,1};
     Vector3D drawRotation = {0,0,0};
     Vector2D drawFlip = {0,0};
@@ -378,20 +374,9 @@ void gf2d_sprite_draw(
     if (colorShift)drawColorShift = *colorShift;
     if (clip)vector4d_copy(drawClip,(*clip));
     
-    commandBuffer = gf2d_sprite.pipe->commandBuffer;
-    buffer_frame = gf3d_vgraphics_get_current_buffer_frame();
-
-    descriptorSet = gf3d_pipeline_get_descriptor_set(gf2d_sprite.pipe, buffer_frame);
-    if (descriptorSet == NULL)
-    {
-        slog("failed to get a free descriptor Set for sprite rendering");
-        return;
-    }
     
-    gf2d_sprite_update_basic_descriptor_set(
+    spriteUBO = gf2d_sprite_get_uniform_buffer(
         sprite,
-        *descriptorSet,
-        buffer_frame,
         position,
         drawScale,
         drawRotation,
@@ -399,7 +384,14 @@ void gf2d_sprite_draw(
         drawClip,
         drawFlip,
         frame);
-    gf2d_sprite_render(sprite,commandBuffer,descriptorSet);
+
+    gf3d_pipeline_queue_render(
+        gf2d_sprite.pipe,
+        sprite->buffer,
+        6,//its a single quad
+        gf2d_sprite.faceBuffer,
+        &spriteUBO,
+        sprite->texture);
 }
 
 void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
@@ -443,9 +435,9 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
     vkFreeMemory(device, stagingBufferMemory, NULL);    
 }
 
-void gf2d_sprite_update_uniform_buffer(
+
+SpriteUBO gf2d_sprite_get_uniform_buffer(
     Sprite *sprite,
-    UniformBuffer *ubo,
     Vector2D position,
     Vector2D scale,
     Vector3D rotation,
@@ -454,7 +446,6 @@ void gf2d_sprite_update_uniform_buffer(
     Vector2D flip,
     Uint32 frame)
 {
-    void* data;
     SpriteUBO spriteUBO = {0};
     spriteUBO.size = vector2d(sprite->texture->width,sprite->texture->height);
     spriteUBO.extent = gf3d_vgraphics_get_view_extent_as_vector2d();;
@@ -482,71 +473,7 @@ void gf2d_sprite_update_uniform_buffer(
     vector4d_copy(spriteUBO.clip,clip);
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
-    
-    vkMapMemory(gf2d_sprite.device, ubo->uniformBufferMemory, 0, sizeof(SpriteUBO), 0, &data);
-    
-        memcpy(data, &spriteUBO, sizeof(SpriteUBO));
-
-    vkUnmapMemory(gf2d_sprite.device, ubo->uniformBufferMemory);
-}
-
-void gf2d_sprite_update_basic_descriptor_set(
-    Sprite *sprite,
-    VkDescriptorSet descriptorSet,
-    Uint32 chainIndex,
-    Vector2D position,
-    Vector2D scale,
-    Vector3D rotation,
-    Color color,
-    Vector4D clip,
-    Vector2D flip,
-    Uint32 frame)
-{
-    VkDescriptorImageInfo imageInfo = {0};
-    VkWriteDescriptorSet descriptorWrite[2] = {0};
-    VkDescriptorBufferInfo bufferInfo = {0};
-    UniformBuffer *ubo;
-
-    if (!sprite)
-    {
-        slog("no sprite provided for descriptor set update");
-        return;
-    }
-    if (descriptorSet == VK_NULL_HANDLE)
-    {
-        slog("null handle provided for descriptorSet");
-        return;
-    }
-
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = sprite->texture->textureImageView;
-    imageInfo.sampler = sprite->texture->textureSampler;
-
-    ubo = gf3d_uniform_buffer_list_get_buffer(gf2d_sprite.pipe->uboList, chainIndex);
-    gf2d_sprite_update_uniform_buffer(sprite,ubo,position,scale,rotation,color,clip,flip,frame);
-
-    bufferInfo.buffer = ubo->uniformBuffer;
-    bufferInfo.offset = 0;
-    bufferInfo.range = sizeof(SpriteUBO);        
-    
-    descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[0].dstSet = descriptorSet;
-    descriptorWrite[0].dstBinding = 0;
-    descriptorWrite[0].dstArrayElement = 0;
-    descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptorWrite[0].descriptorCount = 1;
-    descriptorWrite[0].pBufferInfo = &bufferInfo;
-
-    descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[1].dstSet = descriptorSet;
-    descriptorWrite[1].dstBinding = 1;
-    descriptorWrite[1].dstArrayElement = 0;
-    descriptorWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    descriptorWrite[1].descriptorCount = 1;                        
-    descriptorWrite[1].pImageInfo = &imageInfo;
-    descriptorWrite[1].pTexelBufferView = NULL; // Optional
-
-    vkUpdateDescriptorSets(gf2d_sprite.device, 2, descriptorWrite, 0, NULL);
+    return spriteUBO;
 }
 
 VkVertexInputBindingDescription * gf2d_sprite_get_bind_description()

@@ -1,15 +1,15 @@
 {
 "window":{
-    "dimensions" : [0.15,68,0.7,60],
+    "dimensions" : [0,-100,1,100],
     "elements":
     [
       {
         "type": "list",
         "name": "list",
-        "bounds": [0,0,1,1],
+        "bounds": [16,2,1,1],
         "style": "vertical",
         "packed":true,
-        "item_size" : [100,24],
+        "item_size" : [1,8],
         "elements":
         [
         ]

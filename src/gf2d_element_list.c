@@ -19,12 +19,21 @@ void gf2d_element_list_set_scroll_offset(Element *element,int offset)
     list->scrollOffset = offset;
 }
 
+int gf2d_element_list_get_row_count(Element *element)
+{
+    ListElement *list;
+    if (!element)return 0;
+    list = (ListElement*)element->data;
+    if (!list->itemSize.y)return 0;
+    return (int)element->bounds.h / list->itemSize.y;
+}
+
 int gf2d_element_list_get_items_per_column(Element *element)
 {
-//     ListElement *list;
-//     if (!element)return 0;
-//     list = (ListElement*)element->data;
-    return 0;
+    ListElement *list;
+    if (!element)return 0;
+    list = (ListElement*)element->data;
+    return list->itemsPerColumn;
 }
 
 Vector2D gf2d_element_get_item_position(Element *element,int i,Vector2D lastPosition)
@@ -135,11 +144,11 @@ void gf2d_element_list_draw(Element *element,Vector2D offset)
         position = gf2d_element_get_item_position(element,i,position);
         if (list->cropped)
         {
-            if ((position.x < 0)||(position.y < 0))
+            if ((position.x < element->bounds.x)||(position.y < element->bounds.y))
             {
                 skip = 1;
             }
-            if ((position.x > element->bounds.w)||(position.y > element->bounds.h))
+            if ((position.x + e->bounds.w > element->bounds.x + element->bounds.w)||(position.y + e->bounds.h > element->bounds.y + element->bounds.h))
             {
                 skip = 1;//skip outside of range
             }
@@ -148,6 +157,16 @@ void gf2d_element_list_draw(Element *element,Vector2D offset)
         if (skip)continue;
         gf2d_element_draw(e, drawPosition);
     }
+    gf2d_element_draw(list->scrollbar, offset);
+}
+
+int gf2d_element_list_get_item_count(Element *element)
+{
+    ListElement *list;
+    if (!element)return 0;
+    list = (ListElement*)element->data;
+    if (!list)return 0;
+    return gfc_list_get_count(list->list);
 }
 
 Element *gf2d_list_get_next(Element *element,Element *from)
@@ -219,8 +238,8 @@ List *gf2d_element_list_update(Element *element,Vector2D offset)
     list = (ListElement*)element->data;
     if (!list)return NULL;
     count = gfc_list_get_count(list->list);
-    position.x = element->bounds.x;
-    position.y = element->bounds.y;
+    position.x = 0;
+    position.y = 0;
     for (i = 0; i < count; i++)
     {
         e = (Element *)gfc_list_get_nth(list->list,i);
@@ -237,6 +256,7 @@ List *gf2d_element_list_update(Element *element,Vector2D offset)
             gfc_list_concat_free(ret,updated);
         }
     }
+    gf2d_element_update(list->scrollbar, position);
     return ret;
 }
 
@@ -343,6 +363,9 @@ void gf2d_element_list_add_item(Element *e,Element *item)
     ListElement *list;
     if ((!e)||(!item))return;// no op
     list = (ListElement *)e->data;
+    item->parent = e;
+    if (item->bounds.w == 1)item->bounds.w = list->itemSize.x;
+    if (item->bounds.h == 1)item->bounds.h = list->itemSize.y;
     list->list = gfc_list_append(list->list,(void*)item);
 }
 
@@ -414,5 +437,11 @@ void gf2d_element_load_list_from_config(Element *e,SJson *json,Window *win)
         if (!item)continue;
         gf2d_element_list_add_item(e,gf2d_element_load_from_config(item,e,win));
     }
+    value = sj_object_get_value(json,"scrollbar");
+    if (value)
+    {
+        list->scrollbar = gf2d_element_load_from_config(value,e,win);
+    }
+
 }
 /*eol@eof*/

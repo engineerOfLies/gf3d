@@ -7,6 +7,7 @@
 /**
  * @brief make a window to display a number of options
  * @param position where on the screen to place it (top left corner)
+ * @param width how wide the menu should be.  height is dynamically set
  * @param question the title to display
  * @param options a list of pointers to strings to populate the list with
  * @param onSelect a callback function to invoke when a selections is made
@@ -14,6 +15,6 @@
  * @param result integer to be populated when a decision is made
  * @return a pointer to the newly created window, or NULL otherwise
  */
-Window *item_list_menu(Window *parent,Vector2D position,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result);
+Window *item_list_menu(Window *parent,Vector2D position,float width,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result);
 
 #endif

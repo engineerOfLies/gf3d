@@ -5,12 +5,13 @@
 #include "gfc_shape.h"
 
 #include "gf2d_draw.h"
-#include "gf2d_elements.h"
 #include "gf2d_element_actor.h"
 #include "gf2d_element_button.h"
 #include "gf2d_element_entry.h"
 #include "gf2d_element_list.h"
 #include "gf2d_element_label.h"
+#include "gf2d_element_scrollbar.h"
+#include "gf2d_elements.h"
 
 extern int __DEBUG;
 
@@ -72,10 +73,16 @@ Vector2D gf2d_element_get_draw_position(Element *e)
     return e->lastDrawPosition;
 }
 
+void gf2d_element_set_hidden(Element *element, int hidden)
+{
+    if (!element)return;
+    element->hidden = hidden;
+}
+
 void gf2d_element_draw(Element *e, Vector2D offset)
 {
     Rect rect;
-    if ((!e)||(e->state == ES_hidden))
+    if ((!e)||(e->hidden))
     {
         return;
     }
@@ -95,7 +102,7 @@ void gf2d_element_draw(Element *e, Vector2D offset)
 
 List * gf2d_element_update(Element *e, Vector2D offset)
 {
-    if (!e)
+    if ((!e)||(e->hidden))
     {
         return NULL;
     }
@@ -167,6 +174,7 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     if (!sj_is_object(json))return NULL;
     e = gf2d_element_new();
     if (!e)return NULL;
+    e->parent = parent;
     value = sj_object_get_value(json,"name");
     if (value)
     {
@@ -191,14 +199,20 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     sj_get_bool_value(sj_object_get_value(json,"canHasFocus"),(short int *)&e->canHasFocus);
 
     value = sj_object_get_value(json,"bounds");
-    sj_value_as_vector4d(value,&vector);
-    gfc_rect_set(e->bounds,vector.x,vector.y,vector.z,vector.w);
-    gf2d_element_calibrate(e,parent, win);
-    
-    value = sj_object_get_value(json,"type");
     if (value)
     {
-        type = sj_get_string_value(value);
+        sj_value_as_vector4d(value,&vector);
+        gfc_rect_set(e->bounds,vector.x,vector.y,vector.z,vector.w);
+    }
+    else if (parent)
+    {
+        gfc_rect_copy(e->bounds,parent->bounds);
+    }
+    gf2d_element_calibrate(e,parent, win);
+    
+    type = sj_object_get_value_as_string(json,"type");
+    if (type)
+    {
         if (strcmp(type,"list") == 0)
         {
             gf2d_element_load_list_from_config(e,json,win);
@@ -218,6 +232,10 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
         else if (strcmp(type,"entry") == 0)
         {
             gf2d_element_load_entry_from_config(e,json,win);
+        }
+        else if (strcmp(type,"scrollbar") == 0)
+        {
+            gf2d_element_scrollbar_load_from_config(e,json,win);
         }
     }
     else

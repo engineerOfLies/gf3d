@@ -2,8 +2,10 @@
 
 #include "gfc_input.h"
 
+#include "gf2d_font.h"
 #include "gf2d_element_button.h"
 #include "gf2d_element_actor.h"
+#include "gf2d_element_label.h"
 #include "gf2d_draw.h"
 #include "gf2d_mouse.h"
 
@@ -21,7 +23,6 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
     {
         switch(element->state)
         {
-            case ES_hidden:
             case ES_disable:
                 return;
             case ES_idle:
@@ -42,7 +43,6 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
     {
         switch(element->state)
         {
-            case ES_hidden:
             case ES_disable:
                 return;
             case ES_idle:
@@ -70,6 +70,8 @@ List *gf2d_element_button_update(Element *element,Vector2D offset)
     button = (ButtonElement*)element->data;
     if (!button)return NULL;
     bounds = gf2d_element_get_absolute_bounds(element,offset);
+    bounds.x = element->lastDrawPosition.x;
+    bounds.y = element->lastDrawPosition.y;
     gf2d_element_update(button->actor, offset);
     
     if (element->hasFocus)
@@ -160,11 +162,14 @@ Element *gf2d_button_get_next(Element *element, Element *from)
     button = (ButtonElement*)element->data;
     if (element == from)
     {
-        return button->label;
+        if (button->label)return button->label;
+        if (button->actor)return button->actor;
+        return from;
     }
     if (from == button->label)
     {
         return button->actor;
+        return from;
     }
     if (from == button->actor)return from;//search item was my last child, return me
     return NULL;
@@ -272,6 +277,91 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
     {
         gfc_line_cpy(button->hotkey,sj_get_string_value(value));
     }
+}
+
+
+Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, Vector2D size, Color color)
+{
+    Element *be,*le;
+    
+    LabelElement *label;
+
+    if (!text)return NULL;
+    
+    label = gf2d_element_label_new_full(text,color,ft,LJ_Left,LA_Middle,0);
+
+    be = gf2d_element_new_full(
+        NULL,
+        index,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        color,
+        0,
+        gfc_color(.5,.5,.5,1),0,win);
+    le = gf2d_element_new_full(
+        be,
+        0,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        gfc_color(1,1,1,1),
+        0,
+        gfc_color(1,1,1,1),0,win);
+    
+    gf2d_element_make_label(le,label);
+    gf2d_element_make_button(be,gf2d_element_button_new_full(le,NULL,GFC_COLOR_WHITE,GFC_COLOR_GREY,0));
+    return be;
+}
+
+Element *gf2d_button_new_simple(
+    Window *win,
+    int index,
+    const char *name,
+    const char *actorFile,
+    const char *text,
+    Vector2D scale,
+    Vector2D size,
+    Color color)
+{
+    Element *be,*le,*ae;
+    
+    LabelElement *label;
+    ActorElement *actor;
+    if (!text)return NULL;
+    
+    label = gf2d_element_label_new_full(text,color,FT_Small,LJ_Center,LA_Middle,0);
+
+    be = gf2d_element_new_full(
+        NULL,
+        index,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        color,
+        0,
+        gfc_color(.5,.5,.5,1),0,win);
+    
+    actor = gf2d_element_actor_new_full(actorFile, "idle" ,scale,NULL,vector2d(0,0),vector2d(0,0));
+    ae = gf2d_element_new_full(
+        be,
+        0,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        gfc_color(1,1,1,1),
+        0,
+        gfc_color(1,1,1,1),0,win);
+
+    le = gf2d_element_new_full(
+        be,
+        0,
+        (char *)text,
+        gfc_rect(0,0,size.x,size.y),
+        gfc_color(1,1,1,1),
+        0,
+        gfc_color(1,1,1,1),0,win);
+    
+    gf2d_element_make_label(le,label);
+    gf2d_element_make_actor(ae,actor);
+    gf2d_element_make_button(be,gf2d_element_button_new_full(le,ae,gfc_color(1,1,1,1),gfc_color(0.9,0.9,0.9,1),0));
+    return be;
 }
 
 

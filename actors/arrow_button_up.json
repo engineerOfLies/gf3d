@@ -1,0 +1,36 @@
+{
+    "actor":
+    {
+        "sprite": "images/ui/arrow_buttons_up.png",
+        "frameWidth": 64,
+        "frameHeight": 40,
+        "framesPerLine": 1,
+        "center":[32,20],
+        "scale": [1,1],
+        "color": [20,200,255,255],
+        "actionList":
+        [
+            {
+                "action": "idle",
+                "startFrame": 0,
+                "endFrame": 0,
+                "frameRate": 0,
+                "type": "loop"
+            },
+            {
+                "action": "high",
+                "startFrame": 1,
+                "endFrame": 1,
+                "frameRate": 0,
+                "type": "loop"
+            },
+            {
+                "action": "press",
+                "startFrame": 2,
+                "endFrame": 2,
+                "frameRate": 0,
+                "type": "loop"
+            }
+        ]
+    }
+}

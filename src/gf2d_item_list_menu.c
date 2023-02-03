@@ -1,7 +1,11 @@
 #include "simple_logger.h"
 
 #include "gfc_callbacks.h"
+#include "gfc_input.h"
+#include "gfc_vector.h"
 
+#include "gf3d_vgraphics.h"
+#include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_list.h"
 #include "gf2d_element_label.h"
@@ -49,6 +53,30 @@ int item_list_menu_update(Window *win,List *updateList)
             return 1;
         }
     }
+    if (gfc_input_command_released("cancel"))
+    {
+            if (data->result)
+            {
+                *data->result = -1;
+            }
+            gfc_callback_call(&data->callback);
+            gf2d_window_free(win);
+            return 1;
+    }
+    if ((gf2d_mouse_button_state(0))||(gf2d_mouse_button_state(1)))
+    {
+        if (!gf2d_window_mouse_in(win))
+        {
+            //clicked outside of the menu
+            if (data->result)
+            {
+                *data->result = -1;
+            }
+            gfc_callback_call(&data->callback);
+            gf2d_window_free(win);
+            return 1;
+        }
+    }
     return gf2d_window_mouse_in(win);
 }
 
@@ -74,7 +102,7 @@ void item_list_menu_add_option(Window *win, const char *option,int index)
         1000+index,
         (char *)option,
         gfc_rect(0,0,336,24),
-        gfc_color(0.9,0.9,0.6,1),
+        GFC_COLOR_LIGHTCYAN,
         0,
         gfc_color(.5,.5,.5,1),0,win);
     le = gf2d_element_new_full(
@@ -82,7 +110,7 @@ void item_list_menu_add_option(Window *win, const char *option,int index)
         2000+index,
         (char *)option,
         gfc_rect(0,0,336,24),
-        gfc_color(0.9,0.9,0.6,1),
+        GFC_COLOR_LIGHTCYAN,
         0,
         gfc_color(1,1,1,1),0,win);
     
@@ -95,22 +123,33 @@ void item_list_menu_add_all_options(Window *win,List *options)
 {
     const char *item;
     int i,c;
+    Vector2D screen;
     if ((!win)||(!options))return;
     c = gfc_list_get_count(options);
     gf2d_window_set_dimensions(
         win,
-        gfc_rect(win->dimensions.x,win->dimensions.y,win->dimensions.w,win->dimensions.h + c * 36));
+        gfc_rect(win->dimensions.x,win->dimensions.y,win->dimensions.w,win->dimensions.h + c * 24));
     for (i = 0;i < c;i++)
     {
         item = gfc_list_get_nth(options,i);
         if (!item)continue;
         item_list_menu_add_option(win, item,i);
     }
+    screen = gf3d_vgraphics_get_resolution();
+    if ((win->dimensions.y + win->dimensions.h) > screen.y)
+    {
+        win->dimensions.y = screen.y - win->dimensions.h;
+    }
+    if (win->dimensions.y < 0)
+    {
+        win->dimensions.y = 0;
+    }
 }
 
 
-Window *item_list_menu(Window *parent,Vector2D position,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result)
+Window *item_list_menu(Window *parent,Vector2D position,float width,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result)
 {
+    Element *e;
     Window *win;
     ItemListMenuData* data;
     win = gf2d_window_load("menus/item_list_menu.json");
@@ -129,10 +168,16 @@ Window *item_list_menu(Window *parent,Vector2D position,char *question,List *opt
     }
     win->data = data;
     win->parent = parent;
+    win->dimensions.w = width;
     data->result = result;
     data->callback.data = callbackData;
     data->callback.callback = onSelect;
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),question);
+    e = gf2d_window_get_element_by_name(win,"title");
+    if (e)
+    {
+        e->bounds.w = width;
+        gf2d_element_label_set_text(e,question);
+    }
     gf2d_window_set_position(win,position);
     item_list_menu_add_all_options(win,options);
     return win;

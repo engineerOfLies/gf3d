@@ -27,6 +27,28 @@ typedef struct
     int alignment;      /**<vertical alignment top, middle or bottom*/
 }LabelElement;
 
+
+/**
+ * @brief make a simple label element
+ * @param win the parent window
+ * @param index the identifying index
+ * @param text the label text, also the label name
+ * @param style the font style FT_H1 for example
+ * @param color the draw color
+ */
+Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,Color color);
+
+/**
+ * @brief make a simple label element
+ * @param win the parent window
+ * @param index the identifying index
+ * @param text the label text, also the label name
+ * @param style the font style FT_H1 for example
+ * @param size the size of the label in pixels
+ * @param color the draw color
+ */
+Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int style,Vector2D size, Color color);
+
 /**
  * @brief make a new label element
  * @param text the label text

@@ -139,6 +139,10 @@ void gf2d_sprite_draw_simple(
     Vector2D   position,
     Uint32     frame);
 
+void gf2d_sprite_draw_image(
+    Sprite   * sprite,
+    Vector2D   position);
+
 /**
  * @brief get the default pipeline for overlay rendering
  * @return NULL on error or not yet initlialized, the pipeline otherwise

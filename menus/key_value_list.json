@@ -14,7 +14,7 @@
         "text":"Key / Values",
         "justify" : "center",
         "align" : "middle",
-        "style":"Normal"
+        "style":"H4"
       },
       {
         "type": "button",

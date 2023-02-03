@@ -34,7 +34,6 @@ void gf2d_actor_close()
     }
     actor_manager.actorList = NULL;
     actor_manager.maxActors = 0;
-    slog("actor system closed");
 }
 
 void gf2d_actor_init(Uint32 max)
@@ -46,7 +45,6 @@ void gf2d_actor_init(Uint32 max)
     }
     actor_manager.maxActors = max;
     actor_manager.actorList = (Actor *)gfc_allocate_array(sizeof(Actor),max);
-    slog("actor system initialized");
     atexit(gf2d_actor_close);
 }
 

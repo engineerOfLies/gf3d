@@ -30,16 +30,68 @@ void gf3d_camera_get_view_mat4(Matrix4 *view);
 void gf3d_camera_set_view_mat4(Matrix4 *view);
 
 /**
- * @brief set the camera properties based on position and direction that the camera should be looking
- * @param position the location for the camera
- * @param target the point the camera should be looking at
- * @param up the direction considered to be "up"
+ * @brief have the camera point towards a point in space
+ * @param target the point to look at
+ * @param position [optional] if provided this will move the camera here first
  */
-void gf3d_camera_look_at(
-    Vector3D position,
-    Vector3D target,
-    Vector3D up
-);
+void gf3d_camera_look_at(Vector3D target,const Vector3D *position);
+
+/**
+ * @brief move the camera "FORWARD" relative to the view angles of the camera
+ * @param magnitude how much to move
+ */
+void gf3d_camera_fly_forward(float magnitude);
+
+/**
+ * @brief move the camera "RIGHT" relative to the view angles of the camera
+ * @param magnitude how much to move
+ */
+void gf3d_camera_fly_right(float magnitude);
+
+/**
+ * @brief move the camera "UP" relative to the view angles of the camera
+ * @param magnitude how much to move
+ */
+void gf3d_camera_fly_up(float magnitude);
+
+/**
+ * @brief move the camera forward relative to the camera view angle
+ * @note does not move along the z axis
+ * @param magnitude how far to move
+ */
+void gf3d_camera_walk_forward(float magnitude);
+
+/**
+ * @brief move the camera right relative to the camera view angle
+ * @note does not move along the z axis
+ * @param magnitude how far to move
+ */
+void gf3d_camera_walk_right(float magnitude);
+
+/**
+ * @brief move the camera up along the z axis.
+ * @note does not consider view angles.
+ * @param magnitude how far to move
+ */
+void gf3d_camera_move_up(float magnitude);
+
+/**
+ * @brief rotate the camera's yaw
+ * @param magnitude how far, in radians, to rotate
+ */
+void gf3d_camera_yaw(float magnitude);
+
+/**
+ * @brief rotate the camera's pitch
+ * @param magnitude how far, in radians, to rotate
+ */
+void gf3d_camera_pitch(float magnitude);
+
+/**
+ * @brief rotate the camera's roll
+ * @param magnitude how far, in radians, to rotate
+ */
+void gf3d_camera_roll(float magnitude);
 
 /**
  * @brief move the camera "FORWARD" relative to the view angles of the camera

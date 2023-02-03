@@ -3,6 +3,19 @@
 #include "gf3d_buffers.h"
 #include "gf3d_uniform_buffers.h"
 
+void gf3d_uniform_buffer_setup(UniformBuffer *buffer,VkDeviceSize bufferSize)
+{
+    if (!buffer)return;
+    buffer->_inuse = 1;
+    buffer->bufferSize = bufferSize;
+    gf3d_buffer_create(
+        bufferSize,
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        &buffer->uniformBuffer,
+        &buffer->uniformBufferMemory);
+}
+
 UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize bufferSize, Uint32 bufferCount,Uint32 bufferFrames)
 {
     int i,j;
@@ -47,7 +60,9 @@ UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize buf
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 &bufferList->buffers[j][i].uniformBuffer,
                 &bufferList->buffers[j][i].uniformBufferMemory);
+                bufferList->buffers[j][i].bufferSize = bufferSize;
         }
+        
     }
     bufferList->buffer_count = bufferCount;
     bufferList->buffer_frames = bufferFrames;
@@ -74,6 +89,22 @@ void gf3d_uniform_buffer_list_free(UniformBufferList *list)
             }
         }
     }
+}
+
+UniformBuffer *gf3d_uniform_buffer_list_get_nth_buffer(UniformBufferList *list, Uint32 nth, Uint32 bufferFrame)
+{
+    if (!list)return NULL;
+    if (bufferFrame >= list->buffer_frames)
+    {
+        slog("buffer frame out of range");
+        return NULL;
+    }
+    if (nth >= list->buffer_count)
+    {
+        slog("index out of range");
+        return NULL;
+    }
+    return &list->buffers[bufferFrame][nth];
 }
 
 UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferList *list, Uint32 bufferFrame)

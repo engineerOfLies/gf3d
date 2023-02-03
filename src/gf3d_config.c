@@ -48,14 +48,16 @@ VkPrimitiveTopology gf3d_config_primitive_topology_from_str(const char *str)
 VkPipelineDepthStencilStateCreateFlagBits gf3d_config_depth_stencil_create_flags(SJson *flags)
 {
     int i,c;
+    SJson *item;
     const char *flag;
     VkPipelineDepthStencilStateCreateFlagBits bits = 0;
     if (!flags)return 0;
     c = sj_array_get_count(flags);
     for (i = 0;i < c;i++)
     {
-        flag = sj_array_get_nth_as_string(flags,i);
-        if (!flag)continue;
+        item = sj_array_get_nth(flags,i);
+        if (!item)continue;
+        flag = sj_get_string_value(item);
         bits |= gf3d_config_depth_stencil_create_flag_from_str(flag);
     }
     return bits;
@@ -126,6 +128,62 @@ VkDescriptorType gf3d_config_descriptor_type_from_str(const char *str)
     }
     return 0;
 }   
+
+VkShaderStageFlagBits gf3d_config_shader_stage_flags(SJson *flags)
+{
+    int i,c;
+    const char *flag;
+    SJson *item;
+    VkShaderStageFlagBits bits = 0;
+    if (!flags)return 0;
+    c = sj_array_get_count(flags);
+    for (i = 0;i < c;i++)
+    {
+        item = sj_array_get_nth(flags,i);
+        if (!item)continue;
+        flag = sj_get_string_value(item);
+        bits |= gf3d_config_shader_stage_flag_from_str(flag);
+    }
+    return bits;
+}
+
+VkShaderStageFlagBits gf3d_config_shader_stage_flag_from_str(const char *str)
+{
+    if (!str)return 0;
+    if (strcmp(str,"VK_SHADER_STAGE_VERTEX_BIT")==0)
+    {
+        return VK_SHADER_STAGE_VERTEX_BIT;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT")==0)
+    {
+        return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT")==0)
+    {
+        return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_GEOMETRY_BIT")==0)
+    {
+        return VK_SHADER_STAGE_GEOMETRY_BIT;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_FRAGMENT_BIT")==0)
+    {
+        return VK_SHADER_STAGE_FRAGMENT_BIT;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_COMPUTE_BIT")==0)
+    {
+        return VK_SHADER_STAGE_COMPUTE_BIT;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_ALL_GRAPHICS")==0)
+    {
+        return VK_SHADER_STAGE_ALL_GRAPHICS;
+    }
+    if (strcmp(str,"VK_SHADER_STAGE_ALL")==0)
+    {
+        return VK_SHADER_STAGE_ALL;
+    }
+    return 0;
+}
 
 VkPipelineBindPoint gf3d_config_pipeline_bindpoint_from_str(const char *str)
 {

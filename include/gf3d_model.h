@@ -44,6 +44,7 @@ typedef struct
     
     List               *mesh_list;
     Texture            *texture;
+    Texture            *normalMap;
 }Model;
 
 typedef struct
@@ -53,6 +54,8 @@ typedef struct
     Vector3D position;
     Vector3D rotation;
     Vector3D scale;
+    Vector3D positionDelta;
+    Vector3D rotationDelta;
 }ModelMat;
 
 /**
@@ -98,9 +101,10 @@ Model * gf3d_model_load_from_config(SJson *json);
  * @param index the mesh to render from the mesh_list
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
+ * @param detailColor color to swap in for sections of PURE red of the texture
  * @param ambient how much ambient light there is
  */
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D ambient);
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe
@@ -124,6 +128,50 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
 void gf3d_model_free(Model *model);
 
 /**
+ * @brief populate a modelMat based on config info
+ * @note pulls model,position,rotation, and scale out of the config
+ * @param mat the matrix to populate
+ * @param config the json to find the information
+ */
+void gf3d_model_mat_parse(ModelMat *mat,SJson *config);
+
+/**
+ * @brief used to make a matrix when something is a child of another matrix
+ * @param out the output parameter
+ * @param parent the matrix used to multiply the new matrix
+ * @param position used to make this matrix
+ * @param rotation used to make this matrix
+ * @param scale used to make this matrix
+ */
+void mat_from_parent(
+    Matrix4 out,
+    Matrix4 parent,
+    Vector3D position,
+    Vector3D rotation,
+    Vector3D scale);
+
+
+/**
+ * @brief save a modelMat to config
+ * @param mat the matrix to save
+ * @param updateFirst if true, run the extraction from the matrix4 to the component vectors before making the config
+ * @return NULL on error, or the populated SJson otherwise
+ */
+SJson *gf3d_model_mat_save(ModelMat *mat,Bool updateFirst);
+
+/**
+ * @brief allocate an initialize a blank ModelMat
+ * @return NULL on memory error, or an initialized modelMat otherwise
+ */
+ModelMat *gf3d_model_mat_new();
+
+/**
+ * @brief free an allocated modelMat and its model
+ * @param mat the modelmat to free
+ */
+void gf3d_model_mat_free(ModelMat *mat);
+
+/**
  * @brief reset a ModelMat to identity (all values zero except for the scale values to 1)
  * @param mat the ModelMat to reset.
  */
@@ -134,6 +182,12 @@ void gf3d_model_mat_reset(ModelMat *mat);
  * @param mat the modelMat that will have its matrix set
  */
 void gf3d_model_mat_set_matrix(ModelMat *mat);
+
+/**
+ * @brief extract the translation, rotation, and scale vectors from the modelMat matrix
+ * @param mat the matrix to extract the vectors from
+ */
+void gf3d_model_mat_extract_vectors(ModelMat *mat);
 
 /**
  * @brief set a model mat scale

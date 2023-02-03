@@ -296,7 +296,6 @@ Model *gf3d_gltf_parse_model(const char *filename)
     }
     
     meshes = sj_object_get_value(json,"meshes");
-    slog("loaded %i meshes.",sj_array_get_count(meshes));
     c = sj_array_get_count(meshes);
     for (i = 0; i< c; i++)
     {

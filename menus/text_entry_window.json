@@ -1,6 +1,6 @@
 {
 "window":{
-    "dimensions" : [0,0,600,162],
+    "dimensions" : [0,0,600,130],
     "justify" : "center",
     "align" : "middle",
     "elements":
@@ -42,23 +42,23 @@
             },
             {
             "type": "list",
-            "bounds": [260,0,0.5,64],
+            "bounds": [260,0,0.45,42],
             "style": "horizontal",
-            "item_size" : [168,64],
+            "item_size" : [168,42],
             "elements":
             [
                 {
                 "type": "button",
                 "name": "OK",
                 "id" : 51,
-                "bounds": [0,0,168,64],
+                "bounds": [0,0,168,44],
                 "hotkey":"ok",
                 "sound":"confirm",
                 "canHasFocus":true,
                 "label" :
                     {
                     "type": "label",
-                    "bounds": [0,0,168,64],
+                    "bounds": [0,0,168,44],
                     "text":"OK",
                     "justify" : "center",
                     "align" : "middle",
@@ -67,7 +67,7 @@
                 "actor" :
                     {
                     "type": "actor",
-                    "bounds": [0,0,168,64],
+                    "bounds": [0,0,168,44],
                     "actor" : "actors/button.actor"
                     }
                 },
@@ -82,7 +82,7 @@
                 "label" :
                     {
                     "type": "label",
-                    "bounds": [0,0,168,64],
+                    "bounds": [0,0,168,44],
                     "text":"Cancel",
                     "align" : "middle",
                     "justify" : "center",
@@ -91,7 +91,7 @@
                 "actor" :
                     {
                     "type": "actor",
-                    "bounds": [0,0,168,64],
+                    "bounds": [0,0,168,44],
                     "actor" : "actors/button.actor"
                     }
                 }

@@ -9,7 +9,7 @@
 #include "gf3d_mesh.h"
 
 
- // TODO: Make a command buffer resource manager
+extern int __DEBUG;
 
  
 typedef struct
@@ -38,12 +38,12 @@ void gf3d_command_system_close()
         }
         free(gf3d_commands.command_list);
     }
-    slog("command pool system closed");
+    if(__DEBUG)slog("command pool system closed");
 }
 
 void gf3d_command_system_init(Uint32 max_commands,VkDevice defaultDevice)
 {
-    slog("command pool system init");
+    if(__DEBUG)slog("command pool system init");
     if (!max_commands)
     {
         slog("cannot initliaze 0 command pools");
@@ -130,7 +130,6 @@ Command * gf3d_command_graphics_pool_setup(Uint32 count)
         return NULL;
     }
     
-    slog("created command buffer pool");
     return com;
 }
 

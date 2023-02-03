@@ -55,6 +55,7 @@ int message_buffer_free(Window *win)
     }
 
     gfc_list_delete(data->messages);
+    MessageWindow = NULL;
     return 0;
 }
 
@@ -113,7 +114,7 @@ Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor)
     }
     win->update = message_buffer_update;
     win->free_data = message_buffer_free;
-    win->no_draw_generic = 1;
+    //win->no_draw_generic = 1;
     
     data = gfc_allocate_array(sizeof(MessageBufferData),1);
     data->messages = gfc_list_new();
@@ -128,7 +129,7 @@ Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor)
             p,
             50 + i,
             NULL,
-            gfc_rect(0,0,1,24),
+            gfc_rect(0,0,1,19),
             gfc_color8(255,255,255,255),
             0,
             gfc_color8(255,255,255,255),
@@ -164,6 +165,7 @@ void message_new(const char *newMessage)
     message->ttl = data->ttl;
     gfc_line_cpy(message->text,newMessage);
     data->messages = gfc_list_append(data->messages,message);
+    slog((char *)newMessage);
 }
 
 void message_printf(const char *newMessage,...)
@@ -175,6 +177,12 @@ void message_printf(const char *newMessage,...)
     vsprintf(msg,newMessage,ap);
     va_end(ap);
     message_new(msg);
+}
+
+void message_buffer_set_position(Vector2D position)
+{
+    if (!MessageWindow)return;
+    gf2d_window_set_position(MessageWindow,position);
 }
 
 void message_buffer_bubble()

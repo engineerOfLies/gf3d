@@ -30,7 +30,7 @@
             "text":"?",
             "justify" : "center",
             "align" : "middle",
-            "style":"H2"
+            "style":"H3"
             },
             {
             "type": "list",
@@ -46,14 +46,14 @@
                 "name": "yes",
                 "id" : 51,
                 "canHasFocus":true,
-                "bounds": [0,0,168,64],
+                "bounds": [0,0,168,42],
                 "hotkey":"yes",
                 "sound":"confirm",
                 "label" :
                     {
                     "type": "label",
                     "name": "yes_l",
-                    "bounds": [0,0,168,64],
+                    "bounds": [0,0,168,48],
                     "text":"Yes",
                     "justify" : "center",
                     "align" : "middle",
@@ -62,7 +62,6 @@
                 "actor" :
                     {
                     "type": "actor",
-                    "bounds": [0,0,168,64],
                     "actor" : "actors/button.actor"
                     }
                 },
@@ -71,13 +70,13 @@
                 "name": "no",
                 "id" : 52,
                 "canHasFocus":true,
-                "bounds": [0,0,164,68],
+                "bounds": [0,0,164,42],
                 "hotkey":"no",
                 "sound":"cancel",
                 "label" :
                     {
                     "type": "label",
-                    "bounds": [0,0,168,64],
+                    "bounds": [0,0,168,48],
                     "text":"No",
                     "align" : "middle",
                     "justify" : "center",
@@ -86,7 +85,6 @@
                 "actor" :
                     {
                     "type": "actor",
-                    "bounds": [0,0,168,64],
                     "actor" : "actors/button.actor"
                     }
                 }

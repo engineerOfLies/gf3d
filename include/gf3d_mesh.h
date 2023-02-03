@@ -1,6 +1,7 @@
 #ifndef __GF3D_MESH_H__
 #define __GF3D_MESH_H__
 
+#include <stdalign.h>
 #include <vulkan/vulkan.h>
 
 #include "gfc_vector.h"
@@ -25,12 +26,13 @@ typedef struct
     Matrix4 model;
     Matrix4 view;
     Matrix4 proj;
-    Vector4D color; //color mod
     Vector4D ambientColor;
     Vector4D ambientDir;
+    Vector4D color; //color mod
+    Vector4D detailColor; //color mod
     Vector4D cameraPosition;
     MeshLights dynamicLights[MESH_LIGHTS_MAX];
-    float    dynamicLightCount;//how many
+    alignas(64) Uint32    dynamicLightCount;//how many
 }MeshUBO;
 
 /**
@@ -145,17 +147,19 @@ void gf3d_mesh_submit_pipe_commands();
  * @brief get the current command buffer for the mesh system
  */
 VkCommandBuffer gf3d_mesh_get_model_command_buffer();
+VkCommandBuffer gf3d_mesh_get_alph_model_command_buffer();
 VkCommandBuffer gf3d_mesh_get_highlight_command_buffer();
 VkCommandBuffer gf3d_mesh_get_sky_command_buffer();
 
-
 /**
- * @brief adds a mesh to the render pass
- * @note: must be called within the render pass
+ * @brief queue up a render for the current draw frame
  * @param mesh the mesh to render
- * @param com the command pool to use to handle the request we are rendering with
+ * @param pipe the pipeline to use
+ * @param uboData the data to use to draw the mesh
+ * @param texture texture data to use
  */
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture);
+
 
 /**
  * @brief adds a mesh to the render pass rendered as an outline highlight
@@ -164,8 +168,15 @@ void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet 
  * @param com the command pool to use to handle the request we are rendering with
  */
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+void gf3d_mesh_alpha_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+
 void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+
+/**
+ * @brief render a mesh through a given pipeline
+ */
+void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkDescriptorSet * descriptorSet);
 
 /**
  * @brief create a mesh's internal buffers based on vertices
@@ -182,6 +193,7 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh,Vertex *ve
  * @return NULL on error or the pipeline in question
  */
 Pipeline *gf3d_mesh_get_pipeline();
+Pipeline *gf3d_mesh_get_alpha_pipeline();
 Pipeline *gf3d_mesh_get_highlight_pipeline();
 Pipeline *gf3d_mesh_get_sky_pipeline();
 
