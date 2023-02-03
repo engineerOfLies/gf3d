@@ -15,6 +15,7 @@
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_pak.h"
 #include "gfc_config.h"
 
 #include "gf3d_device.h"
@@ -111,7 +112,7 @@ void gf3d_vgraphics_init(const char *config)
     short int enableValidation = 0;
     short int enableDebug = 0;
     
-    json = sj_load(config);
+    json = gfc_pak_load_json(config);
     if (!json)
     {
         slog("graphics config file load failed, exiting");

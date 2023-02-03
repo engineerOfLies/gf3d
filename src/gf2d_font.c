@@ -4,6 +4,7 @@
 #include "gfc_list.h"
 #include "gfc_color.h"
 #include "gfc_shape.h"
+#include "gfc_pak.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_texture.h"
@@ -238,7 +239,7 @@ void gf2d_fonts_load_json(const char *filename)
     int size = 10;
     FontTypes fontType;
     SJson *file,*fonts,*item;
-    file = sj_load(filename);
+    file = gfc_pak_load_json(filename);
     if (!file)return;
     sj_object_get_value_as_uint32(file,"ttl",&font_manager.ttl);
     sj_object_get_value_as_int(file,"row_padding",&font_manager.row_padding);

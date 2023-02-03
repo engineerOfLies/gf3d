@@ -4,6 +4,7 @@
 #include "gfc_types.h"
 #include "gfc_list.h"
 #include "gfc_config.h"
+#include "gfc_pak.h"
 
 #include "gf3d_mesh.h"
 #include "gf3d_obj_load.h"
@@ -282,7 +283,7 @@ Model *gf3d_gltf_parse_model(const char *filename)
     Mesh *mesh;
     Model *model;
     if (!filename)return NULL;
-    json = sj_load(filename);
+    json = gfc_pak_load_json(filename);
     if (!json)
     {
         slog("GLTF file '%s' Failed to load",filename);

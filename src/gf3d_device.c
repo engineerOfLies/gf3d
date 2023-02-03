@@ -3,6 +3,7 @@
 
 #include "gfc_types.h"
 #include "gfc_list.h"
+#include "gfc_pak.h"
 
 #include "gf3d_vqueues.h"
 #include "gf3d_validation.h"
@@ -67,7 +68,7 @@ void gf3d_device_manager_init(const char *config, VkInstance instance, VkSurface
         slog("no config file provided");
         return;
     }
-    gf3d_device_manager.config = sj_load(config);
+    gf3d_device_manager.config = gfc_pak_load_json(config);
     if (!gf3d_device_manager.config)
     {
         slog("failed to load device config file: %s",config);

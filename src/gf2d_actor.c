@@ -4,6 +4,7 @@
 #include "simple_json.h"
 
 #include "gfc_config.h"
+#include "gfc_pak.h"
 
 #include "gf2d_actor.h"
 
@@ -444,7 +445,7 @@ Actor *gf2d_actor_load(const char *file)
         actor->_refCount++;
         return actor;//found it already in memory
     }
-    json = sj_load(file);
+    json = gfc_pak_load_json(file);
     if (json)
     {
         actor = gf2d_actor_load_json(

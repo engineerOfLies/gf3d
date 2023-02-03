@@ -4,6 +4,8 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
+#include "gfc_pak.h"
+
 #include "gf3d_config.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
@@ -394,7 +396,7 @@ Pipeline *gf3d_pipeline_create_from_config(
         return NULL;
     }
     if (!configFile)return NULL;
-    file = sj_load(configFile);
+    file = gfc_pak_load_json(configFile);
     if (!file)
     {
         slog("failed to load config file for pipeline");

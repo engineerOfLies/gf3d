@@ -8,6 +8,7 @@
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_list.h"
+#include "gfc_pak.h"
 
 #include "gf3d_validation.h"
 
@@ -83,7 +84,7 @@ void gf3d_validation_config_layers(const char *config)
     const char *name;
     int i,c;
     if (!config)return;
-    json = sj_load(config);
+    json = gfc_pak_load_json(config);
     if (!json)
     {
         return;

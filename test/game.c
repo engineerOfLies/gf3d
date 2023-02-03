@@ -6,6 +6,7 @@
 #include "gfc_input.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_pak.h"
 #include "gfc_audio.h"
 
 #include "gf2d_sprite.h"
@@ -78,7 +79,8 @@ void draw_origin()
 int main(int argc,char *argv[])
 {
     parse_arguments(argc,argv);
-    init_logger("gf3d.log",0);    
+    init_logger("gf3d.log",0);
+    gfc_pak_manager_init();
     gfc_input_init("config/input.cfg");
     slog("gf3d begin");
     gf3d_vgraphics_init("config/setup.cfg");
