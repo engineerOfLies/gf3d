@@ -1,7 +1,0 @@
-{
-    "model":
-    {
-        "obj":"models/tunnel_gate/tunnel.obj",
-        "texture":"models/sky/sky.png"
-    }
-}

@@ -1,7 +1,0 @@
-{
-    "model":
-    {
-        "obj":"models/station/expansion_cargo_bay.obj",
-        "texture":"models/station/expansion_cargo_bay.png"
-    }
-}

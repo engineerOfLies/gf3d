@@ -1,7 +1,0 @@
-{
-    "model":
-    {
-        "obj":"models/ships/passenger_transport.obj",
-        "texture":"models/ships/passenger_transport.png"
-    }
-}

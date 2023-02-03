@@ -1,7 +1,0 @@
-{
-    "model":
-    {
-        "obj":"models/station/station_reactor.obj",
-        "texture":"models/station/station_reactor.png"
-    }
-}

@@ -1,7 +1,0 @@
-{
-    "model":
-    {
-        "obj":"models/planet/mineral_mine.obj",
-        "texture":"models/planet/mineral_mine.png"
-    }
-}

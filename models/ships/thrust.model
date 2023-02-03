@@ -1,7 +1,0 @@
-{
-    "model":
-    {
-        "obj":"models/ships/thrust.obj",
-        "texture":"models/ships/thrust.png"
-    }
-}
