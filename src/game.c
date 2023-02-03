@@ -8,6 +8,15 @@
 #include "gfc_matrix.h"
 #include "gfc_audio.h"
 
+#include "gf2d_sprite.h"
+#include "gf2d_font.h"
+#include "gf2d_draw.h"
+#include "gf2d_actor.h"
+#include "gf2d_mouse.h"
+#include "gf2d_windows.h"
+#include "gf2d_windows_common.h"
+#include "gf2d_message_buffer.h"
+
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
 #include "gf3d_swapchain.h"
@@ -17,23 +26,9 @@
 #include "gf3d_particle.h"
 #include "gf3d_draw.h"
 #include "gf3d_lights.h"
-#include "gf3d_gltf_parse.h"
-
-#include "gf2d_sprite.h"
-#include "gf2d_font.h"
-#include "gf2d_draw.h"
-#include "gf2d_actor.h"
-#include "gf2d_mouse.h"
-#include "gf2d_windows.h"
-#include "gf2d_windows_common.h"
-
-#include "config_def.h"
-#include "station_def.h"
 #include "gf3d_entity.h"
-#include "gate.h"
-#include "resources.h"
 
-#include "main_menu.h"
+#include "gf3d_camera_entity.h"
 
 extern int __DEBUG;
 
@@ -95,13 +90,6 @@ int main(int argc,char *argv[])
     gf2d_mouse_load("actors/mouse.actor");
     gf3d_entity_system_init(1024);
     gf2d_windows_init(128,"config/windows.cfg");
-    config_def_init();
-    resources_list_load();  
-    config_def_load("config/facilities.def");
-    config_def_load("config/events.def");
-    station_def_load("config/station.def");    
-    station_def_load("config/ships.def");    
-    station_def_load("config/ship_facilities.def");    
     
     slog_sync();
         
@@ -109,9 +97,15 @@ int main(int argc,char *argv[])
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     //load game definitions
-        
+
+    //game setup
+    gf3d_camera_entity_new(vector3d(-100,0,0),vector3d(0,0,0));
+    gf3d_camera_entity_enable_free_look(1);
+
+    window_message_buffer(5, 1000, GFC_COLOR_GREEN);
+    message_new("ALT+F4 to exit");
+    
     // main game loop
-    main_menu();
     while(!_done)
     {
         gfc_input_update();
@@ -126,7 +120,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
-            //    draw_origin();
+                draw_origin();
                 gf3d_entity_draw_all();
                 //2D draws
                 gf2d_windows_draw_all();

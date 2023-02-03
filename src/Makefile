@@ -10,7 +10,7 @@
 #
 
 # Linux
-PROJECT = antioch
+PROJECT = gf3d
 CC      = gcc
 #CC      = clang
 
