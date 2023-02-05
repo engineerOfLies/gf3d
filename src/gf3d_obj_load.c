@@ -1,10 +1,13 @@
 #include <stdio.h>
+
 #include "simple_logger.h"
+
+#include "gfc_pak.h"
 
 #include "gf3d_obj_load.h"
 
-void gf3d_obj_get_counts_from_file(ObjData *obj, FILE* file);
-void gf3d_obj_load_get_data_from_file(ObjData *obj, FILE* file);
+void gf3d_obj_get_counts_from_file(ObjData *obj, const char *mem,size_t fileSize);
+void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileSize);
 
 void gf3d_obj_free(ObjData *obj)
 {
@@ -98,18 +101,18 @@ void gf3d_obj_get_bounds(ObjData *obj)
 
 ObjData *gf3d_obj_load_from_file(const char *filename)
 {
-    FILE *file;
     ObjData *obj;
-    file = fopen(filename,"r");
-    if (!file)
-    {
-        slog("failed to open obj file %s",filename);
-        return NULL;
-    }
+    void *mem = NULL;
+    size_t fileSize;
+    
+    mem = gfc_pak_file_extract(filename,&fileSize);
+    
+    if (!mem)return NULL;
+        
     obj = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
     if (!obj)return NULL;
     
-    gf3d_obj_get_counts_from_file(obj, file);
+    gf3d_obj_get_counts_from_file(obj, mem,fileSize);
     
     obj->vertices = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->vertex_count);
     obj->normals = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->normal_count);
@@ -119,160 +122,163 @@ ObjData *gf3d_obj_load_from_file(const char *filename)
     obj->faceNormals = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     obj->faceTexels = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     
-    gf3d_obj_load_get_data_from_file(obj, file);
-    fclose(file);
+    gf3d_obj_load_get_data_from_file(obj, mem,fileSize);
+    
+    
     gf3d_obj_get_bounds(obj);
     gf3d_obj_load_reorg(obj);
     return obj;
 }
 
-void gf3d_obj_get_counts_from_file(ObjData *obj, FILE* file)
+void gf3d_obj_get_counts_from_file(ObjData *obj, const char *mem,size_t fileSize)
 {
-  char buf[256];
-  int  numvertices = 0;
-  int  numtexels = 0;
-  int  numnormals = 0;
-  int  numfaces = 0;
+    char buf[256];
+    const char *p;
+    const char *c;
+    int  numvertices = 0;
+    int  numtexels = 0;
+    int  numnormals = 0;
+    int  numfaces = 0;
 
-  if ((file == NULL) ||
-     (obj == NULL))
-  {
-    return;
-  }
-  while(fscanf(file, "%s", buf) != EOF)
-  {
-    switch(buf[0])
+    if ((!obj)||(!mem))
     {
-      case 'v':
-        switch(buf[1])
-        {
-          case '\0':
-            fgets(buf, sizeof(buf), file);
-            numvertices++;
-            break;
-          case 'n':
-            fgets(buf, sizeof(buf), file);
-            numnormals++;
-            break;
-          case 't':
-            fgets(buf, sizeof(buf), file);
-            numtexels++;
-            break;
-          default:
-            break;
-        }
-        break;
-      case 'f':
-        fgets(buf, sizeof(buf), file);
-        numfaces++;
-        break;
-      default:
-        fgets(buf, sizeof(buf), file);
-        break;
+        return;
     }
-  }
-  obj->vertex_count  = numvertices;
-  obj->texel_count  = numtexels;
-  obj->normal_count  = numnormals;
-  obj->face_count = numfaces;
+    p = mem;
+    while(sscanf(p, "%s", buf) != EOF)
+    {
+        c = strchr(p,'\n');//go to the end of line
+        p = c + 1;//and then the next line
+        switch(buf[0])
+        {
+            case 'v':
+              switch(buf[1])
+              {
+                case '\0':
+                  numvertices++;
+                  break;
+                case 'n':
+                  numnormals++;
+                  break;
+                case 't':
+                  numtexels++;
+                  break;
+                default:
+                  break;
+              }
+              break;
+            case 'f':
+              numfaces++;
+              break;
+            default:
+              break;
+        }
+    }
+    obj->vertex_count  = numvertices;
+    obj->texel_count  = numtexels;
+    obj->normal_count  = numnormals;
+    obj->face_count = numfaces;
 }
 
-void gf3d_obj_load_get_data_from_file(ObjData *obj, FILE* file)
+void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileSize)
 {
-  int  numvertices = 0;
-  int  numnormals = 0;
-  int  numtexcoords = 0;
-  int  numfaces = 0;
-  char buf[128];
-  float x,y,z;
-  int f[3][3];
+    const char *p;
+    const char *c;
+    int  numvertices = 0;
+    int  numnormals = 0;
+    int  numtexcoords = 0;
+    int  numfaces = 0;
+    char buf[128];
+    float x,y,z;
+    int f[3][3];
 
-  if (file == NULL)
-    return;
-  
-  rewind(file);
-  while(fscanf(file, "%s", buf) != EOF)
-  {
-    switch(buf[0])
+    if ((!obj)||(!mem))return;
+
+    p = mem;
+    while(sscanf(p, "%s", buf) != EOF)
     {
-      case 'v':
-        switch(buf[1])
+        p += strlen(buf);//skip what was checked so far
+        switch(buf[0])
         {
-          case '\0':
-            fscanf(
-                file,
-                "%f %f %f",
-                &x,
-                &y,
-                &z
-              );
-            obj->vertices[numvertices].x = x;
-            obj->vertices[numvertices].y = y;
-            obj->vertices[numvertices].z = z;
-            numvertices++;
-            break;
-          case 'n':
-            fscanf(
-                file,
-                "%f %f %f",
-                &x,
-                &y,
-                &z
-            );
-            obj->normals[numnormals].x = x;
-            obj->normals[numnormals].y = y;
-            obj->normals[numnormals].z = z;
-            numnormals++;
-            break;
-          case 't':
-            fscanf(
-                file,
-                "%f %f",
-                &x,
-                &y
-              );
-            obj->texels[numtexcoords].x = x;
-            obj->texels[numtexcoords].y = 1 - y;
-            numtexcoords++;
-            break;
-          default:
-            break;
+            case 'v':
+              switch(buf[1])
+              {
+                case '\0':
+                  sscanf(
+                      p,
+                      "%f %f %f",
+                      &x,
+                      &y,
+                      &z
+                    );
+                  obj->vertices[numvertices].x = x;
+                  obj->vertices[numvertices].y = y;
+                  obj->vertices[numvertices].z = z;
+                  numvertices++;
+                  break;
+                case 'n':
+                  sscanf(
+                      p,
+                      "%f %f %f",
+                      &x,
+                      &y,
+                      &z
+                  );
+                  obj->normals[numnormals].x = x;
+                  obj->normals[numnormals].y = y;
+                  obj->normals[numnormals].z = z;
+                  numnormals++;
+                  break;
+                case 't':
+                  sscanf(
+                      p,
+                      "%f %f",
+                      &x,
+                      &y
+                    );
+                  obj->texels[numtexcoords].x = x;
+                  obj->texels[numtexcoords].y = 1 - y;
+                  numtexcoords++;
+                  break;
+                default:
+                  break;
+              }
+              break;
+            case 'f':
+              sscanf(
+                  p,
+                  "%d/%d/%d %d/%d/%d %d/%d/%d",
+                  &f[0][0],
+                  &f[0][1],
+                  &f[0][2],
+                  
+                  &f[1][0],
+                  &f[1][1],
+                  &f[1][2],
+                  
+                  &f[2][0],
+                  &f[2][1],
+                  &f[2][2]);
+              
+              obj->faceVerts[numfaces].verts[0]   = f[0][0] - 1;
+              obj->faceTexels[numfaces].verts[0]  = f[0][1] - 1;
+              obj->faceNormals[numfaces].verts[0] = f[0][2] - 1;
+              
+              obj->faceVerts[numfaces].verts[1]   = f[1][0] - 1;
+              obj->faceTexels[numfaces].verts[1]  = f[1][1] - 1;
+              obj->faceNormals[numfaces].verts[1] = f[1][2] - 1;
+              
+              obj->faceVerts[numfaces].verts[2]   = f[2][0] - 1;
+              obj->faceTexels[numfaces].verts[2]  = f[2][1] - 1;
+              obj->faceNormals[numfaces].verts[2] = f[2][2] - 1;
+              numfaces++;
+              break;
+            default:
+              break;
         }
-        break;
-      case 'f':
-        fscanf(
-            file,
-            "%d/%d/%d %d/%d/%d %d/%d/%d",
-            &f[0][0],
-            &f[0][1],
-            &f[0][2],
-            
-            &f[1][0],
-            &f[1][1],
-            &f[1][2],
-            
-            &f[2][0],
-            &f[2][1],
-            &f[2][2]);
-        
-        obj->faceVerts[numfaces].verts[0]   = f[0][0] - 1;
-        obj->faceTexels[numfaces].verts[0]  = f[0][1] - 1;
-        obj->faceNormals[numfaces].verts[0] = f[0][2] - 1;
-        
-        obj->faceVerts[numfaces].verts[1]   = f[1][0] - 1;
-        obj->faceTexels[numfaces].verts[1]  = f[1][1] - 1;
-        obj->faceNormals[numfaces].verts[1] = f[1][2] - 1;
-        
-        obj->faceVerts[numfaces].verts[2]   = f[2][0] - 1;
-        obj->faceTexels[numfaces].verts[2]  = f[2][1] - 1;
-        obj->faceNormals[numfaces].verts[2] = f[2][2] - 1;
-        numfaces++;
-        break;
-      default:
-        fgets(buf, sizeof(buf), file);
-        break;
+        c = strchr(p,'\n');//go to the end of line
+        p = c + 1;//and then the next line
     }
-  }
 }
 
 /*eol@eof*/

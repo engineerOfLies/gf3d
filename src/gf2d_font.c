@@ -44,6 +44,7 @@ void gf2d_font_close()
         if (font_manager.font_list[i].font != NULL)
         {
             TTF_CloseFont(font_manager.font_list[i].font);
+            free(font_manager.font_list[i].mem);
         }
     }
     c = gfc_list_get_count(font_manager.font_images);
@@ -282,18 +283,18 @@ void gf2d_fonts_load_json(const char *filename)
         mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
         if (!mem)
         {
-            slog("failed to load font %s",filename);
+            slog("failed to load font %s",font_manager.font_list[i].filename);
             continue;
         }
         src = SDL_RWFromMem(mem, fileSize);
         if (!src)
         {
-            slog("failed to read font %s",filename);
+            slog("failed to read font %s",font_manager.font_list[i].filename);
             free(mem);
             continue;
         }
         font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
-        free(mem);
+        font_manager.font_list[i].mem = mem;
     }
     sj_free(file);
 }
@@ -337,18 +338,18 @@ void gf2d_fonts_load(const char *filename)
         mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
         if (!mem)
         {
-            slog("failed to load font %s",filename);
+            slog("failed to load font %s",font_manager.font_list[i].filename);
             continue;
         }
         src = SDL_RWFromMem(mem, fileSize);
         if (!src)
         {
-            slog("failed to read font %s",filename);
+            slog("failed to read font %s",font_manager.font_list[i].filename);
             free(mem);
             continue;
         }
         font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
-        free(mem);
+        font_manager.font_list[i].mem = mem;
         if (!font_manager.font_list[i].font)
         {
             slog("failed to load font: %s\n", TTF_GetError());

@@ -78,6 +78,8 @@ void draw_origin()
 
 int main(int argc,char *argv[])
 {
+    Model      *sky;
+    Matrix4     skyMat;
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
     gfc_pak_manager_init();
@@ -101,7 +103,12 @@ int main(int argc,char *argv[])
     //load game definitions
 
     //game setup
+    sky = gf3d_model_load("models/sky.model");
+    gfc_matrix_identity(skyMat);
+    gfc_matrix_scale(skyMat,vector3d(100,100,100));
+
     gf3d_camera_entity_new(vector3d(-100,0,0),vector3d(0,0,0));
+    gf3d_camera_entity_set_look_mode(CTT_Position);
     gf3d_camera_entity_enable_free_look(1);
 
     window_message_buffer(5, 1000, GFC_COLOR_GREEN);
@@ -122,6 +129,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
+                gf3d_model_draw_sky(sky,skyMat,gfc_color(1,1,1,1));
                 draw_origin();
                 gf3d_entity_draw_all();
                 //2D draws
