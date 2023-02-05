@@ -235,6 +235,9 @@ void gf2d_fonts_load_json(const char *filename)
 {
     int i;
     int count = 0;
+    SDL_RWops *src;
+    void *mem;
+    size_t fileSize = 0;
     const char *str;
     int size = 10;
     FontTypes fontType;
@@ -276,7 +279,21 @@ void gf2d_fonts_load_json(const char *filename)
         }
         sj_get_integer_value(sj_object_get_value(item,"size"),&size);
         font_manager.font_list[i].pointSize = size;
-        font_manager.font_list[i].font = TTF_OpenFont(font_manager.font_list[i].filename, font_manager.font_list[i].pointSize);
+        mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
+        if (!mem)
+        {
+            slog("failed to load font %s",filename);
+            continue;
+        }
+        src = SDL_RWFromMem(mem, fileSize);
+        if (!src)
+        {
+            slog("failed to read font %s",filename);
+            free(mem);
+            continue;
+        }
+        font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
+        free(mem);
     }
     sj_free(file);
 }
@@ -286,6 +303,9 @@ void gf2d_fonts_load(const char *filename)
     FILE *file;
     int count;
     int i;
+    SDL_RWops *src;
+    void *mem;
+    size_t fileSize = 0;
     file = fopen(filename,"r");
     if (!file)
     {
@@ -314,7 +334,21 @@ void gf2d_fonts_load(const char *filename)
     gf2d_fonts_parse(file);
     for (i = 0; i < count; i++)
     {
-        font_manager.font_list[i].font = TTF_OpenFont(font_manager.font_list[i].filename, font_manager.font_list[i].pointSize);
+        mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
+        if (!mem)
+        {
+            slog("failed to load font %s",filename);
+            continue;
+        }
+        src = SDL_RWFromMem(mem, fileSize);
+        if (!src)
+        {
+            slog("failed to read font %s",filename);
+            free(mem);
+            continue;
+        }
+        font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
+        free(mem);
         if (!font_manager.font_list[i].font)
         {
             slog("failed to load font: %s\n", TTF_GetError());

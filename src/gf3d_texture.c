@@ -322,6 +322,7 @@ Texture *gf3d_texture_load(const char *filename)
         return NULL;
     }
     surface = IMG_Load_RW(src,1);
+    free(mem);
     if (!surface)
     {
         slog("failed to load texture file %s",filename);
