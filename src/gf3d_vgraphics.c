@@ -76,6 +76,8 @@ typedef struct
     Uint32                      gmask;
     Uint32                      bmask;
     Uint32                      amask;
+    Bool                        enable_3d;
+    Bool                        enable_2d;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -105,6 +107,8 @@ void gf3d_vgraphics_setup(
 
 void gf3d_vgraphics_init(const char *config)
 {
+    Bool enable;
+    Pipeline *renderPipe= NULL;
     SJson *json,*setup;
     const char *windowName = NULL;
     Vector2D resolution = {1024,768};
@@ -174,7 +178,6 @@ void gf3d_vgraphics_init(const char *config)
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
     gf3d_pipeline_init(16);// how many different rendering pipelines we need
-    gf3d_mesh_init(1024);//TODO: pull this from a parameter
     
     // 2D stuff
     SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_RGBA32,
@@ -199,12 +202,23 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_command_system_init(16 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
-    gf3d_model_manager_init(1024);
-    gf3d_particle_manager_init(4096);
-    gf2d_sprite_manager_init(1024);
+    if (sj_object_get_value_as_bool(json,"enable_3d",&enable)&&(enable))
+    {
+        gf3d_vgraphics.enable_3d = 1;
+        gf3d_mesh_init(1024);//TODO: pull this from a parameter
+        gf3d_model_manager_init(1024);
+        gf3d_particle_manager_init(4096);
+        renderPipe = gf3d_mesh_get_pipeline();
+    }
+    if (sj_object_get_value_as_bool(json,"enable_2d",&enable)&&(enable))
+    {
+        gf3d_vgraphics.enable_2d = 1;
+        gf2d_sprite_manager_init(1024);
+        if (!renderPipe)renderPipe = gf2d_sprite_get_pipeline();
+    }
 
     gf3d_swapchain_create_depth_image();
-    gf3d_swapchain_setup_frame_buffers(gf3d_mesh_get_pipeline());
+    gf3d_swapchain_setup_frame_buffers(renderPipe);
     gf3d_vgraphics_semaphores_create();
 }
 
@@ -367,7 +381,6 @@ void gf3d_vgraphics_close()
     {
         free(gf3d_vgraphics.sdl_extension_names);
     }
-
     gf3d_debug_close();
         
     if(gf3d_vgraphics.surface && gf3d_vgraphics.vk_instance)
@@ -541,7 +554,6 @@ void gf3d_vgraphics_semaphores_close()
 {
     vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.renderFinishedSemaphore, NULL);
     vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.imageAvailableSemaphore, NULL);
-    
 }
 
 void gf3d_vgraphics_semaphores_create()

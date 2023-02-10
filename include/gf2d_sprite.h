@@ -41,6 +41,7 @@ typedef struct
     VkBuffer                    buffer;
     VkDeviceMemory              bufferMemory;
     VkDescriptorSet            *descriptorSet;          /**<descriptor sets used for this sprite to render*/
+    SDL_Surface                *surface;                /**<pointer to the cpu surface data*/
 }Sprite;
 
 /**
@@ -48,6 +49,13 @@ typedef struct
  * @param max_sprites how many concurrent sprites to support
  */
 void gf2d_sprite_manager_init(Uint32 max_sprites);
+
+/**
+ * @brief get a pointer to a free sprite
+ * @note this provides a pointer to a zero initialized sprite, no other work is done
+ * @return NULL on error or an empty sprite otherwise
+ */
+Sprite *gf2d_sprite_new();
 
 /**
  * @brief loads a sprite sheet into memory
@@ -127,6 +135,25 @@ void gf2d_sprite_draw_full(
     Color      colorShift,
     Vector4D   clip,
     Uint32     frame);
+
+/**
+ * @brief draw a sprite to a surface instead of to the screen.
+ * @note sprite must have been loaded with surface data preserved
+ * @param sprite the sprite to draw
+ * @param position where on the target surface to draw it to
+ * @param scale (optional) if provided the sprite will be scaled by this factor
+ * @param scaleCenter (optional) if provided, this will be used to determin the scaling point, (0,0) is default
+ * @param frame the frame to draw to the surface
+ * @param surface the surface to draw to
+ */
+void gf2d_sprite_draw_to_surface(
+    Sprite *sprite,
+    Vector2D position,
+    Vector2D * scale,
+    Vector2D * scaleCenter,
+    Uint32 frame,
+    SDL_Surface *surface
+);
 
 /**
  * @brief draw a sprite to the screen

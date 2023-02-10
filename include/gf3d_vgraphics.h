@@ -39,13 +39,30 @@ Uint32  gf3d_vgraphics_get_current_buffer_frame();
  */
 VkDevice gf3d_vgraphics_get_default_logical_device();
 
+/**
+ * @brief get the physical device handle for the graphics system
+ */
 VkPhysicalDevice gf3d_vgraphics_get_default_physical_device();
 
+/**
+ * @brief get the screen resolution as a Vulkan Extent
+ */
 VkExtent2D gf3d_vgraphics_get_view_extent();
 
+/**
+ * @brief get the screen extent as a 2d vector
+ */
 Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
+
+/**
+ * @brief get the screen extent as a 2d vector
+ */
 Vector2D gf3d_vgraphics_get_resolution();
 
+/**
+ * @brief copy into view the current view matrix
+ * @param view [output]
+ */
 void gf3d_vgraphics_get_view(Matrix4 *view);
 
 
@@ -74,6 +91,9 @@ Matrix4 *gf3d_vgraphics_get_view_matrix();
 void gf3d_vgraphics_get_projection_matrix(Matrix4 *proj);
 
 
+/**
+ * @brief get the vulkan handle for a uniform buffer by its index
+ */
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 
 /**

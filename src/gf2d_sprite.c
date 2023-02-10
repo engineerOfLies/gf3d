@@ -220,6 +220,7 @@ Sprite * gf2d_sprite_from_surface(SDL_Surface *surface,int frame_width,int frame
     if (frames_per_line)sprite->framesPerLine = frames_per_line;
     else sprite->framesPerLine = 1;
     gf2d_sprite_create_vertex_buffer(sprite);
+    sprite->surface = surface;
     return sprite;
 }
 
@@ -435,6 +436,61 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
     vkFreeMemory(device, stagingBufferMemory, NULL);    
 }
 
+void gf2d_sprite_draw_to_surface(
+    Sprite *sprite,
+    Vector2D position,
+    Vector2D * scale,
+    Vector2D * center,
+    Uint32 frame,
+    SDL_Surface *surface
+)
+{
+    SDL_Rect cell,target;
+    int fpl;
+    Vector2D scaleFactor = {1,1};
+    Vector2D scaleOffset = {0,0};
+    if (!sprite)
+    {
+        slog("no sprite provided to draw");
+        return;
+    }
+    if (!sprite->surface)
+    {
+        slog("sprite does not contain surface to draw with");
+        return;
+    }
+    if (!surface)
+    {
+        slog("no surface provided to draw to");
+        return;
+    }
+    if (scale)
+    {
+        vector2d_copy(scaleFactor,(*scale));
+    }
+    if (center)
+    {
+        vector2d_copy(scaleOffset,(*center));
+    }
+    fpl = (sprite->framesPerLine)?sprite->framesPerLine:1;
+    gfc_rect_set(
+        cell,
+        frame%fpl * sprite->frameWidth,
+        frame/fpl * sprite->frameHeight,
+        sprite->frameWidth,
+        sprite->frameHeight);
+    gfc_rect_set(
+        target,
+        position.x - (scaleFactor.x * scaleOffset.x),
+        position.y - (scaleFactor.y * scaleOffset.y),
+        sprite->frameWidth * scaleFactor.x,
+        sprite->frameHeight * scaleFactor.y);
+    SDL_BlitScaled(
+        sprite->surface,
+        &cell,
+        surface,
+        &target);
+}
 
 SpriteUBO gf2d_sprite_get_uniform_buffer(
     Sprite *sprite,

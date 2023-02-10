@@ -399,7 +399,7 @@ Pipeline *gf3d_pipeline_create_from_config(
     file = gfc_pak_load_json(configFile);
     if (!file)
     {
-        slog("failed to load config file for pipeline");
+        slog("failed to load config file for pipeline %s",configFile);
         return NULL;
     }
     config = sj_object_get_value(file,"pipeline");

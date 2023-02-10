@@ -97,6 +97,12 @@ void gf3d_swapchain_create_frame_buffer(VkFramebuffer *buffer,VkImageView *image
     VkFramebufferCreateInfo framebufferInfo = {0};
     VkImageView imageViews[2];
     
+    if (!pipe)
+    {
+        slog("failed to create swapchain without a valid pipe");
+        return;
+    }
+    
     imageViews[0] = *imageView;
     imageViews[1] = gf3d_swapchain.depthImageView;
 
@@ -117,6 +123,11 @@ void gf3d_swapchain_create_frame_buffer(VkFramebuffer *buffer,VkImageView *image
 void gf3d_swapchain_setup_frame_buffers(Pipeline *pipe)
 {
     int i;
+    if (!pipe)
+    {
+        slog("failed to setup frame buffers for pipeline, no pipeline specified");
+        return;
+    }
     gf3d_swapchain.frameBuffers = (VkFramebuffer *)gfc_allocate_array(sizeof(VkFramebuffer),gf3d_swapchain.swapImageCount);
     for (i = 0; i < gf3d_swapchain.swapImageCount;i++)
     {

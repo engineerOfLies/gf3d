@@ -273,7 +273,6 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
     {
         slog("failed to allocate image memory!");
         gf3d_texture_delete(tex);
-        SDL_FreeSurface(tex->surface);
         return NULL;
     }
 
