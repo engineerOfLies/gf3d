@@ -220,7 +220,6 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
         slog("no surface provided for texture conversion");
         return NULL;
     }
-    
 
     tex = gf3d_texture_new();
     if (!tex)

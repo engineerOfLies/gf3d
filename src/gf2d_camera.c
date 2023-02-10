@@ -86,4 +86,11 @@ void gf2d_camera_set_position_absolute(Vector2D position)
     vector2d_copy(_camera.view,position);
 }
 
+void gf2d_camera_center_on(Vector2D position)
+{
+    Vector2D res;
+    res = gf2d_camera_get_size();
+    vector2d_scale(res,res,-0.5);
+    vector2d_add(_camera.view,position,res);
+}
 /*eol@eof*/

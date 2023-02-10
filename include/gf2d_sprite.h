@@ -75,6 +75,13 @@ Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height
 Sprite * gf2d_sprite_load_image(const char * filename);
 
 /**
+ * @brief create the internal support for rendering the sprite.
+ * @note automatically called for loaded sprites, but any created must call this before it will render properly
+ * @param sprite the sprite to setup
+ */
+void gf2d_sprite_create_vertex_buffer(Sprite *sprite);
+
+/**
  * @brief create a sprite from an SDL_Surface
  * @param surface pointer to SDL_Surface image data
  * @param frame_width how wide an individual frame is on the sprite sheet.  if <= 0 this is assumed to be the image size

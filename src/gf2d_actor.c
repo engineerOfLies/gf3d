@@ -596,7 +596,7 @@ void gf2d_actor_draw(
 {
     Color drawColor;
     Vector2D drawCenter;
-    Vector2D drawScale;
+    Vector2D drawScale = {1,1};
     Vector2D drawPosition;
     Vector4D drawClip = {0,0,0,0};
     if (!actor)return;

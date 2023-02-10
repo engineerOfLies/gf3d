@@ -250,6 +250,7 @@ Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height
         gf2d_sprite_free(sprite);
         return NULL;
     }
+    sprite->surface = sprite->texture->surface;
     if (frame_width <= 0)frame_width = sprite->texture->width;
     if (frame_height <= 0)frame_height = sprite->texture->height;
     sprite->frameWidth = frame_width;

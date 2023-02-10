@@ -15,6 +15,11 @@
 void gf2d_draw_manager_init(Uint32 ttl);
 
 /**
+ * @brief timeout old shape drawings
+ */
+void gf2d_draw_manager_update();
+
+/**
  * @brief draw the shape with the color specified
  * @param shape the shape to draw
  * @param color the color to draw with

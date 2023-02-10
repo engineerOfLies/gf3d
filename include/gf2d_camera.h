@@ -82,4 +82,11 @@ void gf2d_camera_set_focus(Vector2D position);
  * @param position the new top left position of the gf2d_camera
  */
 void gf2d_camera_set_position_absolute(Vector2D position);
+
+/**
+ * @brief center the camera based on the position
+ * @param position the new center point for the camera
+ */
+void gf2d_camera_center_on(Vector2D position);
+
 #endif

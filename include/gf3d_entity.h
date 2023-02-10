@@ -14,7 +14,9 @@ typedef struct Entity_S
     Uint8       _inuse;         /**<keeps track of memory usage*/
     TextLine    name;
     ModelMat    mat;            /**<orientation matrix for the model for 3D*/
-    Actor       actor;          /**<actor for 2D entities*/
+    Actor      *actor;          /**<actor for 2D entities*/
+    Action     *action;         /**<which action is current*/
+    float       frame;          /**<current animation frame*/
     
     Shape       shape;          /**<2d shape for collisions in 2D space*/
     Primitive   volume;         /**<3d shape for collisions in 3D space*/
@@ -37,6 +39,8 @@ typedef struct Entity_S
     void       (*free)(struct Entity_S *self); /**<pointer to the custom free function, necessar when there is custom data*/
         
     float       roll;           //kept separate 
+    float       rotation;       /**<for 2D actor rotation*/
+    Vector2D    flip;           /**<for 2d actor drawing*/
     Vector3D    velocity;
     Vector3D    acceleration;
     Vector3D    targetPosition;
@@ -78,9 +82,14 @@ void gf3d_entity_free(Entity *self);
 void gf3d_entity_draw(Entity *self);
 
 /**
- * @brief draw ALL active entities
+ * @brief draw ALL active entities to the 3D pipeline
  */
 void gf3d_entity_draw_all();
+
+/**
+ * @brief draw ALL active entities to the 2D pipeline
+ */
+void gf3d_entity_draw_all_2d();
 
 /**
  * @brief Call an entity's think function if it exists

@@ -3,6 +3,7 @@
 
 #include "simple_logger.h"
 
+#include "gf2d_camera.h"
 #include "gf3d_entity.h"
 
 typedef struct
@@ -66,6 +67,7 @@ void gf3d_entity_free(Entity *self)
     if (!entity_manager.initialized)return;
     if (!self)return;
     //MUST DESTROY
+    gf2d_actor_free(self->actor);
     if (self->free)
     {
         self->free(self);
@@ -74,6 +76,44 @@ void gf3d_entity_free(Entity *self)
     memset(self,0,sizeof(Entity));
 }
 
+void gf3d_entity_draw_2d(Entity *self)
+{
+    Vector2D drawPosition = {0},camera;
+    Vector2D scale = {0};
+    if (!entity_manager.initialized)return;
+    if (!self)return;
+    if (self->hidden)return;
+    if ((self->actor)&& (self->actor->sprite))
+    {
+        camera = gf2d_camera_get_offset();
+        vector2d_add(drawPosition,self->mat.position,camera);
+        vector2d_scale_by(scale,self->mat.scale,self->actor->scale);
+        gf2d_actor_draw(
+            self->actor,
+            self->frame,
+            drawPosition,
+            &scale,
+            &self->actor->center,
+            &self->rotation,
+            &self->color,
+            &self->flip);
+    }
+    if (self->draw)self->draw(self);
+}
+
+void gf3d_entity_draw_all_2d()
+{
+    int i;
+    if (!entity_manager.initialized)return;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)// not used yet
+        {
+            continue;// skip this iteration of the loop
+        }
+        gf3d_entity_draw_2d(&entity_manager.entity_list[i]);
+    }
+}
 
 void gf3d_entity_draw(Entity *self)
 {
@@ -166,6 +206,8 @@ void gf3d_entity_update(Entity *self)
         self->mat.rotation.y = self->mat.rotation.x;
         self->mat.rotation.x = 0;
         self->mat.rotation.z += GFC_HALF_PI;
+        //for 2D
+        self->rotation = (vector2d_angle(vector2d(self->velocity.x,self->velocity.y)) * GFC_DEGTORAD) + GFC_PI;
     }
     
     if (self->update)self->update(self);

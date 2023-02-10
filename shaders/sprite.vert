@@ -27,14 +27,11 @@ layout(location = 2) out float drawOrder;
 
 void main()
 {
+    vec2 center;
     mat4 scale_m = mat4(ubo.scale.x,0,0,0,
                         0,ubo.scale.y,0,0,
                         0,0,1,0,
                         0,0,0,1);
-    mat4 translate_m = mat4(1,0,0,ubo.position.x * 2/ubo.extent.x,
-                            0,1,0,ubo.position.y * 2/ubo.extent.y,
-                            0,0,1,0,
-                            0,0,0,1);
     
     fragTexCoord = inTexCoord + ubo.frame_offset;
     vec4 clip_position = vec4(inPosition,0,1);
@@ -62,9 +59,10 @@ void main()
             fragTexCoord.y = fragTexCoord.y - ubo.clip.w/ubo.size.y;
         break;
     }
-    clip_position.xy = clip_position.xy - ubo.center;
+    center = ubo.center*2;
+    clip_position.xy = clip_position.xy - center;
     vec4 r_position = scale_m * ubo.rotation * clip_position;
-    r_position.xy = r_position.xy + ubo.center;
+    r_position.xy = r_position.xy + center;
     vec4 drawOffset = vec4((ubo.position * 2)/ubo.extent,0,0);
     gl_Position = vec4(r_position.xy/ubo.extent,0,1) - vec4(1,1,0,0) + drawOffset;
     colorMod = ubo.colorMod;

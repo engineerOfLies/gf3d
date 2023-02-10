@@ -103,7 +103,6 @@ DrawImage *gf2d_draw_image_get(
     return NULL;
 }
 
-
 void gf2d_draw_rect(Rect rect,Color color)
 {
     SDL_Surface *surface;
@@ -213,6 +212,130 @@ void gf2d_draw_rect_filled(Rect rect,Color color)
         vector4d(0,0,0,0),
         0);
     gf2d_draw_image_new(sprite,shape,1);
+}
+
+/*
+ * credit circle drawing algorith:
+ * http://groups.csail.mit.edu/graphics/classes/6.837/F98/Lecture6/circle.html
+ */
+
+static int gf2d_draw_circle_points(SDL_Point *p,Vector2D center, SDL_Point point)
+{  
+  if (point.x == 0)
+  {
+    vector2d_set(p[0],center.x, center.y + point.y);
+    vector2d_set(p[1],center.x, center.y - point.y);
+    vector2d_set(p[2],center.x + point.y, center.y);
+    vector2d_set(p[3],center.x - point.y, center.y);
+    return 4;
+  }
+  if (point.x == point.y)
+  {
+    vector2d_set(p[0],center.x + point.x, center.y + point.y);
+    vector2d_set(p[1],center.x - point.x, center.y + point.y);
+    vector2d_set(p[2],center.x + point.x, center.y - point.y);
+    vector2d_set(p[3],center.x - point.x, center.y - point.y);
+    return 4;
+  }
+  if (point.x < point.y)
+  {
+    vector2d_set(p[0],center.x + point.x, center.y + point.y);
+    vector2d_set(p[1],center.x - point.x, center.y + point.y);
+    vector2d_set(p[2],center.x + point.x, center.y - point.y);
+    vector2d_set(p[3],center.x - point.x, center.y - point.y);
+    vector2d_set(p[4],center.x + point.y, center.y + point.x);
+    vector2d_set(p[5],center.x - point.y, center.y + point.x);
+    vector2d_set(p[6],center.x + point.y, center.y - point.x);
+    vector2d_set(p[7],center.x - point.y, center.y - point.x);
+    return 8;
+  }
+  return 0;
+}
+
+void gf2d_draw_circle(Vector2D center, int radius, Color color)
+{
+    Shape shape;
+    SDL_Point *pointArray;
+    int c,i = 0;
+    SDL_Surface *surface;
+    Sprite *sprite;
+    SDL_Rect pixel = {0,0,1,1};
+    SDL_Point point = {0,0};
+    int p = (5 - radius*4)/4;
+    DrawImage *image = NULL;
+    
+    shape = gfc_shape_from_circle(gfc_circle(0,0,radius));
+    image = gf2d_draw_image_get(shape,0);
+    if (image)
+    {
+        image->last_used = SDL_GetTicks();
+        gf2d_sprite_draw_full(
+            image->image,
+            vector2d(center.x - radius,center.y - radius),
+            vector2d(1,1),
+            vector2d(0,0),
+            0,
+            vector2d(0,0),
+            color,
+            vector4d(0,0,0,0),
+            0);
+        return;
+    }
+
+    point.y = radius;
+    pointArray = (SDL_Point*)malloc(sizeof(SDL_Point)*radius*8);
+    if (!pointArray)
+    {
+        slog("gf2d_draw_circle: failed to allocate points for circle drawing");
+        return;
+    }
+    i = gf2d_draw_circle_points(&pointArray[i],vector2d(radius,radius), point);
+    while (point.x < point.y)
+    {
+        point.x++;
+        if (p < 0)
+        {
+            p += 2*point.x+1;
+        }
+        else
+        {
+            point.y--;
+            p += 2*(point.x-point.y)+1;
+        }
+        i += gf2d_draw_circle_points(&pointArray[i],vector2d(radius,radius), point);
+        if (i + 8 >= radius*8)
+        {
+            break;
+        }
+    }
+    surface = gf3d_vgraphics_create_surface((Uint32)(radius * 2) + 1,(Uint32)(radius * 2) + 1);
+    if (!surface)
+    {
+        slog("failed to create surface for rectangle draw");
+    }
+    c = i;
+    
+    for (i = 0; i < c; i++)
+    {
+        pixel.x = pointArray[i].x;
+        pixel.y = pointArray[i].y;
+        SDL_FillRect(surface, &pixel,SDL_MapRGBA(surface->format,255,255,255,255));
+    }
+    free(pointArray);
+    
+    sprite = gf2d_sprite_from_surface(surface,0,0, 1);
+    
+    gf2d_sprite_draw_full(
+        sprite,
+        vector2d(center.x - radius,center.y - radius),
+        vector2d(1,1),
+        vector2d(0,0),
+        0,
+        vector2d(0,0),
+        color,
+        vector4d(0,0,0,0),
+        0);
+    gf2d_draw_image_new(sprite,shape,0);
 }
 
 #if 0
@@ -504,92 +627,6 @@ void gf2d_draw_pixel_list(SDL_Point * pixels,Uint32 count,Color color)
     SDL_RenderDrawPoints(gf2d_graphics_get_renderer(),
                         pixels,
                         count);
-}
-
-/*
- * credit circle drawing algorith:
- * http://groups.csail.mit.edu/graphics/classes/6.837/F98/Lecture6/circle.html
- */
-
-static int gf2d_draw_circle_points(SDL_Point *p,Vector2D center, Vector2D point)
-{  
-  if (point.x == 0)
-  {
-    vector2d_set(p[0],center.x, center.y + point.y);
-    vector2d_set(p[1],center.x, center.y - point.y);
-    vector2d_set(p[2],center.x + point.y, center.y);
-    vector2d_set(p[3],center.x - point.y, center.y);
-    return 4;
-  }
-  if (point.x == point.y)
-  {
-    vector2d_set(p[0],center.x + point.x, center.y + point.y);
-    vector2d_set(p[1],center.x - point.x, center.y + point.y);
-    vector2d_set(p[2],center.x + point.x, center.y - point.y);
-    vector2d_set(p[3],center.x - point.x, center.y - point.y);
-    return 4;
-  }
-  if (point.x < point.y)
-  {
-    vector2d_set(p[0],center.x + point.x, center.y + point.y);
-    vector2d_set(p[1],center.x - point.x, center.y + point.y);
-    vector2d_set(p[2],center.x + point.x, center.y - point.y);
-    vector2d_set(p[3],center.x - point.x, center.y - point.y);
-    vector2d_set(p[4],center.x + point.y, center.y + point.x);
-    vector2d_set(p[5],center.x - point.y, center.y + point.x);
-    vector2d_set(p[6],center.x + point.y, center.y - point.x);
-    vector2d_set(p[7],center.x - point.y, center.y - point.x);
-    return 8;
-  }
-  return 0;
-}
-
-void gf2d_draw_circle(Vector2D center, int radius, Color color)
-{
-    SDL_Point *pointArray;
-    int i = 0;
-    Vector2D point = {0,0};
-    int p = (5 - radius*4)/4;
-    Color drawColor;
-    drawColor = gfc_color_to_int8(color);
-    point.y = radius;
-    pointArray = (SDL_Point*)malloc(sizeof(SDL_Point)*radius*8);
-    if (!pointArray)
-    {
-        slog("gf2d_draw_circle: failed to allocate points for circle drawing");
-        return;
-    }
-    i = gf2d_draw_circle_points(&pointArray[i],center, point);
-    while (point.x < point.y)
-    {
-        point.x++;
-        if (p < 0)
-        {
-            p += 2*point.x+1;
-        }
-        else
-        {
-            point.y--;
-            p += 2*(point.x-point.y)+1;
-        }
-        i += gf2d_draw_circle_points(&pointArray[i],center, point);
-        if (i + 8 >= radius*8)
-        {
-            break;
-        }
-    }
-    SDL_SetRenderDrawColor(gf2d_graphics_get_renderer(),
-                           drawColor.r,
-                           drawColor.g,
-                           drawColor.b,
-                           drawColor.a);
-    SDL_RenderDrawPoints(gf2d_graphics_get_renderer(),pointArray,i);
-    SDL_SetRenderDrawColor(gf2d_graphics_get_renderer(),
-                            255,
-                            255,
-                            255,
-                            255);
-    free(pointArray);
 }
 
 List *gf2d_draw_get_bezier4_points(
