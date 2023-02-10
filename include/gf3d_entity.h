@@ -4,14 +4,21 @@
 #include "gfc_types.h"
 #include "gfc_color.h"
 #include "gfc_primitives.h"
+#include "gfc_shape.h"
 
+#include "gf2d_actor.h"
 #include "gf3d_model.h"
 
 typedef struct Entity_S
 {
     Uint8       _inuse;         /**<keeps track of memory usage*/
     TextLine    name;
-    ModelMat    mat;            /**<orientation matrix for the model*/
+    ModelMat    mat;            /**<orientation matrix for the model for 3D*/
+    Actor       actor;          /**<actor for 2D entities*/
+    
+    Shape       shape;          /**<2d shape for collisions in 2D space*/
+    Primitive   volume;         /**<3d shape for collisions in 3D space*/
+    
     Color       color;          /**<default color for the model*/
     Color       detailColor;    /**<detail color for the model*/
     Color       selectedColor;  /**<Color for highlighting*/
