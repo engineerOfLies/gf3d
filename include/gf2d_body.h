@@ -5,6 +5,10 @@
 #include "gfc_text.h"
 #include "gfc_shape.h"
 
+/**
+ * @purpose bodies are used to track physics enabled objects in the 2d collisions space system
+ */
+
 typedef struct Body_S
 {
     TextLine    name;           /**<name for debugging purposes*/
@@ -94,5 +98,12 @@ void gf2d_body_push(Body *body,Vector2D direction,float force);
  * @return an empty {0} shape on error, or the body shape information otherwise
  */
 Shape gf2d_body_to_shape(Body *a);
+
+/**
+ * @brief configure a body from json
+ * @param body the body to configure
+ * @param config the json to use
+ */
+void gf2d_body_from_config(Body *body, SJson *config);
 
 #endif

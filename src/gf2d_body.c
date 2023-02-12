@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include "simple_logger.h"
 
+#include "gfc_config.h"
+
+#include "gf3d_cliplayers.h"
+
 #include "gf2d_draw.h"
 #include "gf2d_body.h"
 
@@ -90,6 +94,23 @@ Uint8 gf2d_body_body_collide(Body *a,Body *b)
         return 0;
     }
     return gfc_shape_overlap(gf2d_body_to_shape(a),gf2d_body_to_shape(b));
+}
+
+void gf2d_body_from_config(Body *body, SJson *config)
+{
+    const char *str;    
+    if ((!body)||(!config)) return;
+    str = sj_object_get_value_as_string(config,"name");
+    if (str)gfc_line_cpy(body->name,str);
+    sj_object_get_value_as_float(config,"gravity",&body->gravity);
+    sj_object_get_value_as_uint8(config,"worldclip",&body->worldclip);
+    sj_object_get_value_as_uint32(config,"team",&body->team);
+    sj_value_as_vector2d(sj_object_get_value(config,"position"),&body->position);
+    sj_value_as_vector2d(sj_object_get_value(config,"velocity"),&body->velocity);
+    sj_object_get_value_as_float(config,"mass",&body->mass);
+    sj_object_get_value_as_float(config,"elasticity",&body->elasticity);
+    body->cliplayer = gf3d_cliplayers_from_config(sj_object_get_value(config,"cliplayer"));
+    body->touchlayer = gf3d_cliplayers_from_config(sj_object_get_value(config,"touchlayer"));
 }
 
 /*eol@eof*/
