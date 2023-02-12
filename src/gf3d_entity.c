@@ -86,7 +86,7 @@ void gf3d_entity_draw_2d(Entity *self)
     if ((self->actor)&& (self->actor->sprite))
     {
         camera = gf2d_camera_get_offset();
-        vector2d_add(drawPosition,self->mat.position,camera);
+        vector2d_add(drawPosition,self->body.position,camera);
         vector2d_scale_by(scale,self->mat.scale,self->actor->scale);
         gf2d_actor_draw(
             self->actor,
@@ -206,8 +206,11 @@ void gf3d_entity_update(Entity *self)
         self->mat.rotation.y = self->mat.rotation.x;
         self->mat.rotation.x = 0;
         self->mat.rotation.z += GFC_HALF_PI;
-        //for 2D
-        self->rotation = (vector2d_angle(vector2d(self->velocity.x,self->velocity.y)) * GFC_DEGTORAD) + GFC_PI;
+    //for 2D
+    }
+    if (!vector2d_is_zero(self->body.velocity))
+    {
+        self->rotation = (vector2d_angle(self->body.velocity) * GFC_DEGTORAD) + GFC_PI;
     }
     
     if (self->update)self->update(self);

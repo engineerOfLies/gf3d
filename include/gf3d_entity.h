@@ -6,6 +6,7 @@
 #include "gfc_primitives.h"
 #include "gfc_shape.h"
 
+#include "gf2d_body.h"
 #include "gf2d_actor.h"
 #include "gf3d_model.h"
 
@@ -19,7 +20,7 @@ typedef struct Entity_S
     float       frame;          /**<current animation frame*/
     
     Shape       shape;          /**<2d shape for collisions in 2D space*/
-    Primitive   volume;         /**<3d shape for collisions in 3D space*/
+    Body        body;           /**<instance for collisions in 2D space*/
     
     Color       color;          /**<default color for the model*/
     Color       detailColor;    /**<detail color for the model*/
