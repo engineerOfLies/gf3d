@@ -18,6 +18,7 @@ typedef struct Entity_S
     Actor      *actor;          /**<actor for 2D entities*/
     Action     *action;         /**<which action is current*/
     float       frame;          /**<current animation frame*/
+    int         actionReturn;   /**<from the last frame this entity updated*/
     
     Shape       shape;          /**<2d shape for collisions in 2D space*/
     Body        body;           /**<instance for collisions in 2D space*/
@@ -35,7 +36,7 @@ typedef struct Entity_S
     void       (*think)(struct Entity_S *self); /**<pointer to the think function*/
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/
     void       (*draw)(struct Entity_S *self); /**<pointer to an optional extra draw funciton*/
-    void       (*damage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
+    void       (*takeDamage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     void       (*free)(struct Entity_S *self); /**<pointer to the custom free function, necessar when there is custom data*/
         
@@ -49,9 +50,12 @@ typedef struct Entity_S
     float       speed;// how fast it moves
     Bool        targetComplete;
     int         counter;//generic counting variable
+    float       cooldown;
             
     Uint32      health;         /**<entity dies when it reaches zero*/
+    float       damage;
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
+    struct Entity_S *parent;    /**<entity that spawned this one*/
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
     void *data;   /**<IF an entity needs to keep track of extra data, we can do it here*/
@@ -114,5 +118,9 @@ void gf3d_entity_update_all();
  * @return NULL if not found, or the first entity with the given name
  */
 Entity *gf3d_entity_get_by_name(const char *name);
+
+
+
+void gf3d_entity_rotate_to_dir(Entity *self,Vector2D dir);
 
 #endif

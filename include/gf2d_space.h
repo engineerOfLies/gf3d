@@ -57,6 +57,11 @@ Space *gf2d_space_new_full(
     Vector2D    bucketSize);
 
 /**
+ * @brief create a space based on specs from a config file
+ */
+Space *gf2d_space_load(SJson *json);
+
+/**
  * @brief cleans up a space
  */
 void gf2d_space_free(Space *space);

@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "simple_logger.h"
 
+#include "gfc_config.h"
+
 #include "gf2d_draw.h"
 #include "gf2d_collision.h"
 #include "gf2d_dynamic_body.h"
@@ -293,6 +295,38 @@ void gf2d_space_buckets_add_shape(Space *space,Shape *shape)
                 shape);
         }
     }
+}
+
+Space *gf2d_space_load(SJson *json)
+{
+    int         usesBuckets = 0;
+    Vector2D    bucketSize = {0};
+    int         precision = 0;
+    Vector4D    bounds = {0};
+    float       timeStep = 0;
+    Vector2D    gravity = {0};
+    float       dampening = 0;
+    float       slop = 0;
+    Space *space = NULL;
+    if (!json)return NULL;
+    sj_object_get_value_as_int(json,"usesBuckets",&usesBuckets);
+    sj_value_as_vector2d(sj_object_get_value(json,"bucketSize"),&bucketSize);
+    sj_object_get_value_as_int(json,"precision",&precision);
+    sj_value_as_vector4d(sj_object_get_value(json,"bounds"),&bounds);
+    sj_object_get_value_as_float(json,"timeStep",&timeStep);
+    sj_value_as_vector2d(sj_object_get_value(json,"gravity"),&gravity);
+    sj_object_get_value_as_float(json,"dampening",&dampening);
+    sj_object_get_value_as_float(json,"slop",&slop);
+    space = gf2d_space_new_full(
+        precision,
+        gfc_rect_from_vector4(bounds),
+        timeStep,
+        gravity,
+        dampening,
+        slop,
+        usesBuckets,
+        bucketSize);
+    return space;
 }
 
 Space *gf2d_space_new_full(

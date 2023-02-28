@@ -192,27 +192,26 @@ Entity *gf3d_entity_get_by_name(const char *name)
     return NULL;
 }
 
+void gf3d_entity_rotate_to_dir(Entity *self,Vector2D dir)
+{
+    if (!self)return;
+    if (!vector2d_is_zero(dir))
+    {
+        self->rotation = (vector2d_angle(dir) * GFC_DEGTORAD) + GFC_PI;
+    }    
+}
+
 void gf3d_entity_update(Entity *self)
 {
     if (!entity_manager.initialized)return;
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
+    if (self->actor)
+    {
+        self->actionReturn = gf2d_action_next_frame(self->action,&self->frame);
+    }
 
     vector3d_add(self->velocity,self->acceleration,self->velocity);
-    if (!vector3d_is_zero(self->velocity))
-    {
-        vector3d_add(self->mat.position,self->mat.position,self->velocity);
-        vector3d_angles (self->velocity, &self->mat.rotation);
-        self->mat.rotation.y = self->mat.rotation.x;
-        self->mat.rotation.x = 0;
-        self->mat.rotation.z += GFC_HALF_PI;
-    //for 2D
-    }
-    if (!vector2d_is_zero(self->body.velocity))
-    {
-        self->rotation = (vector2d_angle(self->body.velocity) * GFC_DEGTORAD) + GFC_PI;
-    }
-    
     if (self->update)self->update(self);
 }
 
