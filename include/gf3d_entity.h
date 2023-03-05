@@ -57,6 +57,7 @@ typedef struct Entity_S
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     struct Entity_S *parent;    /**<entity that spawned this one*/
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
+    struct Entity_S *killer;    /**<entity that killed this one*/
     
     void *data;   /**<IF an entity needs to keep track of extra data, we can do it here*/
 }Entity;
