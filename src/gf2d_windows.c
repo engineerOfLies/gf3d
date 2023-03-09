@@ -74,6 +74,11 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             &clip,
             0);
     }
+    if (!border)
+    {
+        slog("no border provided");
+        return;
+    }
     if ((border->frameWidth == 0)||(border->frameHeight == 0))return;
     count.x = (int)(rect.w / border->frameWidth) - 1;
     fraction.x = ((float)rect.w / (float)border->frameWidth) - 1;
