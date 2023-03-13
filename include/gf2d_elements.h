@@ -142,6 +142,13 @@ void gf2d_element_set_hidden(Element *element, int hidden);
 void gf2d_element_set_color(Element *element,Color color);
 
 /**
+ * @brief set the backgrond color for the given element
+ * @param element the element to set
+ * @param color the color to set it to
+ */
+void gf2d_element_set_background_color(Element *element,Color color);
+
+/**
  * @brief update an element.  checks input
  * @param element the element to draw
  * @param offset comes from parent window position

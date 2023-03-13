@@ -25,6 +25,7 @@ typedef struct
     Element *actor;
     BE_Style style;
     TextLine hotkey; /**<input used to hotkey the button*/
+    Bool     repeat; /**<if true, enable continuous updates while held*/
     Bool     customActions;
     // base color comes from element
     Color highColor;    /**<color used when button is in highlight*/

@@ -251,6 +251,12 @@ void gf2d_element_set_color(Element *element,Color color)
     element->color = color;
 }
 
+void gf2d_element_set_background_color(Element *element,Color color)
+{
+    if (!element)return;
+    element->backgroundColor = color;
+}
+
 int gf2d_element_set_focus(Element *element,int focus)
 {
     if (!element->canHasFocus)return 0;

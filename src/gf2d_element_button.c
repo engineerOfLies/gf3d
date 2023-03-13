@@ -77,7 +77,7 @@ List *gf2d_element_button_update(Element *element,Vector2D offset)
     if (element->hasFocus)
     {
         element->state = ES_highlight;
-        if (gfc_input_command_pressed("enter"))
+        if ((gfc_input_command_pressed("enter"))||(button->repeat && gfc_input_command_held("enter")))
         {
             element->state = ES_active;
             list = gfc_list_new();
@@ -99,6 +99,13 @@ List *gf2d_element_button_update(Element *element,Vector2D offset)
             if (gf2d_mouse_button_state(0))
             {
                 element->state = ES_active;
+                if (button->repeat && gf2d_mouse_button_held(0))
+                {
+                    list = gfc_list_new();
+                    list = gfc_list_append(list,element);
+                    if (strlen(button->sound))gf2d_windows_play_sound(button->sound);
+                    return list;
+                }
             }
             else if (gf2d_mouse_button_released(0))
             {
@@ -113,7 +120,7 @@ List *gf2d_element_button_update(Element *element,Vector2D offset)
             element->state = ES_idle;
         }
     }
-    if (gfc_input_command_pressed(button->hotkey))
+    if ((gfc_input_command_pressed(button->hotkey))||(button->repeat && gfc_input_command_held(button->hotkey)))
     {
         element->state = ES_active;
         list = gfc_list_new();
@@ -272,6 +279,7 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
     button = (ButtonElement*)e->data;
     text = sj_get_string_value(sj_object_get_value(json,"sound"));
     if (text)gfc_line_cpy(button->sound,text);
+    sj_object_get_value_as_bool(json,"repeat",&button->repeat);
     value = sj_object_get_value(json,"hotkey");
     if (value)
     {
