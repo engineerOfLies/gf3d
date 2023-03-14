@@ -389,6 +389,40 @@ Element *gf2d_element_list_get_item_by_id(Element *e,int id)
     return NULL;
 }
 
+Element *gf2d_element_list_new_complete(
+    Element *parent,
+    Window *win,
+    int      index,
+    TextLine name,
+    Rect bounds,
+    Color color,
+    Color backgroundColor,
+    int backgroundDraw,
+    Vector2D itemSize,
+    ListStyle ls,
+    int wraps,
+    int scrolls,
+    int packed,
+    int cropped)
+{
+    Element *list;
+    ListElement *le;
+    le = gf2d_element_list_new_full(
+        gfc_rect(0,0,1,1),
+        itemSize,
+        ls,
+        wraps,scrolls,packed,cropped);
+    if (!le)return NULL;
+    list = gf2d_element_new_full(
+        parent,index,name,
+        bounds,
+        color,0,
+        backgroundColor,backgroundDraw,win);
+    gf2d_element_make_list(list,le);
+    return list;
+}
+
+
 void gf2d_element_load_list_from_config(Element *e,SJson *json,Window *win)
 {
     SJson *value = NULL;

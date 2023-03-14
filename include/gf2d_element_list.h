@@ -114,4 +114,23 @@ int gf2d_element_list_get_items_per_line(Element *e);
  */
 int gf2d_element_list_get_items_per_column(Element *e);
 
+/**
+ * @brief make a new list element, and specify all of its parameters
+ */
+Element *gf2d_element_list_new_complete(
+    Element *parent,
+    Window *win,
+    int      index,
+    TextLine name,
+    Rect bounds,
+    Color color,
+    Color backgroundColor,
+    int backgroundDraw,
+    Vector2D itemSize,
+    ListStyle ls,
+    int wraps,
+    int scrolls,
+    int packed,
+    int cropped);
+
 #endif
