@@ -98,6 +98,19 @@ void gf3d_entity_draw_all();
 void gf3d_entity_draw_all_2d();
 
 /**
+ * @brief update the position of the entity based on its velocity in 3D space
+ * @param self the entity to update
+ */
+void gf3d_entity_update_position_3d(Entity *self);
+
+/**
+ * @brief rotate an entity to match the given direction
+ * @param self the entity to rotate
+ * @param dir the direction to rotate it by
+ */
+void gf3d_entity_rotate_to_dir_3d(Entity *self,Vector3D dir);
+
+/**
  * @brief Call an entity's think function if it exists
  * @param self the entity in question
  */

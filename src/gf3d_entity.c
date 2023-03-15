@@ -201,6 +201,22 @@ void gf3d_entity_rotate_to_dir(Entity *self,Vector2D dir)
     }    
 }
 
+void gf3d_entity_update_position_3d(Entity *self)
+{
+    if (!self)return;
+    vector3d_add(self->mat.position,self->mat.position,self->velocity);
+}
+
+void gf3d_entity_rotate_to_dir_3d(Entity *self,Vector3D dir)
+{
+    if (!self)return;
+    if (vector2d_is_zero(dir))return;
+    vector3d_angles (dir, &self->mat.rotation);
+    self->mat.rotation.y = self->mat.rotation.x;
+    self->mat.rotation.x = 0;
+    self->mat.rotation.z += GFC_HALF_PI;
+}
+
 void gf3d_entity_update(Entity *self)
 {
     if (!entity_manager.initialized)return;
