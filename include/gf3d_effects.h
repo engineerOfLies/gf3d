@@ -5,13 +5,13 @@
 
 #include "gfc_vector.h"
 #include "gfc_color.h"
+#include "gfc_callbacks.h"
 #include "gf3d_particle.h"
 #include "gf3d_model.h"
 
 typedef enum
 {
     GF3D_ET_Particle = 0,
-    GF3D_ET_Line,
     GF3D_ET_Model,
     GF3D_ET_Sprite,
     GF3D_ET_MAX,
@@ -33,6 +33,7 @@ typedef struct
     Color           color;              // color mod for the effect
     Color           colorVector;        // color delta to be applied over time
     Color           colorAcceleration;  // color delta delta to be applied over time
+    Callback        callback;           // if a callback has been set for when a particle dies
 }GF3DEffect;
 
 /**
@@ -52,6 +53,18 @@ void gf3d_effect_manager_draw_all();
  */
 GF3DEffect *gf3d_effect_new();
 
+/**
+ * @brief make a new particle type temproary effect
+ * @param position where to start it off from
+ * @param velocity how fast it is moving
+ * @param acceleration how fast it changes speed
+ * @param size how large the particle is
+ * @param sizeDelta if the particle size should change over time,  if not set this to 1
+ * @param color the color for the particle
+ * @param colorVector added to the color every update
+ * @param colorAcceleration added to the colorVector every update
+ * @param ttl the number of draw frames this should live for
+ */
 GF3DEffect *gf3d_effect_new_particle(
     Vector3D position,
     Vector3D velocity,
@@ -62,6 +75,53 @@ GF3DEffect *gf3d_effect_new_particle(
     Color colorVector,
     Color colorAcceleration,
     Sint32 ttl);
+
+/**
+ * @brief make a new particle type temproary effect that will move towards a target for its life
+ * @param position where to start it off from
+ * @param target where the particle should end up
+ * @param size how large the particle is
+ * @param sizeDelta if the particle size should change over time,  if not set this to 1
+ * @param color the color for the particle
+ * @param colorVector added to the color every update
+ * @param colorAcceleration added to the colorVector every update
+ * @param ttl the number of draw frames before this reaches the target
+ */
+GF3DEffect *gf3d_effect_new_particle_target(
+    Vector3D position,
+    Vector3D target,
+    float size,
+    float sizeDelta,
+    Color color,
+    Color colorVector,
+    Color colorAcceleration,
+    Sint32 ttl);
+
+/**
+ * @brief make an explosion of particles from the given point
+ * @param position where to spawn the explosion
+ * @param size how large the particles should be
+ * @param sizeDelta how the size changes over time
+ * @param color the base color of the particles
+ * @param colorVariation how much variability will be applied to each color
+ * @param count how many particles to create
+ * @param speed how fast they move
+ * @param ttl how long they will last
+ */
+void gf3d_effect_make_particle_explosion(
+    Vector3D position,
+    float size,
+    float sizeDelta,
+    Color color,
+    Color colorVariation,
+    int count,
+    float speed,
+    Uint32 ttl);
+
+/**
+ * @brief set a callback for when a particle dies
+ */
+void gf3d_effect_set_callback(GF3DEffect *effect,void (*callback)(void *data),void *data);
 
 /**
  * @brief make a new particle based on a json config
