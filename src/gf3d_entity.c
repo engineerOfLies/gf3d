@@ -76,6 +76,14 @@ void gf3d_entity_free(Entity *self)
     memset(self,0,sizeof(Entity));
 }
 
+Vector3D gf3d_entity_get_position(Entity *self)
+{
+    Vector3D position = {0};
+    if (!self)return position;
+    return self->mat.position;
+}
+
+
 void gf3d_entity_draw_2d(Entity *self)
 {
     Vector2D drawPosition = {0},camera;

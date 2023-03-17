@@ -56,6 +56,7 @@ typedef struct
     Vector3D scale;
     Vector3D positionDelta;
     Vector3D rotationDelta;
+    Vector3D scaleDelta;
 }ModelMat;
 
 /**
