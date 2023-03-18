@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 #include "gf3d_effects.h"
+#include "gf3d_effects.h"
 
 typedef struct
 {
@@ -61,6 +62,12 @@ void gf3d_effect_update(GF3DEffect *effect)
             gfc_color_copy(effect->particle.color,effect->color);
             effect->particle.size *= effect->sizeDelta;
             break;
+        case GF3D_ET_Line:
+            gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
+            gf3d_model_mat_rotate(&effect->mat,effect->mat.rotationDelta);
+            gf3d_model_mat_scale(&effect->mat,effect->mat.scaleDelta);
+            effect->radius *= effect->sizeDelta;
+            break;
         case GF3D_ET_Model:
             gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
             gf3d_model_mat_rotate(&effect->mat,effect->mat.rotationDelta);
@@ -84,6 +91,9 @@ void gf3d_effect_draw(GF3DEffect *effect)
     {
         case GF3D_ET_Particle:
             gf3d_particle_draw(effect->particle);
+            break;
+        case GF3D_ET_Line:
+            gf3d_draw_edge_3d(effect->edge,effect->mat.position,effect->mat.rotation,effect->mat.scale,effect->radius,effect->color);
             break;
         case GF3D_ET_Model:
             gf3d_model_draw(effect->mat.model,0,effect->mat.mat,gfc_color_to_vector4f(effect->color),vector4d(1,1,1,1),vector4d(1,1,1,1));
@@ -125,6 +135,36 @@ void gf3d_effect_free(GF3DEffect *effect)
     if (!effect)return;
     if (effect->mat.model)gf3d_model_free(effect->mat.model);
     memset(effect,0,sizeof(GF3DEffect));
+}
+
+GF3DEffect *gf3d_effect_new_line(
+    Edge3D edge,
+    Vector3D velocity,
+    Vector3D acceleration,
+    float size,
+    float sizeDelta,
+    Color color,
+    Color colorVector,
+    Color colorAcceleration,
+    Sint32 ttl)
+{
+    GF3DEffect *effect;
+    if (size <= 0)return NULL;
+    effect = gf3d_effect_new();
+    if (!effect)return NULL;
+    effect->eType = GF3D_ET_Line;
+    if (ttl < 0)effect->ttd = -1;
+    else effect->ttd = gf3d_effect_manager.now + ttl;
+    effect->radius = size;
+    effect->edge = edge;
+    effect->velocity = velocity;
+    effect->acceleration = acceleration;
+    effect->particle.size = size;
+    effect->sizeDelta = sizeDelta;
+    gfc_color_copy(effect->color,color);
+    gfc_color_copy(effect->colorVector,colorVector);
+    gfc_color_copy(effect->colorAcceleration,colorAcceleration);
+    return effect;
 }
 
 GF3DEffect *gf3d_effect_new_particle(

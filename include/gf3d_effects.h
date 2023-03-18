@@ -6,12 +6,16 @@
 #include "gfc_vector.h"
 #include "gfc_color.h"
 #include "gfc_callbacks.h"
+#include "gfc_primitives.h"
+
+#include "gf3d_draw.h"
 #include "gf3d_particle.h"
 #include "gf3d_model.h"
 
 typedef enum
 {
     GF3D_ET_Particle = 0,
+    GF3D_ET_Line,
     GF3D_ET_Model,
     GF3D_ET_Sprite,
     GF3D_ET_MAX,
@@ -23,7 +27,9 @@ typedef struct
     Uint8           _inuse;
     Sint32          ttd;                // when this time is passed, delete this effect
     ModelMat        mat;                // for keeping track of model data`
+    Edge3D          edge;               // for drawing lines
     Particle        particle;           // particle data, partical data
+    float           radius;             // how wide a line is
     GF3DEffectType  eType;              // which type of effect this one is
     Uint16          fadein;             // if true, start fading in from zero alpha to full by the time this has ended
     Uint16          fadeout;            // if true, start fading out when there is this much time left to live
@@ -117,6 +123,30 @@ void gf3d_effect_make_particle_explosion(
     int count,
     float speed,
     Uint32 ttl);
+
+/**
+ * @brief make a line effect
+ * @param edge describes the line in 3d space
+ * @param velocity how fast it is moving
+ * @param acceleration how fast it changes speed
+ * @param size how wide the line is
+ * @param sizeDelta if the line size should change over time,  if not set this to 1
+ * @param color the color for the line
+ * @param colorVector added to the color every update
+ * @param colorAcceleration added to the colorVector every update
+ * @param ttl the number of draw frames this should live for
+ */
+GF3DEffect *gf3d_effect_new_line(
+    Edge3D edge,
+    Vector3D velocity,
+    Vector3D acceleration,
+    float size,
+    float sizeDelta,
+    Color color,
+    Color colorVector,
+    Color colorAcceleration,
+    Sint32 ttl);
+
 
 /**
  * @brief set a callback for when a particle dies
