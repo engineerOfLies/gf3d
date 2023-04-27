@@ -38,6 +38,7 @@ typedef struct
     Texture                    *texture;                /**<texture memory pointer*/
     Uint8                       framesPerLine;          /**<how many frames are per line in the sprite sheet*/
     Uint32                      frameWidth,frameHeight; /*<the size, in pixels, of the individual sprite frames*/
+    float                       widthPercent,heightPercent;/**<size percent of the sprite frame from the texture*/
     VkBuffer                    buffer;
     VkDeviceMemory              bufferMemory;
     VkDescriptorSet            *descriptorSet;          /**<descriptor sets used for this sprite to render*/

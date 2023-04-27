@@ -217,6 +217,8 @@ Sprite * gf2d_sprite_from_surface(SDL_Surface *surface,int frame_width,int frame
     if (frame_height <= 0)frame_height = sprite->texture->height;
     sprite->frameWidth = frame_width;
     sprite->frameHeight = frame_height;
+    sprite->widthPercent = sprite->frameWidth / (float)sprite->texture->width;
+    sprite->heightPercent = sprite->frameHeight/ (float)sprite->texture->height;
     if (frames_per_line)sprite->framesPerLine = frames_per_line;
     else sprite->framesPerLine = 1;
     gf2d_sprite_create_vertex_buffer(sprite);
@@ -255,6 +257,8 @@ Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height
     if (frame_height <= 0)frame_height = sprite->texture->height;
     sprite->frameWidth = frame_width;
     sprite->frameHeight = frame_height;
+    sprite->widthPercent = sprite->frameWidth / (float)sprite->texture->width;
+    sprite->heightPercent = sprite->frameHeight/ (float)sprite->texture->height;
     if (frames_per_line)sprite->framesPerLine = frames_per_line;
     else sprite->framesPerLine = 1;
     gfc_line_cpy(sprite->filename,filename);

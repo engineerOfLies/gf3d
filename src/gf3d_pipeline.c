@@ -76,7 +76,8 @@ void gf3d_pipeline_call_render(
     vkCmdBindVertexBuffers(pipe->commandBuffer, 0, 1, &vertexBuffer, offsets);
     if (indexBuffer != VK_NULL_HANDLE)vkCmdBindIndexBuffer(pipe->commandBuffer, indexBuffer, 0, pipe->indexType);
     vkCmdBindDescriptorSets(pipe->commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe->pipelineLayout, 0, 1, descriptorSet, 0, NULL);
-    vkCmdDrawIndexed(pipe->commandBuffer, vertexCount, 1, 0, 0, 0);
+    if (indexBuffer != VK_NULL_HANDLE)vkCmdDrawIndexed(pipe->commandBuffer, vertexCount, 1, 0, 0, 0);
+    else vkCmdDraw(pipe->commandBuffer, vertexCount,1,0,0);
 }
 
 void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawCall)
@@ -185,7 +186,11 @@ void gf3d_pipeline_queue_render(
     PipelineDrawCall *drawCall;
     if (!pipe)return;
     drawCall = gf3d_pipeline_draw_call_new(pipe);
-    if (!drawCall)return;
+    if (!drawCall)
+    {
+        slog("failed to get a drawcall for pipeline");
+        return;
+    }
     drawCall->descriptorSet = gf3d_pipeline_get_descriptor_set(pipe, gf3d_vgraphics_get_current_buffer_frame());
     drawCall->vertexBuffer = vertexBuffer;
     drawCall->vertexCount = vertexCount;
@@ -569,6 +574,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     pipe->uboData = gfc_allocate_array(bufferSize,descriptorCount);
     pipe->uboDataSize = bufferSize;
     pipe->uboBigBuffer = gf3d_uniform_buffer_list_new(device,bufferSize*descriptorCount,1,gf3d_swapchain_get_swap_image_count());
+    gfc_line_cpy(pipe->name,configFile);
+    pipe->indexType = indexType;
     if (__DEBUG)slog("pipeline created from file '%s'",configFile);
     return pipe;
 }

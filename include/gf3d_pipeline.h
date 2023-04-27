@@ -23,6 +23,7 @@ typedef struct
 typedef struct
 {
     Bool                    inUse;
+    TextLine                name;                   /**<name of pipeline for debugging*/
     VkPipeline              pipeline;               /**<pipeline handle*/
     VkRenderPass            renderPass;
     VkPipelineLayout        pipelineLayout;

@@ -299,66 +299,6 @@ void gf2d_fonts_load_json(const char *filename)
     sj_free(file);
 }
 
-void gf2d_fonts_load(const char *filename)
-{
-    FILE *file;
-    int count;
-    int i;
-    SDL_RWops *src;
-    void *mem;
-    size_t fileSize = 0;
-    file = fopen(filename,"r");
-    if (!file)
-    {
-        slog("failed to open font config file %s",filename);
-        return;
-    }
-    count = gf2d_fonts_get_count(file);
-    if (!count)
-    {
-        slog("font config file %s contained no font information",filename);
-        fclose(file);
-        return;
-    }
-    font_manager.font_list = (Font*)gfc_allocate_array(sizeof(Font),count);
-    if (!font_manager.font_list)
-    {
-        slog("failed to allocate memory for %i fonts",count);
-        fclose(file);
-        return;
-    }
-    memset(font_manager.font_list,0,sizeof(Font)*count);
-    for (i = 0 ; i < FT_MAX; i++)
-    {
-        font_manager.font_tags[i] = font_manager.font_list;
-    }
-    gf2d_fonts_parse(file);
-    for (i = 0; i < count; i++)
-    {
-        mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
-        if (!mem)
-        {
-            slog("failed to load font %s",font_manager.font_list[i].filename);
-            continue;
-        }
-        src = SDL_RWFromMem(mem, fileSize);
-        if (!src)
-        {
-            slog("failed to read font %s",font_manager.font_list[i].filename);
-            free(mem);
-            continue;
-        }
-        font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
-        font_manager.font_list[i].mem = mem;
-        if (!font_manager.font_list[i].font)
-        {
-            slog("failed to load font: %s\n", TTF_GetError());
-        }
-    }
-    font_manager.font_max = count;
-    slog("font library loaded with %i fonts",count);
-    fclose(file);
-}
 
 Font *gf2d_font_get_by_filename(char *filename)
 {

@@ -15,9 +15,12 @@ typedef struct
     Matrix4     view;
     Matrix4     proj;
     Vector4D    color;
+    Vector4D    color2;
     Vector2D    viewportSize;
+    Vector2D    texture_offset;// as a percent
+    Vector2D    texture_size;// as a percent
+    Uint32      textured;
     float       size;
-    float       padding;
 }ParticleUBO;
 
 typedef struct
@@ -26,6 +29,7 @@ typedef struct
     VkVertexInputBindingDescription     bindingDescription;
     VkBuffer                    buffer;                 /**<vertex buffer for particles (just one vertex)*/
     VkDeviceMemory              bufferMemory;           /**<memory handle for the vertex buffer*/
+    Texture                    *defaultTexture;
     Pipeline *pipe;
 }ParticleManager;
 
@@ -37,7 +41,7 @@ void gf3d_particle_create_vertex_buffer();
 
 Particle gf3d_particle(Vector3D position, Color color, float size)
 {
-    Particle p = {position, color, size};
+    Particle p = {position, color, color, size};
     return p;
 }
 
@@ -79,6 +83,7 @@ void gf3d_particle_manager_init(Uint32 max_particles)
         VK_INDEX_TYPE_UINT16
     );
     if(__DEBUG)slog("particle manager initiliazed");
+    gf3d_particle_manager.defaultTexture = gf3d_texture_load("images/effects/flare.png");
     atexit(gf3d_particles_manager_close);
 }
 
@@ -150,7 +155,11 @@ ParticleUBO gf3d_particle_get_uniform_buffer(Particle *particle)
     gfc_matrix_copy(particleUBO.view,graphics_ubo.view);
     gfc_matrix_copy(particleUBO.proj,graphics_ubo.proj);
     
+    particleUBO.texture_size.x = 1.00;
+    particleUBO.texture_size.y = 1.00;
+    
     vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
+    vector4d_copy(particleUBO.color2,gfc_color_to_vector4f(particle->color2));
     particleUBO.size = particle->size;
     particleUBO.viewportSize = gf3d_vgraphics_get_view_extent_as_vector2d();
     return particleUBO;
@@ -185,14 +194,55 @@ void gf3d_particle_draw(Particle particle)
 {
     ParticleUBO ubo = {0};
     ubo = gf3d_particle_get_uniform_buffer(&particle);
+//     slog("particle ubo position: %f,%f,%f",ubo.model[3][0],ubo.model[3][1],ubo.model[3][2]);
+//     slog("particle ubo color: %f,%f,%f,%f",ubo.color.x,ubo.color.y,ubo.color.z,ubo.color.w);
+//     slog("particle ubo size: %f",ubo.size);
+    gf3d_pipeline_queue_render(
+        gf3d_particle_manager.pipe,
+        gf3d_particle_manager.buffer,
+        3,//its a single vertex
+        VK_NULL_HANDLE,
+        &ubo,
+        gf3d_particle_manager.defaultTexture);
+}
+
+void gf3d_particle_draw_textured(Particle particle,Texture *texture)
+{
+    ParticleUBO ubo = {0};
+    ubo = gf3d_particle_get_uniform_buffer(&particle);
+    if (texture)ubo.textured = 1;
+    gf3d_pipeline_queue_render(
+        gf3d_particle_manager.pipe,
+        gf3d_particle_manager.buffer,
+        1,//its a single vertex
+        VK_NULL_HANDLE,
+        &ubo,
+        texture);
+}
+
+void gf3d_particle_draw_sprite(Particle particle,Sprite *sprite,int frame)
+{
+    Texture *texture = NULL;
+    ParticleUBO ubo = {0};
+    ubo = gf3d_particle_get_uniform_buffer(&particle);
+    if (sprite)
+    {
+        ubo.textured = 1;
+        ubo.texture_size.x = sprite->widthPercent;
+        ubo.texture_size.y = sprite->heightPercent;
+        ubo.texture_offset.x = (frame%sprite->framesPerLine)* sprite->widthPercent;
+        ubo.texture_offset.y = (frame/sprite->framesPerLine)* sprite->heightPercent;
+        texture = sprite->texture;
+    }
     gf3d_pipeline_queue_render(
         gf3d_particle_manager.pipe,
         gf3d_particle_manager.buffer,
         1,//its a single quad
         VK_NULL_HANDLE,
         &ubo,
-        NULL);
+        texture);
 }
+
 
 
 void gf3d_particle_trail_draw(Color color, float size, Uint8 count, Edge3D trail)
@@ -204,6 +254,7 @@ void gf3d_particle_trail_draw(Color color, float size, Uint8 count, Edge3D trail
     vector3d_copy(position,trail.a);
     vector3d_sub(step,trail.b,trail.a);//vector to b
     gfc_color_copy(particle.color,color);
+    particle.color2 = gfc_color8(255,255,255,255);
     particle.size = size;
     if (count > 1)
     {
@@ -236,12 +287,12 @@ void draw_guiding_lights(Vector3D position,Vector3D rotation,float width, float 
     vector3d_add(forward,forward,right);
     vector3d_add(start,start,right);
     
-    gf3d_particle_trail_draw(GFC_COLOR_LIGHTRED, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
+    gf3d_particle_trail_draw(GFC_COLOR_RED, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
     
     vector3d_scale(right,right,-2);
     vector3d_add(forward,forward,right);
     vector3d_add(start,start,right);
-    gf3d_particle_trail_draw(GFC_COLOR_LIGHTGREEN, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
+    gf3d_particle_trail_draw(GFC_COLOR_GREEN, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
 
 }
 

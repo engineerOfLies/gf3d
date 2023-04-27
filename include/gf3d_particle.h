@@ -9,12 +9,14 @@
 #include "gfc_list.h"
 #include "gfc_primitives.h"
 
+#include "gf2d_sprite.h"
 #include "gf3d_pipeline.h"
 
 typedef struct
 {
     Vector3D position;
     Color color;
+    Color color2;   //for color blending
     float size;
 }Particle;
 
@@ -45,6 +47,21 @@ void gf3d_particle_submit_pipe_commands();
  * @param particle the particle to draw
  */
 void gf3d_particle_draw(Particle particle);
+
+/**
+ * @brief draw a single particle this frame with a texture
+ * @param particle the particle to draw
+ * @param texture the texture to use for the particle
+ */
+void gf3d_particle_draw_textured(Particle particle,Texture *texture);
+
+/**
+ * @brief draw a particle as an animated sprite
+ * @param particle the particle to draw
+ * @param sprite the sprite to draw with
+ * @param frame the frame of animation to draw
+ */
+void gf3d_particle_draw_sprite(Particle particle,Sprite *sprite,int frame);
 
 /**
  * @brief draw a trail particles from tail.a to tail.b
