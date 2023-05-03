@@ -194,13 +194,10 @@ void gf3d_particle_draw(Particle particle)
 {
     ParticleUBO ubo = {0};
     ubo = gf3d_particle_get_uniform_buffer(&particle);
-//     slog("particle ubo position: %f,%f,%f",ubo.model[3][0],ubo.model[3][1],ubo.model[3][2]);
-//     slog("particle ubo color: %f,%f,%f,%f",ubo.color.x,ubo.color.y,ubo.color.z,ubo.color.w);
-//     slog("particle ubo size: %f",ubo.size);
     gf3d_pipeline_queue_render(
         gf3d_particle_manager.pipe,
         gf3d_particle_manager.buffer,
-        3,//its a single vertex
+        1,//its a single vertex
         VK_NULL_HANDLE,
         &ubo,
         gf3d_particle_manager.defaultTexture);
