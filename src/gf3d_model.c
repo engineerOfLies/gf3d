@@ -523,6 +523,7 @@ void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector
     HighlightUBO uboData = {0};
     
     if (!gf3d_model.initiliazed)return;
+    if (!model)return;
     uboData = gf3d_model_get_highlight_ubo(modelMat,highlight);
     if (!model->texture)
     {
@@ -540,6 +541,7 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color)
     Texture *texture;
     SkyUBO uboData = {0};
     if (!gf3d_model.initiliazed)return;
+    if (!model)return;
     uboData = gf3d_model_get_sky_ubo(modelMat,gfc_color_to_vector4f(color));
     if (!model->texture)
     {
