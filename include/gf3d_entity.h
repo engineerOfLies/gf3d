@@ -93,6 +93,12 @@ void gf3d_entity_draw(Entity *self);
 void gf3d_entity_draw_all();
 
 /**
+ * @brief draw JUST the entities in the list provided.
+ * @note list should contain pointers to entities and nothing else
+ */
+void gf3d_entity_draw_list(List *entities);
+
+/**
  * @brief draw ALL active entities to the 2D pipeline
  */
 void gf3d_entity_draw_all_2d();

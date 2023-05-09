@@ -123,6 +123,12 @@ void gf3d_entity_draw_all_2d()
     }
 }
 
+void gf3d_entity_draw_list(List *entities)
+{
+    if (!entities)return;
+    gfc_list_foreach(entities,(gfc_work_func*)gf3d_entity_draw);
+}
+
 void gf3d_entity_draw(Entity *self)
 {
     Matrix4 mat;
