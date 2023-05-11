@@ -328,11 +328,12 @@ void gf2d_draw_circle(Vector2D center, int radius, Color color)
     int c,i = 0;
     SDL_Surface *surface;
     Sprite *sprite;
-    SDL_Rect pixel = {0,0,1,1};
+    SDL_Rect pixel = {0,0,2.0,2.0};
     SDL_Point point = {0,0};
     int p = (5 - radius*4)/4;
     DrawImage *image = NULL;
     
+    if (radius < 1)return;
     shape = gfc_shape_from_circle(gfc_circle(0,0,radius));
     image = gf2d_draw_image_get(shape,0);
     if (image)

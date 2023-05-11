@@ -68,6 +68,14 @@ Vector2D gf3d_vgraphics_get_resolution();
 Vector2D vgraphics_3d_position_to_screen(Vector3D position);
 
 /**
+ * @brief translate a 3D position to the corresponding screen position
+ * @note this does the same operations that are better handled in shaders, so it sparingly
+ * @param position the position in 3D space input
+ * @return the same position as it maps to the screen with the z component being the screen depth
+ */
+Vector3D vgraphics_3d_position_to_screen_depth(Vector3D position);
+
+/**
  * @brief copy into view the current view matrix
  * @param view [output]
  */
