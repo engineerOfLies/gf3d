@@ -650,5 +650,35 @@ VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
     return imageView;
 }
 
+Vector2D vgraphics_3d_position_to_screen(Vector3D position)
+{
+    Vector2D res,out;
+    Matrix4 mvp,model;
+    Vector4D transformed = {0};
+    UniformBufferObject graphics_ubo;
+    
+    res = gf3d_vgraphics_get_resolution();
+    
+    gfc_matrix_make_translation(
+        model,
+        position);
+    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    gfc_matrix_multiply(
+        mvp,
+        graphics_ubo.view,
+        graphics_ubo.proj
+    );
+    
+    gfc_matrix_v_multiply_M(
+        &transformed,
+        mvp,
+        vector4d(position.x,position.y,position.z,1.0));
+    
+    out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
+    out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;
+        
+    return out;
+}
+
 /*eol@eof*/
 
