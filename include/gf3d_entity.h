@@ -14,6 +14,7 @@ typedef struct Entity_S
 {
     Uint8       _inuse;         /**<keeps track of memory usage*/
     TextLine    name;
+    int         state;          /**<used for keeping track of state indices*/
     ModelMat    mat;            /**<orientation matrix for the model for 3D*/
     Actor      *actor;          /**<actor for 2D entities*/
     Action     *action;         /**<which action is current*/
@@ -97,6 +98,12 @@ void gf3d_entity_draw_all();
  * @note list should contain pointers to entities and nothing else
  */
 void gf3d_entity_draw_list(List *entities);
+
+/**
+ * @brief draw an entity in 2D mode
+ * @param self the entity to draw
+ */
+void gf3d_entity_draw_2d(Entity *self);
 
 /**
  * @brief draw ALL active entities to the 2D pipeline

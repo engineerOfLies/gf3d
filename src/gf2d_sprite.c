@@ -414,15 +414,15 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
         },
         {
             {(sprite->frameWidth + 1)*2,0},
-            {sprite->frameWidth/(float)sprite->texture->width,0}
+            {sprite->frameWidth/((float)sprite->texture->width + 0.01),0}
         },
         {
             {0,(sprite->frameHeight + 1)*2},
-            {0,sprite->frameHeight/(float)sprite->texture->height}
+            {0,sprite->frameHeight/((float)sprite->texture->height + 0.01)}
         },
         {
             {(sprite->frameWidth + 1)*2,(sprite->frameHeight+ 1)*2},
-            {sprite->frameWidth/(float)sprite->texture->width,sprite->frameHeight/(float)sprite->texture->height}
+            {sprite->frameWidth/((float)sprite->texture->width + 0.01),sprite->frameHeight/((float)sprite->texture->height + 0.01)}
         }
     };
     bufferSize = sizeof(SpriteVertex) * 4;
