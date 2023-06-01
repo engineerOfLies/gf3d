@@ -15,6 +15,7 @@ typedef struct Entity_S
     Uint8       _inuse;         /**<keeps track of memory usage*/
     TextLine    name;
     int         state;          /**<used for keeping track of state indices*/
+    int         noDrawGeneric;  /**<if true, this entity won't use the generic draw method*/
     ModelMat    mat;            /**<orientation matrix for the model for 3D*/
     Actor      *actor;          /**<actor for 2D entities*/
     Action     *action;         /**<which action is current*/

@@ -91,20 +91,23 @@ void gf3d_entity_draw_2d(Entity *self)
     if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->hidden)return;
-    if ((self->actor)&& (self->actor->sprite))
+    if (!self->noDrawGeneric)
     {
-        camera = gf2d_camera_get_offset();
-        vector2d_add(drawPosition,self->body.position,camera);
-        vector2d_scale_by(scale,self->mat.scale,self->actor->scale);
-        gf2d_actor_draw(
-            self->actor,
-            self->frame,
-            drawPosition,
-            &scale,
-            &self->actor->center,
-            &self->rotation,
-            &self->color,
-            &self->flip);
+        if ((self->actor)&& (self->actor->sprite))
+        {
+            camera = gf2d_camera_get_offset();
+            vector2d_add(drawPosition,self->body.position,camera);
+            vector2d_scale_by(scale,self->mat.scale,self->actor->scale);
+            gf2d_actor_draw(
+                self->actor,
+                self->frame,
+                drawPosition,
+                &scale,
+                &self->actor->center,
+                &self->rotation,
+                &self->color,
+                &self->flip);
+        }
     }
     if (self->draw)self->draw(self);
 }
