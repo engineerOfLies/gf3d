@@ -43,6 +43,14 @@ void gf2d_draw_pixel(Vector2D pixel,Color color);
 void gf2d_draw_circle(Vector2D center, int radius, Color color);
 
 /**
+ * @brief draw a solid filled circle
+ * @param center the center of the circle to draw
+ * @param radius the radius of the circle
+ * @param color the color to draw with
+ */
+void gf2d_draw_circle_filled(Vector2D center, int radius, Color color);
+
+/**
  * @brief draw a rectanlge outline
  * @param rect the rect to draw
  * @param color the color to draw with

@@ -321,6 +321,95 @@ void gf2d_draw_points_to_surface(SDL_Surface *surface,SDL_Point *pointArray,Uint
 
 }
 
+void gf2d_draw_circle_filled(Vector2D center, int radius, Color color)
+{
+    Shape shape;
+    SDL_Point *pointArray;
+    int c,i = 0;
+    SDL_Surface *surface;
+    Sprite *sprite;
+    SDL_Rect pixel = {0,0,2.0,2.0};
+    SDL_Point point = {0,0};
+    int p = (5 - radius*4)/4;
+    DrawImage *image = NULL;
+    
+    if (radius < 1)return;
+    shape = gfc_shape_from_circle(gfc_circle(0,0,radius));
+    image = gf2d_draw_image_get(shape,1);
+    if (image)
+    {
+        image->last_used = SDL_GetTicks();
+        gf2d_sprite_draw_full(
+            image->image,
+            vector2d(center.x - radius,center.y - radius),
+            vector2d(1,1),
+            vector2d(0,0),
+            0,
+            vector2d(0,0),
+            color,
+            vector4d(0,0,0,0),
+            0);
+        return;
+    }
+
+    point.y = radius;
+    pointArray = (SDL_Point*)malloc(sizeof(SDL_Point)*radius*8);
+    if (!pointArray)
+    {
+        slog("gf2d_draw_circle: failed to allocate points for circle drawing");
+        return;
+    }
+    i = gf2d_draw_circle_points(&pointArray[i],vector2d(radius,radius), point);
+    while (point.x < point.y)
+    {
+        point.x++;
+        if (p < 0)
+        {
+            p += 2*point.x+1;
+        }
+        else
+        {
+            point.y--;
+            p += 2*(point.x-point.y)+1;
+        }
+        i += gf2d_draw_circle_points(&pointArray[i],vector2d(radius,radius), point);
+        if (i + 8 >= radius*8)
+        {
+            break;
+        }
+    }
+    surface = gf3d_vgraphics_create_surface((Uint32)(radius * 2) + 1,(Uint32)(radius * 2) + 1);
+    if (!surface)
+    {
+        slog("failed to create surface for rectangle draw");
+    }
+    c = i;
+    
+    for (i = 0; i < c; i++)
+    {
+        if (pointArray[i].x > radius)continue;//skip right half
+        pixel.x = pointArray[i].x;
+        pixel.y = pointArray[i].y;
+        pixel.w = ((radius - pointArray[i].x)*2) + 1.0;
+        SDL_FillRect(surface, &pixel,SDL_MapRGBA(surface->format,255,255,255,255));
+    }
+    free(pointArray);
+    
+    sprite = gf2d_sprite_from_surface(surface,0,0, 1);
+    
+    gf2d_sprite_draw_full(
+        sprite,
+        vector2d(center.x - radius,center.y - radius),
+        vector2d(1,1),
+        vector2d(0,0),
+        0,
+        vector2d(0,0),
+        color,
+        vector4d(0,0,0,0),
+        0);
+    gf2d_draw_image_new(sprite,shape,1);
+}
+
 void gf2d_draw_circle(Vector2D center, int radius, Color color)
 {
     Shape shape;
@@ -407,6 +496,7 @@ void gf2d_draw_circle(Vector2D center, int radius, Color color)
         0);
     gf2d_draw_image_new(sprite,shape,0);
 }
+
 
 void gf2d_draw_shape(Shape shape,Color color,Vector2D offset)
 {
