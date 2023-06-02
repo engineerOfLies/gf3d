@@ -289,12 +289,12 @@ int gf2d_action_get_animation_frames(Action *action);
 int gf2d_action_get_frames_remaining(Action *action,float frame);
 
 /**
- * @brief returns the percentage of completion of the current action in integer space (0-100)
+ * @brief returns the percentage of completion of the current action
  * @note: this is for synching timing events
  * @param action the action in question
  * @param frame the current frame
  */
-int gf2d_action_get_percent_complete(Action *action,float frame);
+float gf2d_action_get_percent_complete(Action *action,float frame);
 
 /**
  * @brief get the number of frames into the action we are based on the current frame

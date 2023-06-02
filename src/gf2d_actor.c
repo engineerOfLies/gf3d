@@ -662,7 +662,7 @@ int gf2d_action_get_animation_frames(Action *action)
 
 }
 
-int gf2d_action_get_percent_complete(Action *action,float frame)
+float gf2d_action_get_percent_complete(Action *action,float frame)
 {
     float total,passed;
     if (!action)
@@ -676,7 +676,7 @@ int gf2d_action_get_percent_complete(Action *action,float frame)
     total = (action->endFrame - action->startFrame)/action->frameRate;
     passed = (frame - action->startFrame)/action->frameRate;
     if (!total)return 0;
-    return (int)((passed*100)/total);
+    return (passed/total);
 }
 
 int gf2d_action_get_frames_remaining(Action *action,float frame)
