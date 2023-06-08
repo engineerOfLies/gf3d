@@ -138,22 +138,25 @@ void gf3d_entity_draw(Entity *self)
     if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->hidden)return;
-    if (self->mat.model)
+    if (!self->noDrawGeneric)
     {
-        gfc_matrix4_from_vectors(mat,vector3d(0,0,0),vector3d(self->roll,0,0),vector3d(1,1,1));
-        
-        gf3d_model_mat_set_matrix(&self->mat);
-        
-        gfc_matrix_multiply(self->mat.mat,mat,self->mat.mat);
-        
-        gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
-        if (self->selected)
+        if (self->mat.model)
         {
-            gf3d_model_draw_highlight(
-                self->mat.model,
-                0,
-                self->mat.mat,
-                gfc_color_to_vector4f(self->selectedColor));
+            gfc_matrix4_from_vectors(mat,vector3d(0,0,0),vector3d(self->roll,0,0),vector3d(1,1,1));
+            
+            gf3d_model_mat_set_matrix(&self->mat);
+            
+            gfc_matrix_multiply(self->mat.mat,mat,self->mat.mat);
+            
+            gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1));
+            if (self->selected)
+            {
+                gf3d_model_draw_highlight(
+                    self->mat.model,
+                    0,
+                    self->mat.mat,
+                    gfc_color_to_vector4f(self->selectedColor));
+            }
         }
     }
     if (self->draw)self->draw(self);
