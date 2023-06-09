@@ -45,6 +45,7 @@ typedef struct
     List               *mesh_list;
     Texture            *texture;
     Texture            *normalMap;
+    Box                 bounds;         //copied from the mesh
 }Model;
 
 typedef struct

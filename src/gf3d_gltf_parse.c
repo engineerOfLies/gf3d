@@ -306,6 +306,7 @@ Model *gf3d_gltf_parse_model(const char *filename)
         if (mesh)
         {
             gfc_line_cpy(mesh->filename,filename);
+            gfc_box_cpy(model->bounds,mesh->bounds);
         }
         model->mesh_list = gfc_list_append(model->mesh_list,mesh);
     }

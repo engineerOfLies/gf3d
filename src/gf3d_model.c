@@ -202,6 +202,7 @@ Model *gf3d_model_load_from_config(SJson *json)
             gf3d_model_free(model);
             return NULL;
         }
+        gfc_box_cpy(model->bounds,mesh->bounds);
         model->mesh_list = gfc_list_append(model->mesh_list,mesh);
         return model;
     }
@@ -217,7 +218,11 @@ Model *gf3d_model_load_from_config(SJson *json)
             if (modelFile)
             {
                 mesh = gf3d_mesh_load(modelFile);
-                if (mesh)model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+                if (mesh)
+                {
+                    gfc_box_cpy(model->bounds,mesh->bounds);
+                    model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+                }
             }
         }
         return model;
@@ -280,6 +285,7 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
         gf3d_model_free(model);
         return NULL;
     }
+    gfc_box_cpy(model->bounds,mesh->bounds);
     model->mesh_list = gfc_list_append(model->mesh_list,mesh);
     
     model->texture = gf3d_texture_load(textureFile);

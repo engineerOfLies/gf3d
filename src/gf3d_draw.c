@@ -79,6 +79,24 @@ void gf3d_draw_cube_wireframe(Box cube,Vector3D position,Vector3D rotation,Vecto
     gf3d_model_draw_highlight(gf3d_draw_manager.icube,0,modelMat,gfc_color_to_vector4f(color));
 }
 
+void gf3d_draw_box_wireframe(Box cube,Color color)
+{
+    Vector3D center;
+    Matrix4 modelMat;
+    
+    center.x = cube.x + (cube.w * 0.5);
+    center.y = cube.y + (cube.h * 0.5);
+    center.z = cube.z + (cube.d * 0.5);
+
+    gfc_matrix4_from_vectors(
+        modelMat,
+        center,
+        vector3d(0,0,0),
+        vector3d(cube.w,cube.h,cube.d));
+    gf3d_model_draw_highlight(gf3d_draw_manager.icube,0,modelMat,gfc_color_to_vector4f(color));
+}
+
+
 void gf3d_draw_cube_solid(Box cube,Vector3D position,Vector3D rotation,Vector3D scale,Color color)
 {
     Matrix4 modelMat;

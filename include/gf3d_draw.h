@@ -23,9 +23,9 @@ void gf3d_draw_init();
 void gf3d_draw_edge_3d(Edge3D edge,Vector3D position,Vector3D rotation,Vector3D scale,float radius,Color color);
 
 /**
- * @brief draw a cube outline with the given orientation
+ * @brief draw a cube outline with the given orientation, centered on position
  * @param cube the cube dimensions to draw.  (x,y,and z are offsets from center)
- * @param position where to move the sphere (final location is position + cube.xyz
+ * @param position where to move the cube center 
  * @param rotation how to rotation the cube about its center
  * @param scale how much to scale the cube.  The size of the cube is also a factor
  * @param color the color to draw with
@@ -33,9 +33,16 @@ void gf3d_draw_edge_3d(Edge3D edge,Vector3D position,Vector3D rotation,Vector3D 
 void gf3d_draw_cube_wireframe(Box cube,Vector3D position,Vector3D rotation,Vector3D scale,Color color);
 
 /**
- * @brief draw a solid cube with the given orientation
+ * @brief draw an axis aligned box using the box's absolute coordinates
+ * @param cube the cube to draw
+ * @param color the color to draw with
+ */
+void gf3d_draw_box_wireframe(Box cube,Color color);
+
+/**
+ * @brief draw a solid cube with the given orientation, centered on position
  * @param cube the cube dimensions to draw.  (x,y,and z are offsets from center)
- * @param position where to move the sphere (final location is position + cube.xyz
+ * @param position where to move the cube center 
  * @param rotation how to rotation the cube about its center
  * @param scale how much to scale the cube.  The size of the cube is also a factor
  * @param color the color to draw with

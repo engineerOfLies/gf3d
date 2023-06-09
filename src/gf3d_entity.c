@@ -247,7 +247,6 @@ void gf3d_entity_update(Entity *self)
         self->actionReturn = gf2d_action_next_frame(self->action,&self->frame);
     }
     if (self->cooldown)self->cooldown--;
-    vector3d_add(self->velocity,self->acceleration,self->velocity);
     if (self->update)self->update(self);
 }
 
