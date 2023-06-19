@@ -279,9 +279,9 @@ Actor *gf2d_actor_load_json(
 )
 {
     Vector4D color = {255,255,255,255};
+    Vector2D scaleTo;
     Actor *actor;
     SJson *actorJS = NULL;
-    const char *tempStr;
     if ((!json)||(!filename))
     {
         return NULL;
@@ -295,23 +295,23 @@ Actor *gf2d_actor_load_json(
         return NULL;
     }
 
-    
     gfc_line_cpy(actor->filename,filename);
-    sj_get_integer_value(sj_object_get_value(actorJS,"frameWidth"),&actor->frameWidth);
-    sj_get_integer_value(sj_object_get_value(actorJS,"frameHeight"),&actor->frameHeight);
-    sj_get_integer_value(sj_object_get_value(actorJS,"framesPerLine"),&actor->framesPerLine);
-    tempStr = sj_get_string_value(sj_object_get_value(actorJS,"sprite"));
-    if (tempStr)
-    {
-        actor->sprite = gf2d_sprite_load(
-            tempStr,
-            actor->frameWidth,
-            actor->frameHeight,
-            actor->framesPerLine);
-        gfc_line_cpy(actor->spriteFile,tempStr);
-    }
     
+    if (sj_get_string_value(sj_object_get_value(actorJS,"sprite")))
+    {
+        actor->sprite = gf2d_sprite_parse(actorJS);
+        if (actor->sprite)
+        {
+            gfc_line_cpy(actor->spriteFile,actor->sprite->filename);
+        }
+    }
+
     sj_value_as_vector2d(sj_object_get_value(actorJS,"scale"),&actor->scale);
+    if ((actor->sprite) && (sj_value_as_vector2d(sj_object_get_value(actorJS,"scaleTo"),&scaleTo)))
+    {
+        actor->scale.x = scaleTo.x / actor->sprite->frameWidth;
+        actor->scale.y = scaleTo.y / actor->sprite->frameHeight;
+    }
     sj_value_as_vector2d(sj_object_get_value(actorJS,"center"),&actor->center);
     sj_value_as_vector2d(sj_object_get_value(actorJS,"drawOffset"),&actor->drawOffset);
     sj_value_as_vector4d(sj_object_get_value(actorJS,"color"),&color);
