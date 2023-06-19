@@ -22,6 +22,8 @@
     SOFTWARE.
 */
 
+#include "simple_json.h"
+
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
@@ -74,6 +76,20 @@ Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height
  * @return NULL on error (check logs) or a pointer to a sprite that can be draw to the 2d overlay
  */
 Sprite * gf2d_sprite_load_image(const char * filename);
+
+/**
+ * @brief load a sprite based on configuration in json
+ * @note format should be:
+ *     {
+            "sprite": "images/ui/pointer.png",
+            "frameWidth": 16,
+            "frameHeight": 16,
+            "framesPerLine": 1,
+        }
+    @param json the json containing the sprite configuration
+    @return NULL if the json is bad, or the information is incorrect, the sprite otherwise
+ */
+Sprite *gf2d_sprite_parse(SJson *json);
 
 /**
  * @brief create the internal support for rendering the sprite.

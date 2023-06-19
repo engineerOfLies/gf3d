@@ -231,6 +231,27 @@ Sprite * gf2d_sprite_load_image(const char * filename)
     return gf2d_sprite_load(filename,0,0, 1);
 }
 
+Sprite *gf2d_sprite_parse(SJson *json)
+{
+    int frameWidth = -1,frameHeight = -1;
+    int framesPerLine = 1;
+    Sprite *sprite = NULL;
+    const char *str;
+    if (!json)return NULL;
+    str = sj_object_get_value_as_string(json,"sprite");
+    if (!str)
+    {
+        slog("cannot parse from sprite, bad json.  Missing sprite 'tag'");
+        return NULL;
+    }
+    sprite = gf2d_sprite_get_by_filename(str);
+    if (sprite)return sprite;// already loaded
+    sj_object_get_value_as_int(json,"frameWidth",&frameWidth);
+    sj_object_get_value_as_int(json,"frameHeight",&frameHeight);
+    sj_object_get_value_as_int(json,"framesPerLine",&framesPerLine);
+    return gf2d_sprite_load(str,frameWidth,frameHeight, framesPerLine);
+}
+
 Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height, Uint32 frames_per_line)
 {
     Sprite *sprite;
