@@ -273,16 +273,13 @@ List *gf2d_action_list_parse(List *al,SJson *actionList)
     return al;
 }
 
-Actor *gf2d_actor_load_json(
-    SJson *json,
-    const char *filename
-)
+Actor *gf2d_actor_load_json(SJson *json)
 {
     Vector4D color = {255,255,255,255};
     Vector2D scaleTo;
     Actor *actor;
     SJson *actorJS = NULL;
-    if ((!json)||(!filename))
+    if (!json)
     {
         return NULL;
     }
@@ -294,9 +291,6 @@ Actor *gf2d_actor_load_json(
         slog("missing actor object in actor file");
         return NULL;
     }
-
-    gfc_line_cpy(actor->filename,filename);
-    
     if (sj_get_string_value(sj_object_get_value(actorJS,"sprite")))
     {
         actor->sprite = gf2d_sprite_parse(actorJS);
@@ -449,9 +443,10 @@ Actor *gf2d_actor_load(const char *file)
     if (json)
     {
         actor = gf2d_actor_load_json(
-            json,
-            file);
+            json);
         sj_free(json);
+        if (!actor)return NULL;
+        gfc_line_cpy(actor->filename,file);
         return actor;
     }
     // if it failed to load as json, then lets try it as a flat image

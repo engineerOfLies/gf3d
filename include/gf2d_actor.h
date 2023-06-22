@@ -65,6 +65,56 @@ typedef struct
 void gf2d_actor_init(Uint32 max);
 
 /**
+ * @brief free all loaded actors
+ */
+void gf2d_actor_clear_all();
+
+/**
+ * @brief load an actor from json file
+ * @note if its already in memory you get a reference to that one
+ * @param file the json file to load it from
+ * @return NULL on error or the actor otherwise
+ */
+Actor *gf2d_actor_load(const char *file);
+
+/**
+ * @brief parse json into an actor
+ * @note the actor->filename will not be set through this call
+ * @note the should follow this format
+ * {
+        "actor":
+        {
+            "sprite": "images/ui/pointer.png",
+            "frameWidth": 16,
+            "frameHeight": 16,
+            "framesPerLine": 1,
+            "scaleTo": [64,64], 
+            "scale":[2,2],      //overridden by scaleTo
+            "color": [255,255,255,255], //defaults to white (no color shift)
+            "actionList":
+            [
+                {
+                    "action": "default",
+                    "startFrame": 0,
+                    "endFrame": 0,
+                    "frameRate": 0,  //factor for advancing animation frames
+                    "actionTime": 14 //how many frames this animation should take to complete one pass.  Overrides frameRate
+                    "type": "loop"  //"loop" or "pass" for an animation that loops or pass for a single pass through then stop
+                }
+            ]
+        }
+    }
+ * @param json the json to parse
+ */
+Actor *gf2d_actor_load_json(SJson *json);
+
+/**
+ * @brief get an empty actor
+ * @return NULL on error or out of memory, a blank actor otherwise
+ */
+Actor *gf2d_actor_new();
+
+/**
  * @brief free a previously loaded actor
  * @param actor the actor to free
  */
@@ -112,17 +162,6 @@ void gf2d_action_list_frame_inserted(List *list,Uint32 index);
  * @param index the index of the frame that was deleted
  */
 void gf2d_action_list_frame_deleted(List *list,Uint32 index);
-
-/**
- * @brief free all loaded actors
- */
-void gf2d_actor_clear_all();
-
-/**
- * @brief get an empty actor
- * @return NULL on error or out of memory, a blank actor otherwise
- */
-Actor *gf2d_actor_new();
 
 /**
  * @brief allocate a new action
@@ -182,14 +221,6 @@ ActionReturnType gf2d_action_next_frame(Action *action,float *frame);
  * @return which whole number frame would be next
  */
 Uint32 gf2d_action_next_frame_after(Action *action,float frame);
-
-/**
- * @brief load an actor from file
- * @note if its already in memory you get a reference to that one
- * @param file the json file to load it from
- * @return NULL on error or the actor otherwise
- */
-Actor *gf2d_actor_load(const char *file);
 
 /**
  * @brief get an action from an actor by its name
