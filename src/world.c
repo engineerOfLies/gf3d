@@ -76,7 +76,7 @@ void world_delete(World *world)
 
 void world_run_updates(World *self)
 {
-    self->rotation.z += 0.0001;
+    //self->rotation.z += 0.0001;
     gfc_matrix_identity(self->modelMat);
     
     gfc_matrix_scale(self->modelMat,self->scale);

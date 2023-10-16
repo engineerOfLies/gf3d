@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/dino/dino.obj",
+        "model":"models/dino/dino_decapitated.obj",
         "texture":"models/dino/dino.png"
     }
 }

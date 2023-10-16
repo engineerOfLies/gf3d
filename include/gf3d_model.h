@@ -32,10 +32,7 @@
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
 
-/**
- * @purpose the model is a single instance of 3d mesh data.  Each can be drawn individually in the rendering pipeline.
- * Multiple models can reference the same mesh and texture data, but will have separate UBO data and descriptorSets
- */
+
 typedef struct
 {
     Uint8                       _inuse;

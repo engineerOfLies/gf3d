@@ -14,6 +14,7 @@ typedef struct
     Matrix4 proj;
     Vector4D color; //color mod
     Vector4D ambient;
+    //Vector4D lightPosition;
 }MeshUBO;
 
 /**
