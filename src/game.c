@@ -105,10 +105,10 @@ int main(int argc,char *argv[])
                 world_draw(w);
                 entity_draw_all();
                 
-                for (a = 0; a < 100; a++)
-                {
-                    gf3d_particle_draw(&particle[a]);
-                }
+//                 for (a = 0; a < 100; a++)
+//                 {
+//                     gf3d_particle_draw(&particle[a]);
+//                 }
             //2D draws
                 gf2d_draw_rect_filled(gfc_rect(10 ,10,1000,32),gfc_color8(128,128,128,255));
                 gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));

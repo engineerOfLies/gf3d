@@ -7,6 +7,13 @@ void agumon_update(Entity *self);
 
 void agumon_think(Entity *self);
 
+void agumon_damage(Entity *self, float damage, Entity *inflictor)
+{
+    if (!self)return;
+    self->health -= damage;
+    if (self->health <= 0)entity_free(self);
+}
+
 Entity *agumon_new(Vector3D position)
 {
     Entity *ent = NULL;
@@ -21,7 +28,14 @@ Entity *agumon_new(Vector3D position)
     ent->color = gfc_color(1,1,1,1);
     ent->model = gf3d_model_load("models/dino.model");
     ent->think = agumon_think;
+    ent->onDamage = agumon_damage;
     ent->update = agumon_update;
+    ent->bounds.x = -10;
+    ent->bounds.y = -10;
+    ent->bounds.z = -10;
+    ent->bounds.w = 20;
+    ent->bounds.h = 20;
+    ent->bounds.d = 20;
     vector3d_copy(ent->position,position);
     return ent;
 }

@@ -25,6 +25,7 @@ typedef struct Entity_S
     Uint8       hidden;     /**<if true, not drawn*/
     Uint8       selected;
     Color       selectedColor;      /**<Color for highlighting*/
+    float       cooldown;
     
     Box         bounds; // for collisions
     int         team;  //same team dont clip
@@ -33,7 +34,7 @@ typedef struct Entity_S
     void       (*think)(struct Entity_S *self); /**<pointer to the think function*/
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/
     void       (*draw)(struct Entity_S *self); /**<pointer to an optional extra draw funciton*/
-    void       (*damage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
+    void       (*onDamage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     
     EntityState state;
@@ -46,8 +47,10 @@ typedef struct Entity_S
     Vector3D    rotation;
     
     Uint32      health;     /**<entity dies when it reaches zero*/
+    float       damage;
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
+    struct Entity_S *parent;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/
 }Entity;
@@ -97,5 +100,18 @@ void entity_think_all();
  * @brief run the update functions for ALL active entities
  */
 void entity_update_all();
+
+/**
+ * @brief check if two box based entities overlap
+ * @param self one of the entities to check
+ * @param other the other one
+ * @return 1 if there is any overlap, 0 if not
+ */
+int entity_collide_check(Entity *self, Entity *other);
+
+/**
+ * @brief check if there is an entity that is colliding with the self
+ */
+Entity *entity_get_collision_entity(Entity *self);
 
 #endif

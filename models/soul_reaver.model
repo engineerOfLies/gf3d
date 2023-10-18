@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/soul_reaver.obj",
+        "texture":"models/reaver_skin.png"
+    }
+}
