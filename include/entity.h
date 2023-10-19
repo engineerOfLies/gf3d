@@ -20,6 +20,7 @@ typedef struct Entity_S
 {
     Uint8       _inuse;     /**<keeps track of memory usage*/
     Matrix4     modelMat;   /**<orientation matrix for the model*/
+    Matrix4     rotations;   /**<each frame this is used to rotate the modelMat*/
     Color       color;      /**<default color for the model*/
     Model      *model;      /**<pointer to the entity model to draw  (optional)*/
     Uint8       hidden;     /**<if true, not drawn*/
@@ -42,6 +43,7 @@ typedef struct Entity_S
     Vector3D    position;  
     Vector3D    velocity;
     Vector3D    acceleration;
+    float       thrust;
         
     Vector3D    scale;
     Vector3D    rotation;
@@ -113,5 +115,8 @@ int entity_collide_check(Entity *self, Entity *other);
  * @brief check if there is an entity that is colliding with the self
  */
 Entity *entity_get_collision_entity(Entity *self);
+
+
+Vector3D vector3d_get_from_angles(Vector3D angles);
 
 #endif

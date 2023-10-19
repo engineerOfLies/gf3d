@@ -29,10 +29,7 @@ int main(int argc,char *argv[])
     int done = 0;
     int a;
     
-    Sprite *mouse = NULL;
-    int mousex,mousey;
     //Uint32 then;
-    float mouseFrame = 0;
     World *w;
     Entity *agu;
     Particle particle[100];
@@ -58,25 +55,59 @@ int main(int argc,char *argv[])
     
     entity_system_init(1024);
     
-    mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
-    
-    
-    agu = agumon_new(vector3d(0 ,0,0));
+    agu = agumon_new(vector3d(0 ,0,50));
     if (agu)agu->selected = 1;
     w = world_load("config/testworld.json");
     
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(-50,0,0));
+    player_new(vector3d(0,0,0));
+
+    //red, positive X
+    particle[0].position = vector3d(100,0,0);
+    particle[0].color = gfc_color(1,0,0,1);
+    particle[0].size = 10;
     
-    for (a = 0; a < 100; a++)
-    {
-        particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
-        particle[a].color = gfc_color(0,0,0,1);
-//        particle[a].color = gfc_color(gfc_random(),gfc_random(),gfc_random(),1);
-        particle[a].size = 100 * gfc_random();
-    }
+    //green, positive Y
+    particle[1].position = vector3d(0,100,0);
+    particle[1].color = gfc_color(0,1,0,1);
+    particle[1].size = 10;
+
+    //blue, positive Z
+    particle[2].position = vector3d(0,0,100);
+    particle[2].color = gfc_color(0,0,1,1);
+    particle[2].size = 10;
+    
+    //cyan, negative X
+    particle[3].position = vector3d(-100,0,0);
+    particle[3].color = gfc_color(0,1,1,1);
+    particle[3].size = 10;
+    
+    //magenta, negative y
+    particle[4].position = vector3d(0,-100,0);
+    particle[4].color = gfc_color(1,0,1,1);
+    particle[4].size = 10;
+
+    //yellow, negative Z
+    particle[5].position = vector3d(0,0,-100);
+    particle[5].color = gfc_color(1,1,0,1);
+    particle[5].size = 10;
+    
+    //white, origin
+    particle[6].position = vector3d(0,0,0);
+    particle[6].color = gfc_color(1,1,1,1);
+    particle[6].size = 10;
+
+
+
+//     for (a = 0; a < 100; a++)
+//     {
+//         particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
+//         particle[a].color = gfc_color(0,0,0,1);
+//         particle[a].color = gfc_color(gfc_random(),gfc_random(),gfc_random(),1);
+//         particle[a].size = 100 * gfc_random();
+//     }
     a = 0;
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix_identity(skyMat);
@@ -88,10 +119,7 @@ int main(int argc,char *argv[])
     {
         gfc_input_update();
         gf2d_font_update();
-        SDL_GetMouseState(&mousex,&mousey);
         
-        mouseFrame += 0.01;
-        if (mouseFrame >= 16)mouseFrame = 0;
         world_run_updates(w);
         entity_think_all();
         entity_update_all();
@@ -105,17 +133,17 @@ int main(int argc,char *argv[])
                 world_draw(w);
                 entity_draw_all();
                 
-//                 for (a = 0; a < 100; a++)
-//                 {
-//                     gf3d_particle_draw(&particle[a]);
-//                 }
+                for (a = 0; a < 7; a++)
+                {
+                    gf3d_particle_draw(&particle[a]);
+                }
             //2D draws
                 gf2d_draw_rect_filled(gfc_rect(10 ,10,1000,32),gfc_color8(128,128,128,255));
                 gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
                 
                 gf2d_draw_rect(gfc_rect(10 ,10,1000,32),gfc_color8(255,255,255,255));
                 
-                gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
+//                gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition

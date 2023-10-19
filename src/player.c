@@ -24,8 +24,9 @@ Entity *player_new(Vector3D position)
     ent->think = player_think;
     ent->update = player_update;
     vector3d_copy(ent->position,position);
-    ent->rotation.x = -GFC_PI;
-    ent->rotation.z = -GFC_HALF_PI;
+    
+    
+    
     ent->hidden = 1;
     return ent;
 }
@@ -33,9 +34,8 @@ Entity *player_new(Vector3D position)
 
 void player_think(Entity *self)
 {
-    Vector3D forward = {0};
-    Vector3D right = {0};
-    Vector2D w,mouse;
+    Vector3D forward, move = {0};
+    Vector2D mouse;
     int mx,my;
     Uint32 buttons;
     buttons = SDL_GetRelativeMouseState(&mx,&my);
@@ -44,44 +44,71 @@ void player_think(Entity *self)
 
     mouse.x = mx;
     mouse.y = my;
-    w = vector2d_from_angle(self->rotation.z);
-    forward.x = w.x;
-    forward.y = w.y;
-    w = vector2d_from_angle(self->rotation.z - GFC_HALF_PI);
-    right.x = w.x;
-    right.y = w.y;
+    
+    move = vector3d_get_from_angles(self->rotation);
+    
     if (keys[SDL_SCANCODE_W])
-    {   
-        vector3d_add(self->position,self->position,forward);
+    {
+        slog("move: %f,%f,%f",move.x,move.y,move.z);
+       vector3d_add(self->position,self->position,move);
+//         self->position.y += 1;
     }
     if (keys[SDL_SCANCODE_S])
     {
-        vector3d_add(self->position,self->position,-forward);        
+       vector3d_add(self->position,self->position,-move);
+//         self->position.y -= 1;
     }
+    move = vector3d_get_from_angles(self->rotation);
+    move.z = 0;
+    vector3d_rotate_about_z(&move,-GFC_HALF_PI);
+    vector3d_normalize(&move);
     if (keys[SDL_SCANCODE_D])
     {
-        vector3d_add(self->position,self->position,right);
+        vector3d_add(self->position,self->position,move);
+        slog("move:%f,%f,%f",move.x,move.y,move.z);
+//         self->position.x += 1;
     }
-    if (keys[SDL_SCANCODE_A])    
+    if (keys[SDL_SCANCODE_A])
     {
-        vector3d_add(self->position,self->position,-right);
+        vector3d_add(self->position,self->position,-move);
+//         self->position.x -= 1;
     }
-    if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
-    if (keys[SDL_SCANCODE_Z])self->position.z -= 1;
-    
-    if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
-    if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
-    if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.0050;
-    if (keys[SDL_SCANCODE_LEFT])self->rotation.z += 0.0050;
-    
-    if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.001);
-    if (mouse.y != 0)self->rotation.x += (mouse.y * 0.001);
 
+    if (keys[SDL_SCANCODE_SPACE])
+    {
+//         vector3d_add(self->position,self->position,move);
+        self->position.z += 1;
+    }
+    if (keys[SDL_SCANCODE_Z])
+    {
+//         vector3d_sub(self->position,self->position,move);
+        self->position.z -= 1;
+    }
+        
+    if (keys[SDL_SCANCODE_UP])self->rotation.x += 0.00750;
+    if (keys[SDL_SCANCODE_DOWN])self->rotation.x -= 0.00750;
+    if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.00750;
+    if (keys[SDL_SCANCODE_LEFT])self->rotation.z += 0.00750;
+    if (keys[SDL_SCANCODE_KP_RIGHTBRACE])self->rotation.y -= 0.00750;
+    if (keys[SDL_SCANCODE_KP_LEFTBRACE])self->rotation.y += 0.00750;
+    
+    if (self->rotation.x >= (GFC_HALF_PI - GFC_EPSILON))self->rotation.x = GFC_HALF_PI - GFC_EPSILON;
+    if (self->rotation.x <= -(GFC_HALF_PI - GFC_EPSILON))self->rotation.x = -(GFC_HALF_PI - GFC_EPSILON);
+    
+    
+//     if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.002);
+//     if (mouse.y != 0)self->rotation.x += (mouse.y * 0.002);
+    
     if (self->cooldown <= 0)
     {
         if (buttons)
         {
-            projectile_new(self,"models/soul_reaver.model",self->position, forward, 10,1,0);
+            forward = vector3d_get_from_angles(self->rotation);
+//             vector3d_set(forward,0,-1,0);
+//             vector3d_rotate_about_x(&forward, -self->rotation.x);
+//             vector3d_rotate_about_z(&forward, self->rotation.z);
+
+            projectile_new(self,"models/soul_reaver.model",self->position, forward, 1,1,0);
             self->cooldown = 100;
         }
     }
@@ -96,26 +123,19 @@ void player_think(Entity *self)
 
 void player_update(Entity *self)
 {
-    Vector3D forward = {0};
-    Vector3D position;
-    Vector3D rotation;
-    Vector2D w;
+    Vector3D forward;
+    Vector3D thrust;
     
     if (!self)return;
     
-    vector3d_copy(position,self->position);
-    vector3d_copy(rotation,self->rotation);
-    if (thirdPersonMode)
-    {
-        position.z += 100;
-        rotation.x += M_PI*0.125;
-        w = vector2d_from_angle(self->rotation.z);
-        forward.x = w.x * 100;
-        forward.y = w.y * 100;
-        vector3d_add(position,position,-forward);
-    }
-    gf3d_camera_set_position(position);
-    gf3d_camera_set_rotation(rotation);
+    //forward movement based on rotations
+    forward = vector3d_get_from_angles(self->rotation);    
+    vector3d_scale(thrust,forward,self->thrust);
+    vector3d_add(self->position,self->position,thrust);
+
+    
+    gf3d_camera_set_position(self->position);
+    gf3d_camera_set_rotation(self->rotation);
 }
 
 /*eol@eof*/

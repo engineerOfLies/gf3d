@@ -76,7 +76,6 @@ void projectile_update(Entity *self)
 {
     if (!self)return;
     self->health--;
-    slog("projectile health: %i",self->health);
     if (self->health <= 0)entity_free(self);
     //run physics, update position, check for collision, whatever else I gotta do
 }
