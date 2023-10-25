@@ -2,6 +2,7 @@
 #define __GF3D_OBJ_LOAD_H__
 
 #include "gf3d_mesh.h"
+#include "gfc_primitives.h"
 
 typedef struct
 {    
@@ -32,5 +33,7 @@ typedef struct
 ObjData *gf3d_obj_load_from_file(const char *filename);
 
 void gf3d_obj_free(ObjData *obj);
+
+Uint8 gf3d_obj_load_edge_test(ObjData *obj, Edge3D e, Vector3D *contact);
 
 #endif

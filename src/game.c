@@ -20,7 +20,7 @@
 #include "entity.h"
 #include "agumon.h"
 #include "player.h"
-//#include "world.h"
+#include "world.h"
 
 extern int __DEBUG;
 
@@ -33,7 +33,7 @@ int main(int argc,char *argv[])
     int mousex,mousey;
     //Uint32 then;
     float mouseFrame = 0;
-    //World *w;
+    World *w;
     Entity *agu;
     //Particle particle[100];
     Matrix4 skyMat;
@@ -61,9 +61,9 @@ int main(int argc,char *argv[])
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
     
-    agu = agumon_new(vector3d(0 ,0,0));
+    agu = agumon_new(vector3d(0,0,50));
     if (agu)agu->selected = 1;
-    //w = world_load("config/testworld.json");
+    w = world_load("config/testworld.json");
     
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
@@ -93,7 +93,7 @@ int main(int argc,char *argv[])
         
         mouseFrame += 0.01;
         if (mouseFrame >= 16)mouseFrame = 0;
-        //world_run_updates(w);
+        world_run_updates(w);
         entity_think_all();
         entity_update_all();
         gf3d_camera_update_view();
@@ -103,7 +103,7 @@ int main(int argc,char *argv[])
 
             //3D draws
                 gf3d_model_draw_sky(sky,skyMat,gfc_color(1,1,1,1));
-                //world_draw(w);
+                world_draw(w);
                 entity_draw_all();
                 /*
                 for (a = 0; a < 100; a++)
@@ -123,7 +123,7 @@ int main(int argc,char *argv[])
         if (gfc_input_command_down("exit"))done = 1; // exit condition
     }    
     
-    //world_delete(w);
+    world_delete(w);
 
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup

@@ -6,6 +6,8 @@
 
 #include "world.h"
 
+
+static World *the_world = NULL;
 /*
 typedef struct
 {
@@ -56,6 +58,8 @@ World *world_load(char *filename)
     sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
+
+    the_world = w;
     return w;
 }
 
@@ -72,6 +76,7 @@ void world_delete(World *world)
     if (!world)return;
     gf3d_model_free(world->model);
     free(world);
+    the_world = NULL;
 }
 
 void world_run_updates(World *self)
@@ -85,7 +90,23 @@ void world_run_updates(World *self)
 
 }
 
+
+float world_get_collision_height(Vector3D down){
+//     Vector3D contact = {0};
+//     Edge3D e;
+    if(!the_world){
+        return 0;
+    }
+//     e.a = from;
+//     e.b = from;
+//     e.b.z -= 80000;
+//     gf3d_obj_load_edge_test(the_world->model->mesh->obj, e, &contact);
+    return 0;
+}
+
 void world_add_entity(World *world,Entity *entity);
+
+
 
 
 /*eol@eof*/

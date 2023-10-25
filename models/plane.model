@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/plane/plane.obj"
+        "texture":"images/default.png"
+    }
+}

@@ -34,7 +34,7 @@ typedef struct Entity_S
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/
     void       (*draw)(struct Entity_S *self); /**<pointer to an optional extra draw funciton*/
     void       (*damage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
-    void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
+    void       (*onDeath)(struct Entity_S *self); /**<pointer to a funciton to call when the entity dies*/
     void       (*free)(struct Entity_S *self); /** */
     
     EntityState state;
@@ -98,5 +98,21 @@ void entity_think_all();
  * @brief run the update functions for ALL active entities
  */
 void entity_update_all();
+
+/**
+ *  @brief Check if entity is on the ground
+ */
+Uint8 entity_check_ground();
+
+/**
+ *  @brief Check if entity is the player
+ */
+Uint8 entity_check_if_player();
+
+
+//int entity_collide_check(Entity *self, Entity *other);
+
+//Entity *entity_get_collision_partner(Entity *self);
+
 
 #endif

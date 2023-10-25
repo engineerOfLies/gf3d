@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/zombie/zombie.obj",
+        "texture":"models/zombie/world_people_colors.png"
+    }
+}

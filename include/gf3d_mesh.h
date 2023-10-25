@@ -59,6 +59,7 @@ typedef struct
     Uint32          faceCount;
     VkBuffer        faceBuffer;
     VkDeviceMemory  faceBufferMemory;
+    //ObjData         *obj; //Retained from file load in cpu memory
 }Mesh;
 
 /**

@@ -256,4 +256,18 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, FILE* file)
   }
 }
 
+// Uint8 gf3d_obj_load_edge_test(ObjData *obj, Edge3D e, Vector3D *contact){
+//   int i;
+//   Vector3D *contact;
+//   Triangee3D t;
+//   if(!obj)return;
+//   for(i = 0, i< obj->face_count, i++){
+//     t.a = faceVertices[obj->outFace[i].verts[0]].vertex;
+//     t.b = faceVertices[obj->outFace[i].verts[1]].vertex;
+//     t.c = faceVertices[obj->outFace[i].verts[2]].vertex;
+//     if(gfc_triangle_edge_test(e,t,contact))return 1;
+//   }
+//   return 0;
+// }
+
 /*eol@eof*/

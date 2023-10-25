@@ -1,9 +1,9 @@
 {
     "world":
     {
-        "model":"models/antioch.model",
-        "position":[7000,-2500,-5000],
+        "model":"models/plane.model",
+        "position":[0,0,-10],
         "scale":[5000,5000,5000],
-        "rotation":[0,0.001,0]
+        "rotation":[0,0,0]
     }
 }

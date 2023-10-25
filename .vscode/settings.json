@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "gfc_color.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}

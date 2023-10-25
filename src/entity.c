@@ -9,7 +9,7 @@ typedef struct
 {
     Entity *entity_list;
     Uint32  entity_count;
-    
+    Model  *cube;
 }EntityManager;
 
 static EntityManager entity_manager = {0};
@@ -17,6 +17,7 @@ static EntityManager entity_manager = {0};
 void entity_system_close()
 {
     int i;
+    gf3d_model_free(entity_manager.cube);
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         entity_free(&entity_manager.entity_list[i]);        
@@ -51,6 +52,10 @@ Entity *entity_new()
             entity_manager.entity_list[i].scale.x = 1;
             entity_manager.entity_list[i].scale.y = 1;
             entity_manager.entity_list[i].scale.z = 1;
+
+//             entity_manager.entity_list[i].bounds.w = 5;
+//             entity_manager.entity_list[i].bounds.h = 5;
+//             entity_manager.entity_list[i].bounds.d = 5;
             
             entity_manager.entity_list[i].color = gfc_color(1,1,1,1);
             entity_manager.entity_list[i].selectedColor = gfc_color(1,1,1,1);
@@ -83,6 +88,12 @@ void entity_draw(Entity *self)
             self->modelMat,
             gfc_color_to_vector4f(self->selectedColor));
     }
+//     Matrix4 boxTest;
+//     slog("self->bounds.h Value: %f", self->bounds.h);
+//     slog("self->bounds.w Value: %f", self->bounds.w);
+//     slog("self->bounds.d Value: %f", self->bounds.d);
+//     gfc_matrix4_from_vectors(boxTest, self->position, vector3d(0,0,0), vector3d(self->bounds.h,self->bounds.w,self->bounds.d));
+//     gf3d_model_draw_highlight(entity_manager.cube, boxTest, vector4d(1,0,0,1));
 }
 
 void entity_draw_all()
@@ -118,6 +129,21 @@ void entity_think_all()
 }
 
 
+//  int entity_collide_check(Entity *self, Entity *other){
+//     Box A,B;
+//      if((!self)||(!other)){
+//          slog("missing pointers");
+//          return 0;
+//      }
+//      gfc_box_cpy(A, self->bounds);
+//      gfc_box_cpy(B, other->bounds);
+//      vector3d_add(A, A, self->position);
+//      vector3d_add(B, B, other->position);
+//      return gfc_box_overlap(A,B);
+//  }
+
+
+
 void entity_update(Entity *self)
 {
     if (!self)return;
@@ -125,7 +151,7 @@ void entity_update(Entity *self)
     
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_add(self->velocity,self->acceleration,self->velocity);
-    
+
     gfc_matrix_identity(self->modelMat);
     
     gfc_matrix_scale(self->modelMat,self->scale);

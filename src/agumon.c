@@ -1,5 +1,7 @@
 
 #include "simple_logger.h"
+
+#include "world.h"
 #include "agumon.h"
 
 
@@ -23,18 +25,40 @@ Entity *agumon_new(Vector3D position)
     ent->model = gf3d_model_load("models/dino.model");
     ent->think = agumon_think;
     ent->update = agumon_update;
+    ent->bounds.x = -8;
+    ent->bounds.y = -8;
+    ent->bounds.z = -8;
+    ent->bounds.w = 16;
+    ent->bounds.h = 16;
+    ent->bounds.d = 16;
     vector3d_copy(ent->position,position);
     return ent;
 }
 
 void agumon_update(Entity *self)
 {
+    float height;
     if (!self)
     {
         slog("self pointer not provided");
         return;
     }
+
+
+    height = world_get_collision_height(self->position);
+    if(self->position.z > height){
+        self->velocity.z -= 0.0000098;
+    }
     vector3d_add(self->position,self->position,self->velocity);
+
+    if(self->position.z < height){
+        self->position.z = height;
+        if(self->velocity.z < 0)self->velocity.z = 0;
+    }
+
+
+
+
     //self->rotation.z += 0.01;
 }
 
