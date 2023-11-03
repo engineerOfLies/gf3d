@@ -26,6 +26,8 @@ extern int __DEBUG;
 
 int main(int argc,char *argv[])
 {
+    Uint32 startTime, endTime;
+    float deltaTime;
     int done = 0;
     int a;
     
@@ -68,7 +70,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(-50,0,0));
+    player_new(vector3d(0,0,0));
     
     for (a = 0; a < 100; a++)
     {
@@ -86,6 +88,7 @@ int main(int argc,char *argv[])
     slog("gf3d main loop begin");
     while(!done)
     {
+        startTime = SDL_GetTicks();
         gfc_input_update();
         gf2d_font_update();
         SDL_GetMouseState(&mousex,&mousey);
@@ -94,7 +97,9 @@ int main(int argc,char *argv[])
         if (mouseFrame >= 16)mouseFrame = 0;
         world_run_updates(w);
         entity_think_all();
-        entity_update_all();
+        endTime = SDL_GetTicks();
+        deltaTime = (endTime - startTime) / 1000.0f;
+        entity_update_all(deltaTime);
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
 
@@ -117,6 +122,8 @@ int main(int argc,char *argv[])
                 
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
+        endTime = SDL_GetTicks();
+        deltaTime = (endTime - startTime) / 1000.0f;
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
     }    

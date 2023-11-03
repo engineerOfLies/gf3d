@@ -35,6 +35,7 @@ void entity_system_init(Uint32 maxEntities)
         return;
     }
     entity_manager.entity_count = maxEntities;
+
     atexit(entity_system_close);
     slog("entity_system initialized");
 }
@@ -118,13 +119,17 @@ void entity_think_all()
 }
 
 
-void entity_update(Entity *self)
+void entity_update(Entity *self, float deltaTime)
 {
+    Vector3D scaledVelocity;
+    Vector3D scaledAcceleration;
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
     
-    vector3d_add(self->position,self->position,self->velocity);
-    vector3d_add(self->velocity,self->acceleration,self->velocity);
+    vector3d_scale(scaledVelocity, self->velocity, deltaTime);
+    vector3d_scale(scaledAcceleration, self->acceleration, deltaTime);
+    vector3d_add(self->position, self->position, scaledVelocity);
+    vector3d_add(self->velocity, self->velocity, scaledAcceleration);
     
     gfc_matrix_identity(self->modelMat);
     
@@ -132,10 +137,10 @@ void entity_update(Entity *self)
     gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
     gfc_matrix_translate(self->modelMat,self->position);
     
-    if (self->update)self->update(self);
+    if (self->update) self->update(self, deltaTime);
 }
 
-void entity_update_all()
+void entity_update_all(float deltaTime)
 {
     int i;
     for (i = 0; i < entity_manager.entity_count; i++)
@@ -144,8 +149,26 @@ void entity_update_all()
         {
             continue;// skip this iteration of the loop
         }
-        entity_update(&entity_manager.entity_list[i]);
+        entity_update(&entity_manager.entity_list[i], deltaTime);
     }
+}
+
+Vector3D get_Bounding_Box_Max(Vector3D size, Vector3D position)
+{
+    Vector3D max;
+    max.x = position.x + size.x / 2;
+    max.y = position.y + size.y / 2;
+    max.z = position.z + size.z / 2;
+    return max;
+}
+
+Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position)
+{
+    Vector3D min;
+    min.x = position.x + size.x / 2;
+    min.y = position.y + size.y / 2;
+    min.z = position.z + size.z / 2;
+    return min;
 }
 
 /*eol@eof*/

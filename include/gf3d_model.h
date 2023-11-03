@@ -112,4 +112,12 @@ void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
  */
 void gf3d_model_free(Model *model);
 
+/**
+ * @brief get the size of the model
+ * @param model the model to render
+ * @param modelMat the model matrix (MVP)
+ * @param color the color adjustement (gfc_color(1,1,1,1) for no color change
+ */
+Vector3D gf3d_get_model_size_from_obj(const char * filename);
+
 #endif

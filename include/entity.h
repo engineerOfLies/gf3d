@@ -41,6 +41,8 @@ typedef struct Entity_S
     Vector3D    position;  
     Vector3D    velocity;
     Vector3D    acceleration;
+    Vector3D    size; // size of the entity for the bounding box
+
         
     Vector3D    scale;
     Vector3D    rotation;
@@ -50,6 +52,10 @@ typedef struct Entity_S
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/
+    struct {
+        Vector3D min;
+        Vector3D max;
+    }boundingBox;
 }Entity;
 
 /**
@@ -96,6 +102,20 @@ void entity_think_all();
 /**
  * @brief run the update functions for ALL active entities
  */
-void entity_update_all();
+void entity_update_all(float deltaTime);
+
+/**
+ * @brief Calculates the Max of the Bounding Box
+ * @param size of the entity
+ * @param positioin of the entity
+ */
+Vector3D get_Bounding_Box_Max(Vector3D size, Vector3D position);
+
+/**
+ * @brief Calculates the min of the Bounding Box
+ * @param size of the entity
+ * @param position of the entity
+ */
+Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position);
 
 #endif

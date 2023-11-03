@@ -56,6 +56,9 @@ World *world_load(char *filename)
     sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
+    w->size = gf3d_get_model_size_from_obj("models/antioch/antioch.obj");
+    w->worldBoundingBox.min = get_World_Bounding_Box_Min(w->size, w->position);
+    w->worldBoundingBox.max = get_World_Bounding_Box_Max(w->size, w->position);
     return w;
 }
 
@@ -76,7 +79,7 @@ void world_delete(World *world)
 
 void world_run_updates(World *self)
 {
-    self->rotation.z += 0.0001;
+
     gfc_matrix_identity(self->modelMat);
     
     gfc_matrix_scale(self->modelMat,self->scale);
@@ -86,6 +89,24 @@ void world_run_updates(World *self)
 }
 
 void world_add_entity(World *world,Entity *entity);
+
+Vector3D get_World_Bounding_Box_Max(Vector3D size, Vector3D position)
+{
+    Vector3D max;
+    max.x = position.x + size.x / 2;
+    max.y = position.y + size.y / 2;
+    max.z = position.z + size.z / 2;
+    return max;
+}
+
+Vector3D get_World_Bounding_Box_Min(Vector3D size, Vector3D position)
+{
+    Vector3D min;
+    min.x = position.x + size.x / 2;
+    min.y = position.y + size.y / 2;
+    min.z = position.z + size.z / 2;
+    return min;
+}
 
 
 /*eol@eof*/

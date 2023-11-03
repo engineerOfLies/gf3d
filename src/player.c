@@ -4,9 +4,11 @@
 #include "gf3d_camera.h"
 #include "player.h"
 
-static int thirdPersonMode = 0;
+#define GRAVITY -9.8f
+
+static int thirdPersonMode = 1;
 void player_think(Entity *self);
-void player_update(Entity *self);
+void player_update(Entity *self, float deltaTime);
 
 Entity *player_new(Vector3D position)
 {
@@ -23,9 +25,15 @@ Entity *player_new(Vector3D position)
     ent->think = player_think;
     ent->update = player_update;
     vector3d_copy(ent->position,position);
+    ent->size = gf3d_get_model_size_from_obj("models/dino/dino.obj");
+    ent->boundingBox.min = get_Bounding_Box_Min(ent->size, ent->position);
+    ent->boundingBox.max = get_Bounding_Box_Max(ent->size, ent->position);
+    ent->velocity = Vector3D_Zero();
+    ent->acceleration = Vector3D_Zero();
+    ent->acceleration.z = GRAVITY;
     ent->rotation.x = -GFC_PI;
     ent->rotation.z = -GFC_HALF_PI;
-    ent->hidden = 1;
+    ent->hidden = 0;
     return ent;
 }
 
@@ -82,7 +90,7 @@ void player_think(Entity *self)
     }
 }
 
-void player_update(Entity *self)
+void player_update(Entity *self, float deltaTime)
 {
     Vector3D forward = {0};
     Vector3D position;
