@@ -43,6 +43,7 @@ typedef struct Entity_S
     Vector3D    velocity;
     Vector3D    acceleration;
     Vector3D    size; // size of the entity for the bounding box
+    int         grounded;
 
         
     Vector3D    scale;

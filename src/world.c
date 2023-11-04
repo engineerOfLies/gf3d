@@ -105,9 +105,9 @@ Vector3D get_World_Bounding_Box_Max(Vector3D size, Vector3D position)
 Vector3D get_World_Bounding_Box_Min(Vector3D size, Vector3D position)
 {
     Vector3D min;
-    min.x = position.x + size.x / 2;
-    min.y = position.y + size.y / 2;
-    min.z = position.z + size.z / 2;
+    min.x = position.x - size.x / 2;
+    min.y = position.y - size.y / 2;
+    min.z = position.z - size.z / 2;
     return min;
 }
 

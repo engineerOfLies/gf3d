@@ -151,6 +151,7 @@ void entity_update_all(float deltaTime)
         {
             continue;// skip this iteration of the loop
         }
+        entity_manager.entity_list[i].grounded = 0;
         entity_update(&entity_manager.entity_list[i], deltaTime);
         // scans through every entity and checks collision
         for (j = 0; j < entity_manager.entity_count; j++)
@@ -164,16 +165,21 @@ void entity_update_all(float deltaTime)
             if (bounding_box_collision(&entity_manager.entity_list[i], &entity_manager.entity_list[j]))
             {
                 // Just stops the entities from moving if they collide
+                //slog("Hitting something");
                 entity_manager.entity_list[i].velocity.x = 0;
                 entity_manager.entity_list[i].velocity.y = 0;
                 entity_manager.entity_list[i].velocity.z = 0;
             }
-                // scans entities and compares with world bounding box for collision with world 
-                if (world_bounding_box_collision(&entity_manager.entity_list[i], world))
-                {
-                    // Entities will stop falling when colliding with the world
-                    entity_manager.entity_list[i].velocity.z = 0;
-                }
+            // scans entities and compares with world bounding box for collision with world 
+            if (world_bounding_box_collision(&entity_manager.entity_list[i], world))
+            {
+                // Entities will stop falling when colliding with the world
+                entity_manager.entity_list[i].grounded = 1;
+                slog("Grounded: %d, Velocity: %f", entity_manager.entity_list[i].grounded, entity_manager.entity_list[i].velocity.z);
+                entity_manager.entity_list[i].position.z = world->worldBoundingBox.min.z - entity_manager.entity_list[i].size.z / 2;
+                entity_manager.entity_list[i].velocity.z = 0;
+            }
+            
         }
     }
 }

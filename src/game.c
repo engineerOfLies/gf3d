@@ -26,6 +26,11 @@ extern int __DEBUG;
 
 int main(int argc,char *argv[])
 {
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS; 
+
+    Uint32 frameStart;
+    int frameTime;
     Uint32 startTime, endTime;
     float deltaTime = 0.0f;
     int done = 0;
@@ -89,6 +94,7 @@ int main(int argc,char *argv[])
     slog("gf3d main loop begin");
     while(!done)
     {
+        frameStart = SDL_GetTicks();
         startTime = SDL_GetTicks();
         gfc_input_update();
         gf2d_font_update();
@@ -96,10 +102,9 @@ int main(int argc,char *argv[])
         
         mouseFrame += 0.01;
         if (mouseFrame >= 16)mouseFrame = 0;
-        world_run_updates(w);
+        
         entity_think_all(deltaTime);
-        endTime = SDL_GetTicks();
-        deltaTime = (endTime - startTime) / 1000.0f;
+        world_run_updates(w);
         entity_update_all(deltaTime);
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
@@ -124,6 +129,12 @@ int main(int argc,char *argv[])
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
         endTime = SDL_GetTicks();
+        deltaTime = (endTime - startTime) / 1000.0f;
+        //slog("This is deltatime: %.6f", deltaTime);
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime);
+        }
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
     }    

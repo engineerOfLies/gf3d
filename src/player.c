@@ -4,7 +4,7 @@
 #include "gf3d_camera.h"
 #include "player.h"
 
-#define GRAVITY 9.8f
+#define GRAVITY -0.00000000000000000000981f
 
 static int thirdPersonMode = 1;
 void player_think(Entity *self);
@@ -100,15 +100,22 @@ void player_update(Entity* self, float deltaTime)
     self->boundingBox.min = get_Bounding_Box_Min(self->size, self->position);
     self->boundingBox.max = get_Bounding_Box_Max(self->size, self->position);
 
-    // Apply gravity to the player's velocity
-    self->velocity.z = -0.00000000000000000000;
+    if (!self->grounded)
+    {
+        self->velocity.z = GRAVITY;
+        self->position.z += self->velocity.z * deltaTime;
 
-    // Calculate the change in position due to velocity
+    }
+    else
+    {
+        self->velocity.z = 0;
+    }
+
     self->position.x += self->velocity.x * deltaTime;
     self->position.y += self->velocity.y * deltaTime;
-    self->position.z += self->velocity.z * deltaTime;
     
-    slog("Current position %f, %f, %f", self->position.x, self->position.y, self->position.z);
+    
+    //slog("Current position %f, %f, %f", self->position.x, self->position.y, self->position.z);
 
     Vector3D cameraOffset = { 0, 100, -50 }; 
     Vector3D cameraPosition;
