@@ -137,7 +137,7 @@ void entity_update(Entity *self, float deltaTime)
     gfc_matrix_scale(self->modelMat,self->scale);
     gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
     gfc_matrix_translate(self->modelMat,self->position);
-    
+    slog("Grounded: %d: ", self->grounded);
     if (self->update) self->update(self, deltaTime);
 }
 
@@ -152,7 +152,6 @@ void entity_update_all(float deltaTime)
             continue;// skip this iteration of the loop
         }
         entity_manager.entity_list[i].grounded = 0;
-        entity_update(&entity_manager.entity_list[i], deltaTime);
         // scans through every entity and checks collision
         for (j = 0; j < entity_manager.entity_count; j++)
         {
@@ -175,12 +174,13 @@ void entity_update_all(float deltaTime)
             {
                 // Entities will stop falling when colliding with the world
                 entity_manager.entity_list[i].grounded = 1;
-                slog("Grounded: %d, Velocity: %f", entity_manager.entity_list[i].grounded, entity_manager.entity_list[i].velocity.z);
+                //slog("Grounded: %d, Velocity: %f", entity_manager.entity_list[i].grounded, entity_manager.entity_list[i].velocity.z);
                 entity_manager.entity_list[i].position.z = world->worldBoundingBox.min.z - entity_manager.entity_list[i].size.z / 2;
                 entity_manager.entity_list[i].velocity.z = 0;
             }
             
         }
+        entity_update(&entity_manager.entity_list[i], deltaTime);
     }
 }
 
@@ -204,38 +204,25 @@ Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position)
 
 int bounding_box_collision(Entity* a, Entity* b)
 {
-    if (a->boundingBox.max.x < b->boundingBox.min.x || a->boundingBox.min.x > b->boundingBox.max.x)
-    {
-        return 0;
-    }
-    if (a->boundingBox.max.y < b->boundingBox.min.y || a->boundingBox.min.y > b->boundingBox.max.y)
-    {
-        return 0;
-    }
-    if (a->boundingBox.max.z < b->boundingBox.min.z || a->boundingBox.min.z > b->boundingBox.max.z)
+    if ((a->boundingBox.max.x < b->boundingBox.min.x || a->boundingBox.min.x > b->boundingBox.max.x) &&
+        (a->boundingBox.max.y < b->boundingBox.min.y || a->boundingBox.min.y > b->boundingBox.max.y) &&
+        (a->boundingBox.max.z < b->boundingBox.min.z || a->boundingBox.min.z > b->boundingBox.max.z))
     {
         return 0;
     }
     return 1;
 }
 
-int world_bounding_box_collision(Entity* a, World* b)
+int world_bounding_box_collision(Entity* entity, World* world)
 {
 
-    if (a->boundingBox.max.x < b->worldBoundingBox.min.x || a->boundingBox.min.x > b->worldBoundingBox.max.x) 
+    if ((entity->boundingBox.min.x <= world->worldBoundingBox.max.x && entity->boundingBox.max.x >= world->worldBoundingBox.min.x) &&
+        (entity->boundingBox.min.y <= world->worldBoundingBox.max.y && entity->boundingBox.max.y >= world->worldBoundingBox.min.y) &&
+        (entity->boundingBox.min.z <= world->worldBoundingBox.max.z && entity->boundingBox.max.z >= world->worldBoundingBox.min.z))
     {
-        return 0;
+        return 1;
     }
-    if (a->boundingBox.max.y < b->worldBoundingBox.min.y || a->boundingBox.min.y > b->worldBoundingBox.max.y) 
-    {
-        return 0;
-    }
-    if (a->boundingBox.max.z < b->worldBoundingBox.min.z || a->boundingBox.min.z > b->worldBoundingBox.max.z)
-    {
-        return 0;
-    }
-    // If we reach here, there is overlap along all three axes, so there is a collision
-    return 1;
+    return 0;
 }
 
 /*eol@eof*/

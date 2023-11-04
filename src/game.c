@@ -102,9 +102,8 @@ int main(int argc,char *argv[])
         
         mouseFrame += 0.01;
         if (mouseFrame >= 16)mouseFrame = 0;
-        
-        entity_think_all(deltaTime);
         world_run_updates(w);
+        entity_think_all(deltaTime);       
         entity_update_all(deltaTime);
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
