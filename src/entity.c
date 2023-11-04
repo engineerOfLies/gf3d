@@ -4,6 +4,7 @@
 #include "simple_logger.h"
 
 #include "entity.h"
+#include "world.h"
 
 typedef struct
 {
@@ -99,13 +100,13 @@ void entity_draw_all()
     }
 }
 
-void entity_think(Entity *self)
+void entity_think(Entity *self, float deltaTime)
 {
     if (!self)return;
-    if (self->think)self->think(self);
+    if (self->think)self->think(self, deltaTime);
 }
 
-void entity_think_all()
+void entity_think_all(float deltaTime)
 {
     int i;
     for (i = 0; i < entity_manager.entity_count; i++)
@@ -114,7 +115,7 @@ void entity_think_all()
         {
             continue;// skip this iteration of the loop
         }
-        entity_think(&entity_manager.entity_list[i]);
+        entity_think(&entity_manager.entity_list[i], deltaTime);
     }
 }
 
@@ -142,7 +143,8 @@ void entity_update(Entity *self, float deltaTime)
 
 void entity_update_all(float deltaTime)
 {
-    int i;
+    int i, j;
+    World* world = get_world();
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet
@@ -150,6 +152,29 @@ void entity_update_all(float deltaTime)
             continue;// skip this iteration of the loop
         }
         entity_update(&entity_manager.entity_list[i], deltaTime);
+        // scans through every entity and checks collision
+        for (j = 0; j < entity_manager.entity_count; j++)
+        {
+            if (i == j || !entity_manager.entity_list[j]._inuse)
+            {
+                // skip if trying to compare the same entity or if the next entity in the list doesn't exist
+                continue;
+            }
+
+            if (bounding_box_collision(&entity_manager.entity_list[i], &entity_manager.entity_list[j]))
+            {
+                // Just stops the entities from moving if they collide
+                entity_manager.entity_list[i].velocity.x = 0;
+                entity_manager.entity_list[i].velocity.y = 0;
+                entity_manager.entity_list[i].velocity.z = 0;
+            }
+                // scans entities and compares with world bounding box for collision with world 
+                if (world_bounding_box_collision(&entity_manager.entity_list[i], world))
+                {
+                    // Entities will stop falling when colliding with the world
+                    entity_manager.entity_list[i].velocity.z = 0;
+                }
+        }
     }
 }
 
@@ -165,10 +190,46 @@ Vector3D get_Bounding_Box_Max(Vector3D size, Vector3D position)
 Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position)
 {
     Vector3D min;
-    min.x = position.x + size.x / 2;
-    min.y = position.y + size.y / 2;
-    min.z = position.z + size.z / 2;
+    min.x = position.x - size.x / 2;
+    min.y = position.y - size.y / 2;
+    min.z = position.z - size.z / 2;
     return min;
+}
+
+int bounding_box_collision(Entity* a, Entity* b)
+{
+    if (a->boundingBox.max.x < b->boundingBox.min.x || a->boundingBox.min.x > b->boundingBox.max.x)
+    {
+        return 0;
+    }
+    if (a->boundingBox.max.y < b->boundingBox.min.y || a->boundingBox.min.y > b->boundingBox.max.y)
+    {
+        return 0;
+    }
+    if (a->boundingBox.max.z < b->boundingBox.min.z || a->boundingBox.min.z > b->boundingBox.max.z)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+int world_bounding_box_collision(Entity* a, World* b)
+{
+
+    if (a->boundingBox.max.x < b->worldBoundingBox.min.x || a->boundingBox.min.x > b->worldBoundingBox.max.x) 
+    {
+        return 0;
+    }
+    if (a->boundingBox.max.y < b->worldBoundingBox.min.y || a->boundingBox.min.y > b->worldBoundingBox.max.y) 
+    {
+        return 0;
+    }
+    if (a->boundingBox.max.z < b->worldBoundingBox.min.z || a->boundingBox.min.z > b->worldBoundingBox.max.z)
+    {
+        return 0;
+    }
+    // If we reach here, there is overlap along all three axes, so there is a collision
+    return 1;
 }
 
 /*eol@eof*/

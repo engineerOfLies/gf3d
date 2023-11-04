@@ -96,4 +96,12 @@ void gf3d_camera_set_scale(Vector3D scale)
     else gf3d_camera.scale.z = 1/scale.z;
 }
 
+void gf3d_camera_get_rotation(Vector3D* rotation)
+{
+    if (!rotation) return;
+    rotation->x = -gf3d_camera.rotation.x;
+    rotation->y = -gf3d_camera.rotation.y;
+    rotation->z = -gf3d_camera.rotation.z;
+}
+
 /*eol@eof*/

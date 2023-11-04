@@ -10,9 +10,9 @@
 #include "gf3d_vgraphics.h"
 #include "gf3d_model.h"
 
-#include "entity.h"
+typedef struct Entity_S Entity;
 
-typedef struct
+typedef struct World
 {
     Matrix4 modelMat;
     Vector3D position;
@@ -42,5 +42,7 @@ void world_add_entity(World *world,Entity *entity);
 Vector3D get_World_Bounding_Box_Min(Vector3D size, Vector3D position);
 
 Vector3D get_World_Bounding_Box_Max(Vector3D size, Vector3D position);
+
+World* get_world();
 
 #endif

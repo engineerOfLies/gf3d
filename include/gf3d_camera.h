@@ -59,5 +59,9 @@ void gf3d_camera_set_scale(Vector3D scale);
  */
 void gf3d_camera_set_rotation(Vector3D rotation);
 
-
+/**
+ * @brief get the camera current camera rotation
+ * @param current camera rotation (pitch[x], roll[y], yaw[z])
+ */
+void gf3d_camera_get_rotation(Vector3D* rotation);
 #endif

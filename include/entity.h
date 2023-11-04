@@ -7,6 +7,7 @@
 
 #include "gf3d_model.h"
 
+typedef struct World World;
 typedef enum
 {
     ES_idle = 0,
@@ -92,12 +93,12 @@ void entity_draw_all();
  * @brief Call an entity's think function if it exists
  * @param self the entity in question
  */
-void entity_think(Entity *self);
+void entity_think(Entity *self, float deltaTime);
 
 /**
  * @brief run the think functions for ALL active entities
  */
-void entity_think_all();
+void entity_think_all(float deltaTime);
 
 /**
  * @brief run the update functions for ALL active entities
@@ -118,4 +119,17 @@ Vector3D get_Bounding_Box_Max(Vector3D size, Vector3D position);
  */
 Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position);
 
+/**
+ * @brief Detects if 2 entities are colliding with each other
+ * @param Entity a
+ * @param Entity b
+ */
+int bounding_box_collision(Entity* a, Entity* b);
+
+/**
+ * @brief Detects if and entity is colliding with the world
+ * @param Entity a
+ * @param World b
+ */
+int world_bounding_box_collision(Entity* a, World* b);
 #endif

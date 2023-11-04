@@ -27,7 +27,7 @@ extern int __DEBUG;
 int main(int argc,char *argv[])
 {
     Uint32 startTime, endTime;
-    float deltaTime;
+    float deltaTime = 0.0f;
     int done = 0;
     int a;
     
@@ -72,6 +72,7 @@ int main(int argc,char *argv[])
     gf3d_camera_set_scale(vector3d(1,1,1));
     player_new(vector3d(0,0,0));
     
+    
     for (a = 0; a < 100; a++)
     {
         particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
@@ -96,7 +97,7 @@ int main(int argc,char *argv[])
         mouseFrame += 0.01;
         if (mouseFrame >= 16)mouseFrame = 0;
         world_run_updates(w);
-        entity_think_all();
+        entity_think_all(deltaTime);
         endTime = SDL_GetTicks();
         deltaTime = (endTime - startTime) / 1000.0f;
         entity_update_all(deltaTime);
@@ -123,7 +124,6 @@ int main(int argc,char *argv[])
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
         endTime = SDL_GetTicks();
-        deltaTime = (endTime - startTime) / 1000.0f;
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
     }    
