@@ -151,6 +151,7 @@ int main(int argc,char *argv[])
         collisionPartner = entity_get_collision_partner(player);
         if (collisionPartner != NULL) {
             if(collisionPartner->isEnemy == 1){
+                SDL_Delay(1);
                 player->sanityation -= 1;
             }else if(collisionPartner->isResource == 1){
                 if(gfc_stricmp(collisionPartner->entityName, "log") == 0){
