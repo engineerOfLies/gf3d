@@ -9,7 +9,7 @@
  * @param position where to spawn the weapon at
  * @return NULL on error, or an weapon entity pointer on success
  */
-Entity *weapon_new(Vector3D position);
+Entity *weapon_new(void);
 
 #endif
 

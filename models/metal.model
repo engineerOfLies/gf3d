@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/resources/metal.obj"
+        "texture":"models/resources/metal.png"
+    }
+}

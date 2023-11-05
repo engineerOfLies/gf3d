@@ -45,6 +45,12 @@ Entity *player_new(Vector3D position)
     ent->defication = 0;
     ent->sanityation = 100;
     ent->calefaction = 97.8;
+
+    ent->wood = 0;
+    ent->concrete = 0;
+    ent->metal = 0;
+    ent->fuel = 0;
+    ent->water = 0;
     //
     // ent->customData = statuses;
 

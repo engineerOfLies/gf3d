@@ -7,11 +7,13 @@ void weapon_think(Entity *self);
 void weapon_update(Entity *self);
 void weapon_free(Entity *self);
 
-Entity *weapon_new(Vector3D position){
+Entity *weapon_new(void){
 
     Entity *wep = NULL;
+    Entity *player = NULL;
 
     wep = entity_new();
+    player = entity_get_player();
 
     if(!wep){
         slog("You should not own a waepon");
@@ -19,25 +21,39 @@ Entity *weapon_new(Vector3D position){
     }
 
     wep->selectedColor = gfc_color(0,0,0,1);
-    wep->color = gfc_color(1,1,1,1);
+    wep->color = gfc_color(1,0,0,1);
     wep->model = gf3d_model_load("models/ak47.model");
+    wep->scale = vector3d(0.0156,0.0156,0.0156);
     wep->think = weapon_think;
     wep->update = weapon_update;
     wep->free = weapon_free;
     wep->isWeapon = 1;
-    vector3d_copy(wep->position, position);
+    vector3d_copy(wep->position, player->position);
+    wep->rotation.y = GFC_HALF_PI;
     return wep;
 }
 
 void weapon_think(Entity *self){
 
+    Entity *player;
+    player = entity_get_player();
+
     if(!self)return;
+    if(!player)return;
+    self->rotation.z = player->rotation.z;
+
 
 
 }
 
 void weapon_update(Entity *self){
+    Entity *player;
+    player = entity_get_player();
+
     if(!self)return;
+    if(!player)return;
+
+    //vector3d_copy(self->position, player->position);
 }
 
 void weapon_free(Entity *self){

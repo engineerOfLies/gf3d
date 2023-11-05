@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/resources/water.obj"
+        "texture":"models/resources/water.png"
+    }
+}

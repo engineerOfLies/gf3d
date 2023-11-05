@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/resources/cement.obj"
+        "texture":"models/resources/cement.jpg"
+    }
+}

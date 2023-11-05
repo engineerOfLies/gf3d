@@ -21,6 +21,8 @@
 #include "agumon.h"
 #include "player.h"
 #include "world.h"
+#include "weapon.h"
+#include "resource.h"
 
 //#include "player.c"
 
@@ -31,6 +33,7 @@ int main(int argc,char *argv[])
     int done = 0;
     int a;
     TextBlock playerStatuses;
+    TextBlock gatheredResources;
     
     Sprite *mouse = NULL;
     int mousex,mousey;
@@ -40,6 +43,12 @@ int main(int argc,char *argv[])
     Entity *agu;
     Entity *player;
     Entity *collisionPartner;
+    Entity *weapon;
+    Entity *woodLog;
+    Entity *cementBlock;
+    Entity *metalBarrel;
+    Entity *jerryCan;
+    Entity *waterWell;
     //Entity *gun;
     //Particle particle[100];
     Matrix4 skyMat;
@@ -66,7 +75,7 @@ int main(int argc,char *argv[])
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
-    
+
     agu = agumon_new(vector3d(0,0,50));
     if (agu)agu->selected = 1;
     w = world_load("config/testworld.json");
@@ -75,6 +84,15 @@ int main(int argc,char *argv[])
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
     player = player_new(vector3d(-50,0,0));
+    weapon = weapon_new();
+    woodLog = resource_new(vector3d(100,0,0), "models/log.model", "log");
+    cementBlock = resource_new(vector3d(125,0,0), "models/cement.model", "concrete");
+    metalBarrel = resource_new(vector3d(150,0,0), "models/metal.model", "metal");
+    metalBarrel->scale = vector3d(1,1,1);
+    jerryCan = resource_new(vector3d(175,0,0), "models/fuel.model", "fuel");
+    jerryCan->scale = vector3d(5,5,5);
+    waterWell = resource_new(vector3d(200,0,0), "models/water.model", "water");
+    waterWell->scale = vector3d(1,1,1);
 
     //test_string = sj_string_new_text("test: ", 0);
 
@@ -121,11 +139,36 @@ int main(int argc,char *argv[])
         ,player->sanityation
         ,player->defication);
 
+        gfc_block_sprintf(gatheredResources
+        ,"Wood: %i | Concrete: %i | Metal: %i | Fuel: %i | Water: %i"
+        ,player->wood
+        ,player->concrete
+        ,player->metal
+        ,player->fuel
+        ,player->water);
+
 
         collisionPartner = entity_get_collision_partner(player);
         if (collisionPartner != NULL) {
             if(collisionPartner->isEnemy == 1){
-                 player->sanityation -= 1;
+                player->sanityation -= 1;
+            }else if(collisionPartner->isResource == 1){
+                if(gfc_stricmp(collisionPartner->entityName, "log") == 0){
+                    player->wood++;
+                    entity_free(woodLog);
+                }else if(gfc_stricmp(collisionPartner->entityName, "concrete") == 0){
+                    player->concrete++;
+                    entity_free(cementBlock);
+                }else if(gfc_stricmp(collisionPartner->entityName, "metal") == 0){
+                    player->metal++;
+                    entity_free(metalBarrel);
+                }else if(gfc_stricmp(collisionPartner->entityName, "fuel") == 0){
+                    player->fuel += 10;
+                    entity_free(jerryCan);
+                }else if(gfc_stricmp(collisionPartner->entityName, "water") == 0){
+                    player->water += 25;
+                    entity_free(waterWell);
+                }
             }
         } else {
             if(player->sanityation < 100)
@@ -153,6 +196,7 @@ int main(int argc,char *argv[])
             //2D draws
                 //gf2d_draw_rect_filled(gfc_rect(10 ,10,1000,32),gfc_color8(128,128,128,255));
                 gf2d_font_draw_line_tag(playerStatuses,FT_H1,gfc_color(1,0,1,1), vector2d(10,10));
+                gf2d_font_draw_line_tag(gatheredResources,FT_Normal,gfc_color(0,1,0,1), vector2d(10,30));
 
                 //gf2d_font_draw_line_tag(hydrationValue,FT_H1,gfc_color(1,1,1,1), vector2d(10,30));
                 

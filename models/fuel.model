@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/resources/fuel.obj"
+        "texture":"models/resources/fuel.png"
+    }
+}

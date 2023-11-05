@@ -55,11 +55,18 @@ typedef struct Entity_S
     Uint8   isPlayer;
     Uint8   isWeapon;
     Uint8   isEnemy;
+    Uint8   isResource;
     int hydration;
     int saturation;
     int defication;
     int sanityation;
+    int wood;
+    int concrete;
+    int metal;
+    int fuel;
+    int water;
     float calefaction;
+    const char *entityName;
 }Entity;
 
 /**
@@ -116,6 +123,8 @@ Uint8 entity_check_ground();
 Uint8 entity_collide_check(Entity *self, Entity *other);
 
 Entity *entity_get_collision_partner(Entity *self);
+
+Entity *entity_get_player(void);
 
 
 #endif

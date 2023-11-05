@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/resources/log.obj"
+        "texture":"models/resources/log.png"
+    }
+}
