@@ -22,12 +22,15 @@
 #include "player.h"
 #include "world.h"
 
+//#include "player.c"
+
 extern int __DEBUG;
 
 int main(int argc,char *argv[])
 {
     int done = 0;
     int a;
+    TextBlock playerStatuses;
     
     Sprite *mouse = NULL;
     int mousex,mousey;
@@ -35,6 +38,9 @@ int main(int argc,char *argv[])
     float mouseFrame = 0;
     World *w;
     Entity *agu;
+    Entity *player;
+    Entity *collisionPartner;
+    //Entity *gun;
     //Particle particle[100];
     Matrix4 skyMat;
     Model *sky;
@@ -68,7 +74,11 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(-50,0,0));
+    player = player_new(vector3d(-50,0,0));
+
+    //test_string = sj_string_new_text("test: ", 0);
+
+
     /*
     for (a = 0; a < 100; a++)
     {
@@ -99,6 +109,35 @@ int main(int argc,char *argv[])
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
 
+        //rlStatuses workPlease = *((rlStatuses*)player->customData);
+
+        //slog("calefaction check: %f", workPlease.calefaction);
+
+        gfc_block_sprintf(playerStatuses
+        ,"Calefaction: %f | Hydration: %i | Saturation: %i | Sanityation: %i | Defication: %i"
+        ,player->calefaction
+        ,player->hydration
+        ,player->saturation
+        ,player->sanityation
+        ,player->defication);
+
+
+        collisionPartner = entity_get_collision_partner(player);
+        if (collisionPartner != NULL) {
+            if(collisionPartner->isEnemy == 1){
+                 player->sanityation -= 1;
+            }
+        } else {
+            if(player->sanityation < 100)
+            {
+                player->sanityation +=1;
+                if(player->sanityation == 100)continue;
+            }
+        }
+
+
+
+
         gf3d_vgraphics_render_start();
 
             //3D draws
@@ -112,10 +151,12 @@ int main(int argc,char *argv[])
                 }
                 */
             //2D draws
-                gf2d_draw_rect_filled(gfc_rect(10 ,10,1000,32),gfc_color8(128,128,128,255));
-                gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
+                //gf2d_draw_rect_filled(gfc_rect(10 ,10,1000,32),gfc_color8(128,128,128,255));
+                gf2d_font_draw_line_tag(playerStatuses,FT_H1,gfc_color(1,0,1,1), vector2d(10,10));
+
+                //gf2d_font_draw_line_tag(hydrationValue,FT_H1,gfc_color(1,1,1,1), vector2d(10,30));
                 
-                gf2d_draw_rect(gfc_rect(10 ,10,1000,32),gfc_color8(255,255,255,255));
+                //gf2d_draw_rect(gfc_rect(10 ,10,1000,32),gfc_color8(255,255,255,255));
                 
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
@@ -124,7 +165,6 @@ int main(int argc,char *argv[])
     }    
     
     world_delete(w);
-
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup
     slog("gf3d program end");

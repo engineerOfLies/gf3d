@@ -8,11 +8,15 @@
 //static int thirdPersonMode = 0;
 void player_think(Entity *self);
 void player_update(Entity *self);
+//void player_free(Entity *self);
 Vector3D camera_rotation;
+
 
 Entity *player_new(Vector3D position)
 {
     Entity *ent = NULL;
+
+    //rlStatuses *statuses = NULL;
 
     ent = entity_new();
     if (!ent)
@@ -24,12 +28,25 @@ Entity *player_new(Vector3D position)
     ent->model = gf3d_model_load("models/dino.model");
     ent->think = player_think;
     ent->update = player_update;
+    //ent->free = player_free;
     vector3d_copy(ent->position,position);
     camera_rotation.x = GFC_PI;
     camera_rotation.z = GFC_HALF_PI;
     ent->rotation.x = camera_rotation.x ;
     ent->rotation.z = camera_rotation.z;
     ent->rotation.y = GFC_PI;
+    ent->health = 100;
+    ent->isPlayer = 1;
+
+    // statuses = gfc_allocate_array(sizeof(rlStatuses),1);
+    //
+    ent->hydration = 100;
+    ent->saturation = 100;
+    ent->defication = 0;
+    ent->sanityation = 100;
+    ent->calefaction = 97.8;
+    //
+    // ent->customData = statuses;
 
     //ent->hidden = 1;
     return ent;
@@ -47,23 +64,19 @@ void player_think(Entity *self)
     const Uint8 * keys;
     keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
+
+
     mouse.x = mx;
     mouse.y = my;
     w = vector2d_from_angle(self->rotation.z);
-    forward.x = w.x;
-    forward.y = w.y;
+    forward.x = ((w.x)*0.0625);
+    forward.y = ((w.y)*0.0625);
     w = vector2d_from_angle(self->rotation.z - GFC_HALF_PI);
-    right.x = w.x;
-    right.y = w.y;
+    right.x = ((w.x)*0.0625);
+    right.y = ((w.y)*0.0625);
     if (keys[SDL_SCANCODE_W])
     {
         vector3d_add(self->position,self->position,forward);
-
-//         move.z = 0;
-//         vector3d_set_magnitude(&move, 100);
-//         move.z = 100;
-//         vector3d_add(cameraPos,self->position,move);
-//         gf3d_camera_look_at(cameraPos, self->position, vector3d(0,0,1));
     }
     if (keys[SDL_SCANCODE_S])
     {
@@ -77,10 +90,13 @@ void player_think(Entity *self)
     {
         vector3d_add(self->position,self->position,-right);
     }
-    if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
-    if (keys[SDL_SCANCODE_Z])self->position.z -= 1;
+    if (keys[SDL_SCANCODE_SPACE]){
+        if(self->velocity.z == 0){
+            self->velocity.z = 0.25;
+        }
+    }
 
-
+     if (keys[SDL_SCANCODE_Z])self->position.z -= 1;
 
      if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
      if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
@@ -90,6 +106,10 @@ void player_think(Entity *self)
     if (mouse.x != 0)camera_rotation.z -= (mouse.x * 0.001);
     if (mouse.y != 0)camera_rotation.x += (mouse.y * 0.001);
     self->rotation.z = camera_rotation.z;
+
+
+
+
 
 //     if (keys[SDL_SCANCODE_F3])
 //     {
@@ -114,7 +134,8 @@ void player_update(Entity *self)
     vector3d_copy(rotation,camera_rotation);
     vector3d_copy(torso_position, position);
     camera_position = torso_position;
-    slog("rotation Value: \n x:%f \n y:%f \n z:%f", rotation.x, rotation.y, rotation.z);
+
+
     if(camera_rotation.x >= 4.5){
         camera_rotation.x = 4.5;
     }
@@ -124,7 +145,7 @@ void player_update(Entity *self)
 
     height = world_get_collision_height(self->position);
     if(self->position.z > height){
-        self->velocity.z -= 0.0000098;
+        self->velocity.z -= 0.00098;
     }
     vector3d_add(self->position,self->position,self->velocity);
     if(self->position.z < height)
@@ -132,9 +153,6 @@ void player_update(Entity *self)
         self->position.z = height;
         if(self->velocity.z < 0)self->velocity.z = 0;
     }
-    //vector3d_copy(torso_position, self->position);
-    //vector3d_copy(camera_position, torso_position);
-    //camera_position = torso_position;
 //     if (thirdPersonMode)
 //     {
 //         position.z += 100;
@@ -144,8 +162,33 @@ void player_update(Entity *self)
 //         forward.y = w.y * 100;
 //         vector3d_add(position,position,-forward);
 //     }
+
      gf3d_camera_set_position(camera_position);
      gf3d_camera_set_rotation(rotation);
+
+    if(SDL_GetTicks64()%5000 == 0)
+    {
+        self->saturation -= 1;
+        self->hydration -= 2;
+        self->defication += 2;
+    }
+
+        if(SDL_GetTicks64()%10000 == 0)
+    {
+        self->calefaction -= 0.25;
+    }
 }
+
+
+// void player_free(Entity *self){
+//
+//     rlStatuses *statuses;
+//
+//     if (!self)return;
+//     statuses = self->customData;
+//     free(statuses);
+// }
+
+
 
 /*eol@eof*/

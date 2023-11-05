@@ -26,7 +26,7 @@ typedef struct Entity_S
     Uint8       selected;
     Color       selectedColor;      /**<Color for highlighting*/
     
-    Box         bounds; // for collisions
+    Sphere      bounds; // for collisions
     int         team;  //same team dont clip
     int         clips;  // if false, skip collisions
 
@@ -51,6 +51,15 @@ typedef struct Entity_S
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/
+
+    Uint8   isPlayer;
+    Uint8   isWeapon;
+    Uint8   isEnemy;
+    int hydration;
+    int saturation;
+    int defication;
+    int sanityation;
+    float calefaction;
 }Entity;
 
 /**
@@ -104,15 +113,9 @@ void entity_update_all();
  */
 Uint8 entity_check_ground();
 
-/**
- *  @brief Check if entity is the player
- */
-Uint8 entity_check_if_player();
+Uint8 entity_collide_check(Entity *self, Entity *other);
 
-
-//int entity_collide_check(Entity *self, Entity *other);
-
-//Entity *entity_get_collision_partner(Entity *self);
+Entity *entity_get_collision_partner(Entity *self);
 
 
 #endif

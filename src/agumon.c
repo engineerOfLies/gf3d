@@ -25,12 +25,7 @@ Entity *agumon_new(Vector3D position)
     ent->model = gf3d_model_load("models/dino.model");
     ent->think = agumon_think;
     ent->update = agumon_update;
-    ent->bounds.x = -8;
-    ent->bounds.y = -8;
-    ent->bounds.z = -8;
-    ent->bounds.w = 16;
-    ent->bounds.h = 16;
-    ent->bounds.d = 16;
+    ent->isEnemy = 1;
     vector3d_copy(ent->position,position);
     return ent;
 }

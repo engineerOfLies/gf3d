@@ -5,11 +5,14 @@
 
 #include "entity.h"
 
+Uint8 entity_collide_check(Entity *self, Entity *other);
+Uint8 entity_check_ground(Entity *self);
+
 typedef struct
 {
     Entity *entity_list;
     Uint32  entity_count;
-    Model  *cube;
+    Model  *sphere;
 }EntityManager;
 
 static EntityManager entity_manager = {0};
@@ -17,7 +20,7 @@ static EntityManager entity_manager = {0};
 void entity_system_close()
 {
     int i;
-    gf3d_model_free(entity_manager.cube);
+    gf3d_model_free(entity_manager.sphere);
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         entity_free(&entity_manager.entity_list[i]);        
@@ -36,6 +39,7 @@ void entity_system_init(Uint32 maxEntities)
         return;
     }
     entity_manager.entity_count = maxEntities;
+    entity_manager.sphere = gf3d_model_load("models/sphere.model");
     atexit(entity_system_close);
     slog("entity_system initialized");
 }
@@ -48,14 +52,19 @@ Entity *entity_new()
         if (!entity_manager.entity_list[i]._inuse)// not used yet, so we can!
         {
             entity_manager.entity_list[i]._inuse = 1;
+            entity_manager.entity_list[i].isPlayer = 0;
+            entity_manager.entity_list[i].isWeapon = 0;
             gfc_matrix_identity(entity_manager.entity_list[i].modelMat);
             entity_manager.entity_list[i].scale.x = 1;
             entity_manager.entity_list[i].scale.y = 1;
             entity_manager.entity_list[i].scale.z = 1;
 
-//             entity_manager.entity_list[i].bounds.w = 5;
-//             entity_manager.entity_list[i].bounds.h = 5;
-//             entity_manager.entity_list[i].bounds.d = 5;
+             entity_manager.entity_list[i].bounds.x = 2.5;
+             entity_manager.entity_list[i].bounds.y = 2.5;
+             entity_manager.entity_list[i].bounds.z = 2.5;
+             entity_manager.entity_list[i].bounds.r = 5;
+
+
             
             entity_manager.entity_list[i].color = gfc_color(1,1,1,1);
             entity_manager.entity_list[i].selectedColor = gfc_color(1,1,1,1);
@@ -88,12 +97,14 @@ void entity_draw(Entity *self)
             self->modelMat,
             gfc_color_to_vector4f(self->selectedColor));
     }
-//     Matrix4 boxTest;
+     Matrix4 sphereTest;
 //     slog("self->bounds.h Value: %f", self->bounds.h);
 //     slog("self->bounds.w Value: %f", self->bounds.w);
 //     slog("self->bounds.d Value: %f", self->bounds.d);
-//     gfc_matrix4_from_vectors(boxTest, self->position, vector3d(0,0,0), vector3d(self->bounds.h,self->bounds.w,self->bounds.d));
-//     gf3d_model_draw_highlight(entity_manager.cube, boxTest, vector4d(1,0,0,1));
+    if(self->isPlayer == 0){
+     gfc_matrix4_from_vectors(sphereTest, self->position, vector3d(0,0,0), vector3d(self->bounds.x,self->bounds.y,self->bounds.z));
+     gf3d_model_draw_highlight(entity_manager.sphere, sphereTest, vector4d(1,0,1,1));
+    }
 }
 
 void entity_draw_all()
@@ -129,21 +140,6 @@ void entity_think_all()
 }
 
 
-//  int entity_collide_check(Entity *self, Entity *other){
-//     Box A,B;
-//      if((!self)||(!other)){
-//          slog("missing pointers");
-//          return 0;
-//      }
-//      gfc_box_cpy(A, self->bounds);
-//      gfc_box_cpy(B, other->bounds);
-//      vector3d_add(A, A, self->position);
-//      vector3d_add(B, B, other->position);
-//      return gfc_box_overlap(A,B);
-//  }
-
-
-
 void entity_update(Entity *self)
 {
     if (!self)return;
@@ -173,5 +169,52 @@ void entity_update_all()
         entity_update(&entity_manager.entity_list[i]);
     }
 }
+
+Uint8 entity_check_ground(Entity *self){
+    if(self->velocity.z > 0)return 0;
+    return 1;
+}
+
+Uint8 entity_collide_check(Entity *self, Entity *other){
+
+    if((!self) || (!other)||(self == other))return 0;
+
+    Sphere A;
+    Sphere B;
+
+    vector3d_copy(A, self->position);
+    vector3d_add(A,A, self->bounds);
+    A.r = self->bounds.r;
+
+    vector3d_copy(B, other->position);
+    vector3d_add(B,B, other->bounds);
+    B.r = other->bounds.r;
+
+    return gfc_sphere_overlap(A,B);
+
+    //slog("Sphere A Values: %f, %f, %f, %f", A.x, A.y, A.z, A.r);
+
+}
+
+Entity *entity_get_collision_partner(Entity *self){
+    int i;
+    if(!self)return NULL;
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if (!entity_manager.entity_list[i]._inuse)continue;
+
+        if(self == &entity_manager.entity_list[i])continue;
+
+        if(entity_collide_check(self, &entity_manager.entity_list[i]) == 1)
+        {
+            return &entity_manager.entity_list[i];
+        }
+
+    }
+    return NULL;
+}
+
+
+
 
 /*eol@eof*/

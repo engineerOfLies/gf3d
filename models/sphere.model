@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/sphere/sphere.obj",
+        "texture":"image/default.png"
+    }
+}
