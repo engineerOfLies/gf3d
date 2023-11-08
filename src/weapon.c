@@ -55,5 +55,4 @@ void weapon_update(Entity *self){
 
 void weapon_free(Entity *self){
     if(!self)return;
-    entity_free(self);
 }
