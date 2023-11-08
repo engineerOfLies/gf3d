@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/gun/ak47.obj",
+        "model":"models/gun/newgun.obj",
         "texture":"models/gun/ak47.png"
     }
 }

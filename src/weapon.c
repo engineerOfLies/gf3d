@@ -21,15 +21,14 @@ Entity *weapon_new(void){
     }
 
     wep->selectedColor = gfc_color(0,0,0,1);
-    wep->color = gfc_color(1,0,0,1);
+    wep->color = gfc_color(1,1,1,1);
     wep->model = gf3d_model_load("models/ak47.model");
-    wep->scale = vector3d(0.0156,0.0156,0.0156);
+    wep->scale = vector3d(0.25,0.25,0.25);
     wep->think = weapon_think;
     wep->update = weapon_update;
     wep->free = weapon_free;
     wep->isWeapon = 1;
     vector3d_copy(wep->position, player->position);
-    wep->rotation.y = GFC_HALF_PI;
     return wep;
 }
 
@@ -41,9 +40,7 @@ void weapon_think(Entity *self){
     if(!self)return;
     if(!player)return;
     self->rotation.z = player->rotation.z;
-
-
-
+    self->position.z = -1;
 }
 
 void weapon_update(Entity *self){
@@ -53,9 +50,10 @@ void weapon_update(Entity *self){
     if(!self)return;
     if(!player)return;
 
-    //vector3d_copy(self->position, player->position);
+    vector3d_copy(self->position, player->position);
 }
 
 void weapon_free(Entity *self){
     if(!self)return;
+    entity_free(self);
 }

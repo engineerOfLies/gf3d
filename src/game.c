@@ -216,5 +216,4 @@ int main(int argc,char *argv[])
     slog_sync();
     return 0;
 }
-
 /*eol@eof*/
