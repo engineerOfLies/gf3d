@@ -23,6 +23,7 @@
 #include "world.h"
 #include "weapon.h"
 #include "resource.h"
+#include "enemy.h"
 
 //#include "player.c"
 
@@ -49,6 +50,7 @@ int main(int argc,char *argv[])
     Entity *metalBarrel;
     Entity *jerryCan;
     Entity *waterWell;
+    Entity *zombie;
     //Entity *gun;
     //Particle particle[100];
     Matrix4 skyMat;
@@ -93,6 +95,8 @@ int main(int argc,char *argv[])
     jerryCan->scale = vector3d(5,5,5);
     waterWell = resource_new(vector3d(200,0,0), "models/water.model", "water");
     waterWell->scale = vector3d(1,1,1);
+    zombie = enemy_new(vector3d(225,0,0), "models/zombie.model", "walker");
+
 
     //test_string = sj_string_new_text("test: ", 0);
 
@@ -132,10 +136,10 @@ int main(int argc,char *argv[])
         //slog("calefaction check: %f", workPlease.calefaction);
 
         gfc_block_sprintf(playerStatuses
-        ,"Calefaction: %f | Hydration: %i | Saturation: %i | Sanityation: %i | Defication: %i"
+        ,"Calefaction: %f | Hydration: %i | Satiation: %i | Sanityation: %i | Defication: %i"
         ,player->calefaction
         ,player->hydration
-        ,player->saturation
+        ,player->satiation
         ,player->sanityation
         ,player->defication);
 
@@ -149,29 +153,44 @@ int main(int argc,char *argv[])
 
 
         collisionPartner = entity_get_collision_partner(player);
-        if (collisionPartner != NULL) {
-            if(collisionPartner->isEnemy == 1){
+        if (collisionPartner != NULL)
+        {
+            if(collisionPartner->isEnemy == 1)
+            {
                 SDL_Delay(1);
                 player->sanityation -= 1;
-            }else if(collisionPartner->isResource == 1){
-                if(gfc_stricmp(collisionPartner->entityName, "log") == 0){
+            }
+            else if(collisionPartner->isResource == 1)
+            {
+                if(gfc_stricmp(collisionPartner->entityName, "log") == 0)
+                {
                     player->wood++;
                     entity_free(woodLog);
-                }else if(gfc_stricmp(collisionPartner->entityName, "concrete") == 0){
+                }
+                else if(gfc_stricmp(collisionPartner->entityName, "concrete") == 0)
+                {
                     player->concrete++;
                     entity_free(cementBlock);
-                }else if(gfc_stricmp(collisionPartner->entityName, "metal") == 0){
+                }
+                else if(gfc_stricmp(collisionPartner->entityName, "metal") == 0)
+                {
                     player->metal++;
                     entity_free(metalBarrel);
-                }else if(gfc_stricmp(collisionPartner->entityName, "fuel") == 0){
+                }
+                else if(gfc_stricmp(collisionPartner->entityName, "fuel") == 0)
+                {
                     player->fuel += 10;
                     entity_free(jerryCan);
-                }else if(gfc_stricmp(collisionPartner->entityName, "water") == 0){
+                }
+                else if(gfc_stricmp(collisionPartner->entityName, "water") == 0)
+                {
                     player->water += 25;
                     entity_free(waterWell);
                 }
             }
-        } else {
+        }
+        else
+        {
             if(player->sanityation < 100)
             {
                 player->sanityation +=1;

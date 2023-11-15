@@ -1,7 +1,7 @@
 {
     "model":
     {
-        "model":"models/resources/cement.obj"
+        "model":"models/resources/newcement.obj"
         "texture":"models/resources/cement.jpg"
     }
 }

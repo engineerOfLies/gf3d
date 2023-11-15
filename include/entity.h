@@ -57,7 +57,7 @@ typedef struct Entity_S
     Uint8   isEnemy;
     Uint8   isResource;
     int hydration;
-    int saturation;
+    int satiation;
     int defication;
     int sanityation;
     int wood;

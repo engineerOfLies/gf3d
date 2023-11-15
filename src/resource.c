@@ -11,13 +11,13 @@ void resource_free(Entity *self);
 Entity *resource_new(Vector3D position, const char *modelToLoad, const char *name){
 
     Entity *log = NULL;
-    Entity *player = NULL;
+    //Entity *player = NULL;
 
     log = entity_new();
-    player = entity_get_player();
+    //player = entity_get_player();
 
     if(!log){
-        slog("You should not own a waepon");
+        slog("Could not create resource");
         return NULL;
     }
 
@@ -31,7 +31,7 @@ Entity *resource_new(Vector3D position, const char *modelToLoad, const char *nam
     log->free = resource_free;
     log->isResource = 1;
     vector3d_copy(log->position, position);
-    log->rotation.y = GFC_HALF_PI;
+    //log->rotation.y = GFC_HALF_PI;
     log->entityName = name;
     return log;
 }
@@ -43,10 +43,6 @@ void resource_think(Entity *self){
 
     if(!self)return;
     if(!player)return;
-    //self->rotation.z = player->rotation.z;
-
-
-
 }
 
 void resource_update(Entity *self){

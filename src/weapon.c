@@ -28,6 +28,10 @@ Entity *weapon_new(void){
     wep->update = weapon_update;
     wep->free = weapon_free;
     wep->isWeapon = 1;
+    wep->bounds.x = 0;
+    wep->bounds.y = 0;
+    wep->bounds.z = 0;
+    wep->bounds.r = 0;
     vector3d_copy(wep->position, player->position);
     return wep;
 }
@@ -40,7 +44,7 @@ void weapon_think(Entity *self){
     if(!self)return;
     if(!player)return;
     self->rotation.z = player->rotation.z;
-    self->position.z = -1;
+    self->position.z = ((player->position.z) - 1);
 }
 
 void weapon_update(Entity *self){
@@ -50,7 +54,8 @@ void weapon_update(Entity *self){
     if(!self)return;
     if(!player)return;
 
-    vector3d_copy(self->position, player->position);
+    // self->position.y = player->position.y;
+    // self->position.x = player->position.x;
 }
 
 void weapon_free(Entity *self){

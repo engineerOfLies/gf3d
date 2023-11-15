@@ -41,7 +41,7 @@ Entity *player_new(Vector3D position)
     // statuses = gfc_allocate_array(sizeof(rlStatuses),1);
     //
     ent->hydration = 100;
-    ent->saturation = 100;
+    ent->satiation = 100;
     ent->defication = 0;
     ent->sanityation = 100;
     ent->calefaction = 97.8;
@@ -174,7 +174,7 @@ void player_update(Entity *self)
 
     if(SDL_GetTicks64()%5000 == 0)
     {
-        self->saturation -= 1;
+        self->satiation -= 1;
         self->hydration -= 2;
         self->defication += 2;
     }
