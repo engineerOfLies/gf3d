@@ -1,8 +1,10 @@
 #include "simple_logger.h"
 #include "gfc_types.h"
+#include "stdlib.h"
 
 #include "enemy.h"
 #include "world.h"
+
 
 void enemy_think(Entity *self);
 void enemy_update(Entity *self);
@@ -34,6 +36,10 @@ Entity *enemy_new(Vector3D position, const char *modelToLoad, const char *name){
     //enemy->rotation.y = GFC_HALF_PI;
     enemy->entityName = name;
     enemy->target = player;
+    enemy->targetRadius.x = 50;
+    enemy->targetRadius.y = 50;
+    enemy->targetRadius.z = 50;
+    enemy->targetRadius.r = 50;
     return enemy;
 }
 
@@ -50,10 +56,20 @@ void enemy_think(Entity *self){
     if(!player)return;
 
     w = vector2d_from_angle(self->rotation.z);
-    forward.x = ((w.x)*0.0625);
-    forward.y = ((w.y)*0.0625);
-    right.x = ((w.x)*0.0625);
-    right.y = ((w.y)*0.0625);
+    forward.x = ((w.x)*0.125);
+    forward.y = ((w.y)*0.125);
+    right.x = ((w.x)*0.125);
+    right.y = ((w.y)*0.125);
+
+    slog("Distance Difference X: %f", ((player->position.x)*2 - (self->position.x)*2));
+    slog("Distance Difference Y: %f", ((player->position.y)*2 - (self->position.y)*2));
+
+    if( vector3d_magnitude_between(player->position, self->position) < 50)
+    {
+        self->rotation.z = player->rotation.z;
+        vector3d_add(self->position,self->position,-forward);
+    }
+
 }
 
 void enemy_update(Entity *self){

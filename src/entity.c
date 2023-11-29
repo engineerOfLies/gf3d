@@ -99,13 +99,15 @@ void entity_draw(Entity *self)
             self->modelMat,
             gfc_color_to_vector4f(self->selectedColor));
     }
-     Matrix4 sphereTest;
+     Matrix4 sphereTest, sphereTest2;
 //     slog("self->bounds.h Value: %f", self->bounds.h);
 //     slog("self->bounds.w Value: %f", self->bounds.w);
 //     slog("self->bounds.d Value: %f", self->bounds.d);
     if(self->isPlayer == 0 && self->isWeapon == 0){
      gfc_matrix4_from_vectors(sphereTest, self->position, vector3d(0,0,0), vector3d(self->bounds.x,self->bounds.y,self->bounds.z));
+     gfc_matrix4_from_vectors(sphereTest2, self->position, vector3d(0,0,0), vector3d(self->targetRadius.x,self->targetRadius.y,self->targetRadius.z));
      gf3d_model_draw_highlight(entity_manager.sphere, sphereTest, vector4d(1,0,1,1));
+     gf3d_model_draw_highlight(entity_manager.sphere, sphereTest2, vector4d(1,0,0,.125));
     }
 }
 
@@ -230,6 +232,7 @@ Entity *entity_get_player(void){
     return NULL;
 
 }
+
 
 
 

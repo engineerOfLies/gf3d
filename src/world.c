@@ -20,9 +20,13 @@ typedef struct
 
 World *world_load(char *filename)
 {
-    SJson *json,*wjson;
+    SJson *json,*wjson,*ejson;
     World *w = NULL;
     const char *modelName = NULL;
+    const char *entName = NULL;
+
+    List *entityList = NULL;
+
     w = gfc_allocate_array(sizeof(World),1);
     if (w == NULL)
     {
@@ -56,6 +60,25 @@ World *world_load(char *filename)
     sj_value_as_vector3d(sj_object_get_value(wjson,"scale"),&w->scale);
     sj_value_as_vector3d(sj_object_get_value(wjson,"position"),&w->position);
     sj_value_as_vector3d(sj_object_get_value(wjson,"rotation"),&w->rotation);
+
+    ejson = sj_object_get_value(json,"player");
+    if (!ejson)
+    {
+        slog("failed to find world object in %s world condig",filename);
+        free(w);
+        sj_free(json);
+        return NULL;
+    }
+
+    entName = sj_get_string_value(sj_object_get_value(ejson,"entityName"));
+    if (!entName)
+    {
+        slog("entity data in (%s) has no name",filename);
+        sj_free(json);
+        return w;
+    }
+    slog("entName: %s \n", entName);
+
     sj_free(json);
     w->color = gfc_color(1,1,1,1);
 

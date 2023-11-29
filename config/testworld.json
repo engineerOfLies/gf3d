@@ -5,5 +5,19 @@
         "position":[0,0,-10],
         "scale":[5000,5000,5000],
         "rotation":[0,0,0]
+    },
+
+    "player":
+    {
+        "model":"models/dino.model",
+        "position": [-50,0,0],
+        "entityName":"Player"
+    },
+
+    "agumon":
+    {
+        "model":"models/dino.model",
+        "position": [0,0,50],
+        "entityName": "Agumon"
     }
 }

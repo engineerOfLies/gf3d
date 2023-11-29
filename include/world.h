@@ -32,7 +32,7 @@ void world_delete(World *world);
 
 void world_run_updates(World *world);
 
-void world_add_entity(World *world,Entity *entity);
+void world_add_entity(World *world, Entity *entity);
 
 float world_get_collision_height(Vector3D down);
 

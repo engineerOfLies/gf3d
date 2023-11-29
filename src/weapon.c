@@ -44,6 +44,7 @@ void weapon_think(Entity *self){
     if(!self)return;
     if(!player)return;
     self->rotation.z = player->rotation.z;
+    self->rotation.x = player->rotation.x;
     self->position.z = ((player->position.z) - 1);
 }
 

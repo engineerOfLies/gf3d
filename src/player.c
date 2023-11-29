@@ -38,6 +38,7 @@ Entity *player_new(Vector3D position)
     ent->health = 100;
     ent->isPlayer = 1;
 
+
     // statuses = gfc_allocate_array(sizeof(rlStatuses),1);
     //
     ent->hydration = 100;
@@ -51,6 +52,7 @@ Entity *player_new(Vector3D position)
     ent->metal = 0;
     ent->fuel = 0;
     ent->water = 0;
+    ent->entityName = "Player";
     //
     // ent->customData = statuses;
 
