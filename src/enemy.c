@@ -61,8 +61,8 @@ void enemy_think(Entity *self){
     right.x = ((w.x)*0.125);
     right.y = ((w.y)*0.125);
 
-    slog("Distance Difference X: %f", ((player->position.x)*2 - (self->position.x)*2));
-    slog("Distance Difference Y: %f", ((player->position.y)*2 - (self->position.y)*2));
+    //slog("Distance Difference X: %f", ((player->position.x)*2 - (self->position.x)*2));
+    //slog("Distance Difference Y: %f", ((player->position.y)*2 - (self->position.y)*2));
 
     if( vector3d_magnitude_between(player->position, self->position) < 50)
     {

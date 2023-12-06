@@ -33,6 +33,7 @@ Entity *weapon_new(void){
     wep->bounds.z = 0;
     wep->bounds.r = 0;
     vector3d_copy(wep->position, player->position);
+    wep->entityName = "AK";
     return wep;
 }
 
@@ -44,7 +45,7 @@ void weapon_think(Entity *self){
     if(!self)return;
     if(!player)return;
     self->rotation.z = player->rotation.z;
-    self->rotation.x = player->rotation.x;
+    //self->rotation.x = player->rotation.x;
     self->position.z = ((player->position.z) - 1);
 }
 

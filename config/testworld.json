@@ -12,12 +12,62 @@
         "model":"models/dino.model",
         "position": [-50,0,0],
         "entityName":"Player"
+
+    },
+
+    "wep1":
+    {
+        "model":"models/ak47.model",
+        "entityName":"AK"
     },
 
     "agumon":
     {
         "model":"models/dino.model",
         "position": [0,0,50],
-        "entityName": "Agumon"
+        "entityName":"Agumon"
+    },
+
+    "log":
+    {
+        "model":"models/log.model",
+        "position": [100,0,0],
+        "entityName":"log"
+    },
+
+    "cement":
+    {
+        "model":"models/cement.model",
+        "position": [125,0,0],
+        "entityName":"concrete"
+    },
+
+    "metal":
+    {
+        "model":"models/metal.model",
+        "position": [150,0,0],
+        "entityName":"metal"
+    },
+
+    "fuel":
+    {
+        "model":"models/fuel.model",
+        "position": [175,0,0],
+        "entityName":"fuel"
+    },
+
+    "water":
+    {
+        "model":"models/water.model",
+        "position": [200,0,0],
+        "entityName":"water"
+    },
+
+
+    "walker":
+    {
+        "model":"models/zombie.model",
+        "position": [250,0,0],
+        "entityName":"walker"
     }
 }
