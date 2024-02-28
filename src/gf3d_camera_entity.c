@@ -123,7 +123,7 @@ void gf3d_camera_entity_enable_free_look(Uint8 enable)
 
 void gf3d_camera_entity_think(Entity *self)
 {
-    float moveSpeed = 1;
+    float moveSpeed = 2;
     Vector3D position,rotation;
     const Uint8 * keys;
     CameraEntityData *data;
@@ -163,10 +163,10 @@ void gf3d_camera_entity_think(Entity *self)
         if (keys[SDL_SCANCODE_SPACE])gf3d_camera_move_up(moveSpeed);
         if (keys[SDL_SCANCODE_Z])gf3d_camera_move_up(-moveSpeed);
         
-        if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-0.005);
-        if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(0.005);
-        if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.005);
-        if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.005);
+        if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-0.01);
+        if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(0.01);
+        if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.01);
+        if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.01);
         
         return;
     }

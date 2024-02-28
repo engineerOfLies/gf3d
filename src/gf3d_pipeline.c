@@ -461,6 +461,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     }
 
     pipe->device = device;
+    
+    sj_object_get_value_as_uint32(config,"descriptorCount",&descriptorCount);
     pipe->descriptorSetCount = descriptorCount;
     
     gf3d_pipelin_depth_stencil_create_info_from_json(sj_object_get_value(config,"depthStencil"),&depthStencil);
