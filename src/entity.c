@@ -4,6 +4,7 @@
 #include "simple_logger.h"
 
 #include "entity.h"
+#include "world.h"
 
 typedef struct
 {
@@ -35,6 +36,7 @@ void entity_system_init(Uint32 maxEntities)
         return;
     }
     entity_manager.entity_count = maxEntities;
+
     atexit(entity_system_close);
     slog("entity_system initialized");
 }
@@ -98,13 +100,13 @@ void entity_draw_all()
     }
 }
 
-void entity_think(Entity *self)
+void entity_think(Entity *self, float deltaTime)
 {
     if (!self)return;
-    if (self->think)self->think(self);
+    if (self->think)self->think(self, deltaTime);
 }
 
-void entity_think_all()
+void entity_think_all(float deltaTime)
 {
     int i;
     for (i = 0; i < entity_manager.entity_count; i++)
@@ -113,39 +115,114 @@ void entity_think_all()
         {
             continue;// skip this iteration of the loop
         }
-        entity_think(&entity_manager.entity_list[i]);
+        entity_think(&entity_manager.entity_list[i], deltaTime);
     }
 }
 
 
-void entity_update(Entity *self)
+void entity_update(Entity *self, float deltaTime)
 {
+    Vector3D scaledVelocity;
+    Vector3D scaledAcceleration;
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
     
-    vector3d_add(self->position,self->position,self->velocity);
-    vector3d_add(self->velocity,self->acceleration,self->velocity);
+    vector3d_scale(scaledVelocity, self->velocity, deltaTime);
+    vector3d_scale(scaledAcceleration, self->acceleration, deltaTime);
+    vector3d_add(self->position, self->position, scaledVelocity);
+    vector3d_add(self->velocity, self->velocity, scaledAcceleration);
     
     gfc_matrix_identity(self->modelMat);
     
     gfc_matrix_scale(self->modelMat,self->scale);
     gfc_matrix_rotate_by_vector(self->modelMat,self->modelMat,self->rotation);
     gfc_matrix_translate(self->modelMat,self->position);
-    
-    if (self->update)self->update(self);
+    slog("Grounded: %d: ", self->grounded);
+    if (self->update) self->update(self, deltaTime);
 }
 
-void entity_update_all()
+void entity_update_all(float deltaTime)
 {
-    int i;
+    int i, j;
+    World* world = get_world();
     for (i = 0; i < entity_manager.entity_count; i++)
     {
         if (!entity_manager.entity_list[i]._inuse)// not used yet
         {
             continue;// skip this iteration of the loop
         }
-        entity_update(&entity_manager.entity_list[i]);
+        entity_manager.entity_list[i].grounded = 0;
+        // scans through every entity and checks collision
+        for (j = 0; j < entity_manager.entity_count; j++)
+        {
+            if (i == j || !entity_manager.entity_list[j]._inuse)
+            {
+                // skip if trying to compare the same entity or if the next entity in the list doesn't exist
+                continue;
+            }
+
+            if (bounding_box_collision(&entity_manager.entity_list[i], &entity_manager.entity_list[j]))
+            {
+                // Just stops the entities from moving if they collide
+                //slog("Hitting something");
+                entity_manager.entity_list[i].velocity.x = 0;
+                entity_manager.entity_list[i].velocity.y = 0;
+                entity_manager.entity_list[i].velocity.z = 0;
+            }
+            // scans entities and compares with world bounding box for collision with world 
+            if (world_bounding_box_collision(&entity_manager.entity_list[i], world))
+            {
+                // Entities will stop falling when colliding with the world
+                entity_manager.entity_list[i].grounded = 1;
+                //slog("Grounded: %d, Velocity: %f", entity_manager.entity_list[i].grounded, entity_manager.entity_list[i].velocity.z);
+                entity_manager.entity_list[i].position.z = world->worldBoundingBox.min.z - entity_manager.entity_list[i].size.z / 2;
+                entity_manager.entity_list[i].velocity.z = 0;
+            }
+            
+        }
+        entity_update(&entity_manager.entity_list[i], deltaTime);
     }
+}
+
+Vector3D get_Bounding_Box_Max(Vector3D size, Vector3D position)
+{
+    Vector3D max;
+    max.x = position.x + size.x / 2;
+    max.y = position.y + size.y / 2;
+    max.z = position.z + size.z / 2;
+    return max;
+}
+
+Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position)
+{
+    Vector3D min;
+    min.x = position.x - size.x / 2;
+    min.y = position.y - size.y / 2;
+    min.z = position.z - size.z / 2;
+    return min;
+}
+
+int bounding_box_collision(Entity* a, Entity* b)
+{
+    if ((a->boundingBox.max.x < b->boundingBox.min.x || a->boundingBox.min.x > b->boundingBox.max.x) &&
+        (a->boundingBox.max.y < b->boundingBox.min.y || a->boundingBox.min.y > b->boundingBox.max.y) &&
+        (a->boundingBox.max.z < b->boundingBox.min.z || a->boundingBox.min.z > b->boundingBox.max.z))
+    {
+        return 0;
+    }
+    return 1;
+}
+
+int world_bounding_box_collision(Entity* entity, World* world)
+{
+
+    if ((entity->boundingBox.min.x <= world->worldBoundingBox.max.x && entity->boundingBox.max.x >= world->worldBoundingBox.min.x) &&
+        (entity->boundingBox.min.y <= world->worldBoundingBox.max.y && entity->boundingBox.max.y >= world->worldBoundingBox.min.y) &&
+        (entity->boundingBox.min.z <= world->worldBoundingBox.max.z && entity->boundingBox.max.z >= world->worldBoundingBox.min.z))
+    {
+        return 1;
+    }
+    return 0;
 }
 
 /*eol@eof*/

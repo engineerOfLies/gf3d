@@ -7,6 +7,7 @@
 
 #include "gf3d_model.h"
 
+typedef struct World World;
 typedef enum
 {
     ES_idle = 0,
@@ -41,6 +42,9 @@ typedef struct Entity_S
     Vector3D    position;  
     Vector3D    velocity;
     Vector3D    acceleration;
+    Vector3D    size; // size of the entity for the bounding box
+    int         grounded;
+
         
     Vector3D    scale;
     Vector3D    rotation;
@@ -50,6 +54,10 @@ typedef struct Entity_S
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/
+    struct {
+        Vector3D min;
+        Vector3D max;
+    }boundingBox;
 }Entity;
 
 /**
@@ -86,16 +94,43 @@ void entity_draw_all();
  * @brief Call an entity's think function if it exists
  * @param self the entity in question
  */
-void entity_think(Entity *self);
+void entity_think(Entity *self, float deltaTime);
 
 /**
  * @brief run the think functions for ALL active entities
  */
-void entity_think_all();
+void entity_think_all(float deltaTime);
 
 /**
  * @brief run the update functions for ALL active entities
  */
-void entity_update_all();
+void entity_update_all(float deltaTime);
 
+/**
+ * @brief Calculates the Max of the Bounding Box
+ * @param size of the entity
+ * @param positioin of the entity
+ */
+Vector3D get_Bounding_Box_Max(Vector3D size, Vector3D position);
+
+/**
+ * @brief Calculates the min of the Bounding Box
+ * @param size of the entity
+ * @param position of the entity
+ */
+Vector3D get_Bounding_Box_Min(Vector3D size, Vector3D position);
+
+/**
+ * @brief Detects if 2 entities are colliding with each other
+ * @param Entity a
+ * @param Entity b
+ */
+int bounding_box_collision(Entity* a, Entity* b);
+
+/**
+ * @brief Detects if and entity is colliding with the world
+ * @param Entity a
+ * @param World b
+ */
+int world_bounding_box_collision(Entity* a, World* b);
 #endif

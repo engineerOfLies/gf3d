@@ -3,10 +3,13 @@
 
 #include "gf3d_camera.h"
 #include "player.h"
+#include "world.h"
 
-static int thirdPersonMode = 0;
+#define GRAVITY -0.0000000000000000000981f
+
+static int thirdPersonMode = 1;
 void player_think(Entity *self);
-void player_update(Entity *self);
+void player_update(Entity *self, float deltaTime);
 
 Entity *player_new(Vector3D position)
 {
@@ -23,21 +26,27 @@ Entity *player_new(Vector3D position)
     ent->think = player_think;
     ent->update = player_update;
     vector3d_copy(ent->position,position);
+    ent->size = gf3d_get_model_size_from_obj("models/dino/dino.obj");
+    ent->boundingBox.min = get_Bounding_Box_Min(ent->size, ent->position);
+    ent->boundingBox.max = get_Bounding_Box_Max(ent->size, ent->position);
+    ent->velocity = Vector3D_Zero();
+    ent->acceleration = Vector3D_Zero();
+    ent->acceleration.z = GRAVITY;
     ent->rotation.x = -GFC_PI;
-    ent->rotation.z = -GFC_HALF_PI;
-    ent->hidden = 1;
+    ent->rotation.z = -GFC_HALF_PI*0.125;
+    ent->hidden = 0;
     return ent;
 }
 
 
-void player_think(Entity *self)
+void player_think(Entity* self)
 {
-    Vector3D forward = {0};
-    Vector3D right = {0};
-    Vector2D w,mouse;
-    int mx,my;
-    SDL_GetRelativeMouseState(&mx,&my);
-    const Uint8 * keys;
+    Vector3D forward = { 0 };
+    Vector3D right = { 0 };
+    Vector2D w, mouse;
+    int mx, my;
+    SDL_GetRelativeMouseState(&mx, &my);
+    const Uint8* keys;
     keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
     mouse.x = mx;
@@ -49,31 +58,34 @@ void player_think(Entity *self)
     right.x = w.x;
     right.y = w.y;
     if (keys[SDL_SCANCODE_W])
-    {   
-        vector3d_add(self->position,self->position,forward);
+    {
+        vector3d_add(self->position, self->position, forward);
     }
     if (keys[SDL_SCANCODE_S])
     {
-        vector3d_add(self->position,self->position,-forward);        
+        vector3d_add(self->position, self->position, -forward);
     }
     if (keys[SDL_SCANCODE_D])
     {
-        vector3d_add(self->position,self->position,right);
+        vector3d_add(self->position, self->position, right);
     }
-    if (keys[SDL_SCANCODE_A])    
+    if (keys[SDL_SCANCODE_A])
     {
-        vector3d_add(self->position,self->position,-right);
+        vector3d_add(self->position, self->position, -right);
     }
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
     if (keys[SDL_SCANCODE_Z])self->position.z -= 1;
-    
-    if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
-    if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
-    if (keys[SDL_SCANCODE_RIGHT])self->rotation.z -= 0.0050;
-    if (keys[SDL_SCANCODE_LEFT])self->rotation.z += 0.0050;
-    
+
+    // Camera rotation
     if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.001);
-    if (mouse.y != 0)self->rotation.x += (mouse.y * 0.001);
+    if (mouse.y != 0)
+    {
+        // Adjust the camera's pitch based on mouse movement
+        Vector3D cameraRotation;
+        gf3d_camera_get_rotation(&cameraRotation);
+        cameraRotation.x += (mouse.y * 0.001);
+        gf3d_camera_set_rotation(cameraRotation);
+    }
 
     if (keys[SDL_SCANCODE_F3])
     {
@@ -82,28 +94,42 @@ void player_think(Entity *self)
     }
 }
 
-void player_update(Entity *self)
+void player_update(Entity* self, float deltaTime)
 {
-    Vector3D forward = {0};
-    Vector3D position;
-    Vector3D rotation;
-    Vector2D w;
-    
-    if (!self)return;
-    
-    vector3d_copy(position,self->position);
-    vector3d_copy(rotation,self->rotation);
-    if (thirdPersonMode)
+    World* world = get_world();
+    if (!self) return;
+
+    self->boundingBox.min = get_Bounding_Box_Min(self->size, self->position);
+    self->boundingBox.max = get_Bounding_Box_Max(self->size, self->position);
+    if (!self->grounded)
     {
-        position.z += 100;
-        rotation.x += M_PI*0.125;
-        w = vector2d_from_angle(self->rotation.z);
-        forward.x = w.x * 100;
-        forward.y = w.y * 100;
-        vector3d_add(position,position,-forward);
+        //slog("not grounded yet");
+        self->velocity.z = GRAVITY ; // Apply gravity continuously
     }
-    gf3d_camera_set_position(position);
-    gf3d_camera_set_rotation(rotation);
+    else
+    {
+        //slog("grounded");
+        self->position.z = world->worldBoundingBox.min.z - self->size.z / 2; // Adjust position to be on the ground
+        //self->velocity.z *= 1000.0f; // Apply damping to the velocity
+    }
+
+    self->position.x += self->velocity.x * deltaTime;
+    self->position.y += self->velocity.y * deltaTime;
+    self->position.z += self->velocity.z * deltaTime;
+    
+    
+    //slog("Current position %f, %f, %f", self->position.x, self->position.y, self->position.z);
+
+    Vector3D cameraOffset = { 0, 100, -50 }; 
+    Vector3D cameraPosition;
+    cameraPosition.x = self->position.x + cameraOffset.x;
+    cameraPosition.y = self->position.y + cameraOffset.y;
+    cameraPosition.z = self->position.z + cameraOffset.z;
+
+    Vector3D cameraRotation = { GFC_HALF_PI / 4, 0, self->rotation.z };
+
+    gf3d_camera_set_position(cameraPosition);
+    gf3d_camera_set_rotation(cameraRotation);
 }
 
 /*eol@eof*/

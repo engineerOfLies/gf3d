@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <float.h>
 
 #include "simple_logger.h"
 
@@ -497,6 +498,42 @@ void gf3d_model_update_highlight_uniform_buffer(
         memcpy(data, &modelUBO, sizeof(HighlightUBO));
 
     vkUnmapMemory(gf3d_model.device, ubo->uniformBufferMemory);
+}
+
+Vector3D gf3d_get_model_size_from_obj(const char * filename)
+{
+    float minX = FLT_MAX, minY = FLT_MAX, minZ = FLT_MAX;
+    float maxX = -FLT_MAX, maxY = -FLT_MAX, maxZ = -FLT_MAX;
+
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        slog("Could not get size from %s", filename);
+        return Vector3D_Zero();
+    }
+
+    char line[1024];
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "v ", 2) == 0) {
+            float x, y, z;
+            sscanf(line, "v %f %f %f", &x, &y, &z);
+
+            minX = fmin(minX, x);
+            minY = fmin(minY, y);
+            minZ = fmin(minZ, z);
+            maxX = fmax(maxX, x);
+            maxY = fmax(maxY, y);
+            maxZ = fmax(maxZ, z);
+        }
+    }
+
+    fclose(file);
+
+    Vector3D size;
+    size.x = maxX - minX;
+    size.y = maxY - minY;
+    size.z = maxZ - minZ;
+
+    return size;
 }
 
 /*eol@eof*/
