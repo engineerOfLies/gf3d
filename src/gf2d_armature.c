@@ -12,10 +12,10 @@
 typedef struct
 {
     Uint32 maxArmatures;
-    Armature *armatureList;
+    Armature2D *armatureList;
 }ArmatureManager;
 
-void gf2d_armature_delete(Armature *armature);
+void gf2d_armature_delete(Armature2D *armature);
 void gf2d_armature_bone_free(Bone *bone);
 void gf2d_armature_pose_free(Pose *pose);
 BonePose *gf2d_armature_bone_pose_new();
@@ -49,20 +49,20 @@ void gf2d_armature_init(Uint32 maxArmatures)
     }
     memset(&armature_manager,0,sizeof(ArmatureManager));
     
-    armature_manager.armatureList = (Armature*)malloc(sizeof(Armature)*maxArmatures);
+    armature_manager.armatureList = (Armature2D*)malloc(sizeof(Armature2D)*maxArmatures);
     if (!armature_manager.armatureList)
     {
         slog("failed to allocate armature list");
         gf2d_armature_system_close();
         return;
     }
-    memset(armature_manager.armatureList,0,sizeof(Armature)*maxArmatures);
+    memset(armature_manager.armatureList,0,sizeof(Armature2D)*maxArmatures);
     armature_manager.maxArmatures = maxArmatures;
     atexit(gf2d_armature_system_close);
     slog("armature system initialized");
 }
 
-Armature *gf2d_armature_new()
+Armature2D *gf2d_armature_new()
 {
     int i;
     /*search for an unused armature address*/
@@ -70,7 +70,7 @@ Armature *gf2d_armature_new()
     {
         if ((armature_manager.armatureList[i].refCount == 0)&&(armature_manager.armatureList[i].bones == NULL))
         {
-            memset(&armature_manager.armatureList[i],0,sizeof(Armature));
+            memset(&armature_manager.armatureList[i],0,sizeof(Armature2D));
             armature_manager.armatureList[i].refCount = 1;//set ref count
             armature_manager.armatureList[i].bones = gfc_list_new();
             armature_manager.armatureList[i].poses = gfc_list_new();
@@ -97,7 +97,7 @@ Armature *gf2d_armature_new()
     return NULL;
 }
 
-void gf2d_armature_renumber_bones(Armature *armature)
+void gf2d_armature_renumber_bones(Armature2D *armature)
 {
     Bone *bone;
     int i,c;
@@ -111,7 +111,7 @@ void gf2d_armature_renumber_bones(Armature *armature)
     }
 }
 
-void gf2d_armature_delete_pose_by_index(Armature *armature,Uint32 index)
+void gf2d_armature_delete_pose_by_index(Armature2D *armature,Uint32 index)
 {
     Pose *pose;
     if (!armature)return;
@@ -121,7 +121,7 @@ void gf2d_armature_delete_pose_by_index(Armature *armature,Uint32 index)
     gfc_list_delete_data(armature->poses,pose);
 }
 
-void gf2d_armature_delete(Armature *armature)
+void gf2d_armature_delete(Armature2D *armature)
 {
     int i,c;
     if (!armature)return;
@@ -144,16 +144,16 @@ void gf2d_armature_delete(Armature *armature)
         }
         gfc_list_delete(armature->poses);
     }
-    memset(armature,0,sizeof(Armature));
+    memset(armature,0,sizeof(Armature2D));
 }
 
-void gf2d_armature_free(Armature *armature)
+void gf2d_armature_free(Armature2D *armature)
 {
     if (!armature) return;
     armature->refCount--;
 }
 
-Action *gf2d_armature_set_action(Armature *armature, const char *name,float *frame)
+Action *gf2d_armature_set_action(Armature2D *armature, const char *name,float *frame)
 {
     Action *action;
     if (!armature)return NULL;
@@ -163,7 +163,7 @@ Action *gf2d_armature_set_action(Armature *armature, const char *name,float *fra
     return action;
 }
 
-Action *gf2d_armature_get_action_by_index(Armature *armature,Uint32 index)
+Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index)
 {
     if (!armature)return NULL;
     return gfc_list_get_nth(armature->actions,index);
@@ -203,7 +203,7 @@ void gf2d_armature_delete_bones_from_pose_by_bone(Pose *pose,Bone *bone)
     }
 }
 
-void gf2d_armature_delete_pose_bones_by_bone(Armature *armature,Bone *bone)
+void gf2d_armature_delete_pose_bones_by_bone(Armature2D *armature,Bone *bone)
 {
     Pose *pose;
     int i,c;
@@ -219,10 +219,10 @@ void gf2d_armature_delete_pose_bones_by_bone(Armature *armature,Bone *bone)
 
 void gf2d_armature_pose_free(Pose *pose)
 {
+    int i,c;
     if (!pose)return;
     if (pose->poseBones != NULL)
     {
-        int i,c;
         c = gfc_list_get_count(pose->poseBones);
         for (i = 0; i < c; i++)
         {
@@ -250,7 +250,7 @@ void gf2d_armature_add_bone_to_parent(Bone *parent,Bone *child)
     parent->children = gfc_list_append(parent->children,child);
 }
 
-Bone *gf2d_armature_duplicate_bone(Armature *armature, Bone *bone)
+Bone *gf2d_armature_duplicate_bone(Armature2D *armature, Bone *bone)
 {
     Bone *child;
     Bone *newbone;
@@ -281,9 +281,9 @@ void gf2d_armature_bone_parent_remove_child(Bone *parent, Bone *child)
     gfc_list_delete_data(parent->children,child);
 }
 
-void gf2d_armature_delete_bone_recurse(Armature *armature, Bone *bone);
+void gf2d_armature_delete_bone_recurse(Armature2D *armature, Bone *bone);
 
-void gf2d_armature_delete_bone(Armature *armature, Bone *bone)
+void gf2d_armature_delete_bone(Armature2D *armature, Bone *bone)
 {
     Bone *child;
     int i,c;
@@ -309,7 +309,7 @@ void gf2d_armature_delete_bone(Armature *armature, Bone *bone)
     gf2d_armature_renumber_bones(armature);
 }
 
-void gf2d_armature_delete_bone_recurse(Armature *armature, Bone *bone)
+void gf2d_armature_delete_bone_recurse(Armature2D *armature, Bone *bone)
 {
     Bone *child;
     int i,c;
@@ -346,7 +346,7 @@ Bone *gf2d_armature_bone_new()
     return bone;
 }
 
-Bone *gf2d_armature_get_bone_by_name(Armature *armature, const char *name)
+Bone *gf2d_armature_get_bone_by_name(Armature2D *armature, const char *name)
 {
     Bone *bone;
     int i,c;
@@ -366,7 +366,7 @@ Bone *gf2d_armature_get_bone_by_name(Armature *armature, const char *name)
     return NULL;
 }
 
-Bone *gf2d_armature_get_bone_by_index(Armature *armature, Uint32 index)
+Bone *gf2d_armature_get_bone_by_index(Armature2D *armature, Uint32 index)
 {
     Bone *bone;
     if (!armature)return NULL;
@@ -378,7 +378,7 @@ Bone *gf2d_armature_get_bone_by_index(Armature *armature, Uint32 index)
     return bone;
 }
 
-BonePose *gf2d_armature_get_bone_pose_by_name(Armature *armature,Uint32 pose, const char *name)
+BonePose *gf2d_armature_get_bone_pose_by_name(Armature2D *armature,Uint32 pose, const char *name)
 {
     Bone *bone;
     bone = gf2d_armature_get_bone_by_name(armature, name);
@@ -387,7 +387,7 @@ BonePose *gf2d_armature_get_bone_pose_by_name(Armature *armature,Uint32 pose, co
 }
 
 
-BonePose *gf2d_armature_get_bone_pose(Armature *armature,Uint32 poseIndex, Uint32 index)
+BonePose *gf2d_armature_get_bone_pose(Armature2D *armature,Uint32 poseIndex, Uint32 index)
 {
     Pose *pose;
     BonePose *bonepose;
@@ -429,7 +429,7 @@ Vector2D gf2d_armature_get_pose_bone_draw_position(BonePose *posebone,Vector2D s
     return drawPosition;
 }
 
-BonePose gf2d_armature_get_tweened_pose_bone(Armature *armature,Uint32 poseA, Uint32 poseB,Uint32 index, float weight)
+BonePose gf2d_armature_get_tweened_pose_bone(Armature2D *armature,Uint32 poseA, Uint32 poseB,Uint32 index, float weight)
 {
     BonePose *A,*B, result = {0};
     float d;
@@ -448,7 +448,7 @@ BonePose gf2d_armature_get_tweened_pose_bone(Armature *armature,Uint32 poseA, Ui
 }
 
 void gf2d_armature_draw_tweened_pose(
-    Armature *armature,
+    Armature2D *armature,
     Uint32 poseA,
     Uint32 poseB,
     float fraction,
@@ -471,7 +471,7 @@ void gf2d_armature_draw_tweened_pose(
 
 
 void gf2d_armature_draw_sprite_to_named_bone_pose(
-    Armature *armature,
+    Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
     Vector2D position,
@@ -501,7 +501,7 @@ void gf2d_armature_draw_sprite_to_named_bone_pose(
 }
 
 void gf2d_armature_draw_sprite_to_bone_pose(
-    Armature *armature,
+    Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
     Vector2D position,
@@ -575,7 +575,7 @@ void gf2d_armature_draw_pose_bone(BonePose *bonePose,Vector2D position,Vector2D 
 }
 
 void gf2d_armature_draw_pose(
-    Armature *armature,
+    Armature2D *armature,
     Uint32 poseindex,
     Vector2D position,
     Vector2D scale,
@@ -607,7 +607,7 @@ void gf2d_armature_draw_bone(Bone *bone,Vector2D position, Vector2D scale, float
     gf2d_armature_bone_draw(drawPosition, drawbone.baseAngle + rotation, drawbone.length, color);
 }
 
-void gf2d_armature_draw_bones(Armature *armature,Vector2D position, Vector2D scale, float rotation, Color color)
+void gf2d_armature_draw_bones(Armature2D *armature,Vector2D position, Vector2D scale, float rotation, Color color)
 {
     Vector2D drawPosition;
     Bone *bone;
@@ -657,7 +657,7 @@ SJson *gf2d_armature_bone_to_json(Bone *bone)
     return save;
 }
 
-SJson *gf2d_armature_bones_to_json(Armature *armature)
+SJson *gf2d_armature_bones_to_json(Armature2D *armature)
 {
     int i,c;
     SJson *bones;
@@ -710,7 +710,7 @@ SJson *gf2d_armature_pose_to_json(Pose *pose)
     return save;
 }
 
-SJson *gf2d_armature_poses_to_json(Armature *armature)
+SJson *gf2d_armature_poses_to_json(Armature2D *armature)
 {
     int i,c;
     SJson *poses;
@@ -728,7 +728,7 @@ SJson *gf2d_armature_poses_to_json(Armature *armature)
     return poses;
 }
 
-void gf2d_armature_save(Armature *armature, const char *filepath)
+void gf2d_armature_save(Armature2D *armature, const char *filepath)
 {
     SJson *save;
     if ((!armature)||(!filepath))return;
@@ -762,7 +762,7 @@ Bone *gf2d_armature_bone_parse(SJson *jBone)
     return bone;
 }
 
-void gf2d_armature_bone_parse_link(Armature *armature,SJson *jBone,Bone *bone)
+void gf2d_armature_bone_parse_link(Armature2D *armature,SJson *jBone,Bone *bone)
 {
     SJson *children,*jChild;
     Bone *child;
@@ -791,7 +791,7 @@ void gf2d_armature_bone_parse_link(Armature *armature,SJson *jBone,Bone *bone)
     }
 }
 
-BonePose *gf2d_armature_bone_pose_parse(Armature *armature,SJson *jPoseBone)
+BonePose *gf2d_armature_bone_pose_parse(Armature2D *armature,SJson *jPoseBone)
 {
     const char *name;
     BonePose *posebone;
@@ -809,7 +809,7 @@ BonePose *gf2d_armature_bone_pose_parse(Armature *armature,SJson *jPoseBone)
     return posebone;
 }
 
-Pose *gf2d_armature_pose_parse(Armature *armature, SJson *jPose)
+Pose *gf2d_armature_pose_parse(Armature2D *armature, SJson *jPose)
 {
     int i,c;
     Pose *pose;
@@ -830,7 +830,7 @@ Pose *gf2d_armature_pose_parse(Armature *armature, SJson *jPose)
     return pose;
 }
 
-Armature *gf2d_armature_get_by_filename(const char *filepath)
+Armature2D *gf2d_armature_get_by_filename(const char *filepath)
 {
     int i;
     if (!filepath)return NULL;
@@ -844,11 +844,11 @@ Armature *gf2d_armature_get_by_filename(const char *filepath)
     return NULL;
 }
 
-Armature *gf2d_armature_load(const char *filepath)
+Armature2D *gf2d_armature_load(const char *filepath)
 {
     int i,c;
     const char *name = NULL;
-    Armature *armature;
+    Armature2D *armature;
     Bone *bone;
     Pose *pose;
     SJson *json,*jBones,*jBone,*jPoses,*jPose;
@@ -911,7 +911,7 @@ Armature *gf2d_armature_load(const char *filepath)
     return armature;
 }
 
-void gf2d_armature_bone_rotate_by_name(Armature *armature,const char *name, float angle)
+void gf2d_armature_bone_rotate_by_name(Armature2D *armature,const char *name, float angle)
 {
     Bone *bone;
     bone = gf2d_armature_get_bone_by_name(armature, name);
@@ -930,7 +930,7 @@ Vector2D gf2d_armature_get_bone_tip(Bone *bone)
 }
 
 Vector2D gf2d_armature_get_bonepose_tip_by_name(
-    Armature *armature,
+    Armature2D *armature,
     const char *bonename,
     Uint32 pose,
     Vector2D scale,
@@ -957,7 +957,7 @@ Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,Vector2D scale, float
 
 
 BonePose *gf2d_armature_get_bonepose_by_position(
-    Armature *armature,
+    Armature2D *armature,
     Uint32 poseindex,
     Vector2D position,
     Vector2D scale,
@@ -986,7 +986,7 @@ BonePose *gf2d_armature_get_bonepose_by_position(
     return NULL;
 }
 
-Bone *gf2d_armature_get_bone_by_position(Armature *armature,Vector2D position,Vector2D scale,Bone *ignore)
+Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,Vector2D position,Vector2D scale,Bone *ignore)
 {
     Bone *bone;
     Bone bonescale;
@@ -1053,7 +1053,7 @@ void gf2d_armature_bone_move_to(Bone *bone,Vector2D newPosition)
     gf2d_armature_bone_move(bone,offset);
 }
 
-void gf2d_armature_bonepose_move(Armature *armature, BonePose *bonepose,Uint32 poseindex, Vector2D delta)
+void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D delta)
 {
     Bone *bone;
     Bone *child;
@@ -1076,7 +1076,7 @@ void gf2d_armature_bonepose_move(Armature *armature, BonePose *bonepose,Uint32 p
     }    
 }
 
-void gf2d_armature_bonepose_rotate(Armature *armature, BonePose *bonepose,Uint32 poseindex, Vector2D center, float angle)
+void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D center, float angle)
 {
     Bone *bone;
     Bone *child;
@@ -1119,7 +1119,7 @@ void gf2d_armature_bone_rotate(Bone *bone, Vector2D center, float angle)
     }
 }
 
-Bone *gf2d_armature_add_bone(Armature* armature,Bone *parent)
+Bone *gf2d_armature_add_bone(Armature2D * armature,Bone *parent)
 {
     int i,c;
     Pose *pose;
@@ -1186,7 +1186,7 @@ void gf2d_armature_bone_scale_children(Bone *bone,Vector2D scale, Vector2D cente
     }
 }
 
-Pose *gf2d_armature_pose_create_for(Armature *armature)
+Pose *gf2d_armature_pose_create_for(Armature2D *armature)
 {
     BonePose *newposebone;
     Bone *bone;
@@ -1208,7 +1208,7 @@ Pose *gf2d_armature_pose_create_for(Armature *armature)
     return pose;
 }
 
-Pose *gf2d_armature_pose_add_at_index(Armature *armature,Uint32 index)
+Pose *gf2d_armature_pose_add_at_index(Armature2D *armature,Uint32 index)
 {
     Pose *pose;
     if (!armature)return NULL;
@@ -1218,7 +1218,7 @@ Pose *gf2d_armature_pose_add_at_index(Armature *armature,Uint32 index)
     return pose;
 }
 
-Pose *gf2d_armature_pose_add(Armature *armature)
+Pose *gf2d_armature_pose_add(Armature2D *armature)
 {
     Pose *pose;
     if (!armature)return NULL;
@@ -1227,13 +1227,13 @@ Pose *gf2d_armature_pose_add(Armature *armature)
     return pose;
 }
 
-Pose *gf2d_armature_pose_get_by_index(Armature *armature,Uint32 index)
+Pose *gf2d_armature_pose_get_by_index(Armature2D *armature,Uint32 index)
 {
     if (!armature)return NULL;
     return gfc_list_get_nth(armature->poses,index);
 }
 
-Uint32 gf2d_armature_get_pose_count(Armature *armature)
+Uint32 gf2d_armature_get_pose_count(Armature2D *armature)
 {
     if (!armature)return 0;
     return gfc_list_get_count(armature->poses);
@@ -1256,7 +1256,7 @@ Bone gf2d_armature_bone_copy(Bone *bone)
     return copy;
 }
 
-Pose *gf2d_armature_pose_duplicate_at_index(Armature *armature,Pose *pose,Uint32 index)
+Pose *gf2d_armature_pose_duplicate_at_index(Armature2D *armature,Pose *pose,Uint32 index)
 {
     int i,c;
     Pose *newpose;
@@ -1297,7 +1297,7 @@ void gf2d_armature_pose_copy(Pose *dst,Pose *src)
     }
 }
 
-Pose *gf2d_armature_pose_duplicate(Armature *armature,Pose *pose)
+Pose *gf2d_armature_pose_duplicate(Armature2D *armature,Pose *pose)
 {
     int i,c;
     Pose *newpose;
@@ -1316,7 +1316,7 @@ Pose *gf2d_armature_pose_duplicate(Armature *armature,Pose *pose)
     return newpose;
 }
 
-void gf2d_armature_scale(Armature *armature,Vector2D scale,Vector2D center)
+void gf2d_armature_scale(Armature2D *armature,Vector2D scale,Vector2D center)
 {
     Bone *bone;
     int i,c;
@@ -1363,7 +1363,7 @@ int gf2d_armature_bone_name_lr_flip(char *newname,const char *oldname)
 
 
 /*  TODO: solve inverse kinematics
-void gf2d_armature_rotate_pose_bones_to_length(Armature *armature,Uint32 poseIndex, BonePose *tipbone,BonePose *rootbone,float length)
+void gf2d_armature_rotate_pose_bones_to_length(Armature2D *armature,Uint32 poseIndex, BonePose *tipbone,BonePose *rootbone,float length)
 {
     Vector2D rootPosition,rootToTip;
     float chainreach = 0;
@@ -1422,7 +1422,7 @@ void gf2d_armature_rotate_pose_bones_to_length(Armature *armature,Uint32 poseInd
 }
 
 //target must be in armature space
-void gf2d_armature_pose_bone_ik_to(Armature *armature,Uint32 poseIndex, BonePose *posebone,Vector2D target,Uint32 chainlength)
+void gf2d_armature_pose_bone_ik_to(Armature2D *armature,Uint32 poseIndex, BonePose *posebone,Vector2D target,Uint32 chainlength)
 {
     Bone *bone;
     BonePose *rootPose;

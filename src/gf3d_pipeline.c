@@ -862,7 +862,7 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
     }
     if (frame >= gf3d_pipeline.chainLength)
     {
-        slog("frame %i us out of the range of descriptor pools, limited to %i",frame,gf3d_pipeline.chainLength);
+        slog("frame %i is out of the range of descriptor pools, limited to %i",frame,gf3d_pipeline.chainLength);
         return NULL;
     }
     if (pipe->descriptorCursor[frame] > pipe->descriptorSetCount)

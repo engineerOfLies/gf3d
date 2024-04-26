@@ -30,7 +30,7 @@ typedef struct
     int         _inuse;       /**<set if the actor is in use*/
     TextLine    filename;     /**<the filename*/
     TextLine    name;         /**<figure name*/
-    Armature   *armature;     /**<which armature is used for this figure*/
+    Armature2D *armature;     /**<which armature is used for this figure*/
     List       *links;        /**<list of FigureLinks to draw this with*/
 }Figure;
 
@@ -120,7 +120,7 @@ void gf2d_figure_link_remove(Figure *figure,FigureLink *link);
  * @param figure the figure to link
  * @param armature the new armature to link.  Can be NULL if the figure already has an armature
  */
-void gf2d_figure_link_armature(Figure *figure,Armature *armature);
+void gf2d_figure_link_armature(Figure *figure,Armature2D *armature);
 
 /**
  * @brief reload actor and action for a link after it's information has changed

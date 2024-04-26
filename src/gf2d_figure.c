@@ -178,7 +178,7 @@ FigureLink *gf2d_figure_link_from_json(SJson *load)
     return link;
 }
 
-void gf2d_figure_link_armature(Figure *figure,Armature *armature)
+void gf2d_figure_link_armature(Figure *figure,Armature2D *armature)
 {
     int i,c;
     FigureLink *link;

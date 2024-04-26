@@ -40,7 +40,7 @@ typedef struct
     List       *bones;          /**<list of Bones in the base armature*/
     List       *poses;          /**<list of poses for the armature*/
     List       *actions;        /**<action list for managing animation of poses*/
-}Armature;
+}Armature2D;
 
 /**
  * @brief initialize the armature system
@@ -52,21 +52,21 @@ void gf2d_armature_init(Uint32 maxArmatures);
  * @brief get a pointer to a blank armature
  * @returns NULL on error or out of space, a blank armature otherwise
  */
-Armature *gf2d_armature_new();
+Armature2D *gf2d_armature_new();
 
 /**
  * @brief load an armature from a json file
  * @param filepath the filename and path to the armature file
  * @returns NULL on file not found or error (see logs), A setup armature otherwise
  */
-Armature *gf2d_armature_load(const char *filepath);
+Armature2D *gf2d_armature_load(const char *filepath);
 
 /**
  * @brief save an armature to json
  * @param armature the armature to save
  * @param filepath the file and path to save to
  */
-void gf2d_armature_save(Armature *armature, const char *filepath);
+void gf2d_armature_save(Armature2D *armature, const char *filepath);
 
 /**
  * @brief draw a sprite to the screen based on an armature's bone pose
@@ -83,7 +83,7 @@ void gf2d_armature_save(Armature *armature, const char *filepath);
  * @param bone which bone to draw to
  */
 void gf2d_armature_draw_sprite_to_bone_pose(
-    Armature *armature,
+    Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
     Vector2D position,
@@ -110,7 +110,7 @@ void gf2d_armature_draw_sprite_to_bone_pose(
  * @param name which bone to draw to
  */
 void gf2d_armature_draw_sprite_to_named_bone_pose(
-    Armature *armature,
+    Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
     Vector2D position,
@@ -127,7 +127,7 @@ void gf2d_armature_draw_sprite_to_named_bone_pose(
  * @note memory address will be re-used, do no access the addres anymore
  * @param armature the armature to free
  */
-void gf2d_armature_free(Armature *armature);
+void gf2d_armature_free(Armature2D *armature);
 
 /**
  * @brief set the action for an armature by name
@@ -136,7 +136,7 @@ void gf2d_armature_free(Armature *armature);
  * @param frame (optional output) set the starting frame for the named action if found
  * @return NULL on not found or error, the action information otherwise
  */
-Action *gf2d_armature_set_action(Armature *armature, const char *name,float *frame);
+Action *gf2d_armature_set_action(Armature2D *armature, const char *name,float *frame);
 
 /**
  * @brief get the action from the action list by index
@@ -144,7 +144,7 @@ Action *gf2d_armature_set_action(Armature *armature, const char *name,float *fra
  * @param index the index of the action to get
  * @return NULL on not found, or the action in question
  */
-Action *gf2d_armature_get_action_by_index(Armature *armature,Uint32 index);
+Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index);
 
 
 /**
@@ -155,7 +155,7 @@ Action *gf2d_armature_get_action_by_index(Armature *armature,Uint32 index);
  * @param rotation angle to draw it at
  * @param color the color to use to draw
  */
-void gf2d_armature_draw_bones(Armature *armature,Vector2D position, Vector2D scale, float rotation, Color color);
+void gf2d_armature_draw_bones(Armature2D *armature,Vector2D position, Vector2D scale, float rotation, Color color);
 
 /**
  * @brief draw a pose of an armature
@@ -166,7 +166,7 @@ void gf2d_armature_draw_bones(Armature *armature,Vector2D position, Vector2D sca
  * @param rotation angle to draw it at
  * @param color the color to draw with
  */
-void gf2d_armature_draw_pose(Armature *armature,Uint32 poseindex,Vector2D position,Vector2D scale, float rotation, Color color);
+void gf2d_armature_draw_pose(Armature2D *armature,Uint32 poseindex,Vector2D position,Vector2D scale, float rotation, Color color);
 
 /**
  * @brief get an interpolation of a bonepose between two bones
@@ -176,7 +176,7 @@ void gf2d_armature_draw_pose(Armature *armature,Uint32 poseindex,Vector2D positi
  * @param index which bone
  * @param weight percentage of the way from poseA to boseB between 0 (all A) and 1 (All B)
  */
-BonePose gf2d_armature_get_tweened_pose_bone(Armature *armature,Uint32 poseA, Uint32 poseB,Uint32 index, float weight);
+BonePose gf2d_armature_get_tweened_pose_bone(Armature2D *armature,Uint32 poseA, Uint32 poseB,Uint32 index, float weight);
 
 /**
  * @brief draw an interpolation between two poses
@@ -190,7 +190,7 @@ BonePose gf2d_armature_get_tweened_pose_bone(Armature *armature,Uint32 poseA, Ui
  * @param color in what color
  */
 void gf2d_armature_draw_tweened_pose(
-    Armature *armature,
+    Armature2D *armature,
     Uint32 poseA,
     Uint32 poseB,
     float fraction,
@@ -236,7 +236,7 @@ void gf2d_armature_draw_bone(Bone *bone,Vector2D position, Vector2D scale, float
  * @param ignore if not NULL, this will bone will be skipped in the search
  * @return NULL on error or no bones, the bone otherwise
  */
-Bone *gf2d_armature_get_bone_by_position(Armature *armature,Vector2D position,Vector2D scale,Bone *ignore);
+Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,Vector2D position,Vector2D scale,Bone *ignore);
 
 /**
  * @brief get a copy of a bone
@@ -263,7 +263,7 @@ void gf2d_armature_add_bone_to_parent(Bone *parent,Bone *child);
  * @return NULL on error or no bones, the posebone otherwise
  */
 BonePose *gf2d_armature_get_bonepose_by_position(
-    Armature *armature,
+    Armature2D *armature,
     Uint32 poseindex,
     Vector2D position,
     Vector2D scale,
@@ -276,7 +276,7 @@ BonePose *gf2d_armature_get_bonepose_by_position(
  * @param name the name of the bone to find
  * @returns NULL on error or not found, a valid pointer otherwise
  */
-Bone *gf2d_armature_get_bone_by_name(Armature *armature, const char *name);
+Bone *gf2d_armature_get_bone_by_name(Armature2D *armature, const char *name);
 
 /**
  * @brief get a bone by its index
@@ -284,7 +284,7 @@ Bone *gf2d_armature_get_bone_by_name(Armature *armature, const char *name);
  * @param index the index of the bone to find
  * @returns NULL on error or not found, a valid pointer otherwise
  */
-Bone *gf2d_armature_get_bone_by_index(Armature *armature, Uint32 index);
+Bone *gf2d_armature_get_bone_by_index(Armature2D *armature, Uint32 index);
 
 /**
  * @brief get a bone pose based on specific pose and bone index
@@ -293,7 +293,7 @@ Bone *gf2d_armature_get_bone_by_index(Armature *armature, Uint32 index);
  * @param index the bone index
  * @return NULL on not found, or the BonePose information
  */
-BonePose *gf2d_armature_get_bone_pose(Armature *armature,Uint32 pose, Uint32 index);
+BonePose *gf2d_armature_get_bone_pose(Armature2D *armature,Uint32 pose, Uint32 index);
 
 /**
  * @brief get a bone pose based on specific pose and bone name
@@ -302,7 +302,7 @@ BonePose *gf2d_armature_get_bone_pose(Armature *armature,Uint32 pose, Uint32 ind
  * @param name the bone name
  * @return NULL on not found, or the BonePose information
  */
-BonePose *gf2d_armature_get_bone_pose_by_name(Armature *armature,Uint32 pose, const char *name);
+BonePose *gf2d_armature_get_bone_pose_by_name(Armature2D *armature,Uint32 pose, const char *name);
 
 /**
  * @brief get the position of the bone's tip by name
@@ -313,7 +313,7 @@ BonePose *gf2d_armature_get_bone_pose_by_name(Armature *armature,Uint32 pose, co
  * @param rotation rotated by this much
  */
 Vector2D gf2d_armature_get_bonepose_tip_by_name(
-    Armature *armature,
+    Armature2D *armature,
     const char *bonename,
     Uint32 pose,
     Vector2D scale,
@@ -327,7 +327,7 @@ Vector2D gf2d_armature_get_bonepose_tip_by_name(
  * @param name the name of the bone to rotate
  * @param angle the amount to rotate by in radians
  */
-void gf2d_armature_bone_rotate_by_name(Armature *armature,const char *name, float angle);
+void gf2d_armature_bone_rotate_by_name(Armature2D *armature,const char *name, float angle);
 
 /**
  * @brief move a bonepose and all of its children by delta provided
@@ -336,7 +336,7 @@ void gf2d_armature_bone_rotate_by_name(Armature *armature,const char *name, floa
  * @param poseindex the pose index for the bone
  * @param delta the amount to move
  */
-void gf2d_armature_bonepose_move(Armature *armature, BonePose *bonepose,Uint32 poseindex, Vector2D delta);
+void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D delta);
 
 /**
  * @brief rotate a bonepose and all of its children by the angle provided
@@ -346,7 +346,7 @@ void gf2d_armature_bonepose_move(Armature *armature, BonePose *bonepose,Uint32 p
  * @param center the point about which to rotate
  * @param angle how much to rotate the bone in radians
  */
-void gf2d_armature_bonepose_rotate(Armature *armature, BonePose *bonepose,Uint32 poseindex, Vector2D center, float angle);
+void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D center, float angle);
 
 /**
  * @brief get the root position for the bonepose given that it has been scaled
@@ -406,7 +406,7 @@ void gf2d_armature_bone_scale_children(Bone *bone,Vector2D scale, Vector2D cente
  * @param scale how much to scale each dimension by
  * @param center where to scale relative to
  */
-void gf2d_armature_scale(Armature *armature,Vector2D scale,Vector2D center);
+void gf2d_armature_scale(Armature2D *armature,Vector2D scale,Vector2D center);
 
 /**
  * @brief get the location of the bone tip in armature space
@@ -426,14 +426,14 @@ Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,Vector2D scale, float
  * @param parent (if not null) set this as the parent bone
  * @return NULL on error or a pointer to the newly created bone
  */
-Bone *gf2d_armature_add_bone(Armature* armature,Bone *parent);
+Bone *gf2d_armature_add_bone(Armature2D* armature,Bone *parent);
 
 /**
  * @brief delete a bone, its children and poses from the armature
  * @param armature the armature from which the bone belongs
  * @param bone the bone in question to delete
  */
-void gf2d_armature_delete_bone(Armature *armature, Bone *bone);
+void gf2d_armature_delete_bone(Armature2D *armature, Bone *bone);
 
 /**
  * @brief make a copy of a bone and all its children
@@ -441,7 +441,7 @@ void gf2d_armature_delete_bone(Armature *armature, Bone *bone);
  * @param bone the bone to copy
  * @return NULL on error, or a pointer to the new bone otherwise
  */
-Bone *gf2d_armature_duplicate_bone(Armature *armature, Bone *bone);
+Bone *gf2d_armature_duplicate_bone(Armature2D *armature, Bone *bone);
 
 /**
  * @brief check if a bone is named with a .l or .left and switch it to .r or .right or vice versa
@@ -464,7 +464,7 @@ BonePose *gf2d_armature_bone_pose_new();
  * @param pose the pose to duplicate
  * @return NULL on error or the newly duplicated pose
  */
-Pose *gf2d_armature_pose_duplicate(Armature *armature,Pose *pose);
+Pose *gf2d_armature_pose_duplicate(Armature2D *armature,Pose *pose);
 
 /**
  * @brief free a pose, note this does not remove it from an armature.
@@ -486,7 +486,7 @@ void gf2d_armature_pose_copy(Pose *dst,Pose *src);
  * @return NULL on error, or a BLANK pose for an armature
  * @note the pose is NOT added TO the armature.
  */
-Pose *gf2d_armature_pose_create_for(Armature *armature);
+Pose *gf2d_armature_pose_create_for(Armature2D *armature);
 
 /**
  * @brief make a new copy of an existing pose for an armature and insert at the index
@@ -495,14 +495,14 @@ Pose *gf2d_armature_pose_create_for(Armature *armature);
  * @param index the location to insert the new frame
  * @return NULL on error or the newly duplicated pose
  */
-Pose *gf2d_armature_pose_duplicate_at_index(Armature *armature,Pose *pose,Uint32 index);
+Pose *gf2d_armature_pose_duplicate_at_index(Armature2D *armature,Pose *pose,Uint32 index);
 
 /**
  * @brief get the number of poses on an armature
  * @param armature the armature to query
  * @return the number of pose frames
  */
-Uint32 gf2d_armature_get_pose_count(Armature *armature);
+Uint32 gf2d_armature_get_pose_count(Armature2D *armature);
 
 /**
  * @brief add a new blank pose to the armature
@@ -510,7 +510,7 @@ Uint32 gf2d_armature_get_pose_count(Armature *armature);
  * @return NULL on error or the created pose.  
  * @note this creates all the pose bones too
  */
-Pose *gf2d_armature_pose_add(Armature *armature);
+Pose *gf2d_armature_pose_add(Armature2D *armature);
 
 /**
  * @brief add a new blank pose to the armature at the index specified
@@ -519,14 +519,14 @@ Pose *gf2d_armature_pose_add(Armature *armature);
  * @return NULL on error or the created pose.  
  * @note this creates all the pose bones too
  */
-Pose *gf2d_armature_pose_add_at_index(Armature *armature,Uint32 index);
+Pose *gf2d_armature_pose_add_at_index(Armature2D *armature,Uint32 index);
 
 /**
  * @brief delete a single pose from the armature by index
  * @param armature the armature to modify
  * @param index the index of the pose to delete
  */
-void gf2d_armature_delete_pose_by_index(Armature *armature,Uint32 index);
+void gf2d_armature_delete_pose_by_index(Armature2D *armature,Uint32 index);
 
 /**
  * @brief allocate and initialize a new pose
@@ -540,6 +540,6 @@ Pose *gf2d_armature_pose_new();
  * @param index the index to get
  * @return NULL on bad index or error, a valid Pose otherwise
  */
-Pose *gf2d_armature_pose_get_by_index(Armature *armature,Uint32 index);
+Pose *gf2d_armature_pose_get_by_index(Armature2D *armature,Uint32 index);
 
 #endif
