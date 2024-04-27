@@ -98,7 +98,7 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile);
 Model * gf3d_model_load_from_config(SJson *json);
 
 /**
- * @brief queue up a model for rendering
+ * @brief queue up a model for rendering, specifying one mesh in the model (this can be fore animation, or sub-meshes
  * @param model the model to render
  * @param index the mesh to render from the mesh_list
  * @param modelMat the model matrix (MVP)
@@ -107,6 +107,16 @@ Model * gf3d_model_load_from_config(SJson *json);
  * @param ambient how much ambient light there is
  */
 void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight);
+
+/**
+ * @brief draw all of the meshes of a model.  This is meant for multi-mesh models
+ * @param model the model to render
+ * @param modelMat the model matrix (MVP)
+ * @param colorMod color modulation
+ * @param detailColor color to swap in for sections of PURE red of the texture
+ * @param ambient how much ambient light there is
+ */
+void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe

@@ -498,6 +498,17 @@ HighlightUBO gf3d_model_get_highlight_ubo(
     return modelUBO;
 }
 
+void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight)
+{
+    int i,c;
+    if (!model)return;
+    c = gfc_list_get_count(model->mesh_list);
+    for (i = 0;i < c; i++)
+    {
+        gf3d_model_draw(model,i,modelMat,gfc_color_to_vector4f(colorMod),gfc_color_to_vector4f(detailColor),gfc_color_to_vector4f(ambientLight));
+    }
+}
+
 void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight)
 {
     Mesh *mesh;
@@ -518,6 +529,7 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
     else texture = model->texture;
         // queue up a render for batch rendering
     mesh = gfc_list_get_nth(model->mesh_list,index);
+    if (!mesh)return;
     gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
 }
