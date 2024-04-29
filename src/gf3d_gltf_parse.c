@@ -259,6 +259,31 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
         else slog("failed to get accessor detials");
     }
     
+    //bone indices
+    if (sj_object_get_value_as_int(attributes,"JOINTS_0",&index))
+    {
+        if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->bone_count))
+        {
+            obj->boneIndices = (Vector4UI8 *)gfc_allocate_array(sizeof(Vector4UI8),obj->bone_count);
+            
+            gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->boneIndices);
+            slog("extraced %i bone indices for %s",obj->bone_count,gltf->filename);
+        }
+        else slog("failed to get accessor detials");
+    }
+    //bone weights
+    if (sj_object_get_value_as_int(attributes,"WEIGHTS_0",&index))
+    {
+        if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->weight_count))
+        {
+            obj->boneWeights = (Vector4D *)gfc_allocate_array(sizeof(Vector4D),obj->weight_count);
+            
+            gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->boneWeights);
+            slog("extraced %i bone weights for %s",obj->weight_count,gltf->filename);
+        }
+        else slog("failed to get accessor detials");
+    }
+
     if (sj_object_get_value_as_int(primitive,"indices",&index))
     {
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->face_count))
@@ -288,6 +313,8 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
         vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
         vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
         vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
+        vector4d_copy(obj->faceVertices[i].bones,obj->boneIndices[i]);
+        vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
     }
     slog("parsed %i vertices of a mesh",obj->vertex_count);
 }

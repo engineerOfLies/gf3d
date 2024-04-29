@@ -59,6 +59,9 @@ typedef struct
     Vector3D vertex;
     Vector3D normal;
     Vector2D texel;
+    //armature support:
+    Vector4UI8 bones;   //bone indices
+    Vector4D   weights; //bone weights
 }Vertex;
 
 typedef struct

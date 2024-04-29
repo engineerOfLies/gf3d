@@ -25,6 +25,14 @@ void gf3d_obj_free(ObjData *obj)
     {
         free(obj->texels);
     }
+    if (obj->boneIndices!= NULL)
+    {
+        free(obj->boneIndices);
+    }
+    if (obj->boneWeights != NULL)
+    {
+        free(obj->boneWeights);
+    }
     
     if (obj->faceVerts != NULL)
     {
@@ -38,10 +46,14 @@ void gf3d_obj_free(ObjData *obj)
     {
         free(obj->faceTexels);
     }
-    
-    if (obj->faceVertices != NULL)
+    if (obj->faceBones != NULL)
     {
-        free(obj->faceVertices);
+        free(obj->faceBones);
+    }
+    
+    if (obj->faceWeights != NULL)
+    {
+        free(obj->faceWeights);
     }
     
     if (obj->outFace != NULL)
@@ -52,11 +64,13 @@ void gf3d_obj_free(ObjData *obj)
     free(obj);
 }
 
+//while normal obj files don't support bones, the obj structure is used as a staging area for gltf loading.
+
 void gf3d_obj_load_reorg(ObjData *obj)
 {
     int i,f;
     int vert = 0;
-    int vertexIndex,normalIndex,texelIndex;
+    int vertexIndex,normalIndex,texelIndex,boneIndex,weightIndex;
     
     if (!obj)return;
     
@@ -69,12 +83,28 @@ void gf3d_obj_load_reorg(ObjData *obj)
         for (f = 0; f < 3;f++,vert++)
         {
             vertexIndex = obj->faceVerts[i].verts[f];
-            normalIndex = obj->faceNormals[i].verts[f];
-            texelIndex = obj->faceTexels[i].verts[f];
-            
             vector3d_copy(obj->faceVertices[vert].vertex,obj->vertices[vertexIndex]);
-            vector3d_copy(obj->faceVertices[vert].normal,obj->normals[normalIndex]);
-            vector2d_copy(obj->faceVertices[vert].texel,obj->texels[texelIndex]);
+
+            if (obj->faceNormals)
+            {
+                normalIndex = obj->faceNormals[i].verts[f];
+                vector3d_copy(obj->faceVertices[vert].normal,obj->normals[normalIndex]);
+            }
+            if (obj->faceTexels)
+            {
+                texelIndex = obj->faceTexels[i].verts[f];
+                vector2d_copy(obj->faceVertices[vert].texel,obj->texels[texelIndex]);
+            }
+            if (obj->faceBones)
+            {
+                boneIndex = obj->faceBones[i].verts[f];
+                vector4d_copy(obj->faceVertices[vert].bones,obj->boneIndices[boneIndex]);
+            }
+            if (obj->faceWeights)
+            {
+                weightIndex = obj->faceWeights[i].verts[f];
+                vector4d_copy(obj->faceVertices[vert].weights,obj->boneWeights[weightIndex]);
+            }
             
             obj->outFace[i].verts[f] = vert;
         }

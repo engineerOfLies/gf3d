@@ -11,10 +11,16 @@ typedef struct
     Uint32 normal_count;
     Vector2D *texels;
     Uint32 texel_count;
+    Vector4UI8 *boneIndices;
+    Uint32 bone_count;
+    Vector4D *boneWeights;
+    Uint32 weight_count;
     
     Face *faceVerts;
     Face *faceNormals;
     Face *faceTexels;
+    Face *faceBones;
+    Face *faceWeights;
     
     Uint32 face_count;
 
