@@ -7,6 +7,7 @@
 #include "gfc_pak.h"
 
 #include "gf3d_mesh.h"
+#include "gf3d_model.h"
 #include "gf3d_obj_load.h"
 
 #include "gf3d_gltf_parse.h"
@@ -66,7 +67,7 @@ GLTF *gf3d_gltf_load(const char *filename)
     {
         gfc_list_append(gltf->buffers,gf3d_gltf_decode(json, i));
     }
-    slog("decoded %i buffers from %s",c,filename);
+//    slog("decoded %i buffers from %s",c,filename);
     return gltf;
 }
 
@@ -175,13 +176,12 @@ void gf3d_gltf_get_buffer_view_data(GLTF *gltf,Uint32 viewIndex,char *buffer)
         slog("failed to find buffer view %i in %s",viewIndex,gltf->filename);
         return;
     }
-    else slog("got buffer view %i",viewIndex);
     sj_object_get_value_as_int(bufferView,"buffer",&index);
     sj_object_get_value_as_int(bufferView,"byteLength",&byteLength);
     sj_object_get_value_as_int(bufferView,"byteOffset",&byteOffset);
     gf3d_gltf_get_data_from_buffer(gltf,index,byteOffset,byteLength, buffer);
-//    gf3d_gltf_parse_copy_buffer_data(gltf->json,index,byteOffset,byteLength, buffer);
 }
+
 //TODO: report on componentType so the data can be parsed correctly
 const char *gf3d_gltf_accessor_get_details(GLTF* gltf,Uint32 accessorIndex, int *bufferIndex, int *count)
 {
@@ -267,7 +267,7 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
             obj->boneIndices = (Vector4UI8 *)gfc_allocate_array(sizeof(Vector4UI8),obj->bone_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->boneIndices);
-            slog("extraced %i bone indices for %s",obj->bone_count,gltf->filename);
+            
         }
         else slog("failed to get accessor detials");
     }
@@ -279,7 +279,6 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
             obj->boneWeights = (Vector4D *)gfc_allocate_array(sizeof(Vector4D),obj->weight_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->boneWeights);
-            slog("extraced %i bone weights for %s",obj->weight_count,gltf->filename);
         }
         else slog("failed to get accessor detials");
     }
@@ -313,10 +312,10 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
         vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
         vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
         vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
-        vector4d_copy(obj->faceVertices[i].bones,obj->boneIndices[i]);
+        vector4d_copy(obj->faceVertices[i].bones,(float)obj->boneIndices[i]);
         vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
+        //slog("vertex weights are: (%f,%f,%f,%f)",obj->faceVertices[i].weights.x,obj->faceVertices[i].weights.y,obj->faceVertices[i].weights.z,obj->faceVertices[i].weights.w);
     }
-    slog("parsed %i vertices of a mesh",obj->vertex_count);
 }
 
 

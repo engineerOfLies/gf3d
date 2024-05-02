@@ -161,6 +161,7 @@ Model *gf3d_model_load_from_config(SJson *json)
     Model *model;
     const char *modelFile;
     const char *textureFile;
+    const char *armatureFile;
     if (!gf3d_model.initiliazed)return NULL;
     if (!json)return NULL;
 
@@ -173,6 +174,11 @@ Model *gf3d_model_load_from_config(SJson *json)
         {
             model->texture = gf3d_texture_load(textureFile);
 
+        }
+        armatureFile = sj_get_string_value(sj_object_get_value(json,"armature"));
+        if (armatureFile)
+        {
+            model->armature = gf3d_armature_load(armatureFile);
         }
         return model;
     }    
@@ -259,6 +265,7 @@ void gf3d_model_delete(Model *model)
     }
     gfc_list_delete(model->mesh_list);
     gf3d_texture_free(model->texture);
+    gf3d_armature_free(model->armature);
     memset(model,0,sizeof(Model));
 }
 
@@ -498,19 +505,21 @@ HighlightUBO gf3d_model_get_highlight_ubo(
     return modelUBO;
 }
 
-void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight)
+void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight,Uint32 frame)
 {
     int i,c;
     if (!model)return;
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw(model,i,modelMat,gfc_color_to_vector4f(colorMod),gfc_color_to_vector4f(detailColor),gfc_color_to_vector4f(ambientLight));
+        gf3d_model_draw(model,i,modelMat,gfc_color_to_vector4f(colorMod),gfc_color_to_vector4f(detailColor),gfc_color_to_vector4f(ambientLight),frame);
     }
 }
 
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight)
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight,Uint32 frame)
 {
+    Matrix4 *bones;
+    Uint32 boneCount = 0;
     Mesh *mesh;
     MeshUBO uboData = {0};
     Texture *texture;
@@ -521,7 +530,18 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
         colorMod,
         ambientLight,
         detailColor);
-    
+    if (model->armature)
+    {
+        bones = gf3d_armature_get_pose_matrices(model->armature,frame,&boneCount);
+        if (bones)
+        {
+            memcpy(uboData.bones,bones,sizeof(Matrix4)*boneCount);
+//             slog("frame %i bone 5 matrix:",frame);
+//             gfc_matrix4_slog(bones[5]);
+            uboData.flags.x = 1;
+        }
+        else slog("no bones for model %s at frame %i",model->filename,frame);
+    }
     if (!model->texture)
     {
         texture = gf3d_model.defaultTexture;

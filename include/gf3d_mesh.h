@@ -26,13 +26,14 @@ typedef struct
     Matrix4 model;
     Matrix4 view;
     Matrix4 proj;
+    Matrix4 bones[100]; //I hate that this is how it is done.  I want to move this to a buffer on the GPU and index into it in the shader
     Vector4D ambientColor;
     Vector4D ambientDir;
     Vector4D color; //color mod
     Vector4D detailColor; //color mod
     Vector4D cameraPosition;
-    MeshLights dynamicLights[MESH_LIGHTS_MAX];
-    alignas(64) Uint32    dynamicLightCount;//how many
+    Vector4D flags;  //.x is bone flag
+
 }MeshUBO;
 
 /**
@@ -60,8 +61,8 @@ typedef struct
     Vector3D normal;
     Vector2D texel;
     //armature support:
-    Vector4UI8 bones;   //bone indices
-    Vector4D   weights; //bone weights
+    Vector4D bones;   //bone indices
+    Vector4D weights; //bone weights
 }Vertex;
 
 typedef struct

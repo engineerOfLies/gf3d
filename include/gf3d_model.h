@@ -32,6 +32,7 @@
 
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
+#include "gf3d_armature.h"
 
 /**
  * @purpose the model is a single instance of 3d mesh data.  Each can be drawn individually in the rendering pipeline.
@@ -45,6 +46,7 @@ typedef struct
     List               *mesh_list;
     Texture            *texture;
     Texture            *normalMap;
+    Armature3D         *armature;
     Box                 bounds;         //copied from the mesh
 }Model;
 
@@ -100,13 +102,14 @@ Model * gf3d_model_load_from_config(SJson *json);
 /**
  * @brief queue up a model for rendering, specifying one mesh in the model (this can be fore animation, or sub-meshes
  * @param model the model to render
- * @param index the mesh to render from the mesh_list
+ * @param index the mesh to render from the mesh_list, could be animation frames if a sequence of objs, or sub-meshes
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
  * @param detailColor color to swap in for sections of PURE red of the texture
  * @param ambient how much ambient light there is
+ * @param frame the animation frame to use for armature based animations
  */
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight);
+void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight, Uint32 frame);
 
 /**
  * @brief draw all of the meshes of a model.  This is meant for multi-mesh models
@@ -115,8 +118,9 @@ void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMo
  * @param colorMod color modulation
  * @param detailColor color to swap in for sections of PURE red of the texture
  * @param ambient how much ambient light there is
+ * @param frame used to access a frame of armature based animation
  */
-void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight);
+void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight,Uint32 frame);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe
@@ -243,5 +247,11 @@ void gf3d_model_mat_move(ModelMat *mat,Vector3D translation);
  */
 void gf3d_model_mat_rotate(ModelMat *mat,Vector3D rotation);
 
+/**
+ * @brief parse a mesh / model out of a gltf file.  Including bone associations and weights
+ * @param filename the gltf file containing a number of meshes
+ * @return NULL on error, or the model file loaded.
+ */
+Model *gf3d_gltf_parse_model(const char *filename);
 
 #endif

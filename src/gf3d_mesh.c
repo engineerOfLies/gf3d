@@ -65,7 +65,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
 
     gf3d_mesh.attributeDescriptions[3].binding = 0;
     gf3d_mesh.attributeDescriptions[3].location = 3;
-    gf3d_mesh.attributeDescriptions[3].format = VK_FORMAT_R8G8B8A8_UINT;
+    gf3d_mesh.attributeDescriptions[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
     gf3d_mesh.attributeDescriptions[3].offset = offsetof(Vertex, bones);
 
     gf3d_mesh.attributeDescriptions[4].binding = 0;

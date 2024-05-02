@@ -8,6 +8,8 @@
 #include "gfc_text.h"
 #include "gfc_matrix.h"
 
+#include "gf3d_gltf_parse.h"
+
 typedef struct Bone3D_S
 {
     TextLine            name;           /**<name of bone*/
@@ -16,17 +18,35 @@ typedef struct Bone3D_S
     struct Bone3D_S    *parent;         /**<pointer to the parent of the bone*/
     List               *children;       /**<list of indicies to any children, no data is allocated for this*/
     Matrix4             mat;            /**<matrix describing the bone orientation*/
+    List               *poses;          /**<list of bonePose3Ds,when parsed, they are initially added here,*/
+    //staging area for extraction
+    Uint32              translationCount;
+    float              *translationTimestamps;
+    Vector3D           *translations;
+    
+    Uint32              rotationCount;
+    float              *rotationTimestamps;
+    Vector4D           *rotations;
+
+    Uint32              scaleCount;
+    float              *scaleTimestamps;
+    Vector3D           *scales;
 }Bone3D;
 
 typedef struct
 {
-    Bone3D     *bone;       /**<original bone, referenced and not owned*/
-    Matrix4     mat;        /**<matrix describing the bone orientation*/
+    Uint8       set;                /**<true if set already*/
+    float       timestamp;          /**<for tweening*/
+    Matrix4     localMat;           /**<local bone space*/
+    Matrix4     globalMat;          /**<armature space*/
+    Matrix4     jointMat;           /**<what gets sent to the gpu for mesh transforming*/
+    Bone3D     *bone;               /**<link back to the bone*/
 }BonePose3D;
 
 typedef struct
 {
-    List *poseBones;        /**<list of bone poses*/
+    Uint32 boneCount;
+    Matrix4 *bones;     //list of bone poses in index order
 }Pose3D;
 
 typedef struct
@@ -34,9 +54,13 @@ typedef struct
     TextLine    filepath;       /**<the file that this has been loaded from / to*/
     TextLine    name;           /**<printing name*/
     Uint32      refCount;       /**<resurce management*/
+    Uint32      bindCount;      /**<how many bones in the inverseBindMatrix*/
+    Matrix4    *inverseBindMatrices;    /**<to make the math math*/
     List       *bones;          /**<list of Bones in the base armature*/
-    List       *poses;          /**<list of poses for the armature*/
     List       *actions;        /**<action list for managing animation of poses*/
+    List       *poses;          /**<list of Pose3Ds.*/
+    Uint32      maxFrames;      /**<how many poses we store*/
+    float       maxTimestamp;   /**<timestamp of the last from (starting from 0.0)*/
 }Armature3D;
 
 /**
@@ -66,12 +90,21 @@ void gf3d_armature_free(Armature3D *arm);
 Armature3D *gf3d_armature_load(const char *filename);
 
 /**
+ * @brief get the array of bone pose matrices for a given armature's frame
+ * @param armature the armature in question
+ * @param frame the frame to get
+ * @param bonecount [output] if provided, this will be set to the number of bones in the matrix array
+ * @return NULL on error, or an array of matrices for each bone in index order.
+ */
+Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint32 *boneCount);
+
+/**
  * @brief parse armature data out of a json file.
  * @note only gltf 2.0 is supported at this time
- * @param config the json to parse
+ * @param gltf the gltf file to parse
  * @return NULL on error, or the loaded armature otherwise
  */
-Armature3D *gf3d_armature_parse(SJson *config);
+Armature3D *gf3d_armature_parse(GLTF *gltf);
 
 /**
  * @brief draw a primitive line representation of an armature
@@ -79,5 +112,20 @@ Armature3D *gf3d_armature_parse(SJson *config);
  */
 void gf3d_armature_draw_bones(Armature3D *arm);
 
+/**
+ * @brief draw a primitive line representation of an armature pose
+ * @param arm the armature to draw
+ * @param frame the pose frame to draw
+ */
+void gf3d_armature_draw_bone_poses(Armature3D *arm,Uint32 frame);
+
+/**
+ * @brief translate a bone ID to its index in the bone list.
+ * @note needed to sync poses to mesh bones/weights
+ * @param armature the armature to poll
+ * @param bone the bone in question.
+ * @return -1 on error or not found, the index starting from zero otherwise
+ */
+int gf3d_armature_get_bone_index(Armature3D *armature,Uint32 boneId);
 
 #endif

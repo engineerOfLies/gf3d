@@ -96,7 +96,7 @@ void gf3d_effect_draw(GF3DEffect *effect)
             gf3d_draw_edge_3d(effect->edge,effect->mat.position,effect->mat.rotation,effect->mat.scale,effect->radius,effect->color);
             break;
         case GF3D_ET_Model:
-            gf3d_model_draw(effect->mat.model,0,effect->mat.mat,gfc_color_to_vector4f(effect->color),vector4d(1,1,1,1),vector4d(1,1,1,1));
+            gf3d_model_draw(effect->mat.model,0,effect->mat.mat,gfc_color_to_vector4f(effect->color),vector4d(1,1,1,1),vector4d(1,1,1,1),0);
             break;
         default:
             break;
