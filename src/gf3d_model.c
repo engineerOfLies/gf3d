@@ -169,11 +169,12 @@ Model *gf3d_model_load_from_config(SJson *json)
     if (modelFile)
     {
         model = gf3d_gltf_parse_model(modelFile);
+        if (!model)return NULL;
+
         textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
         if (textureFile)
         {
             model->texture = gf3d_texture_load(textureFile);
-
         }
         armatureFile = sj_get_string_value(sj_object_get_value(json,"armature"));
         if (armatureFile)

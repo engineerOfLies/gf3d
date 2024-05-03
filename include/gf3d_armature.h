@@ -18,6 +18,7 @@ typedef struct Bone3D_S
     struct Bone3D_S    *parent;         /**<pointer to the parent of the bone*/
     List               *children;       /**<list of indicies to any children, no data is allocated for this*/
     Matrix4             mat;            /**<matrix describing the bone orientation*/
+    Matrix4             localMat;       /**<local bone orientation*/
     List               *poses;          /**<list of bonePose3Ds,when parsed, they are initially added here,*/
     //staging area for extraction
     Uint32              translationCount;
@@ -105,6 +106,32 @@ Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint3
  * @return NULL on error, or the loaded armature otherwise
  */
 Armature3D *gf3d_armature_parse(GLTF *gltf);
+
+/**
+ * @brief get a bone from an armature by its name
+ * @param armature the armature to search
+ * @param name the search critera
+ * @return NULL on error or not found. A pointer to the bone otherwise
+ */
+Bone3D *gf3d_armature_get_bone_by_name(Armature3D *armature,const char *name);
+
+/**
+ * @brief get the global matrix (in model space) for a bone.
+ * @param armature the armature to search
+ * @param name the name of the bone to find
+ * @return NULL if not found or error.  A pointer to the Matrix otherwise
+ */
+Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *name);
+
+/**
+ * @brief get the global matrix (in model space) for a bone pose
+ * @param armature the armature to search
+ * @param frame the pose frame to grab
+ * @param name the bone to find
+ * @return NULL on error or not found, the matrix otherwise.  
+ * @note this should be used to snap a model to a bone.  Further adjustments may be necessary
+ */
+Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 frame,const char *name);
 
 /**
  * @brief draw a primitive line representation of an armature

@@ -309,12 +309,11 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
 
     for (i = 0; i< obj->vertex_count;i++)
     {
-        vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
-        vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
-        vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
-        vector4d_copy(obj->faceVertices[i].bones,(float)obj->boneIndices[i]);
-        vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
-        //slog("vertex weights are: (%f,%f,%f,%f)",obj->faceVertices[i].weights.x,obj->faceVertices[i].weights.y,obj->faceVertices[i].weights.z,obj->faceVertices[i].weights.w);
+        if (obj->vertices)vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
+        if (obj->normals)vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
+        if (obj->texels)vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
+        if (obj->boneIndices)vector4d_copy(obj->faceVertices[i].bones,(float)obj->boneIndices[i]);
+        if (obj->boneWeights)vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
     }
 }
 

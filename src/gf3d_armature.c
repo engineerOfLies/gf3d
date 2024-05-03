@@ -78,6 +78,26 @@ Armature3D *gf3d_armature_load(const char *filename)
     return armature;
 }
 
+Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *name)
+{
+    Bone3D *bone;
+    bone = gf3d_armature_get_bone_by_name(armature,name);
+    if (!bone)return NULL;
+    return &bone->mat;
+}
+
+Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 frame,const char *name)
+{
+    Bone3D *bone;
+    BonePose3D *pose;
+    bone = gf3d_armature_get_bone_by_name(armature,name);
+    if (!bone)return NULL;
+    pose = gfc_list_get_nth(bone->poses,frame);
+    if (!pose)return NULL;
+    return &pose->globalMat;
+}
+
+
 Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint32 *boneCount)
 {
     Pose3D *pose;
@@ -107,6 +127,22 @@ Bone3D *gf3d_armature_get_bone_by_id(Armature3D *armature,Uint32 id)
         bone = gfc_list_get_nth(armature->bones,i);
         if (!bone)continue;
         if (bone->nodeId == id)return bone;
+    }
+    return NULL;
+}
+
+
+Bone3D *gf3d_armature_get_bone_by_name(Armature3D *armature,const char *name)
+{
+    int i,c;
+    Bone3D *bone;
+    if ((!armature)||(!name))return NULL;
+    c = gfc_list_get_count(armature->bones);
+    for (i = 0;i < c; i++)
+    {
+        bone = gfc_list_get_nth(armature->bones,i);
+        if (!bone)continue;
+        if (gfc_line_cmp(name,bone->name) == 0)return bone;
     }
     return NULL;
 }
@@ -175,9 +211,6 @@ void gf3d_armature_bone_calc_joint_matrices(Bone3D *bone,Matrix4 inverseBindMatr
             pose->jointMat,
             inverseBindMatrix,
             pose->globalMat);
-        
-//         slog("frame %i, bone %s jointMatrix:",i,bone->name);
-//         gfc_matrix4_slog(pose->jointMat);
     }
 }
 
@@ -253,7 +286,6 @@ void gf3d_armature_calculate_poses(Armature3D *armature)
         }
         gfc_list_append(armature->poses,pose);
     }
-    //now the armature poses are in frame and index order
 }
 
 void gf3d_armature_parse_joints(Armature3D *armature,SJson *nodes, SJson *joints)
@@ -327,17 +359,8 @@ void gf3d_armature_parse_joints(Armature3D *armature,SJson *nodes, SJson *joints
             gf3d_armature_bone_make_parent(bone, gf3d_armature_get_bone_by_id(armature,childId));
         }
     }
-    //now figure out the matrices in global space
     gf3d_armature_calc_bone_mats(armature);
 }
-
-/**
- * notes on how to parse the animations OUT of a gltf
- * go through all the animations that pertain to a bone.  If the target node doesn't get a bone, skip it.
- * extract the time stamps and counts for all keyframes for translation, rotation, and scales of the bone.
- * then for each bone determine the maximum number of key frames.  Pre-allocate all of them.
- * Insert into the poses, the translation, rotation, and scale that would be there for that time stamp.  Interpolating as necessary
- */
 
 /**
  * @brief get the interpolations for the bone poses for a given timestamp
