@@ -5,15 +5,15 @@
 
 typedef struct
 {    
-    Vector3D *vertices;
+    GFC_Vector3D *vertices;
     Uint32 vertex_count;
-    Vector3D *normals;
+    GFC_Vector3D *normals;
     Uint32 normal_count;
-    Vector2D *texels;
+    GFC_Vector2D *texels;
     Uint32 texel_count;
-    Vector4UI8 *boneIndices;
+    GFC_Vector4UI8 *boneIndices;
     Uint32 bone_count;
-    Vector4D *boneWeights;
+    GFC_Vector4D *boneWeights;
     Uint32 weight_count;
     
     Face *faceVerts;
@@ -28,7 +28,7 @@ typedef struct
     
     Vertex *faceVertices;
     Uint32  face_vert_count;
-    Box     bounds;
+    GFC_Box     bounds;
 }ObjData;
 
 /**

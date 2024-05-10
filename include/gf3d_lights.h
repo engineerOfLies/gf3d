@@ -7,8 +7,8 @@
 typedef struct
 {
     Uint8   _inuse;
-    Vector4D color;
-    Vector4D position;
+    GFC_Vector4D color;
+    GFC_Vector4D position;
 }Gf3D_Light;
 
 /**
@@ -21,13 +21,13 @@ void gf3d_lights_init(Uint32 max_light);
  * @param color the color of the light
  * @param direction the direction of the light
  */
-void gf3d_lights_set_global_light(Vector4D color,Vector4D direction);
+void gf3d_lights_set_global_light(GFC_Vector4D color,GFC_Vector4D direction);
 
 /**
  * @brief get the stats for a single global light source
  * @param color populated with the color of the global light
- * @param direciton the unit vector for the direction of the light
+ * @param direciton the unit gfc_vector for the direction of the light
  */
-void gf3d_lights_get_global_light(Vector4D *color, Vector4D *direction);
+void gf3d_lights_get_global_light(GFC_Vector4D *color, GFC_Vector4D *direction);
 
 #endif

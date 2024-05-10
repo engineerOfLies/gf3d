@@ -3,26 +3,26 @@
 #include "gf2d_collision.h"
 #include "gf2d_dynamic_body.h"
 
-Shape gf2d_dynamic_body_to_shape(DynamicBody *a)
+GFC_Shape gf2d_dynamic_body_to_shape(DynamicBody *a)
 {
-    Shape aS = {0};
+    GFC_Shape aS = {0};
     if ((!a)||(!a->body)||(!a->body->shape))return aS;
     gfc_shape_copy(&aS,*a->body->shape);
     gfc_shape_move(&aS,a->position);
     return aS;
 }
 
-Vector2D gf2d_dynamic_body_bounce(DynamicBody *dba,Vector2D normal)
+GFC_Vector2D gf2d_dynamic_body_bounce(DynamicBody *dba,GFC_Vector2D normal)
 {
-    Vector2D nv = {0};
-    vector2d_reflect(&nv, normal,dba->velocity);
+    GFC_Vector2D nv = {0};
+    gfc_vector2d_reflect(&nv, normal,dba->velocity);
     return nv;
 }
 
-Collision *gf2d_dynamic_body_bounds_collision_check(DynamicBody *dba,Rect bounds,float timeStep)
+Collision *gf2d_dynamic_body_bounds_collision_check(DynamicBody *dba,GFC_Rect bounds,float timeStep)
 {
     Collision *collision = NULL;
-    Rect dbBounds;
+    GFC_Rect dbBounds;
     if (!dba)return NULL;
     if (!dba->body)
     {
@@ -45,14 +45,14 @@ Collision *gf2d_dynamic_body_bounds_collision_check(DynamicBody *dba,Rect bounds
     if (dbBounds.y <= bounds.y)collision->normal.y = 1;
     if (dbBounds.x + dbBounds.w >= bounds.x + bounds.w)collision->normal.x = -1;
     if (dbBounds.y + dbBounds.h >= bounds.y + bounds.h)collision->normal.y = -1;
-    vector2d_normalize(&collision->normal);
-    memset(&collision->shape,0,sizeof(Shape));
+    gfc_vector2d_normalize(&collision->normal);
+    memset(&collision->shape,0,sizeof(GFC_Shape));
     collision->bounds = 1;
     dba->blocked = 1;
     return collision;
 }
 
-Collision *gf2d_dynamic_body_shape_collision_check(DynamicBody *dba,Shape shape,float timeStep)
+Collision *gf2d_dynamic_body_shape_collision_check(DynamicBody *dba,GFC_Shape shape,float timeStep)
 {
     Collision *collision = NULL;
     if (!dba)return NULL;
@@ -132,23 +132,23 @@ DynamicBody *gf2d_dynamic_body_new()
         return NULL;
     }
     memset(db,0,sizeof(DynamicBody));
-    db->collisionList = gfc_list_new();
-    db->bucketList = gfc_list_new();
+    db->collisionGFC_List = gfc_list_new();
+    db->bucketGFC_List = gfc_list_new();
     return db;
 }
 
 void gf2d_dynamic_body_clear_collisions(DynamicBody *db)
 {
     if (!db)return;
-    gf2d_collision_list_clear(db->collisionList);
+    gf2d_collision_list_clear(db->collisionGFC_List);
 }
 
 void gf2d_dynamic_body_free(DynamicBody *db)
 {
     if (!db)return;
-    //cleanup collionList
-    gf2d_collision_list_free(db->collisionList);
-    gfc_list_delete(db->bucketList);
+    //cleanup collionGFC_List
+    gf2d_collision_list_free(db->collisionGFC_List);
+    gfc_list_delete(db->bucketGFC_List);
     free(db);
 }
 
@@ -158,12 +158,12 @@ void gf2d_dynamic_body_update(DynamicBody *db,float factor)
     if (!db->body)return;
     if ((db->body->position.x != db->position.x)||(db->body->position.y != db->position.y))
     {
-        vector2d_copy(db->body->position,db->position);
+        gfc_vector2d_copy(db->body->position,db->position);
         //BUCKETS
         db->shape = *db->body->shape;
         gfc_shape_move(&db->shape,db->position);
     }
-    vector2d_scale(db->body->velocity,db->velocity,factor);
+    gfc_vector2d_scale(db->body->velocity,db->velocity,factor);
 }
 
 void gf2d_dynamic_body_reset(DynamicBody *db,float factor)
@@ -172,22 +172,22 @@ void gf2d_dynamic_body_reset(DynamicBody *db,float factor)
     db->blocked = 0;
     gf2d_dynamic_body_clear_collisions(db);
     // may need to redo buckets if the positions don't match
-    vector2d_copy(db->position,db->body->position);
-    vector2d_scale(db->velocity,db->body->velocity,factor);
-    db->speed = vector2d_magnitude(db->velocity);
+    gfc_vector2d_copy(db->position,db->body->position);
+    gfc_vector2d_scale(db->velocity,db->body->velocity,factor);
+    db->speed = gfc_vector2d_magnitude(db->velocity);
 }
 
 void gf2d_dynamic_body_resolve_overlap(DynamicBody *db,float backoff)
 {
     int i,count;
-    Rect r;
+    GFC_Rect r;
     Collision *collision;
-    Vector2D adjust = {0};
+    GFC_Vector2D adjust = {0};
     if (!db)return;
-    count = gfc_list_get_count(db->collisionList);
+    count = gfc_list_get_count(db->collisionGFC_List);
     for (i = 0; i < count; i++)
     {
-        collision = (Collision*)gfc_list_get_nth(db->collisionList,i);
+        collision = (Collision*)gfc_list_get_nth(db->collisionGFC_List,i);
         if (!collision)continue;
         if (!gfc_shape_overlap(gf2d_dynamic_body_to_shape(db),collision->shape))continue;
         r = gfc_shape_get_bounds(collision->shape);

@@ -11,22 +11,22 @@
 void gf2d_element_scrollbar_update_range(Element *element);
 
 
-void gf2d_element_scrollbar_draw(Element *element,Vector2D offset)
+void gf2d_element_scrollbar_draw(Element *element,GFC_Vector2D offset)
 {
-    Rect rect;
-    Vector2D position;
+    GFC_Rect rect;
+    GFC_Vector2D position;
     ScrollbarElement *data;
     if (!element)return;
     data = (ScrollbarElement*)element->data;
 
-    vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->bounds);
     //draw background of the sliders
     gfc_rect_set(rect,
         offset.x + element->bounds.x + 20,
         offset.y + element->bounds.y + 20,
         element->bounds.w -25,
         element->bounds.h -40);
-    gf2d_draw_rect_filled(rect,element->backgroundColor);
+    gf2d_draw_rect_filled(rect,element->backgroundGFC_Color);
     
     gf2d_element_draw(data->scrollUp,position);
     gf2d_element_draw(data->scrollSlider,position);
@@ -82,10 +82,10 @@ void gf2d_element_scrollbar_scroll_down(Element *element)
     }
 }
 
-List *gf2d_element_scrollbar_update(Element *element,Vector2D offset)
+GFC_List *gf2d_element_scrollbar_update(Element *element,GFC_Vector2D offset)
 {
-    List *list;
-    Rect bounds;
+    GFC_List *list;
+    GFC_Rect bounds;
     ScrollbarElement *data;
     if (!element)return NULL;
     data = (ScrollbarElement*)element->data;
@@ -248,7 +248,7 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
     }
     else
     {
-        if (e->parent->type == ET_List)
+        if (e->parent->type == ET_GFC_List)
         {
             gf2d_element_scrollbar_set_list_target(e,e->parent);
         }
@@ -279,8 +279,8 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
         "scrollup",
         "actors/arrow_button_up.json",
         " ",
-        vector2d(0.5,0.5),
-        vector2d(32,20),
+        gfc_vector2d(0.5,0.5),
+        gfc_vector2d(32,20),
         GFC_COLOR_WHITE);
     bar->scrollDown = gf2d_button_new_simple(
         e->win,
@@ -288,8 +288,8 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
         "scrolldown",
         "actors/arrow_button_up.json",
         " ",
-        vector2d(0.5,-0.5),
-        vector2d(32,20),
+        gfc_vector2d(0.5,-0.5),
+        gfc_vector2d(32,20),
         GFC_COLOR_WHITE);
     bar->scrollDown->bounds.y = e->bounds.h - bar->scrollDown->bounds.h;
 
@@ -301,7 +301,7 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
     }
     else
     {
-        if (e->parent->type == ET_List)
+        if (e->parent->type == ET_GFC_List)
         {
             gf2d_element_scrollbar_set_list_target(e,e->parent);
         }

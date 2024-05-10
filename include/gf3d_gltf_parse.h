@@ -17,8 +17,8 @@ typedef enum
 typedef struct
 {
     SJson *json;
-    List  *buffers;
-    TextLine filename;
+    GFC_List  *buffers;
+    GFC_TextLine filename;
 }GLTF;
 
 /**

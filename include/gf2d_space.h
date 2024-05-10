@@ -6,24 +6,24 @@
 
 typedef struct
 {
-    Vector2D coordinate;            /**<where in the hash this bucket is*/
-    List *dynamicBodies;            /**<list of clipping dynamic bodies*/
-    List *staticShapes;             /**<list of clipping static shapes*/
+    GFC_Vector2D coordinate;            /**<where in the hash this bucket is*/
+    GFC_List *dynamicBodies;            /**<list of clipping dynamic bodies*/
+    GFC_List *staticGFC_Shapes;             /**<list of clipping static shapes*/
 }SpaceBucket;
 
 typedef struct
 {
-    List       *dynamicBodyList;    /**<list of bodies in the space*/
-    List       *staticShapes;       /**<list of shapes that will collide that do not move*/
+    GFC_List       *dynamicBodyGFC_List;    /**<list of bodies in the space*/
+    GFC_List       *staticGFC_Shapes;       /**<list of shapes that will collide that do not move*/
     int         usesBuckets;        /**<if true, we will optimize with buckets*/
-    List       *buckets;            /**<for spacial hash, a list of body lists*/
+    GFC_List       *buckets;            /**<for spacial hash, a list of body lists*/
     SpaceBucket *voidBucket;        /**<catch all bucket for if bodies exit the playable space*/
-    Vector2D    bucketSize;         /**<how large the buckets are individually*/
-    Vector2D    bucketCount;        /**<how many buckets per row,column*/
+    GFC_Vector2D    bucketSize;         /**<how large the buckets are individually*/
+    GFC_Vector2D    bucketCount;        /**<how many buckets per row,column*/
     int         precision;          /**<number of backoff attempts before giving up*/
-    Rect        bounds;             /**<absolute bounds of the space*/
+    GFC_Rect        bounds;             /**<absolute bounds of the space*/
     float       timeStep;           /**<how much each iteration of the simulation progresses time by*/
-    Vector2D    gravity;            /**<global gravity pull direction*/
+    GFC_Vector2D    gravity;            /**<global gravity pull direction*/
     float       dampening;          /**<rate of movement degrade  ambient frictions*/
     float       slop;               /**<how much to correct for body overlap*/
     Uint32      idpool;
@@ -48,13 +48,13 @@ Space *gf2d_space_new();
  */
 Space *gf2d_space_new_full(
     int         precision,
-    Rect        bounds,
+    GFC_Rect        bounds,
     float       timeStep,
-    Vector2D    gravity,
+    GFC_Vector2D    gravity,
     float       dampening,
     float       slop,
     int         useBuckets,
-    Vector2D    bucketSize);
+    GFC_Vector2D    bucketSize);
 
 /**
  * @brief create a space based on specs from a config file
@@ -71,7 +71,7 @@ void gf2d_space_free(Space *space);
  * @param space the space to draw
  * @param offset a positional offset applied when drawing.
  */
-void gf2d_space_draw(Space *space,Vector2D offset);
+void gf2d_space_draw(Space *space,GFC_Vector2D offset);
 
 /**
  * @brief add a body to the space simulation
@@ -95,7 +95,7 @@ void gf2d_space_remove_body(Space *space,Body *body);
  * @param space the space to add to
  * @param shape the shape to add.
  */
-void gf2d_space_add_static_shape(Space *space,Shape shape);
+void gf2d_space_add_static_shape(Space *space,GFC_Shape shape);
 
 /**
  * @brief update the bodies in the physics space for one time slice
@@ -116,7 +116,7 @@ void gf2d_space_fix_overlaps(Space *space,Uint8 tries);
  * @param point the spot to check
  * @return (-1,-1) if out of range, or error.  The bucket index otherwise
  */
-Vector2D gf2d_space_bucket_coordinates_by_point(Space *space,Vector2D point);
+GFC_Vector2D gf2d_space_bucket_coordinates_by_point(Space *space,GFC_Vector2D point);
 
 /**
  * @brief get the corresponding bucket index given a position
@@ -124,7 +124,7 @@ Vector2D gf2d_space_bucket_coordinates_by_point(Space *space,Vector2D point);
  * @param point the spot to check
  * @return -1 if out of range, or error.  The bucket index otherwise
  */
-int gf2d_space_bucket_index_get_by_point(Space *space,Vector2D point);
+int gf2d_space_bucket_index_get_by_point(Space *space,GFC_Vector2D point);
 
 /**
  * @brief get the corresponding bucket given a position
@@ -132,16 +132,16 @@ int gf2d_space_bucket_index_get_by_point(Space *space,Vector2D point);
  * @param point the spot to check
  * @return Null on error, the voidBucket if its out of range, The bucket otherwise
  */
-SpaceBucket *gf2d_space_bucket_get_by_point(Space *space,Vector2D point);
+SpaceBucket *gf2d_space_bucket_get_by_point(Space *space,GFC_Vector2D point);
 
 /**
  * @brief check against the static shapes of a space to see if there any collisions
  * @param space the space to check
  * @param shape the shape to check with
- * @param collisionList the list of collisions to append to (if NULL, a new list is created)
+ * @param collisionGFC_List the list of collisions to append to (if NULL, a new list is created)
  * @return NULL on missing space, or a list of collisions otherwise
  */
-List *gf2d_space_static_shape_check(Space *space, Shape shape, List *collisionList);
+GFC_List *gf2d_space_static_shape_check(Space *space, GFC_Shape shape, GFC_List *collisionGFC_List);
 
 /**
  * @brief iterate through an area of the spacial hash based on which buckets clip the given bounds
@@ -150,7 +150,7 @@ List *gf2d_space_static_shape_check(Space *space, Shape shape, List *collisionLi
  * @param last provide the return of the last call to this function.  Provide NULL to initiate a search
  * @return NULL when search is complete, or the next clipped bucket.
  */
-SpaceBucket *gf2d_space_bucket_foreach_clipped(Space *space,Rect bounds,SpaceBucket *last);
+SpaceBucket *gf2d_space_bucket_foreach_clipped(Space *space,GFC_Rect bounds,SpaceBucket *last);
 
 
 #endif

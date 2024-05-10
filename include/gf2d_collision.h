@@ -21,9 +21,9 @@ typedef struct Collision_S
 {
     Uint8    collided;          /**<true if the there as a collision*/
     Uint8    blocked;           /**<true if this blocked any further movement.  Default for non elastic collisions*/
-    Vector2D pointOfContact;    /**<point in space that contact was made*/
-    Vector2D normal;            /**<normal vector at the point of contact*/
-    Shape    shape;             /**<shape information on what what contacted*/
+    GFC_Vector2D pointOfContact;    /**<point in space that contact was made*/
+    GFC_Vector2D normal;            /**<normal gfc_vector at the point of contact*/
+    GFC_Shape    shape;             /**<shape information on what what contacted*/
     Body    *body;              /**<body information if a body was collided with*/
     Uint8    bounds;            /**<true if this collision was with the space bounds*/
     float    timeStep;          /**<at what time step contact was made*/
@@ -48,7 +48,7 @@ Collision *gf2d_collision_new();
  * @brief empty the list, without freeing the data
  * @param list the collision list to clear
  */
-void gf2d_collision_list_clear(List *list);
+void gf2d_collision_list_clear(GFC_List *list);
 
 /**
  * @brief free data allocated for a collision
@@ -60,16 +60,16 @@ void gf2d_collision_free(Collision *collision);
  * @brief free all the collisions and the list containing it.
  * @param list must contain a list of collisions
  */
-void gf2d_collision_list_free(List *list);
+void gf2d_collision_list_free(GFC_List *list);
 
 /**
  * @brief check if the provided shape intersects anything in the space
  * @param space the space to test
  * @param shape the shape to check with
  * @param filter the filter to use for testing
- * @return a List of collisions data for the test
+ * @return a GFC_List of collisions data for the test
  */
-List *gf2d_collision_check_space_shape(Space *space, Shape shape,CollisionFilter filter);
+GFC_List *gf2d_collision_check_space_shape(Space *space, GFC_Shape shape,CollisionFilter filter);
 
 /**
  * @brief perform a linear trace through the space
@@ -79,7 +79,7 @@ List *gf2d_collision_check_space_shape(Space *space, Shape shape,CollisionFilter
  * @param filter the filter to apply to the test
  * @return a collision structure.  Note the timeStep will be the percentage of the trace that was completed before a collision was triggered
  */
-Collision gf2d_collision_trace_space(Space *space, Vector2D start, Vector2D end ,CollisionFilter filter);
+Collision gf2d_collision_trace_space(Space *space, GFC_Vector2D start, GFC_Vector2D end ,CollisionFilter filter);
 
 /**
  * @brief check if the two shapes overlap, and if they do build a collsion info
@@ -88,6 +88,6 @@ Collision gf2d_collision_trace_space(Space *space, Vector2D start, Vector2D end 
  * @return NULL on no collision, Collsion information otherwise
  * @note if it returns data, it must be freed
  */
-Collision *gf2d_collision_space_static_shape_clip(Shape a, Shape s);
+Collision *gf2d_collision_space_static_shape_clip(GFC_Shape a, GFC_Shape s);
 
 #endif

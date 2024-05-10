@@ -27,19 +27,19 @@ typedef struct
     Uint8           _inuse;
     Sint32          ttd;                // when this time is passed, delete this effect
     ModelMat        mat;                // for keeping track of model data`
-    Edge3D          edge;               // for drawing lines
+    GFC_Edge3D          edge;               // for drawing lines
     Particle        particle;           // particle data, partical data
     float           radius;             // how wide a line is
     GF3DEffectType  eType;              // which type of effect this one is
     Uint16          fadein;             // if true, start fading in from zero alpha to full by the time this has ended
     Uint16          fadeout;            // if true, start fading out when there is this much time left to live
     float           sizeDelta;          // for particles, this changes the size of the particle to draw over time
-    Vector3D        velocity;           // movement of the effect
-    Vector3D        acceleration;       // acceleration of the effect
-    Color           color;              // color mod for the effect
-    Color           colorVector;        // color delta to be applied over time
-    Color           colorAcceleration;  // color delta delta to be applied over time
-    Callback        callback;           // if a callback has been set for when a particle dies
+    GFC_Vector3D        velocity;           // movement of the effect
+    GFC_Vector3D        acceleration;       // acceleration of the effect
+    GFC_Color           color;              // color mod for the effect
+    GFC_Color           colorVector;        // color delta to be applied over time
+    GFC_Color           colorAcceleration;  // color delta delta to be applied over time
+    GFC_Callback        callback;           // if a callback has been set for when a particle dies
 }GF3DEffect;
 
 /**
@@ -67,19 +67,19 @@ GF3DEffect *gf3d_effect_new();
  * @param size how large the particle is
  * @param sizeDelta if the particle size should change over time,  if not set this to 1
  * @param color the color for the particle
- * @param colorVector added to the color every update
- * @param colorAcceleration added to the colorVector every update
+ * @param colorGFC_Vector added to the color every update
+ * @param colorAcceleration added to the colorGFC_Vector every update
  * @param ttl the number of draw frames this should live for
  */
 GF3DEffect *gf3d_effect_new_particle(
-    Vector3D position,
-    Vector3D velocity,
-    Vector3D acceleration,
+    GFC_Vector3D position,
+    GFC_Vector3D velocity,
+    GFC_Vector3D acceleration,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVector,
-    Color colorAcceleration,
+    GFC_Color color,
+    GFC_Color colorGFC_Vector,
+    GFC_Color colorAcceleration,
     Sint32 ttl);
 
 /**
@@ -89,18 +89,18 @@ GF3DEffect *gf3d_effect_new_particle(
  * @param size how large the particle is
  * @param sizeDelta if the particle size should change over time,  if not set this to 1
  * @param color the color for the particle
- * @param colorVector added to the color every update
- * @param colorAcceleration added to the colorVector every update
+ * @param colorGFC_Vector added to the color every update
+ * @param colorAcceleration added to the colorGFC_Vector every update
  * @param ttl the number of draw frames before this reaches the target
  */
 GF3DEffect *gf3d_effect_new_particle_target(
-    Vector3D position,
-    Vector3D target,
+    GFC_Vector3D position,
+    GFC_Vector3D target,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVector,
-    Color colorAcceleration,
+    GFC_Color color,
+    GFC_Color colorGFC_Vector,
+    GFC_Color colorAcceleration,
     Sint32 ttl);
 
 /**
@@ -115,11 +115,11 @@ GF3DEffect *gf3d_effect_new_particle_target(
  * @param ttl how long they will last
  */
 void gf3d_effect_make_particle_explosion(
-    Vector3D position,
+    GFC_Vector3D position,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVariation,
+    GFC_Color color,
+    GFC_Color colorVariation,
     int count,
     float speed,
     Uint32 ttl);
@@ -132,19 +132,19 @@ void gf3d_effect_make_particle_explosion(
  * @param size how wide the line is
  * @param sizeDelta if the line size should change over time,  if not set this to 1
  * @param color the color for the line
- * @param colorVector added to the color every update
- * @param colorAcceleration added to the colorVector every update
+ * @param colorGFC_Vector added to the color every update
+ * @param colorAcceleration added to the colorGFC_Vector every update
  * @param ttl the number of draw frames this should live for
  */
 GF3DEffect *gf3d_effect_new_line(
-    Edge3D edge,
-    Vector3D velocity,
-    Vector3D acceleration,
+    GFC_Edge3D edge,
+    GFC_Vector3D velocity,
+    GFC_Vector3D acceleration,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVector,
-    Color colorAcceleration,
+    GFC_Color color,
+    GFC_Color colorGFC_Vector,
+    GFC_Color colorAcceleration,
     Sint32 ttl);
 
 

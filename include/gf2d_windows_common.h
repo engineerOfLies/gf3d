@@ -67,7 +67,7 @@ Window *window_key_value(char *question, char *defaultKey,char *defaultValue,voi
  * @param onCancel callback function to be invoked if the users selects cancel
  * @param data data to be sent with the callback function
  */
-Window *window_color_select(char *title, Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *data);
+Window *window_color_select(char *title, GFC_Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *data);
 
 
 #endif

@@ -12,54 +12,54 @@
 
 typedef struct Bone3D_S
 {
-    TextLine            name;           /**<name of bone*/
+    GFC_TextLine            name;           /**<name of bone*/
     Uint32              index;          /**<place in the list*/
     Uint32              nodeId;         /**<for parsing*/
     struct Bone3D_S    *parent;         /**<pointer to the parent of the bone*/
-    List               *children;       /**<list of indicies to any children, no data is allocated for this*/
-    Matrix4             mat;            /**<matrix describing the bone orientation*/
-    Matrix4             localMat;       /**<local bone orientation*/
-    List               *poses;          /**<list of bonePose3Ds,when parsed, they are initially added here,*/
+    GFC_List               *children;       /**<list of indicies to any children, no data is allocated for this*/
+    GFC_Matrix4             mat;            /**<matrix describing the bone orientation*/
+    GFC_Matrix4             localMat;       /**<local bone orientation*/
+    GFC_List               *poses;          /**<list of bonePose3Ds,when parsed, they are initially added here,*/
     //staging area for extraction
     Uint32              translationCount;
     float              *translationTimestamps;
-    Vector3D           *translations;
+    GFC_Vector3D           *translations;
     
     Uint32              rotationCount;
     float              *rotationTimestamps;
-    Vector4D           *rotations;
+    GFC_Vector4D           *rotations;
 
     Uint32              scaleCount;
     float              *scaleTimestamps;
-    Vector3D           *scales;
+    GFC_Vector3D           *scales;
 }Bone3D;
 
 typedef struct
 {
     Uint8       set;                /**<true if set already*/
     float       timestamp;          /**<for tweening*/
-    Matrix4     localMat;           /**<local bone space*/
-    Matrix4     globalMat;          /**<armature space*/
-    Matrix4     jointMat;           /**<what gets sent to the gpu for mesh transforming*/
+    GFC_Matrix4     localMat;           /**<local bone space*/
+    GFC_Matrix4     globalMat;          /**<armature space*/
+    GFC_Matrix4     jointMat;           /**<what gets sent to the gpu for mesh transforming*/
     Bone3D     *bone;               /**<link back to the bone*/
 }BonePose3D;
 
 typedef struct
 {
     Uint32 boneCount;
-    Matrix4 *bones;     //list of bone poses in index order
+    GFC_Matrix4 *bones;     //list of bone poses in index order
 }Pose3D;
 
 typedef struct
 {
-    TextLine    filepath;       /**<the file that this has been loaded from / to*/
-    TextLine    name;           /**<printing name*/
+    GFC_TextLine    filepath;       /**<the file that this has been loaded from / to*/
+    GFC_TextLine    name;           /**<printing name*/
     Uint32      refCount;       /**<resurce management*/
-    Uint32      bindCount;      /**<how many bones in the inverseBindMatrix*/
-    Matrix4    *inverseBindMatrices;    /**<to make the math math*/
-    List       *bones;          /**<list of Bones in the base armature*/
-    List       *actions;        /**<action list for managing animation of poses*/
-    List       *poses;          /**<list of Pose3Ds.*/
+    Uint32      bindCount;      /**<how many bones in the inverseBindGFC_Matrix*/
+    GFC_Matrix4    *inverseBindMatrices;    /**<to make the math math*/
+    GFC_List       *bones;          /**<list of Bones in the base armature*/
+    GFC_List       *actions;        /**<action list for managing animation of poses*/
+    GFC_List       *poses;          /**<list of Pose3Ds.*/
     Uint32      maxFrames;      /**<how many poses we store*/
     float       maxTimestamp;   /**<timestamp of the last from (starting from 0.0)*/
 }Armature3D;
@@ -97,7 +97,7 @@ Armature3D *gf3d_armature_load(const char *filename);
  * @param bonecount [output] if provided, this will be set to the number of bones in the matrix array
  * @return NULL on error, or an array of matrices for each bone in index order.
  */
-Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint32 *boneCount);
+GFC_Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint32 *boneCount);
 
 /**
  * @brief parse armature data out of a json file.
@@ -119,9 +119,9 @@ Bone3D *gf3d_armature_get_bone_by_name(Armature3D *armature,const char *name);
  * @brief get the global matrix (in model space) for a bone.
  * @param armature the armature to search
  * @param name the name of the bone to find
- * @return NULL if not found or error.  A pointer to the Matrix otherwise
+ * @return NULL if not found or error.  A pointer to the GFC_Matrix otherwise
  */
-Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *name);
+GFC_Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *name);
 
 /**
  * @brief get the global matrix (in model space) for a bone pose
@@ -131,7 +131,7 @@ Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *
  * @return NULL on error or not found, the matrix otherwise.  
  * @note this should be used to snap a model to a bone.  Further adjustments may be necessary
  */
-Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 frame,const char *name);
+GFC_Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 frame,const char *name);
 
 /**
  * @brief draw a primitive line representation of an armature

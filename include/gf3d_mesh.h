@@ -17,22 +17,22 @@
 
 typedef struct
 {
-    Vector4D color;
-    Vector4D position;
+    GFC_Vector4D color;
+    GFC_Vector4D position;
 }MeshLights;
 
 typedef struct
 {
-    Matrix4 model;
-    Matrix4 view;
-    Matrix4 proj;
-    Matrix4 bones[100]; //I hate that this is how it is done.  I want to move this to a buffer on the GPU and index into it in the shader
-    Vector4D ambientColor;
-    Vector4D ambientDir;
-    Vector4D color; //color mod
-    Vector4D detailColor; //color mod
-    Vector4D cameraPosition;
-    Vector4D flags;  //.x is bone flag
+    GFC_Matrix4 model;
+    GFC_Matrix4 view;
+    GFC_Matrix4 proj;
+    GFC_Matrix4 bones[100]; //I hate that this is how it is done.  I want to move this to a buffer on the GPU and index into it in the shader
+    GFC_Vector4D ambientGFC_Color;
+    GFC_Vector4D ambientDir;
+    GFC_Vector4D color; //color mod
+    GFC_Vector4D detailGFC_Color; //color mod
+    GFC_Vector4D cameraPosition;
+    GFC_Vector4D flags;  //.x is bone flag
 
 }MeshUBO;
 
@@ -41,28 +41,28 @@ typedef struct
  */
 typedef struct
 {
-    Matrix4 model;
-    Matrix4 view;
-    Matrix4 proj;
-    Vector4D color; 
+    GFC_Matrix4 model;
+    GFC_Matrix4 view;
+    GFC_Matrix4 proj;
+    GFC_Vector4D color; 
 }HighlightUBO;
 
 typedef struct
 {
-    Matrix4 model;
-    Matrix4 view;
-    Matrix4 proj;
-    Vector4D color; 
+    GFC_Matrix4 model;
+    GFC_Matrix4 view;
+    GFC_Matrix4 proj;
+    GFC_Vector4D color; 
 }SkyUBO;
 
 typedef struct
 {
-    Vector3D vertex;
-    Vector3D normal;
-    Vector2D texel;
+    GFC_Vector3D vertex;
+    GFC_Vector3D normal;
+    GFC_Vector2D texel;
     //armature support:
-    Vector4D bones;   //bone indices
-    Vector4D weights; //bone weights
+    GFC_Vector4D bones;   //bone indices
+    GFC_Vector4D weights; //bone weights
 }Vertex;
 
 typedef struct
@@ -82,11 +82,11 @@ typedef struct
 
 typedef struct
 {
-    TextLine        filename;
+    GFC_TextLine        filename;
     Uint32          _refCount;
     Uint8           _inuse;
-    List           *primitives;
-    Box             bounds;    
+    GFC_List           *primitives;
+    GFC_Box             bounds;    
 }Mesh;
 
 /**
@@ -117,7 +117,7 @@ Mesh *gf3d_mesh_load(const char *filename);
  * @return the factor to scale a mesh so that it fits exactly within the size provided.
  * @note: likely you want to uniformly scale based on the SMALLEST of the dimensions
  */
-Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,Vector3D size);
+GFC_Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,GFC_Vector3D size);
 
 /**
  * @brief get the input attribute descriptions for mesh based rendering

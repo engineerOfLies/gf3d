@@ -31,11 +31,11 @@ Element *gf2d_element_new()
 Element *gf2d_element_new_full(
     Element *parent,
     int      index,
-    TextLine name,
-    Rect bounds,
-    Color color,
+    GFC_TextLine name,
+    GFC_Rect bounds,
+    GFC_Color color,
     int state,
-    Color backgroundColor,
+    GFC_Color backgroundGFC_Color,
     int backgroundDraw,
     Window *win
 )
@@ -51,7 +51,7 @@ Element *gf2d_element_new_full(
     e->color = color;
     e->state = state;
     e->bounds = bounds;
-    e->backgroundColor = backgroundColor;
+    e->backgroundGFC_Color = backgroundGFC_Color;
     e->backgroundDraw = backgroundDraw;
     e->win = win;
     return e;
@@ -67,9 +67,9 @@ void gf2d_element_free(Element *e)
     free(e);
 }
 
-Vector2D gf2d_element_get_draw_position(Element *e)
+GFC_Vector2D gf2d_element_get_draw_position(Element *e)
 {
-    if (!e)return vector2d(0,0);
+    if (!e)return gfc_vector2d(0,0);
     return e->lastDrawPosition;
 }
 
@@ -79,9 +79,9 @@ void gf2d_element_set_hidden(Element *element, int hidden)
     element->hidden = hidden;
 }
 
-void gf2d_element_draw(Element *e, Vector2D offset)
+void gf2d_element_draw(Element *e, GFC_Vector2D offset)
 {
-    Rect rect;
+    GFC_Rect rect;
     if ((!e)||(e->hidden))
     {
         return;
@@ -91,7 +91,7 @@ void gf2d_element_draw(Element *e, Vector2D offset)
     e->lastDrawPosition.y = rect.y;
     if (e->backgroundDraw)
     {
-        gf2d_draw_rect_filled(rect,e->backgroundColor);
+        gf2d_draw_rect_filled(rect,e->backgroundGFC_Color);
     }
     if (e->draw)e->draw(e,offset);
     if (__DEBUG)
@@ -100,7 +100,7 @@ void gf2d_element_draw(Element *e, Vector2D offset)
     }
 }
 
-List * gf2d_element_update(Element *e, Vector2D offset)
+GFC_List * gf2d_element_update(Element *e, GFC_Vector2D offset)
 {
     if ((!e)||(e->hidden))
     {
@@ -112,7 +112,7 @@ List * gf2d_element_update(Element *e, Vector2D offset)
 
 void gf2d_element_calibrate(Element *e,Element *parent, Window *win)
 {
-    Rect res;
+    GFC_Rect res;
     int negx = 0,negy = 0;
     if (!e)return;
     if (parent != NULL)
@@ -170,7 +170,7 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     Element *e = NULL;
     SJson *value;
     const char *type;
-    Vector4D vector ={0,0,0,0};
+    GFC_Vector4D gfc_vector ={0,0,0,0};
     if (!sj_is_object(json))return NULL;
     e = gf2d_element_new();
     if (!e)return NULL;
@@ -189,7 +189,7 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     sj_get_integer_value(value,&e->index);
 
     e->color = sj_value_as_color(sj_object_get_value(json,"color"));
-    e->backgroundColor = sj_value_as_color(sj_object_get_value(json,"backgroundColor"));
+    e->backgroundGFC_Color = sj_value_as_color(sj_object_get_value(json,"backgroundGFC_Color"));
 
     value = sj_object_get_value(json,"backgroundDraw");
     if (value)
@@ -201,8 +201,8 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     value = sj_object_get_value(json,"bounds");
     if (value)
     {
-        sj_value_as_vector4d(value,&vector);
-        gfc_rect_set(e->bounds,vector.x,vector.y,vector.z,vector.w);
+        sj_value_as_vector4d(value,&gfc_vector);
+        gfc_rect_set(e->bounds,gfc_vector.x,gfc_vector.y,gfc_vector.z,gfc_vector.w);
     }
     else if (parent)
     {
@@ -245,16 +245,16 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     return e;
 }
 
-void gf2d_element_set_color(Element *element,Color color)
+void gf2d_element_set_color(Element *element,GFC_Color color)
 {
     if (!element)return;
     element->color = color;
 }
 
-void gf2d_element_set_background_color(Element *element,Color color)
+void gf2d_element_set_background_color(Element *element,GFC_Color color)
 {
     if (!element)return;
-    element->backgroundColor = color;
+    element->backgroundGFC_Color = color;
 }
 
 int gf2d_element_set_focus(Element *element,int focus)
@@ -264,9 +264,9 @@ int gf2d_element_set_focus(Element *element,int focus)
     return 1;
 }
 
-Rect gf2d_element_get_absolute_bounds(Element *element,Vector2D offset)
+GFC_Rect gf2d_element_get_absolute_bounds(Element *element,GFC_Vector2D offset)
 {
-    Rect r = {0};
+    GFC_Rect r = {0};
     if (!element)return r;
     r.x = element->bounds.x + offset.x;
     r.y = element->bounds.y + offset.y;
@@ -281,7 +281,7 @@ Element *gf2d_element_get_by_id(Element *e,int id)
     if (e->index == id)return e;
     switch(e->type)
     {
-        case ET_List:
+        case ET_GFC_List:
             return gf2d_element_list_get_item_by_id(e,id);
             break;
         case ET_Button:

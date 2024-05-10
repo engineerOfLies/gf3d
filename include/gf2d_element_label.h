@@ -19,8 +19,8 @@ typedef enum
 
 typedef struct
 {
-    TextBlock text;     /**<the label text*/
-    Color bgcolor;      /**<background color for the text*/
+    GFC_TextBlock text;     /**<the label text*/
+    GFC_Color bgcolor;      /**<background color for the text*/
     int wraps;          /**<if the text should word wrap to match the dimensional width of its element space*/
     int style;          /**<which font style to use*/
     int justify;        /**<leaning left or right*/
@@ -36,7 +36,7 @@ typedef struct
  * @param style the font style FT_H1 for example
  * @param color the draw color
  */
-Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,Color color);
+Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,GFC_Color color);
 
 /**
  * @brief make a simple label element
@@ -47,7 +47,7 @@ Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,
  * @param size the size of the label in pixels
  * @param color the draw color
  */
-Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int style,Vector2D size, Color color);
+Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int style,GFC_Vector2D size, GFC_Color color);
 
 /**
  * @brief make a new label element
@@ -59,7 +59,7 @@ Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int s
  * @param wraps if the label should word wrap
  * @return NULL on error or a new label element
  */
-LabelElement *gf2d_element_label_new_full(const char *text,Color color,int style,int justify,int align,int wraps);
+LabelElement *gf2d_element_label_new_full(const char *text,GFC_Color color,int style,int justify,int align,int wraps);
 
 /**
  * @brief set an element to be the label provided

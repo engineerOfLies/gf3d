@@ -9,15 +9,15 @@
 #include "gf2d_draw.h"
 #include "gf2d_mouse.h"
 
-void gf2d_element_button_draw(Element *element,Vector2D offset)
+void gf2d_element_button_draw(Element *element,GFC_Vector2D offset)
 {
-    Rect rect;
+    GFC_Rect rect;
     ButtonElement *button;
-    Vector2D position;
+    GFC_Vector2D position;
     if (!element)return;
     button = (ButtonElement*)element->data;
     if (!button)return;
-    vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->bounds);
     gfc_rect_set(rect,offset.x + element->bounds.x,offset.y + element->bounds.y,element->bounds.w,element->bounds.h);
     if (button->customActions == BCA_Default)
     {
@@ -31,11 +31,11 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
                 break;
             case ES_highlight:
                 gf2d_element_actor_set_action(button->actor,"high");
-                gf2d_element_set_color(button->label,button->highColor);
+                gf2d_element_set_color(button->label,button->highGFC_Color);
                 break;
             case ES_active:
                 gf2d_element_actor_set_action(button->actor,"press");
-                gf2d_element_set_color(button->label,button->pressColor);
+                gf2d_element_set_color(button->label,button->pressGFC_Color);
                 break;
         }
     }
@@ -46,13 +46,13 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
             case ES_disable:
                 return;
             case ES_idle:
-                gf2d_draw_rect_filled(rect,element->backgroundColor);
+                gf2d_draw_rect_filled(rect,element->backgroundGFC_Color);
                 break;
             case ES_highlight:
-                gf2d_draw_rect_filled(rect,button->highColor);
+                gf2d_draw_rect_filled(rect,button->highGFC_Color);
                 break;
             case ES_active:
-                gf2d_draw_rect_filled(rect,button->pressColor);
+                gf2d_draw_rect_filled(rect,button->pressGFC_Color);
                 break;
         }
 
@@ -61,10 +61,10 @@ void gf2d_element_button_draw(Element *element,Vector2D offset)
     gf2d_element_draw(button->label,position);
 }
 
-List *gf2d_element_button_update(Element *element,Vector2D offset)
+GFC_List *gf2d_element_button_update(Element *element,GFC_Vector2D offset)
 {
-    Rect bounds;
-    List *list;
+    GFC_Rect bounds;
+    GFC_List *list;
     ButtonElement *button;
     if (!element)return NULL;
     button = (ButtonElement*)element->data;
@@ -222,22 +222,22 @@ void gf2d_element_make_button(Element *e,ButtonElement *button)
     e->get_next = gf2d_button_get_next;
 }
 
-ButtonElement *gf2d_element_button_new_full(Element *label,Element *actor,Color highColor,Color pressColor,int customActions)
+ButtonElement *gf2d_element_button_new_full(Element *label,Element *actor,GFC_Color highGFC_Color,GFC_Color pressGFC_Color,int customActions)
 {
     ButtonElement *button;
     button = gf2d_element_button_new();
     if (!button)return NULL;
     button->label = label;
     button->actor = actor;
-    button->highColor = highColor;
-    button->pressColor = pressColor;
+    button->highGFC_Color = highGFC_Color;
+    button->pressGFC_Color = pressGFC_Color;
     button->customActions = customActions;
     return button;
 }
 
 void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
 {
-    Vector4D highColor = {255,255,255,255},pressColor = {255,255,255,255};
+    GFC_Vector4D highGFC_Color = {255,255,255,255},pressGFC_Color = {255,255,255,255};
     Element *label = NULL;
     Element *actor = NULL;
     SJson *value;
@@ -251,15 +251,15 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
         return;
     }
     
-    value = sj_object_get_value(json,"highColor");
+    value = sj_object_get_value(json,"highGFC_Color");
     if (value)
     {
-        sj_value_as_vector4d(value,&highColor);
+        sj_value_as_vector4d(value,&highGFC_Color);
     }
-    value = sj_object_get_value(json,"pressColor");
+    value = sj_object_get_value(json,"pressGFC_Color");
     if (value)
     {
-        sj_value_as_vector4d(value,&pressColor);
+        sj_value_as_vector4d(value,&pressGFC_Color);
     }
     
     sj_get_integer_value(sj_object_get_value(json,"customActions"),&customActions);
@@ -274,7 +274,7 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
     {
         actor = gf2d_element_load_from_config(value,e,win);
     }
-    gf2d_element_make_button(e,gf2d_element_button_new_full(label,actor,gfc_color_from_vector4(highColor),gfc_color_from_vector4(pressColor),customActions));
+    gf2d_element_make_button(e,gf2d_element_button_new_full(label,actor,gfc_color_from_vector4(highGFC_Color),gfc_color_from_vector4(pressGFC_Color),customActions));
  
     button = (ButtonElement*)e->data;
     text = sj_get_string_value(sj_object_get_value(json,"sound"));
@@ -288,7 +288,7 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
 }
 
 
-Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, Vector2D size, Color color)
+Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, GFC_Vector2D size, GFC_Color color)
 {
     Element *be,*le;
     
@@ -326,9 +326,9 @@ Element *gf2d_button_new_simple(
     const char *name,
     const char *actorFile,
     const char *text,
-    Vector2D scale,
-    Vector2D size,
-    Color color)
+    GFC_Vector2D scale,
+    GFC_Vector2D size,
+    GFC_Color color)
 {
     Element *be,*le,*ae;
     
@@ -347,7 +347,7 @@ Element *gf2d_button_new_simple(
         0,
         gfc_color(.5,.5,.5,1),0,win);
     
-    actor = gf2d_element_actor_new_full(actorFile, "idle" ,scale,NULL,vector2d(0,0),vector2d(0,0));
+    actor = gf2d_element_actor_new_full(actorFile, "idle" ,scale,NULL,gfc_vector2d(0,0),gfc_vector2d(0,0));
     ae = gf2d_element_new_full(
         be,
         0,

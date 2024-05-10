@@ -17,7 +17,7 @@ typedef struct
     int                 autoPan;
     int                 freeLook;
     Entity             *lookTargetEntity;
-    Vector3D            lookTargetPosition;
+    GFC_Vector3D            lookTargetPosition;
     CameraTargetType    targetType;
 }CameraEntityData;
 
@@ -25,7 +25,7 @@ static Entity *gf3d_camera_entity = NULL;
 
 void gf3d_camera_entity_think(Entity *self);
 
-Entity *gf3d_camera_entity_new(Vector3D position,Vector3D rotation)
+Entity *gf3d_camera_entity_new(GFC_Vector3D position,GFC_Vector3D rotation)
 {
     Entity *ent = NULL;
     CameraEntityData *data;
@@ -53,28 +53,28 @@ Entity *gf3d_camera_entity_new(Vector3D position,Vector3D rotation)
     return ent;
 }
 
-void gf3d_camera_entity_set_position(Vector3D position)
+void gf3d_camera_entity_set_position(GFC_Vector3D position)
 {
     gf3d_camera_set_position(position);
 }
 
-Vector3D gf3d_camera_entity_get_position()
+GFC_Vector3D gf3d_camera_entity_get_position()
 {
     return gf3d_camera_get_position();
 }
 
-void gf3d_camera_entity_set_look_target(Vector3D target)
+void gf3d_camera_entity_set_look_target(GFC_Vector3D target)
 {
     CameraEntityData *data;
     if (!gf3d_camera_entity)return;
     data = gf3d_camera_entity->data;
-    vector3d_copy(data->lookTargetPosition,target);
+    gfc_vector3d_copy(data->lookTargetPosition,target);
 }
 
-Vector3D gf3d_camera_entity_get_look_target()
+GFC_Vector3D gf3d_camera_entity_get_look_target()
 {
     CameraEntityData *data;
-    Vector3D target = {0};
+    GFC_Vector3D target = {0};
     if (!gf3d_camera_entity)return target;
     data = gf3d_camera_entity->data;
     return data->lookTargetPosition;
@@ -124,7 +124,7 @@ void gf3d_camera_entity_enable_free_look(Uint8 enable)
 void gf3d_camera_entity_think(Entity *self)
 {
     float moveSpeed = 2;
-    Vector3D position,rotation;
+    GFC_Vector3D position,rotation;
     const Uint8 * keys;
     CameraEntityData *data;
     if (!self)return;
@@ -186,7 +186,7 @@ void gf3d_camera_entity_think(Entity *self)
         }
         else
         {
-            gf3d_camera_look_at(vector3d(0,0,0),NULL);
+            gf3d_camera_look_at(gfc_vector3d(0,0,0),NULL);
         }
     }
 }

@@ -10,13 +10,13 @@
 
 typedef struct Bone_S
 {
-    TextLine        name;           /**<name of bone*/
+    GFC_TextLine        name;           /**<name of bone*/
     Uint32          index;          /**<place in the list*/
     struct Bone_S  *parent;         /**<pointer to the parent of the bone*/
-    List           *children;       /**<list of indicies to any children, no data is allocated for this*/
+    GFC_List           *children;       /**<list of indicies to any children, no data is allocated for this*/
     float           baseAngle;      /**<rest angle for the bone*/
     float           length;         /**<length of the bone*/
-    Vector2D        rootPosition;   /**<root position of the bone*/
+    GFC_Vector2D        rootPosition;   /**<root position of the bone*/
 }Bone;
 
 typedef struct
@@ -24,22 +24,22 @@ typedef struct
     Bone       *bone;       /**<original bone, referenced and not allocated*/
     float       angle;      /**<rotation for the bone*/
     float       length;     /**<length delta from original bone*/
-    Vector2D    position;   /**<position to move the bone to*/
+    GFC_Vector2D    position;   /**<position to move the bone to*/
 }BonePose;
 
 typedef struct
 {
-    List *poseBones;    /**<list of bone poses*/
+    GFC_List *poseBones;    /**<list of bone poses*/
 }Pose;
 
 typedef struct
 {
-    TextLine    filepath;       /**<the file that this has been loaded from / to*/
-    TextLine    name;           /**<printing name*/
+    GFC_TextLine    filepath;       /**<the file that this has been loaded from / to*/
+    GFC_TextLine    name;           /**<printing name*/
     Uint32      refCount;       /**<resurce management*/
-    List       *bones;          /**<list of Bones in the base armature*/
-    List       *poses;          /**<list of poses for the armature*/
-    List       *actions;        /**<action list for managing animation of poses*/
+    GFC_List       *bones;          /**<list of Bones in the base armature*/
+    GFC_List       *poses;          /**<list of poses for the armature*/
+    GFC_List       *actions;        /**<action list for managing animation of poses*/
 }Armature2D;
 
 /**
@@ -86,12 +86,12 @@ void gf2d_armature_draw_sprite_to_bone_pose(
     Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Vector2D * flip,
-    Color    * colorShift,
+    GFC_Vector2D * flip,
+    GFC_Color    * colorShift,
     Uint32 pose,
     Uint32 bone);
 
@@ -113,12 +113,12 @@ void gf2d_armature_draw_sprite_to_named_bone_pose(
     Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Vector2D * flip,
-    Color    * colorShift,
+    GFC_Vector2D * flip,
+    GFC_Color    * colorShift,
     Uint32 pose,
     const char *name);
 
@@ -155,7 +155,7 @@ Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index);
  * @param rotation angle to draw it at
  * @param color the color to use to draw
  */
-void gf2d_armature_draw_bones(Armature2D *armature,Vector2D position, Vector2D scale, float rotation, Color color);
+void gf2d_armature_draw_bones(Armature2D *armature,GFC_Vector2D position, GFC_Vector2D scale, float rotation, GFC_Color color);
 
 /**
  * @brief draw a pose of an armature
@@ -166,7 +166,7 @@ void gf2d_armature_draw_bones(Armature2D *armature,Vector2D position, Vector2D s
  * @param rotation angle to draw it at
  * @param color the color to draw with
  */
-void gf2d_armature_draw_pose(Armature2D *armature,Uint32 poseindex,Vector2D position,Vector2D scale, float rotation, Color color);
+void gf2d_armature_draw_pose(Armature2D *armature,Uint32 poseindex,GFC_Vector2D position,GFC_Vector2D scale, float rotation, GFC_Color color);
 
 /**
  * @brief get an interpolation of a bonepose between two bones
@@ -194,10 +194,10 @@ void gf2d_armature_draw_tweened_pose(
     Uint32 poseA,
     Uint32 poseB,
     float fraction,
-    Vector2D position,
-    Vector2D scale,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
     float rotation,
-    Color color);
+    GFC_Color color);
 
 /**
  * @brief draw a pose bone to the screen
@@ -207,7 +207,7 @@ void gf2d_armature_draw_tweened_pose(
  * @param rotation angle to draw it at
  * @param color the color to draw with
  */
-void gf2d_armature_draw_pose_bone(BonePose *bonePose,Vector2D position,Vector2D scale, float rotation,Color color);
+void gf2d_armature_draw_pose_bone(BonePose *bonePose,GFC_Vector2D position,GFC_Vector2D scale, float rotation,GFC_Color color);
 
 /**
  * @brief draw a single bone
@@ -216,7 +216,7 @@ void gf2d_armature_draw_pose_bone(BonePose *bonePose,Vector2D position,Vector2D 
  * @param length of the bone
  * @param color in this color
  */
-void gf2d_armature_bone_draw(Vector2D position, float angle, float length, Color color);
+void gf2d_armature_bone_draw(GFC_Vector2D position, float angle, float length, GFC_Color color);
 
 /**
  * @brief draw a specific bone with respect to draw scale
@@ -226,7 +226,7 @@ void gf2d_armature_bone_draw(Vector2D position, float angle, float length, Color
  * @param rotation draw rotation
  * @param color the color to draw with
  */
-void gf2d_armature_draw_bone(Bone *bone,Vector2D position, Vector2D scale, float rotation, Color color);
+void gf2d_armature_draw_bone(Bone *bone,GFC_Vector2D position, GFC_Vector2D scale, float rotation, GFC_Color color);
 
 /**
  * @brief get a bone by its tip position
@@ -236,7 +236,7 @@ void gf2d_armature_draw_bone(Bone *bone,Vector2D position, Vector2D scale, float
  * @param ignore if not NULL, this will bone will be skipped in the search
  * @return NULL on error or no bones, the bone otherwise
  */
-Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,Vector2D position,Vector2D scale,Bone *ignore);
+Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,GFC_Vector2D position,GFC_Vector2D scale,Bone *ignore);
 
 /**
  * @brief get a copy of a bone
@@ -265,8 +265,8 @@ void gf2d_armature_add_bone_to_parent(Bone *parent,Bone *child);
 BonePose *gf2d_armature_get_bonepose_by_position(
     Armature2D *armature,
     Uint32 poseindex,
-    Vector2D position,
-    Vector2D scale,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
     float rotation,
     BonePose *ignore);
 
@@ -312,11 +312,11 @@ BonePose *gf2d_armature_get_bone_pose_by_name(Armature2D *armature,Uint32 pose, 
  * @param scale scale values by
  * @param rotation rotated by this much
  */
-Vector2D gf2d_armature_get_bonepose_tip_by_name(
+GFC_Vector2D gf2d_armature_get_bonepose_tip_by_name(
     Armature2D *armature,
     const char *bonename,
     Uint32 pose,
-    Vector2D scale,
+    GFC_Vector2D scale,
     float rotation);
 
 //manipulation
@@ -336,7 +336,7 @@ void gf2d_armature_bone_rotate_by_name(Armature2D *armature,const char *name, fl
  * @param poseindex the pose index for the bone
  * @param delta the amount to move
  */
-void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D delta);
+void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, GFC_Vector2D delta);
 
 /**
  * @brief rotate a bonepose and all of its children by the angle provided
@@ -346,7 +346,7 @@ void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32
  * @param center the point about which to rotate
  * @param angle how much to rotate the bone in radians
  */
-void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D center, float angle);
+void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, GFC_Vector2D center, float angle);
 
 /**
  * @brief get the root position for the bonepose given that it has been scaled
@@ -354,14 +354,14 @@ void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint
  * @param scale the scaling factor for drawing
  * @param rotation if it has been rotated as well
  */
-Vector2D gf2d_armature_get_pose_bone_draw_position(BonePose *posebone,Vector2D scale,float rotation);
+GFC_Vector2D gf2d_armature_get_pose_bone_draw_position(BonePose *posebone,GFC_Vector2D scale,float rotation);
 
 /**
  * @brief get the bonepose position in armature space
  * @param posebone the bonepose to get
- * @return a zero vector on error, or the position relative to the armature (could still be zero)
+ * @return a zero gfc_vector on error, or the position relative to the armature (could still be zero)
  */
-Vector2D gf2d_armature_get_pose_bone_position(BonePose *posebone);
+GFC_Vector2D gf2d_armature_get_pose_bone_position(BonePose *posebone);
 
 /**
  * @brief rotate the given bone by the amount
@@ -369,28 +369,28 @@ Vector2D gf2d_armature_get_pose_bone_position(BonePose *posebone);
  * @param center the point around to rotate
  * @param angle how much to rotate by
  */
-void gf2d_armature_bone_rotate(Bone *bone, Vector2D center, float angle);
+void gf2d_armature_bone_rotate(Bone *bone, GFC_Vector2D center, float angle);
 
 /**
  * @brief move the bone (and its children) to the new position relative to the armature
  * @param bone the bone to move
  * @param newPosition the new position to move to
  */
-void gf2d_armature_bone_move_to(Bone *bone,Vector2D newPosition);
+void gf2d_armature_bone_move_to(Bone *bone,GFC_Vector2D newPosition);
 
 /**
  * @brief move the bone (and its children)
  * @param bone the bone to move
  * @param offset how much to move by
  */
-void gf2d_armature_bone_move(Bone *bone,Vector2D offset);
+void gf2d_armature_bone_move(Bone *bone,GFC_Vector2D offset);
 
 /**
  * @brief move the tip of the bone
  * @param bone the bone to move
  * @param offset how much to move by
  */
-void gf2d_armature_bone_tip_move(Bone *bone,Vector2D offset);
+void gf2d_armature_bone_tip_move(Bone *bone,GFC_Vector2D offset);
 
 /**
  * @brief scale the bone (and its children)
@@ -398,7 +398,7 @@ void gf2d_armature_bone_tip_move(Bone *bone,Vector2D offset);
  * @param scale the factor to scale the bone by
  * @param center scale relative to this position
  */
-void gf2d_armature_bone_scale_children(Bone *bone,Vector2D scale, Vector2D center);
+void gf2d_armature_bone_scale_children(Bone *bone,GFC_Vector2D scale, GFC_Vector2D center);
 
 /**
  * @brief scale the entire armature by the provided scale
@@ -406,19 +406,19 @@ void gf2d_armature_bone_scale_children(Bone *bone,Vector2D scale, Vector2D cente
  * @param scale how much to scale each dimension by
  * @param center where to scale relative to
  */
-void gf2d_armature_scale(Armature2D *armature,Vector2D scale,Vector2D center);
+void gf2d_armature_scale(Armature2D *armature,GFC_Vector2D scale,GFC_Vector2D center);
 
 /**
  * @brief get the location of the bone tip in armature space
  * @param bone the bone to get
- * @return a zero vector on error, or the tip location in armature space
+ * @return a zero gfc_vector on error, or the tip location in armature space
  */
-Vector2D gf2d_armature_get_bone_tip(Bone *bone);
+GFC_Vector2D gf2d_armature_get_bone_tip(Bone *bone);
 
 /**
  * @brief get the tip of the posebone
  */
-Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,Vector2D scale, float rotation);
+GFC_Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,GFC_Vector2D scale, float rotation);
 
 /**
  * @brief create a new bone and its relative bone poses

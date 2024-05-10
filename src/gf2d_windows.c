@@ -29,9 +29,9 @@ typedef struct
     WindowDrawStyle style;      /**<tiled or stretched*/
     Window *window_list;        /**<list of all active windows*/
     int window_max;             /**<how many windows can exist at once*/
-    List *window_deque;         /**<draw order is back to front, update order is front to back*/
+    GFC_List *window_deque;         /**<draw order is back to front, update order is front to back*/
     int drawbounds;             /**<if true draw rects around window bounds*/
-    HashMap *sounds;            /**<sound pack for windows and elements*/
+    GFC_HashMap *sounds;            /**<sound pack for windows and elements*/
 }WindowManager;
 
 static WindowManager window_manager = {0};
@@ -39,7 +39,7 @@ static WindowManager window_manager = {0};
 Window *gf2d_window_load_from_json(SJson *json);
 Element *gf2d_window_get_next_element(Window *win,Element *from);
 
-void gf2d_draw_window_border_generic(Rect rect,Color color)
+void gf2d_draw_window_border_generic(GFC_Rect rect,GFC_Color color)
 {
     if (window_manager.style == WDS_Tiled)
     {
@@ -51,13 +51,13 @@ void gf2d_draw_window_border_generic(Rect rect,Color color)
     }
 }
 
-void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color color)
+void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_Color color)
 {
     int i;
-    Vector4D clip = {0,0,0,0};
-    Vector2D count = {0};
-    Vector2D fraction = {0};
-    Vector2D scale = {0};
+    GFC_Vector4D clip = {0,0,0,0};
+    GFC_Vector2D count = {0};
+    GFC_Vector2D fraction = {0};
+    GFC_Vector2D scale = {0};
     if ((bg)&&(bg->frameWidth != 0)&&(bg->frameHeight != 0))
     {
         
@@ -65,7 +65,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
         scale.y = (rect.h + 0.5)/bg->frameHeight;
         gf2d_sprite_draw(
             bg,
-            vector2d(rect.x,rect.y),
+            gfc_vector2d(rect.x,rect.y),
             &scale,
             NULL,
             NULL,
@@ -84,13 +84,13 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     fraction.x = ((float)rect.w / (float)border->frameWidth) - 1;
     count.y = (int)(rect.h / border->frameHeight) - 1;
     fraction.y = ((float)rect.h / (float)border->frameHeight) - 1;
-    vector2d_sub(fraction,fraction,count);
+    gfc_vector2d_sub(fraction,fraction,count);
     // draw horizontal borders
     for (i = 0; i  < count.x; i++)
     {
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y - border->frameWidth/2),
+            gfc_vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y - border->frameWidth/2),
             NULL,
             NULL,
             NULL,
@@ -100,7 +100,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             BE_Top);
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y + rect.h - border->frameWidth/2),
+            gfc_vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y + rect.h - border->frameWidth/2),
             NULL,
             NULL,
             NULL,
@@ -115,7 +115,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
         clip.w = 0;
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y - border->frameWidth/2),
+            gfc_vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y - border->frameWidth/2),
             NULL,
             NULL,
             NULL,
@@ -125,7 +125,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             BE_Top);
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y + rect.h - border->frameWidth/2),
+            gfc_vector2d(rect.x + border->frameWidth/2 + (i * border->frameWidth),rect.y + rect.h - border->frameWidth/2),
             NULL,
             NULL,
             NULL,
@@ -140,7 +140,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     {
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
+            gfc_vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -150,7 +150,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             BE_Left);
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
+            gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -167,7 +167,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
         clip.w = (1- fraction.y)*border->frameHeight;
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
+            gfc_vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -177,7 +177,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
             BE_Left);
         gf2d_sprite_draw(
             border,
-            vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
+            gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2  + (i * border->frameHeight)),
             NULL,
             NULL,
             NULL,
@@ -189,7 +189,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
     //corners
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + rect.w - border->frameWidth/2,rect.y - border->frameWidth/2),
+        gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -199,7 +199,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
         BE_TR);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
+        gfc_vector2d(rect.x - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -209,7 +209,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
         BE_BL);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x - border->frameWidth/2,rect.y - border->frameWidth/2),
+        gfc_vector2d(rect.x - border->frameWidth/2,rect.y - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -219,7 +219,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
         BE_TL);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
+        gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -234,16 +234,16 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color col
 
 }
 
-void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color color)
+void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_Color color)
 {
-    Vector2D scale = {0};
+    GFC_Vector2D scale = {0};
     if ((bg)&&(bg->frameWidth != 0)&&(bg->frameHeight != 0))
     {
         scale.x = rect.w/bg->frameWidth;
         scale.y = rect.h/bg->frameHeight;
         gf2d_sprite_draw(
             bg,
-            vector2d(rect.x,rect.y),
+            gfc_vector2d(rect.x,rect.y),
             &scale,
             NULL,
             NULL,
@@ -257,7 +257,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
     scale.y = 1;
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + border->frameWidth/2,rect.y - border->frameWidth/2),
+        gfc_vector2d(rect.x + border->frameWidth/2,rect.y - border->frameWidth/2),
         &scale,
         NULL,
         NULL,
@@ -267,7 +267,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
         BE_Top);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + border->frameWidth/2,rect.y + rect.h- border->frameWidth/2),
+        gfc_vector2d(rect.x + border->frameWidth/2,rect.y + rect.h- border->frameWidth/2),
         &scale,
         NULL,
         NULL,
@@ -281,7 +281,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
 
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2),
+        gfc_vector2d(rect.x - border->frameWidth/2,rect.y + border->frameWidth/2),
         &scale,
         NULL,
         NULL,
@@ -291,7 +291,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
         BE_Left);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2),
+        gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + border->frameWidth/2),
         &scale,
         NULL,
         NULL,
@@ -302,7 +302,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
     //corners
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + rect.w - border->frameWidth/2,rect.y - border->frameWidth/2),
+        gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -312,7 +312,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
         BE_TR);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
+        gfc_vector2d(rect.x - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -322,7 +322,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
         BE_BL);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x - border->frameWidth/2,rect.y - border->frameWidth/2),
+        gfc_vector2d(rect.x - border->frameWidth/2,rect.y - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -332,7 +332,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color
         BE_TL);
     gf2d_sprite_draw(
         border,
-        vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
+        gfc_vector2d(rect.x + rect.w - border->frameWidth/2,rect.y + rect.h - border->frameWidth/2),
         NULL,
         NULL,
         NULL,
@@ -366,9 +366,9 @@ void gf2d_windows_close()
 
 void gf2d_windows_init(int max_windows,const char *config)
 {
-    TextLine background,border;
+    GFC_TextLine background,border;
     const char *str;
-    Vector2D borderSize = {64,64};
+    GFC_Vector2D borderSize = {64,64};
     int      borderFPL = 8;
     SJson *file,*window,*sounds;
     if (max_windows <= 0)
@@ -480,16 +480,16 @@ void gf2d_window_refresh_by_name(const char *name)
 }
 
 
-void gf2d_window_set_dimensions(Window *win,Rect dimensions)
+void gf2d_window_set_dimensions(Window *win,GFC_Rect dimensions)
 {
     if (!win)return;
     gfc_rect_copy(win->dimensions,dimensions);
 }
 
-void gf2d_window_set_position(Window *win,Vector2D position)
+void gf2d_window_set_position(Window *win,GFC_Vector2D position)
 {
     if (!win)return;
-    vector2d_copy(win->dimensions,position);
+    gfc_vector2d_copy(win->dimensions,position);
 }
 
 void gf2d_window_hide(Window *win)
@@ -508,7 +508,7 @@ void gf2d_window_unhide(Window *win)
 void gf2d_window_draw(Window *win)
 {
     int count,i;
-    Vector2D offset;
+    GFC_Vector2D offset;
     if (!win)return;
     if (win->hidden)return;
     if (!win->no_draw_generic)
@@ -528,9 +528,9 @@ int gf2d_window_update(Window *win)
 {
     int count,i;
     int retval = 0;
-    Vector2D offset;
-    List *updateList = gfc_list_new();
-    List *updated = NULL;
+    GFC_Vector2D offset;
+    GFC_List *updateGFC_List = gfc_list_new();
+    GFC_List *updated = NULL;
     Element *e;
     if (!win)return 0;
     if (win->hidden)return 0;
@@ -544,14 +544,14 @@ int gf2d_window_update(Window *win)
         updated = gf2d_element_update(e, offset);
         if (updated)
         {
-            updateList = gfc_list_concat_free(updateList,updated);
+            updateGFC_List = gfc_list_concat_free(updateGFC_List,updated);
         }
     }
     if (win->update)
     {
-        retval = win->update(win,updateList);
+        retval = win->update(win,updateGFC_List);
     }
-    gfc_list_delete(updateList);
+    gfc_list_delete(updateGFC_List);
     return retval;
 }
 
@@ -768,7 +768,7 @@ int gf2d_windows_update_all()
 
 void gf2d_window_align(Window *win,int vertical)
 {
-    Vector2D res;
+    GFC_Vector2D res;
     if (!win)return;
     res = gf3d_vgraphics_get_resolution();
     if (vertical < 0)
@@ -787,7 +787,7 @@ void gf2d_window_align(Window *win,int vertical)
 
 void gf2d_window_justify(Window *win,int horizontal)
 {
-    Vector2D res;
+    GFC_Vector2D res;
     if (!win)return;
     res = gf3d_vgraphics_get_resolution();
     if (horizontal < 0)
@@ -806,7 +806,7 @@ void gf2d_window_justify(Window *win,int horizontal)
 
 void gf2d_window_calibrate(Window *win)
 {
-    Vector2D res;
+    GFC_Vector2D res;
     if (!win)return;
     res = gf3d_vgraphics_get_resolution();
     if ((win->dimensions.x > 0)&&(win->dimensions.x < 1.0))
@@ -865,7 +865,7 @@ Window *gf2d_window_load_from_json(SJson *json)
     Window *win = NULL;
     int i,count;
     short int buul = 0;
-    Vector4D vector = {255,255,255,255};
+    GFC_Vector4D gfc_vector = {255,255,255,255};
     SJson *elements,*value;
     const char *buffer;
     if (!json)
@@ -890,12 +890,12 @@ Window *gf2d_window_load_from_json(SJson *json)
     if (buffer)gfc_line_cpy(win->name,buffer);
     sj_get_bool_value(sj_object_get_value(json,"no_draw_generic"),&buul);
     if (buul)win->no_draw_generic = 1;
-    sj_value_as_vector4d(sj_object_get_value(json,"color"),&vector);
-    win->color = gfc_color_from_vector4(vector);
+    sj_value_as_vector4d(sj_object_get_value(json,"color"),&gfc_vector);
+    win->color = gfc_color_from_vector4(gfc_vector);
     
-    vector4d_clear(vector);
-    sj_value_as_vector4d(sj_object_get_value(json,"dimensions"),&vector);
-    win->dimensions = gfc_rect(vector.x,vector.y,vector.z,vector.w);
+    gfc_vector4d_clear(gfc_vector);
+    sj_value_as_vector4d(sj_object_get_value(json,"dimensions"),&gfc_vector);
+    win->dimensions = gfc_rect(gfc_vector.x,gfc_vector.y,gfc_vector.z,gfc_vector.w);
     gf2d_window_calibrate(win);
     
     value = sj_object_get_value(json,"justify");

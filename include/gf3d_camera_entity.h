@@ -16,7 +16,7 @@ typedef enum
  * @param position where to spawn the entity at
  * @return NULL on error, or an entity pointer on success
  */
-Entity *gf3d_camera_entity_new(Vector3D position,Vector3D rotation);
+Entity *gf3d_camera_entity_new(GFC_Vector3D position,GFC_Vector3D rotation);
 
 /**
  * @brief enable/disable free look mode
@@ -39,25 +39,25 @@ Bool gf3d_camera_entity_free_look_enabled();
  * @brief set the position of the camera
  * @param position where to put it
  */
-void gf3d_camera_entity_set_position(Vector3D position);
+void gf3d_camera_entity_set_position(GFC_Vector3D position);
 
 /**
  * @brief get the position of the camera
  * @return where it is
  */
-Vector3D gf3d_camera_entity_get_position();
+GFC_Vector3D gf3d_camera_entity_get_position();
 
 /**
  * @brief set this position as the target to look at
  * @param target the point to look at
  */
-void gf3d_camera_entity_set_look_target(Vector3D target);
+void gf3d_camera_entity_set_look_target(GFC_Vector3D target);
 
 /**
  * @brief get the current look target location
  * @return the target position
  */
-Vector3D gf3d_camera_entity_get_look_target();
+GFC_Vector3D gf3d_camera_entity_get_look_target();
 
 /**
  * @brief get the current look target entity

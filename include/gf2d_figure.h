@@ -16,22 +16,22 @@
 
 typedef struct
 {
-    TextLine    bonename;       /**<name of the bone this is associated with*/
-    TextLine    actorname;      /**<name of the bone this is associated with*/
-    TextLine    action;         /**<name of the action to use*/
-    Vector2D    offset;         /**<position offset from the bone root*/
+    GFC_TextLine    bonename;       /**<name of the bone this is associated with*/
+    GFC_TextLine    actorname;      /**<name of the bone this is associated with*/
+    GFC_TextLine    action;         /**<name of the action to use*/
+    GFC_Vector2D    offset;         /**<position offset from the bone root*/
     float       rotation;       /**<rotation offset from the bone*/
-    Vector2D    scale;          /**<scale*/
+    GFC_Vector2D    scale;          /**<scale*/
     Bone       *bone;           /**<link to the bone*/
 }FigureLink;
 
 typedef struct
 {
     int         _inuse;       /**<set if the actor is in use*/
-    TextLine    filename;     /**<the filename*/
-    TextLine    name;         /**<figure name*/
+    GFC_TextLine    filename;     /**<the filename*/
+    GFC_TextLine    name;         /**<figure name*/
     Armature2D *armature;     /**<which armature is used for this figure*/
-    List       *links;        /**<list of FigureLinks to draw this with*/
+    GFC_List       *links;        /**<list of FigureLinks to draw this with*/
 }Figure;
 
 // below are for keeping track of individual instanes of figures
@@ -47,7 +47,7 @@ typedef struct
 {
     Uint8    _inuse;
     Figure  *figure;
-    List    *instances;
+    GFC_List    *instances;
     Action  *action;
     float    frame;
     Uint32   nextFrame;
@@ -226,10 +226,10 @@ void gf2d_figure_instance_link(FigureInstance *instance);
  */
 void gf2d_figure_instance_draw(
     FigureInstance *instance,
-    Vector2D position,
-    Vector2D *scale,
+    GFC_Vector2D position,
+    GFC_Vector2D *scale,
     float *rotation,
-    Color *color,
+    GFC_Color *color,
     int tween);
 
 /**
@@ -246,9 +246,9 @@ void gf2d_figure_link_draw(
     Figure *figure,
     FigureLink *link,
     float       poseIndex,
-    Vector2D    position,
-    Vector2D   *scale,
+    GFC_Vector2D    position,
+    GFC_Vector2D   *scale,
     float      *rotation,
-    Color      *color);
+    GFC_Color      *color);
 
 #endif

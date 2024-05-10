@@ -12,11 +12,11 @@ typedef struct
     Element *scrollDown;    //or right
     Element *scrollSlider;  //The thing that indicates position
     Element *list;          //the list we are scrolling for.  We don't own this, we just point to it
-    ListStyle scrollStyle;
+    GFC_ListStyle scrollStyle;
     Bool drawSlider;         //if we should draw the slider or not
 }ScrollbarElement;
 
-Element *gf2d_element_scrollbar_new_simple(Element *list,Rect bounds);
+Element *gf2d_element_scrollbar_new_simple(Element *list,GFC_Rect bounds);
 
 ScrollbarElement *gf2d_element_scrollbar_new();
 

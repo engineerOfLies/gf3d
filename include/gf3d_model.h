@@ -41,25 +41,25 @@
 typedef struct
 {
     Uint32              refCount;
-    TextLine            filename;
+    GFC_TextLine            filename;
     
-    List               *mesh_list;
+    GFC_List               *mesh_list;
     Texture            *texture;
     Texture            *normalMap;
     Armature3D         *armature;
-    Box                 bounds;         //copied from the mesh
+    GFC_Box                 bounds;         //copied from the mesh
 }Model;
 
 typedef struct
 {
     Model *model;
-    Matrix4 mat;
-    Vector3D position;
-    Vector3D rotation;
-    Vector3D scale;
-    Vector3D positionDelta;
-    Vector3D rotationDelta;
-    Vector3D scaleDelta;
+    GFC_Matrix4 mat;
+    GFC_Vector3D position;
+    GFC_Vector3D rotation;
+    GFC_Vector3D scale;
+    GFC_Vector3D positionDelta;
+    GFC_Vector3D rotationDelta;
+    GFC_Vector3D scaleDelta;
 }ModelMat;
 
 /**
@@ -105,30 +105,30 @@ Model * gf3d_model_load_from_config(SJson *json);
  * @param index the mesh to render from the mesh_list, could be animation frames if a sequence of objs, or sub-meshes
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
- * @param detailColor color to swap in for sections of PURE red of the texture
+ * @param detailGFC_Color color to swap in for sections of PURE red of the texture
  * @param ambient how much ambient light there is
  * @param frame the animation frame to use for armature based animations
  */
-void gf3d_model_draw(Model *model,Uint32 index,Matrix4 modelMat,Vector4D colorMod,Vector4D detailColor, Vector4D ambientLight, Uint32 frame);
+void gf3d_model_draw(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D colorMod,GFC_Vector4D detailGFC_Color, GFC_Vector4D ambientLight, Uint32 frame);
 
 /**
  * @brief draw all of the meshes of a model.  This is meant for multi-mesh models
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation
- * @param detailColor color to swap in for sections of PURE red of the texture
+ * @param detailGFC_Color color to swap in for sections of PURE red of the texture
  * @param ambient how much ambient light there is
  * @param frame used to access a frame of armature based animation
  */
-void gf3d_model_draw_all_meshes(Model *model,Matrix4 modelMat,Color colorMod,Color detailColor, Color ambientLight,Uint32 frame);
+void gf3d_model_draw_all_meshes(Model *model,GFC_Matrix4 modelMat,GFC_Color colorMod,GFC_Color detailGFC_Color, GFC_Color ambientLight,Uint32 frame);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
- * @param highlightColor the color of the outline
+ * @param highlightGFC_Color the color of the outline
  */
-void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector4D highlight);
+void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D highlight);
 
 /**
  * @brief queue up a model for rendering as a sky
@@ -136,7 +136,7 @@ void gf3d_model_draw_highlight(Model *model,Uint32 index,Matrix4 modelMat,Vector
  * @param modelMat the model matrix (MVP)
  * @param color the color adjustement (gfc_color(1,1,1,1) for no color change
  */
-void gf3d_model_draw_sky(Model *model,Matrix4 modelMat,Color color);
+void gf3d_model_draw_sky(Model *model,GFC_Matrix4 modelMat,GFC_Color color);
 
 /**
  * @brief free a model
@@ -160,17 +160,17 @@ void gf3d_model_mat_parse(ModelMat *mat,SJson *config);
  * @param scale used to make this matrix
  */
 void mat_from_parent(
-    Matrix4 out,
-    Matrix4 parent,
-    Vector3D position,
-    Vector3D rotation,
-    Vector3D scale);
+    GFC_Matrix4 out,
+    GFC_Matrix4 parent,
+    GFC_Vector3D position,
+    GFC_Vector3D rotation,
+    GFC_Vector3D scale);
 
 
 /**
  * @brief save a modelMat to config
  * @param mat the matrix to save
- * @param updateFirst if true, run the extraction from the matrix4 to the component vectors before making the config
+ * @param updateFirst if true, run the extraction from the matrix4 to the component gfc_vectors before making the config
  * @return NULL on error, or the populated SJson otherwise
  */
 SJson *gf3d_model_mat_save(ModelMat *mat,Bool updateFirst);
@@ -200,8 +200,8 @@ void gf3d_model_mat_reset(ModelMat *mat);
 void gf3d_model_mat_set_matrix(ModelMat *mat);
 
 /**
- * @brief extract the translation, rotation, and scale vectors from the modelMat matrix
- * @param mat the matrix to extract the vectors from
+ * @brief extract the translation, rotation, and scale gfc_vectors from the modelMat matrix
+ * @param mat the matrix to extract the gfc_vectors from
  */
 void gf3d_model_mat_extract_vectors(ModelMat *mat);
 
@@ -210,42 +210,42 @@ void gf3d_model_mat_extract_vectors(ModelMat *mat);
  * @param mat the modelMat to set
  * @param scale the scale value (1,1,1) is no scale at all
  */
-void gf3d_model_mat_set_scale(ModelMat *mat,Vector3D scale);
+void gf3d_model_mat_set_scale(ModelMat *mat,GFC_Vector3D scale);
 
 /**
  * @brief set a model mat scale
  * @param mat the modelMat to set
  * @param position the position to set
  */
-void gf3d_model_mat_set_position(ModelMat *mat,Vector3D position);
+void gf3d_model_mat_set_position(ModelMat *mat,GFC_Vector3D position);
 
 /**
  * @brief set a model mat rotation
  * @param mat the modelMat to set
  * @param rotation the rotation to set
  */
-void gf3d_model_mat_set_rotation(ModelMat *mat,Vector3D rotation);
+void gf3d_model_mat_set_rotation(ModelMat *mat,GFC_Vector3D rotation);
 
 /**
  * @brief scale a modelMat from its current scale
  * @param mat the modelMat to change
  * @param scale the amount to change the scale by
  */
-void gf3d_model_mat_scale(ModelMat *mat,Vector3D scale);
+void gf3d_model_mat_scale(ModelMat *mat,GFC_Vector3D scale);
 
 /**
  * @brief move a modelMat from its current position
  * @param mat the modelMat to change
  * @param translation the amount to change the position by
  */
-void gf3d_model_mat_move(ModelMat *mat,Vector3D translation);
+void gf3d_model_mat_move(ModelMat *mat,GFC_Vector3D translation);
 
 /**
  * @brief rotate a modelMat from its current rotation
  * @param mat the modelMat to change
  * @param rotation the amount to change the rotation by
  */
-void gf3d_model_mat_rotate(ModelMat *mat,Vector3D rotation);
+void gf3d_model_mat_rotate(ModelMat *mat,GFC_Vector3D rotation);
 
 /**
  * @brief parse a mesh / model out of a gltf file.  Including bone associations and weights

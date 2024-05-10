@@ -35,7 +35,7 @@
 typedef struct
 {
     Uint8                       _inuse;
-    TextLine                    filename;               /**<the name of the file used to create the sprite*/
+    GFC_TextLine                    filename;               /**<the name of the file used to create the sprite*/
     Uint32                      frameCount;             /**<how many frames are loaded for this model*/
     Texture                    *texture;                /**<texture memory pointer*/
     Uint8                       framesPerLine;          /**<how many frames are per line in the sprite sheet*/
@@ -128,13 +128,13 @@ void gf2d_sprite_free(Sprite *sprite);
  */
 void gf2d_sprite_draw(
     Sprite * sprite,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Vector2D * flip,
-    Color    * colorShift,
-    Vector4D * clip,
+    GFC_Vector2D * flip,
+    GFC_Color    * colorShift,
+    GFC_Vector4D * clip,
     Uint32 frame);
 
 /**
@@ -151,13 +151,13 @@ void gf2d_sprite_draw(
  */
 void gf2d_sprite_draw_full(
     Sprite   * sprite,
-    Vector2D   position,
-    Vector2D   scale,
-    Vector2D   center,
+    GFC_Vector2D   position,
+    GFC_Vector2D   scale,
+    GFC_Vector2D   center,
     float      rotation,
-    Vector2D   flip,
-    Color      colorShift,
-    Vector4D   clip,
+    GFC_Vector2D   flip,
+    GFC_Color      colorShift,
+    GFC_Vector4D   clip,
     Uint32     frame);
 
 /**
@@ -172,9 +172,9 @@ void gf2d_sprite_draw_full(
  */
 void gf2d_sprite_draw_to_surface(
     Sprite *sprite,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * scaleCenter,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * scaleCenter,
     Uint32 frame,
     SDL_Surface *surface
 );
@@ -187,12 +187,12 @@ void gf2d_sprite_draw_to_surface(
  */
 void gf2d_sprite_draw_simple(
     Sprite   * sprite,
-    Vector2D   position,
+    GFC_Vector2D   position,
     Uint32     frame);
 
 void gf2d_sprite_draw_image(
     Sprite   * sprite,
-    Vector2D   position);
+    GFC_Vector2D   position);
 
 /**
  * @brief get the default pipeline for overlay rendering

@@ -18,17 +18,17 @@
 
 typedef struct
 {
-    TextLine    text;
-    Color       color;
+    GFC_TextLine    text;
+    GFC_Color       color;
     Uint32      ttl;
 }Message;
 
 typedef struct
 {
-    Color   defaultColor;
+    GFC_Color   defaultGFC_Color;
     int     bufferCount;// how many messages can be displayed at once
     Uint32  ttl;        // how long each message will be given to live
-    List   *messages;   // text buffers for the messages
+    GFC_List   *messages;   // text buffers for the messages
 }MessageBufferData;
 
 static Window *MessageWindow = NULL; // WE ARE A SINGLETON
@@ -59,7 +59,7 @@ int message_buffer_free(Window *win)
     return 0;
 }
 
-int message_buffer_update(Window *win,List *updateList)
+int message_buffer_update(Window *win,GFC_List *updateGFC_List)
 {
     int i,count;
     Message *message;
@@ -98,7 +98,7 @@ int message_buffer_update(Window *win,List *updateList)
     return 0;
 }
 
-Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor)
+Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultGFC_Color)
 {
     int i;
     LabelElement *label;
@@ -120,7 +120,7 @@ Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor)
     data->messages = gfc_list_new();
     data->bufferCount = count;
     data->ttl = timeout;
-    gfc_color_copy(data->defaultColor,defaultColor);
+    gfc_color_copy(data->defaultGFC_Color,defaultGFC_Color);
 
     p = gf2d_window_get_element_by_id(win,0);
     for (i =0; i  < count; i++)
@@ -161,7 +161,7 @@ void message_new(const char *newMessage)
     
     data = MessageWindow->data;
     
-    gfc_color_copy(message->color,data->defaultColor);
+    gfc_color_copy(message->color,data->defaultGFC_Color);
     message->ttl = data->ttl;
     gfc_line_cpy(message->text,newMessage);
     data->messages = gfc_list_append(data->messages,message);
@@ -169,7 +169,7 @@ void message_new(const char *newMessage)
 
 void message_printf(const char *newMessage,...)
 {
-    TextLine msg;
+    GFC_TextLine msg;
     va_list ap;
     /*echo all logging to stdout*/
     va_start(ap,newMessage);
@@ -178,7 +178,7 @@ void message_printf(const char *newMessage,...)
     message_new(msg);
 }
 
-void message_buffer_set_position(Vector2D position)
+void message_buffer_set_position(GFC_Vector2D position)
 {
     if (!MessageWindow)return;
     gf2d_window_set_position(MessageWindow,position);

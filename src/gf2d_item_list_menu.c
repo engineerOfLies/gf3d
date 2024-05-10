@@ -15,33 +15,33 @@
 
 typedef struct
 {
-    Callback callback;
+    GFC_Callback callback;
     int *result;
-}ItemListMenuData;
+}ItemGFC_ListMenuData;
 
 int item_list_menu_free(Window *win)
 {
-    ItemListMenuData* data;
+    ItemGFC_ListMenuData* data;
     if ((!win)||(!win->data))return 0;
-    data = (ItemListMenuData*)win->data;
+    data = (ItemGFC_ListMenuData*)win->data;
     gf2d_window_close_child(win->parent,win);
     free(data);
     return 0;
 }
 
-int item_list_menu_update(Window *win,List *updateList)
+int item_list_menu_update(Window *win,GFC_List *updateGFC_List)
 {
     int i,count;
     Element *e;
-    ItemListMenuData* data;
+    ItemGFC_ListMenuData* data;
     if ((!win)||(!win->data))return 0;
-    if (!updateList)return 0;
-    data = (ItemListMenuData*)win->data;
+    if (!updateGFC_List)return 0;
+    data = (ItemGFC_ListMenuData*)win->data;
         
-    count = gfc_list_get_count(updateList);
+    count = gfc_list_get_count(updateGFC_List);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateList,i);
+        e = gfc_list_get_nth(updateGFC_List,i);
         if (e->index >= 1000)
         {
             if (data->result)
@@ -119,11 +119,11 @@ void item_list_menu_add_option(Window *win, const char *option,int index)
     gf2d_element_list_add_item(list,be);
 }
 
-void item_list_menu_add_all_options(Window *win,List *options)
+void item_list_menu_add_all_options(Window *win,GFC_List *options)
 {
     const char *item;
     int i,c;
-    Vector2D screen;
+    GFC_Vector2D screen;
     if ((!win)||(!options))return;
     c = gfc_list_get_count(options);
     gf2d_window_set_dimensions(
@@ -147,11 +147,11 @@ void item_list_menu_add_all_options(Window *win,List *options)
 }
 
 
-Window *item_list_menu(Window *parent,Vector2D position,float width,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result)
+Window *item_list_menu(Window *parent,GFC_Vector2D position,float width,char *question,GFC_List *options,void(*onSelect)(void *),void *callbackData,int *result)
 {
     Element *e;
     Window *win;
-    ItemListMenuData* data;
+    ItemGFC_ListMenuData* data;
     win = gf2d_window_load("menus/item_list_menu.json");
     if (!win)
     {
@@ -160,7 +160,7 @@ Window *item_list_menu(Window *parent,Vector2D position,float width,char *questi
     }
     win->update = item_list_menu_update;
     win->free_data = item_list_menu_free;
-    data = gfc_allocate_array(sizeof(ItemListMenuData),1);
+    data = gfc_allocate_array(sizeof(ItemGFC_ListMenuData),1);
     if (!data)
     {
         gf2d_window_free(win);

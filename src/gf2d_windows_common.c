@@ -13,21 +13,21 @@
 
 int yes_no_free(Window *win)
 {
-    List *list;
+    GFC_List *list;
     int count,i;
-    Callback *callback;
+    GFC_Callback *callback;
 
     if (!win)return 0;
     if (!win->data)return 0;
 
-    list = (List*)win->data;
+    list = (GFC_List*)win->data;
     if (list)
     {
     count = gfc_list_get_count(list);
 
         for (i = 0; i < count; i++)
         {
-            callback = (Callback*)gfc_list_get_nth(list,i);
+            callback = (GFC_Callback*)gfc_list_get_nth(list,i);
             if (callback)
             {
                 gfc_callback_free(callback);
@@ -39,15 +39,15 @@ int yes_no_free(Window *win)
     return 0;
 }
 
-int yes_no_update(Window *win,List *updateList)
+int yes_no_update(Window *win,GFC_List *updateGFC_List)
 {
     int i,count;
     Element *e;
     Element *focus;
-    List *callbacks;
-    Callback *callback;
+    GFC_List *callbacks;
+    GFC_Callback *callback;
     if (!win)return 0;
-    if (!updateList)return 0;
+    if (!updateGFC_List)return 0;
     
     if ((gf2d_mouse_hidden())&&(gfc_input_command_pressed("nextelement")))
     {
@@ -55,11 +55,11 @@ int yes_no_update(Window *win,List *updateList)
         return 1;
     }
 
-    callbacks = (List*)win->data;
-    count = gfc_list_get_count(updateList);
+    callbacks = (GFC_List*)win->data;
+    count = gfc_list_get_count(updateGFC_List);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateList,i);
+        e = gfc_list_get_nth(updateGFC_List,i);
         if (!e)continue;
         if ((strcmp(e->name,"item_right")==0)||(strcmp(e->name,"item_left")==0))
         {
@@ -77,7 +77,7 @@ int yes_no_update(Window *win,List *updateList)
         switch(e->index)
         {
             case 51:
-                callback = (Callback*)gfc_list_get_nth(callbacks,0);
+                callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
                 if (callback)
                 {
                     gfc_callback_call(callback);
@@ -85,7 +85,7 @@ int yes_no_update(Window *win,List *updateList)
                 gf2d_window_free(win);
                 return 1;
             case 52:
-                callback = (Callback*)gfc_list_get_nth(callbacks,1);
+                callback = (GFC_Callback*)gfc_list_get_nth(callbacks,1);
                 if (callback)
                 {
                     gfc_callback_call(callback);
@@ -100,7 +100,7 @@ int yes_no_update(Window *win,List *updateList)
 Window *window_yes_no(char *text, void(*onYes)(void *),void(*onNo)(void *),void *data)
 {
     Window *win;
-    List *callbacks;
+    GFC_List *callbacks;
     win = gf2d_window_load("menus/yes_no_window.json");
     if (!win)
     {
@@ -125,24 +125,24 @@ Window *window_yes_no(char *text, void(*onYes)(void *),void(*onNo)(void *),void 
 }
 
 
-int ok_update(Window *win,List *updateList)
+int ok_update(Window *win,GFC_List *updateGFC_List)
 {
     int i,count;
     Element *e;
-    List *callbacks;
-    Callback *callback;
+    GFC_List *callbacks;
+    GFC_Callback *callback;
     if (!win)return 0;
-    if (!updateList)return 0;
-    callbacks = (List*)win->data;
-    count = gfc_list_get_count(updateList);
+    if (!updateGFC_List)return 0;
+    callbacks = (GFC_List*)win->data;
+    count = gfc_list_get_count(updateGFC_List);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateList,i);
+        e = gfc_list_get_nth(updateGFC_List,i);
         if (!e)continue;
         switch(e->index)
         {
             case 51:
-                callback = (Callback*)gfc_list_get_nth(callbacks,0);
+                callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
                 if (callback)
                 {
                     gfc_callback_call(callback);
@@ -154,19 +154,19 @@ int ok_update(Window *win,List *updateList)
     return 0;
 }
 
-int alert_update(Window *win,List *updateList)
+int alert_update(Window *win,GFC_List *updateGFC_List)
 {
     int i,count;
     Element *e;
-    List *callbacks;
-    Callback *callback;
+    GFC_List *callbacks;
+    GFC_Callback *callback;
     if (!win)return 0;
-    callbacks = (List*)win->data;
+    callbacks = (GFC_List*)win->data;
     if (gf2d_mouse_button_pressed(0))
     {
         if (callbacks)
         {
-            callback = (Callback*)gfc_list_get_nth(callbacks,0);
+            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
             if (callback)
             {
                 gfc_callback_call(callback);
@@ -175,15 +175,15 @@ int alert_update(Window *win,List *updateList)
         gf2d_window_free(win);
         return 1;
     }
-    if (!updateList)return 0;
-    count = gfc_list_get_count(updateList);
+    if (!updateGFC_List)return 0;
+    count = gfc_list_get_count(updateGFC_List);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateList,i);
+        e = gfc_list_get_nth(updateGFC_List,i);
         if (!e)continue;
         if (strcmp(e->name,"ok")==0)
         {
-            callback = (Callback*)gfc_list_get_nth(callbacks,0);
+            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
             if (callback)
             {
                 gfc_callback_call(callback);
@@ -198,7 +198,7 @@ int alert_update(Window *win,List *updateList)
 Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData)
 {
     Window *win;
-    List *callbacks;
+    GFC_List *callbacks;
     win = gf2d_window_load("menus/alert_menu.json");
     if (!win)
     {
@@ -221,7 +221,7 @@ Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData)
 Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
 {
     Window *win;
-    List *callbacks;
+    GFC_List *callbacks;
     win = gf2d_window_load("menus/dialog.json");
     if (!win)
     {
@@ -245,7 +245,7 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
 Window *window_text_entry(char *question, char *defaultText,void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *))
 {
     Window *win;
-    List *callbacks;
+    GFC_List *callbacks;
     win = gf2d_window_load("menus/text_entry_window.json");
     if (!win)
     {
@@ -273,7 +273,7 @@ Window *window_text_entry(char *question, char *defaultText,void *callbackData, 
 Window *window_key_value(char *question, char *defaultKey,char *defaultValue,void *callbackData, size_t keyLength,size_t valueLength, void(*onOk)(void *),void(*onCancel)(void *))
 {
     Window *win;
-    List *callbacks;
+    GFC_List *callbacks;
     win = gf2d_window_load("menus/key_value.json");
     if (!win)
     {
@@ -302,33 +302,33 @@ Window *window_key_value(char *question, char *defaultKey,char *defaultValue,voi
 
 typedef struct
 {
-    Color *color;
-    Color color8;
-    Callback okay;
-    Callback cancel;
-}GF2DWindowColorPickData;
+    GFC_Color *color;
+    GFC_Color color8;
+    GFC_Callback okay;
+    GFC_Callback cancel;
+}GF2DWindowGFC_ColorPickData;
 
 int window_color_select_free(Window *win)
 {
-    GF2DWindowColorPickData *data;
+    GF2DWindowGFC_ColorPickData *data;
     if ((!win)||(!win->data))return 0;
     data = win->data;
     free(data);
     return 0;
 }
 
-int window_color_select_update(Window *win,List *updateList)
+int window_color_select_update(Window *win,GFC_List *updateGFC_List)
 {
     int i,count;
     Element *e;
-    GF2DWindowColorPickData *data;
+    GF2DWindowGFC_ColorPickData *data;
     if ((!win)||(!win->data))return 0;
-    if (!updateList)return 0;
+    if (!updateGFC_List)return 0;
     data = win->data;
-    count = gfc_list_get_count(updateList);
+    count = gfc_list_get_count(updateGFC_List);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateList,i);
+        e = gfc_list_get_nth(updateGFC_List,i);
         if (!e)continue;
         if (strcmp(e->name,"red_up")==0)
         {
@@ -409,8 +409,8 @@ int window_color_select_update(Window *win,List *updateList)
 
 void window_color_refresh(Window *win)
 {
-    TextLine buffer;
-    GF2DWindowColorPickData *data;
+    GFC_TextLine buffer;
+    GF2DWindowGFC_ColorPickData *data;
     if ((!win)||(!win->data))return;
     data = win->data;
     gf2d_element_set_background_color(gf2d_window_get_element_by_name(win,"color"),data->color8);
@@ -422,10 +422,10 @@ void window_color_refresh(Window *win)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"blue"),buffer);
 }
 
-Window *window_color_select(char *title, Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *okData)
+Window *window_color_select(char *title, GFC_Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *okData)
 {
     Window *win;
-    GF2DWindowColorPickData *data;
+    GF2DWindowGFC_ColorPickData *data;
     if (!color)return NULL;
     win = gf2d_window_load("menus/color_pick.menu");
     if (!win)
@@ -433,7 +433,7 @@ Window *window_color_select(char *title, Color *color, void(*onOK)(void *),void(
         slog("failed to load color pick menu");
         return NULL;
     }
-    data = gfc_allocate_array(sizeof(GF2DWindowColorPickData),1);
+    data = gfc_allocate_array(sizeof(GF2DWindowGFC_ColorPickData),1);
     if (!data)
     {
         gf2d_window_free(win);

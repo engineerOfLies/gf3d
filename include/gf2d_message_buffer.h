@@ -9,9 +9,9 @@
  * @note this is a singleton and won't make a new one if one already exists
  * @param count how many messages will be displayed at once
  * @param timeout how long messages stay in the buffer before timing out
- * @param defaultColor the color the messages are drawn with
+ * @param defaultGFC_Color the color the messages are drawn with
  */
-Window *window_message_buffer(int count, Uint32 timeout, Color defaultColor);
+Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultGFC_Color);
 
 /**
  * @brief print a new message to the message buffer
@@ -35,7 +35,7 @@ void message_buffer_bubble();
  * @brief change where on the screen the message buffer is
  * @param position where on the screen to move the buffer to
  */
-void message_buffer_set_position(Vector2D position);
+void message_buffer_set_position(GFC_Vector2D position);
 
 
 #endif

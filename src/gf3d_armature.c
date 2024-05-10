@@ -9,7 +9,7 @@
 typedef struct
 {
     Uint32 maxArmatures;
-    Armature3D *armatureList;
+    Armature3D *armatureGFC_List;
 }ArmatureManager3D;
 
 static ArmatureManager3D armature_manager3d = {0};
@@ -51,9 +51,9 @@ void gf3d_armature_add_bone_pose_data(
     Armature3D *armature,
     Bone3D *bone,
     Uint32 frame,
-    Vector3D *translation,
-    Vector4D *rotation,
-    Vector3D *scale);
+    GFC_Vector3D *translation,
+    GFC_Vector4D *rotation,
+    GFC_Vector3D *scale);
 
 
 Armature3D *gf3d_armature_load(const char *filename)
@@ -78,7 +78,7 @@ Armature3D *gf3d_armature_load(const char *filename)
     return armature;
 }
 
-Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *name)
+GFC_Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *name)
 {
     Bone3D *bone;
     bone = gf3d_armature_get_bone_by_name(armature,name);
@@ -86,7 +86,7 @@ Matrix4 *gf3d_armature_get_bone_matrix_by_name(Armature3D *armature,const char *
     return &bone->mat;
 }
 
-Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 frame,const char *name)
+GFC_Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 frame,const char *name)
 {
     Bone3D *bone;
     BonePose3D *pose;
@@ -98,7 +98,7 @@ Matrix4 *gf3d_armature_get_bone_pose_matrix_by_name(Armature3D *armature,Uint32 
 }
 
 
-Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint32 *boneCount)
+GFC_Matrix4 *gf3d_armature_get_pose_matrices(Armature3D *armature,Uint32 frame,Uint32 *boneCount)
 {
     Pose3D *pose;
     if (!armature)
@@ -197,11 +197,11 @@ void gf3d_armature_bone_make_parent(Bone3D *parent, Bone3D *child)
     //slog("%s is the parent of %s",parent->name,child->name);
 }
 
-void gf3d_armature_bone_calc_joint_matrices(Bone3D *bone,Matrix4 inverseBindMatrix)
+void gf3d_armature_bone_calc_joint_matrices(Bone3D *bone,GFC_Matrix4 inverseBindGFC_Matrix)
 {
     BonePose3D *pose;
     int i,c;
-    if ((!bone)||(!inverseBindMatrix))return;
+    if ((!bone)||(!inverseBindGFC_Matrix))return;
     c = gfc_list_get_count(bone->poses);
     for (i = 0;i < c; i++)
     {
@@ -209,7 +209,7 @@ void gf3d_armature_bone_calc_joint_matrices(Bone3D *bone,Matrix4 inverseBindMatr
         if (!pose)continue;
         gfc_matrix_multiply(
             pose->jointMat,
-            inverseBindMatrix,
+            inverseBindGFC_Matrix,
             pose->globalMat);
     }
 }
@@ -292,8 +292,8 @@ void gf3d_armature_parse_joints(Armature3D *armature,SJson *nodes, SJson *joints
 {
     Bone3D *bone;
     SJson *node;
-    Vector4D quaternion;
-    Vector3D position,scale;
+    GFC_Vector4D quaternion;
+    GFC_Vector3D position,scale;
     const char *name;
     int nodeId,childId;
     int i,c,j,d;
@@ -317,9 +317,9 @@ void gf3d_armature_parse_joints(Armature3D *armature,SJson *nodes, SJson *joints
         bone->index = i;
         gfc_line_cpy(bone->name,name);
         
-        position = vector3d(0,0,0);
-        scale = vector3d(1,1,1);
-        quaternion = vector4d(0,0,0,0);
+        position = gfc_vector3d(0,0,0);
+        scale = gfc_vector3d(1,1,1);
+        quaternion = gfc_vector4d(0,0,0,0);
         
         sj_object_get_vector3d(node,"translation",&position);
         sj_object_get_vector3d(node,"scale",&scale);
@@ -373,15 +373,15 @@ void gf3d_armature_parse_joints(Armature3D *armature,SJson *nodes, SJson *joints
 void gf3d_armature_bone_get_interpolation_for_timestamp(
     Bone3D *bone,
     float timestamp,
-    Vector3D *translation,
-    Vector4D *rotation,
-    Vector3D *scale)
+    GFC_Vector3D *translation,
+    GFC_Vector4D *rotation,
+    GFC_Vector3D *scale)
 {
     int i,done;
     int last,next;
     float time,delta;
-    Vector3D a,b;
-    Vector4D A,B;
+    GFC_Vector3D a,b;
+    GFC_Vector4D A,B;
     if (!bone)return;
     if ((translation)&&(bone->translations)&&(bone->translationTimestamps))
     {
@@ -391,7 +391,7 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
         {
             if (bone->translationTimestamps[i] == timestamp)
             {
-                vector3d_copy((*translation),bone->translations[i]);
+                gfc_vector3d_copy((*translation),bone->translations[i]);
                 done = 1;
                 break;
             }
@@ -414,12 +414,12 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
             if ((last == -1)&&(next != -1))
             {
                 //there is no keyframe before this, so just use the next keyframe without interpolation
-                vector3d_copy((*translation),bone->translations[next]);
+                gfc_vector3d_copy((*translation),bone->translations[next]);
             }
             else if ((next == -1)&&(last != -1))
             {
                 //there is no keyframe after this, so just use the last keyframe without interpolation
-                vector3d_copy((*translation),bone->translations[last]);
+                gfc_vector3d_copy((*translation),bone->translations[last]);
             }
             else if ((next != -1)&&(last != -1))
             {
@@ -429,20 +429,20 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
                 if (!time)
                 {
                     //something is wrong
-                    *translation = vector3d(0,0,0);
+                    *translation = gfc_vector3d(0,0,0);
                 }
                 else
                 {
                     time = delta / time;//now a percentage of the way from Last to Next;
-                    vector3d_scale(a,bone->translations[last],time);
-                    vector3d_scale(b,bone->translations[next],1.0 - time);
-                    vector3d_add((*translation),a,b);
+                    gfc_vector3d_scale(a,bone->translations[last],time);
+                    gfc_vector3d_scale(b,bone->translations[next],1.0 - time);
+                    gfc_vector3d_add((*translation),a,b);
                 }
             }
             else
             {
                 //there are no keyframes this channel, set it to defaults
-                *translation = vector3d(0,0,0);
+                *translation = gfc_vector3d(0,0,0);
             }
         }
     }
@@ -456,7 +456,7 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
         {
             if (bone->rotationTimestamps[i] == timestamp)
             {
-                vector4d_copy((*rotation),bone->rotations[i]);
+                gfc_vector4d_copy((*rotation),bone->rotations[i]);
                 done = 1;
                 break;
             }
@@ -479,12 +479,12 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
             if ((last == -1)&&(next != -1))
             {
                 //there is no keyframe before this, so just use the next keyframe without interpolation
-                vector4d_copy((*rotation),bone->rotations[next]);
+                gfc_vector4d_copy((*rotation),bone->rotations[next]);
             }
             else if ((next == -1)&&(last != -1))
             {
                 //there is no keyframe after this, so just use the last keyframe without interpolation
-                vector4d_copy((*rotation),bone->rotations[last]);
+                gfc_vector4d_copy((*rotation),bone->rotations[last]);
             }
             else if ((next != -1)&&(last != -1))
             {
@@ -494,20 +494,20 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
                 if (!time)
                 {
                     //something is wrong
-                    *rotation = vector4d(0,0,0,0);
+                    *rotation = gfc_vector4d(0,0,0,0);
                 }
                 else
                 {
                     time = delta / time;//now a percentage of the way from Last to Next;
-                    vector4d_scale(A,bone->rotations[last],time);
-                    vector4d_scale(B,bone->rotations[next],1.0 - time);
-                    vector4d_add((*rotation),A,B);
+                    gfc_vector4d_scale(A,bone->rotations[last],time);
+                    gfc_vector4d_scale(B,bone->rotations[next],1.0 - time);
+                    gfc_vector4d_add((*rotation),A,B);
                 }
             }
             else
             {
                 //there are no keyframes this channel, set it to defaults
-                *rotation = vector4d(0,0,0,0);
+                *rotation = gfc_vector4d(0,0,0,0);
             }
         }
     }
@@ -522,7 +522,7 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
         {
             if (bone->scaleTimestamps[i] == timestamp)
             {
-                vector3d_copy((*scale),bone->scales[i]);
+                gfc_vector3d_copy((*scale),bone->scales[i]);
                 done = 1;
                 break;
             }
@@ -545,12 +545,12 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
             if ((last == -1)&&(next != -1))
             {
                 //there is no keyframe before this, so just use the next keyframe without interpolation
-                vector3d_copy((*scale),bone->scales[next]);
+                gfc_vector3d_copy((*scale),bone->scales[next]);
             }
             else if ((next == -1)&&(last != -1))
             {
                 //there is no keyframe after this, so just use the last keyframe without interpolation
-                vector3d_copy((*scale),bone->scales[last]);
+                gfc_vector3d_copy((*scale),bone->scales[last]);
             }
             else if ((next != -1)&&(last != -1))
             {
@@ -560,20 +560,20 @@ void gf3d_armature_bone_get_interpolation_for_timestamp(
                 if (!time)
                 {
                     //something is wrong
-                    *scale = vector3d(1,1,1);
+                    *scale = gfc_vector3d(1,1,1);
                 }
                 else
                 {
                     time = delta / time;//now a percentage of the way from Last to Next;
-                    vector3d_scale(a,bone->scales[last],time);
-                    vector3d_scale(b,bone->scales[next],1.0 - time);
-                    vector3d_add((*scale),a,b);
+                    gfc_vector3d_scale(a,bone->scales[last],time);
+                    gfc_vector3d_scale(b,bone->scales[next],1.0 - time);
+                    gfc_vector3d_add((*scale),a,b);
                 }
             }
             else
             {
                 //there are no keyframes this channel, set it to defaults
-                *scale = vector3d(1,1,1);
+                *scale = gfc_vector3d(1,1,1);
             }
         }
     }
@@ -583,9 +583,9 @@ void gf3d_armature_bone_build_poses(Bone3D *bone,Uint32 maxFrames, float maxTime
 {
     int i;
     BonePose3D *pose;
-    Vector3D translation;
-    Vector4D rotation;
-    Vector3D scale;
+    GFC_Vector3D translation;
+    GFC_Vector4D rotation;
+    GFC_Vector3D scale;
     if (!bone)return;
     if (!bone->poses)bone->poses = gfc_list_new();
 
@@ -597,9 +597,9 @@ void gf3d_armature_bone_build_poses(Bone3D *bone,Uint32 maxFrames, float maxTime
         pose->timestamp = i*timeStep;
         //now determine the interpolation for the three metrics
         //defaults:
-        translation = vector3d(0,0,0);
-        rotation = vector4d(0,0,0,0);
-        scale = vector3d(1,1,1);
+        translation = gfc_vector3d(0,0,0);
+        rotation = gfc_vector4d(0,0,0,0);
+        scale = gfc_vector3d(1,1,1);
         gf3d_armature_bone_get_interpolation_for_timestamp(
             bone,
             pose->timestamp,
@@ -686,9 +686,9 @@ void gf3d_armature_parse_animation(Armature3D *armature,GLTF *gltf,SJson *animat
     int itemCount;
     int i,c;
     float *times = NULL;
-    Vector3D *translations = NULL;
-    Vector4D *rotations = NULL;
-    Vector3D *scales = NULL;
+    GFC_Vector3D *translations = NULL;
+    GFC_Vector4D *rotations = NULL;
+    GFC_Vector3D *scales = NULL;
     Bone3D *bone;
     const char *path;
     int timeAccessor,valuesAccessor;
@@ -729,7 +729,7 @@ void gf3d_armature_parse_animation(Armature3D *armature,GLTF *gltf,SJson *animat
         {
             if (gf3d_gltf_accessor_get_details(gltf,valuesAccessor, &bufferIndex, (int *)&itemCount))
             {
-                translations = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),itemCount);                
+                translations = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),itemCount);                
                 gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)translations); 
                 
                 bone->translations = translations;
@@ -742,7 +742,7 @@ void gf3d_armature_parse_animation(Armature3D *armature,GLTF *gltf,SJson *animat
         {
             if (gf3d_gltf_accessor_get_details(gltf,valuesAccessor, &bufferIndex, (int *)&itemCount))
             {
-                rotations = (Vector4D *)gfc_allocate_array(sizeof(Vector4D),itemCount);                
+                rotations = (GFC_Vector4D *)gfc_allocate_array(sizeof(GFC_Vector4D),itemCount);                
                 gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)rotations);            
                 
                 bone->rotations = rotations;
@@ -756,7 +756,7 @@ void gf3d_armature_parse_animation(Armature3D *armature,GLTF *gltf,SJson *animat
         {
             if (gf3d_gltf_accessor_get_details(gltf,valuesAccessor, &bufferIndex, (int *)&itemCount))
             {
-                scales = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),itemCount);
+                scales = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),itemCount);
                 gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)scales);    
                 
                 bone->scales = scales;
@@ -793,7 +793,7 @@ void gf3d_armature_parse_inverseBindMatrices(Armature3D *armature,GLTF *gltf,SJs
     if (!sj_object_get_value_as_int(skin,"inverseBindMatrices",&valuesAccessor))return;
     if (gf3d_gltf_accessor_get_details(gltf,valuesAccessor, &bufferIndex, (int *)&armature->bindCount))
     {
-        armature->inverseBindMatrices = (Matrix4 *)gfc_allocate_array(sizeof(Matrix4),armature->bindCount);
+        armature->inverseBindMatrices = (GFC_Matrix4 *)gfc_allocate_array(sizeof(GFC_Matrix4),armature->bindCount);
         gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)armature->inverseBindMatrices);
     }
 }
@@ -836,9 +836,9 @@ BonePose3D *gf3d_armature_bone_pose_get_parent(BonePose3D *pose)
 
 void gf3d_armature_posebone_draw(BonePose3D *pose)
 {
-    Edge3D edge;
+    GFC_Edge3D edge;
     BonePose3D *parent;
-    Vector3D position = {0},rotation = {0}, scale = {1,1,1};
+    GFC_Vector3D position = {0},rotation = {0}, scale = {1,1,1};
     if (!pose)return;
     parent = gf3d_armature_bone_pose_get_parent(pose);
     if (!parent)return;//skip the root
@@ -853,8 +853,8 @@ void gf3d_armature_posebone_draw(BonePose3D *pose)
         &edge.b,
         NULL,
         NULL);
-    vector3d_scale(edge.a,edge.a,100);
-    vector3d_scale(edge.b,edge.b,100);
+    gfc_vector3d_scale(edge.a,edge.a,100);
+    gfc_vector3d_scale(edge.b,edge.b,100);
     
     gf3d_draw_edge_3d(edge,position,rotation,scale,1,GFC_COLOR_LIGHTCYAN);
 }
@@ -879,8 +879,8 @@ void gf3d_armature_draw_bone_poses(Armature3D *arm,Uint32 frame)
 
 void gf3d_armature_bone_draw(Bone3D *bone)
 {
-    Edge3D edge;
-    Vector3D position = {0},rotation = {0}, scale = {1,1,1};
+    GFC_Edge3D edge;
+    GFC_Vector3D position = {0},rotation = {0}, scale = {1,1,1};
     if (!bone)return;
     if (!bone->parent)return;//skip the root bone
     gfc_matrix4_to_vectors(
@@ -894,8 +894,8 @@ void gf3d_armature_bone_draw(Bone3D *bone)
         NULL,
         NULL);
     
-    vector3d_scale(edge.a,edge.a,100);
-    vector3d_scale(edge.b,edge.b,100);
+    gfc_vector3d_scale(edge.a,edge.a,100);
+    gfc_vector3d_scale(edge.b,edge.b,100);
     
     gf3d_draw_edge_3d(edge,position,rotation,scale,1,GFC_COLOR_LIGHTORANGE);
 }
@@ -917,13 +917,13 @@ void gf3d_armature_draw_bones(Armature3D *arm)
 void gf3d_armature_system_close()
 {
     int i;
-    if (armature_manager3d.armatureList != NULL)
+    if (armature_manager3d.armatureGFC_List != NULL)
     {
         for (i = 0;i < armature_manager3d.maxArmatures;i++)
         {
-            gf3d_armature_free(&armature_manager3d.armatureList[i]);
+            gf3d_armature_free(&armature_manager3d.armatureGFC_List[i]);
         }
-        free(armature_manager3d.armatureList);
+        free(armature_manager3d.armatureGFC_List);
     }
     memset(&armature_manager3d,0,sizeof(ArmatureManager3D));
     slog("armature system closed");
@@ -937,14 +937,14 @@ void gf3d_armature_system_init(Uint32 maxArmatures)
         return;
     }
     
-    armature_manager3d.armatureList = (Armature3D*)malloc(sizeof(Armature3D)*maxArmatures);
-    if (!armature_manager3d.armatureList)
+    armature_manager3d.armatureGFC_List = (Armature3D*)malloc(sizeof(Armature3D)*maxArmatures);
+    if (!armature_manager3d.armatureGFC_List)
     {
         slog("failed to allocate armature list");
         gf3d_armature_system_close();
         return;
     }
-    memset(armature_manager3d.armatureList,0,sizeof(Armature3D)*maxArmatures);
+    memset(armature_manager3d.armatureGFC_List,0,sizeof(Armature3D)*maxArmatures);
     armature_manager3d.maxArmatures = maxArmatures;
     atexit(gf3d_armature_system_close);
     slog("3d armature system initialized");
@@ -956,29 +956,29 @@ Armature3D *gf3d_armature_new()
     /*search for an unused armature address*/
     for (i = 0;i < armature_manager3d.maxArmatures;i++)
     {
-        if ((armature_manager3d.armatureList[i].refCount == 0)&&(armature_manager3d.armatureList[i].bones == NULL))
+        if ((armature_manager3d.armatureGFC_List[i].refCount == 0)&&(armature_manager3d.armatureGFC_List[i].bones == NULL))
         {
-            memset(&armature_manager3d.armatureList[i],0,sizeof(Armature3D));
-            armature_manager3d.armatureList[i].refCount = 1;//set ref count
-            armature_manager3d.armatureList[i].bones = gfc_list_new();
-            armature_manager3d.armatureList[i].poses = gfc_list_new();
-            armature_manager3d.armatureList[i].actions = gfc_list_new();
+            memset(&armature_manager3d.armatureGFC_List[i],0,sizeof(Armature3D));
+            armature_manager3d.armatureGFC_List[i].refCount = 1;//set ref count
+            armature_manager3d.armatureGFC_List[i].bones = gfc_list_new();
+            armature_manager3d.armatureGFC_List[i].poses = gfc_list_new();
+            armature_manager3d.armatureGFC_List[i].actions = gfc_list_new();
 
 
-            return &armature_manager3d.armatureList[i];//return address of this array element        }
+            return &armature_manager3d.armatureGFC_List[i];//return address of this array element        }
         }
     }
     /*find an unused armature address and clean up the old data*/
     for (i = 0;i < armature_manager3d.maxArmatures;i++)
     {
-        if (armature_manager3d.armatureList[i].refCount <= 0)
+        if (armature_manager3d.armatureGFC_List[i].refCount <= 0)
         {
-            gf3d_armature_delete(&armature_manager3d.armatureList[i]);// clean up the old data
-            armature_manager3d.armatureList[i].refCount = 1;//set ref count
-            armature_manager3d.armatureList[i].bones = gfc_list_new();
-            armature_manager3d.armatureList[i].poses = gfc_list_new();
-            armature_manager3d.armatureList[i].actions = gfc_list_new();
-            return &armature_manager3d.armatureList[i];//return address of this array element
+            gf3d_armature_delete(&armature_manager3d.armatureGFC_List[i]);// clean up the old data
+            armature_manager3d.armatureGFC_List[i].refCount = 1;//set ref count
+            armature_manager3d.armatureGFC_List[i].bones = gfc_list_new();
+            armature_manager3d.armatureGFC_List[i].poses = gfc_list_new();
+            armature_manager3d.armatureGFC_List[i].actions = gfc_list_new();
+            return &armature_manager3d.armatureGFC_List[i];//return address of this array element
         }
     }
     slog("error: out of armature addresses");
@@ -1079,7 +1079,7 @@ Pose3D *gf3d_armature_pose_new(Uint32 boneCount)
     if (!pose)return NULL;
     if (boneCount)
     {
-        pose->bones = (Matrix4*)gfc_allocate_array(sizeof(Matrix4),boneCount);
+        pose->bones = (GFC_Matrix4*)gfc_allocate_array(sizeof(GFC_Matrix4),boneCount);
         pose->boneCount = boneCount;
     }
     return pose;

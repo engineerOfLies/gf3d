@@ -203,7 +203,7 @@ const char *gf3d_gltf_accessor_get_details(GLTF* gltf,Uint32 accessorIndex, int 
 ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
 {
     ObjData *obj;
-    Vector3D min,max;
+    GFC_Vector3D min,max;
     int index,bufferIndex;
     SJson *attributes,*accessor;
 
@@ -224,13 +224,13 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
     {
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->vertex_count))
         {
-            obj->vertices = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->vertex_count);
+            obj->vertices = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),obj->vertex_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->vertices);
             
             accessor = gf3d_gltf_parse_get_accessor(gltf,index);
-            vector3d_clear(min);
-            vector3d_clear(max);
+            gfc_vector3d_clear(min);
+            gfc_vector3d_clear(max);
             sj_value_as_vector3d(sj_object_get_value(accessor,"min"),&min);
             sj_value_as_vector3d(sj_object_get_value(accessor,"max"),&max);
             obj->bounds = gfc_box(min.x, min.y, min.z, max.x, max.y, max.z);
@@ -241,7 +241,7 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
     {
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->normal_count))
         {
-            obj->normals = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->normal_count);
+            obj->normals = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),obj->normal_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->normals);            
         }
@@ -252,7 +252,7 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
     {
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->texel_count))
         {
-            obj->texels = (Vector2D *)gfc_allocate_array(sizeof(Vector2D),obj->texel_count);
+            obj->texels = (GFC_Vector2D *)gfc_allocate_array(sizeof(GFC_Vector2D),obj->texel_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->texels);            
         }
@@ -264,7 +264,7 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
     {
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->bone_count))
         {
-            obj->boneIndices = (Vector4UI8 *)gfc_allocate_array(sizeof(Vector4UI8),obj->bone_count);
+            obj->boneIndices = (GFC_Vector4UI8 *)gfc_allocate_array(sizeof(GFC_Vector4UI8),obj->bone_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->boneIndices);
             
@@ -276,7 +276,7 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
     {
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->weight_count))
         {
-            obj->boneWeights = (Vector4D *)gfc_allocate_array(sizeof(Vector4D),obj->weight_count);
+            obj->boneWeights = (GFC_Vector4D *)gfc_allocate_array(sizeof(GFC_Vector4D),obj->weight_count);
             
             gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->boneWeights);
         }
@@ -309,11 +309,11 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
 
     for (i = 0; i< obj->vertex_count;i++)
     {
-        if (obj->vertices)vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
-        if (obj->normals)vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
-        if (obj->texels)vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
-        if (obj->boneIndices)vector4d_copy(obj->faceVertices[i].bones,(float)obj->boneIndices[i]);
-        if (obj->boneWeights)vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
+        if (obj->vertices)gfc_vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
+        if (obj->normals)gfc_vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
+        if (obj->texels)gfc_vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
+        if (obj->boneIndices)gfc_vector4d_copy(obj->faceVertices[i].bones,(float)obj->boneIndices[i]);
+        if (obj->boneWeights)gfc_vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
     }
 }
 

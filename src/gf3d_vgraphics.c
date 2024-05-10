@@ -57,7 +57,7 @@ typedef struct
     VkSurfaceKHR                surface;
 
     // color space
-    Color                       bgcolor;
+    GFC_Color                       bgcolor;
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
     
@@ -111,7 +111,7 @@ void gf3d_vgraphics_init(const char *config)
     Pipeline *renderPipe= NULL;
     SJson *json,*setup;
     const char *windowName = NULL;
-    Vector2D resolution = {1024,768};
+    GFC_Vector2D resolution = {1024,768};
     short int fullscreen = 0;
     short int enableValidation = 0;
     short int enableDebug = 0;
@@ -413,16 +413,16 @@ VkExtent2D gf3d_vgraphics_get_view_extent()
     return gf3d_swapchain_get_extent();
 }
 
-Vector2D gf3d_vgraphics_get_resolution()
+GFC_Vector2D gf3d_vgraphics_get_resolution()
 {
     return gf3d_vgraphics_get_view_extent_as_vector2d();
 }
 
-Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
+GFC_Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
 {
     VkExtent2D extent;
     extent = gf3d_swapchain_get_extent();
-    return vector2d(extent.width,extent.height);
+    return gfc_vector2d(extent.width,extent.height);
 }
 
 SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h)
@@ -588,20 +588,20 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
-void gf3d_vgraphics_get_projection_matrix(Matrix4 *proj)
+void gf3d_vgraphics_get_projection_matrix(GFC_Matrix4 *proj)
 {
     if (!proj)return;
-    memcpy(proj,gf3d_vgraphics.ubo.proj,sizeof(Matrix4));
+    memcpy(proj,gf3d_vgraphics.ubo.proj,sizeof(GFC_Matrix4));
 }
 
-void gf3d_vgraphics_get_view(Matrix4 *view)
+void gf3d_vgraphics_get_view(GFC_Matrix4 *view)
 {
     if (!view)return;
-    memcpy(view,gf3d_vgraphics.ubo.view,sizeof(Matrix4));
+    memcpy(view,gf3d_vgraphics.ubo.view,sizeof(GFC_Matrix4));
 }
 
 
-Matrix4 *gf3d_vgraphics_get_view_matrix()
+GFC_Matrix4 *gf3d_vgraphics_get_view_matrix()
 {
     return &gf3d_vgraphics.ubo.view;
 }
@@ -612,7 +612,7 @@ void gf3d_vgraphics_rotate_camera(float degrees)
         gf3d_vgraphics.ubo.view,
         gf3d_vgraphics.ubo.view,
         degrees,
-        vector3d(0,0,1));
+        gfc_vector3d(0,0,1));
 
 }
 
@@ -650,11 +650,11 @@ VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
     return imageView;
 }
 
-Vector2D vgraphics_3d_position_to_screen(Vector3D position)
+GFC_Vector2D vgraphics_3d_position_to_screen(GFC_Vector3D position)
 {
-    Vector2D res,out;
-    Matrix4 mvp,model;
-    Vector4D transformed = {0};
+    GFC_Vector2D res,out;
+    GFC_Matrix4 mvp,model;
+    GFC_Vector4D transformed = {0};
     UniformBufferObject graphics_ubo;
     
     res = gf3d_vgraphics_get_resolution();
@@ -672,7 +672,7 @@ Vector2D vgraphics_3d_position_to_screen(Vector3D position)
     gfc_matrix_v_multiply_M(
         &transformed,
         mvp,
-        vector4d(position.x,position.y,position.z,1.0));
+        gfc_vector4d(position.x,position.y,position.z,1.0));
     
     out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
     out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;
@@ -680,12 +680,12 @@ Vector2D vgraphics_3d_position_to_screen(Vector3D position)
     return out;
 }
 
-Vector3D vgraphics_3d_position_to_screen_depth(Vector3D position)
+GFC_Vector3D vgraphics_3d_position_to_screen_depth(GFC_Vector3D position)
 {
-    Vector2D res;
-    Vector3D out;
-    Matrix4 mvp,model;
-    Vector4D transformed = {0};
+    GFC_Vector2D res;
+    GFC_Vector3D out;
+    GFC_Matrix4 mvp,model;
+    GFC_Vector4D transformed = {0};
     UniformBufferObject graphics_ubo;
     
     res = gf3d_vgraphics_get_resolution();
@@ -703,7 +703,7 @@ Vector3D vgraphics_3d_position_to_screen_depth(Vector3D position)
     gfc_matrix_v_multiply_M(
         &transformed,
         mvp,
-        vector4d(position.x,position.y,position.z,1.0));
+        gfc_vector4d(position.x,position.y,position.z,1.0));
     
     out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
     out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;

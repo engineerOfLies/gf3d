@@ -34,7 +34,7 @@ typedef enum
  */
 typedef struct Action_S
 {
-    TextLine    name;
+    GFC_TextLine    name;
     int         startFrame;
     int         endFrame;
     float       frameRate;
@@ -44,18 +44,18 @@ typedef struct Action_S
 typedef struct
 {
     int         _refCount;      /**<set if the actor is in use*/
-    TextLine    filename;       /**<filename of the actor json file*/
+    GFC_TextLine    filename;       /**<filename of the actor json file*/
     Sprite     *sprite;         /**<which sprite to draw this entity with*/
-    TextLine    spriteFile;
+    GFC_TextLine    spriteFile;
     int         frameWidth;
     int         frameHeight;
     int         framesPerLine;
-    Vector2D    size;           /**<scaled heigth and width*/
-    Vector2D    scale;          /**<scale to draw at*/
-    Vector2D    center;         /**<center for rotation and scale*/
-    Color       color;
-    Vector2D    drawOffset;
-    List       *al;             /**<action list for managing sprite animations*/
+    GFC_Vector2D    size;           /**<scaled heigth and width*/
+    GFC_Vector2D    scale;          /**<scale to draw at*/
+    GFC_Vector2D    center;         /**<center for rotation and scale*/
+    GFC_Color       color;
+    GFC_Vector2D    drawOffset;
+    GFC_List       *al;             /**<action list for managing sprite animations*/
 }Actor;
 
 /**
@@ -91,7 +91,7 @@ Actor *gf2d_actor_load(const char *file);
             "scaleTo": [64,64], 
             "scale":[2,2],      //overridden by scaleTo
             "color": [255,255,255,255], //defaults to white (no color shift)
-            "actionList":
+            "actionGFC_List":
             [
                 {
                     "action": "default",
@@ -124,22 +124,22 @@ void gf2d_actor_free(Actor *actor);
  * @brief delete all actions in the provided list, deletes the list too
  * @param list list contain Actions that will be deleted
  */
-void gf2d_action_list_delete(List *list);
+void gf2d_action_list_delete(GFC_List *list);
 
 /**
  * @brief parse out an action list from json
  * @param al list to be populated with actions
- * @param actionList json contain a list of actions
+ * @param actionGFC_List json contain a list of actions
  * @return the parsed list
  */
-List *gf2d_action_list_parse(List *al,SJson *actionList);
+GFC_List *gf2d_action_list_parse(GFC_List *al,SJson *actionGFC_List);
 
 /**
  * @brief encode an action list into json
  * @param actions list of Actions to encode
  * @return NULL on error or SJSon
  */
-SJson *gf2d_action_list_to_json(List *actions);
+SJson *gf2d_action_list_to_json(GFC_List *actions);
 
 /**
  * @brief given a list of Actions, search for the name
@@ -147,21 +147,21 @@ SJson *gf2d_action_list_to_json(List *actions);
  * @param name the search criteria
  * @return NULL on error or not found, the Action otherwise
  */
-Action *gf2d_action_list_get_action_by_name(List *list,const char *name);
+Action *gf2d_action_list_get_action_by_name(GFC_List *list,const char *name);
 
 /**
  * @brief call if you insert an animation frame and need to keep the actions in line
  * @param list the action list to modify
  * @param index the index of the frame that was inserted
  */
-void gf2d_action_list_frame_inserted(List *list,Uint32 index);
+void gf2d_action_list_frame_inserted(GFC_List *list,Uint32 index);
 
 /**
  * @brief call if you delete an animation frame and need to keep the actions in line
  * @param list the action list to modify
  * @param index the index of the frame that was deleted
  */
-void gf2d_action_list_frame_deleted(List *list,Uint32 index);
+void gf2d_action_list_frame_deleted(GFC_List *list,Uint32 index);
 
 /**
  * @brief allocate a new action
@@ -204,7 +204,7 @@ void gf2d_actor_save(Actor *actor,const char *filename);
  * @param name the search criteria
  * @return NULL on error or not found, the action otherwise
  */
-Action *gf2d_action_list_get_action(List *al, const char *name);
+Action *gf2d_action_list_get_action(GFC_List *al, const char *name);
 
 /**
  * @brief given an action get the next frame from the current frame
@@ -237,7 +237,7 @@ Action *gf2d_actor_get_action_by_name(Actor *actor,const char *name);
  * @param frame the frame to search fo
  * @return NULL on error or no results, the action otherwise
  */
-Action *gf2d_action_list_get_action_by_frame(List *list,Uint32 frame);
+Action *gf2d_action_list_get_action_by_frame(GFC_List *list,Uint32 frame);
 
 /**
  * @brief get how many actions are in the actor
@@ -292,12 +292,12 @@ Uint32 gf2d_actor_get_framecount(Actor *actor);
 void gf2d_actor_draw(
     Actor *actor,
     float frame,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Color    * color,
-    Vector2D * flip
+    GFC_Color    * color,
+    GFC_Vector2D * flip
 );
 
 /**

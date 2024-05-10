@@ -57,8 +57,8 @@ void gf3d_effect_update(GF3DEffect *effect)
     switch (effect->eType)
     {
         case GF3D_ET_Particle:
-            vector3d_add(effect->particle.position,effect->particle.position,effect->velocity);
-            vector3d_add(effect->velocity,effect->velocity,effect->acceleration);
+            gfc_vector3d_add(effect->particle.position,effect->particle.position,effect->velocity);
+            gfc_vector3d_add(effect->velocity,effect->velocity,effect->acceleration);
             gfc_color_copy(effect->particle.color,effect->color);
             effect->particle.size *= effect->sizeDelta;
             break;
@@ -72,7 +72,7 @@ void gf3d_effect_update(GF3DEffect *effect)
             gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
             gf3d_model_mat_rotate(&effect->mat,effect->mat.rotationDelta);
             gf3d_model_mat_scale(&effect->mat,effect->mat.scaleDelta);
-            vector3d_add(effect->mat.positionDelta,effect->mat.positionDelta,effect->acceleration);
+            gfc_vector3d_add(effect->mat.positionDelta,effect->mat.positionDelta,effect->acceleration);
             gfc_matrix4_from_vectors(
                 effect->mat.mat,
                 effect->mat.position,
@@ -96,7 +96,7 @@ void gf3d_effect_draw(GF3DEffect *effect)
             gf3d_draw_edge_3d(effect->edge,effect->mat.position,effect->mat.rotation,effect->mat.scale,effect->radius,effect->color);
             break;
         case GF3D_ET_Model:
-            gf3d_model_draw(effect->mat.model,0,effect->mat.mat,gfc_color_to_vector4f(effect->color),vector4d(1,1,1,1),vector4d(1,1,1,1),0);
+            gf3d_model_draw(effect->mat.model,0,effect->mat.mat,gfc_color_to_vector4f(effect->color),gfc_vector4d(1,1,1,1),gfc_vector4d(1,1,1,1),0);
             break;
         default:
             break;
@@ -138,14 +138,14 @@ void gf3d_effect_free(GF3DEffect *effect)
 }
 
 GF3DEffect *gf3d_effect_new_line(
-    Edge3D edge,
-    Vector3D velocity,
-    Vector3D acceleration,
+    GFC_Edge3D edge,
+    GFC_Vector3D velocity,
+    GFC_Vector3D acceleration,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVector,
-    Color colorAcceleration,
+    GFC_Color color,
+    GFC_Color colorVector,
+    GFC_Color colorAcceleration,
     Sint32 ttl)
 {
     GF3DEffect *effect;
@@ -168,14 +168,14 @@ GF3DEffect *gf3d_effect_new_line(
 }
 
 GF3DEffect *gf3d_effect_new_particle(
-    Vector3D position,
-    Vector3D velocity,
-    Vector3D acceleration,
+    GFC_Vector3D position,
+    GFC_Vector3D velocity,
+    GFC_Vector3D acceleration,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVector,
-    Color colorAcceleration,
+    GFC_Color color,
+    GFC_Color colorVector,
+    GFC_Color colorAcceleration,
     Sint32 ttl)
 {
     GF3DEffect *effect;
@@ -205,36 +205,36 @@ void gf3d_effect_set_callback(GF3DEffect *effect,void (*callback)(void *data),vo
 
 
 void gf3d_effect_make_particle_explosion(
-    Vector3D position,
+    GFC_Vector3D position,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVariation,
+    GFC_Color color,
+    GFC_Color colorVariation,
     int count,
     float speed,
     Uint32 ttl)
 {
     int i;
-    Color pColor,vColor;
-    Vector3D velocity;
+    GFC_Color pColor,vGFC_Color;
+    GFC_Vector3D velocity;
     for (i = 0; i < count; i++)
     {
         velocity.x = gfc_crandom();
         velocity.y = gfc_crandom();
         velocity.z = gfc_crandom();
-        vector3d_set_magnitude(&velocity,speed);
+        gfc_vector3d_set_magnitude(&velocity,speed);
         gfc_color_copy(pColor,color);
-        gfc_color_copy(vColor,colorVariation);
-        vColor.r *= gfc_crandom();
-        vColor.g *= gfc_crandom();
-        vColor.b *= gfc_crandom();
-        vColor.a *= gfc_crandom();
-        gfc_color_add(&pColor,pColor,vColor);
+        gfc_color_copy(vGFC_Color,colorVariation);
+        vGFC_Color.r *= gfc_crandom();
+        vGFC_Color.g *= gfc_crandom();
+        vGFC_Color.b *= gfc_crandom();
+        vGFC_Color.a *= gfc_crandom();
+        gfc_color_add(&pColor,pColor,vGFC_Color);
         
         gf3d_effect_new_particle(
             position,
             velocity,
-            vector3d(0,0,0),
+            gfc_vector3d(0,0,0),
             size,
             sizeDelta,
             pColor,
@@ -245,16 +245,16 @@ void gf3d_effect_make_particle_explosion(
 }
 
 GF3DEffect *gf3d_effect_new_particle_target(
-    Vector3D position,
-    Vector3D target,
+    GFC_Vector3D position,
+    GFC_Vector3D target,
     float size,
     float sizeDelta,
-    Color color,
-    Color colorVector,
-    Color colorAcceleration,
+    GFC_Color color,
+    GFC_Color colorVector,
+    GFC_Color colorAcceleration,
     Sint32 ttl)
 {
-    Vector3D velocity;
+    GFC_Vector3D velocity;
     GF3DEffect *effect;
     if (!ttl)
     {
@@ -271,9 +271,9 @@ GF3DEffect *gf3d_effect_new_particle_target(
     gfc_color_copy(effect->color,color);
     gfc_color_copy(effect->colorVector,colorVector);
     gfc_color_copy(effect->colorAcceleration,colorAcceleration);
-    vector3d_sub(velocity,target,position);
+    gfc_vector3d_sub(velocity,target,position);
     
-    vector3d_scale(velocity,velocity,(1.0 / (float)ttl));
+    gfc_vector3d_scale(velocity,velocity,(1.0 / (float)ttl));
     effect->velocity = velocity;
     return effect;
 }

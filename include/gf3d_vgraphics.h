@@ -10,6 +10,14 @@
 
 #define GF3D_VGRAPHICS_DISCRETE 1
 //Choosing whether to use discrete [1] or integrated graphics [0]
+//NOTE: make this configurable
+
+typedef struct
+{
+    GFC_Matrix4 model;
+    GFC_Matrix4 view;
+    GFC_Matrix4 proj;
+}UniformBufferObject;
 
 /**
  * @brief init Vulkan / SDL, setup device and initialize infrastructure for 3d graphics
@@ -50,14 +58,14 @@ VkPhysicalDevice gf3d_vgraphics_get_default_physical_device();
 VkExtent2D gf3d_vgraphics_get_view_extent();
 
 /**
- * @brief get the screen extent as a 2d vector
+ * @brief get the screen extent as a 2d gfc_vector
  */
-Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
+GFC_Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
 
 /**
- * @brief get the screen extent as a 2d vector
+ * @brief get the screen extent as a 2d gfc_vector
  */
-Vector2D gf3d_vgraphics_get_resolution();
+GFC_Vector2D gf3d_vgraphics_get_resolution();
 
 /**
  * @brief translate a 3D position to the corresponding screen position
@@ -65,7 +73,7 @@ Vector2D gf3d_vgraphics_get_resolution();
  * @param position the position in 3D space input
  * @return the same position as it maps to the screen.
  */
-Vector2D vgraphics_3d_position_to_screen(Vector3D position);
+GFC_Vector2D vgraphics_3d_position_to_screen(GFC_Vector3D position);
 
 /**
  * @brief translate a 3D position to the corresponding screen position
@@ -73,13 +81,13 @@ Vector2D vgraphics_3d_position_to_screen(Vector3D position);
  * @param position the position in 3D space input
  * @return the same position as it maps to the screen with the z component being the screen depth
  */
-Vector3D vgraphics_3d_position_to_screen_depth(Vector3D position);
+GFC_Vector3D vgraphics_3d_position_to_screen_depth(GFC_Vector3D position);
 
 /**
  * @brief copy into view the current view matrix
  * @param view [output]
  */
-void gf3d_vgraphics_get_view(Matrix4 *view);
+void gf3d_vgraphics_get_view(GFC_Matrix4 *view);
 
 
 void gf3d_vgraphics_clear();
@@ -98,13 +106,13 @@ void gf3d_vgraphics_rotate_camera(float degrees);
  * @brief get the matrix used for rendering the view
  * @return the view matrix sent to every rendering call
  */
-Matrix4 *gf3d_vgraphics_get_view_matrix();
+GFC_Matrix4 *gf3d_vgraphics_get_view_matrix();
 
 /**
  * @brief get the projection matrix
  * @param proj where to put the projection matrix
  */
-void gf3d_vgraphics_get_projection_matrix(Matrix4 *proj);
+void gf3d_vgraphics_get_projection_matrix(GFC_Matrix4 *proj);
 
 
 /**

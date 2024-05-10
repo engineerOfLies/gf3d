@@ -3,6 +3,7 @@
 #include "simple_logger.h"
 
 #include "gfc_types.h"
+#include "gfc_shape.h"
 
 #include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
@@ -17,22 +18,22 @@ extern int __DEBUG;
 
 typedef struct
 {
-    Matrix4 rotation;
-    Vector4D colorMod;
-    Vector4D clip;
-    Vector2D size;
-    Vector2D extent;
-    Vector2D position;
-    Vector2D scale;
-    Vector2D frame_offset;
-    Vector2D center;
+    GFC_Matrix4 rotation;
+    GFC_Vector4D colorMod;
+    GFC_Vector4D clip;
+    GFC_Vector2D size;
+    GFC_Vector2D extent;
+    GFC_Vector2D position;
+    GFC_Vector2D scale;
+    GFC_Vector2D frame_offset;
+    GFC_Vector2D center;
     alignas(64) float drawOrder;
 }SpriteUBO;
 
 typedef struct
 {
-    Vector2D vertex;
-    Vector2D texel;
+    GFC_Vector2D vertex;
+    GFC_Vector2D texel;
 }SpriteVertex;
 
 typedef struct
@@ -57,12 +58,12 @@ typedef struct
 
 SpriteUBO gf2d_sprite_get_uniform_buffer(
     Sprite *sprite,
-    Vector2D position,
-    Vector2D scale,
-    Vector3D rotation,
-    Color color,
-    Vector4D clip,
-    Vector2D flip,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
+    GFC_Vector3D rotation,
+    GFC_Color color,
+    GFC_Vector4D clip,
+    GFC_Vector2D flip,
     Uint32 frame);
 void gf2d_sprite_create_vertex_buffer(Sprite *sprite);
 void gf2d_sprite_delete(Sprite *sprite);
@@ -313,13 +314,13 @@ void gf2d_sprite_delete(Sprite *sprite)
 
 void gf2d_sprite_draw_full(
     Sprite   * sprite,
-    Vector2D   position,
-    Vector2D   scale,
-    Vector2D   center,
+    GFC_Vector2D   position,
+    GFC_Vector2D   scale,
+    GFC_Vector2D   center,
     float      rotation,
-    Vector2D   flip,
-    Color      colorShift,
-    Vector4D   clip,
+    GFC_Vector2D   flip,
+    GFC_Color      colorShift,
+    GFC_Vector4D   clip,
     Uint32     frame)
 {
     gf2d_sprite_draw(
@@ -336,7 +337,7 @@ void gf2d_sprite_draw_full(
 
 void gf2d_sprite_draw_image(
     Sprite   * sprite,
-    Vector2D   position)
+    GFC_Vector2D   position)
 {
     gf2d_sprite_draw(
         sprite,
@@ -351,7 +352,7 @@ void gf2d_sprite_draw_image(
 
 void gf2d_sprite_draw_simple(
     Sprite   * sprite,
-    Vector2D   position,
+    GFC_Vector2D   position,
     Uint32     frame)
 {
     gf2d_sprite_draw(
@@ -369,21 +370,21 @@ void gf2d_sprite_draw_simple(
 
 void gf2d_sprite_draw(
     Sprite   * sprite,
-    Vector2D   position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D   position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Vector2D * flip,
-    Color    * colorShift,
-    Vector4D * clip,
+    GFC_Vector2D * flip,
+    GFC_Color    * colorShift,
+    GFC_Vector4D * clip,
     Uint32     frame)
 {
     SpriteUBO spriteUBO = {0};
-    Vector2D drawScale = {1,1};
-    Vector3D drawRotation = {0,0,0};
-    Vector2D drawFlip = {0,0};
-    Vector4D drawClip = {0,0,0,0};
-    Color    drawColorShift = gfc_color(1,1,1,1);
+    GFC_Vector2D drawScale = {1,1};
+    GFC_Vector3D drawRotation = {0,0,0};
+    GFC_Vector2D drawFlip = {0,0};
+    GFC_Vector4D drawClip = {0,0,0,0};
+    GFC_Color    drawGFC_ColorShift = gfc_color(1,1,1,1);
 
     if (!sprite)
     {
@@ -391,15 +392,15 @@ void gf2d_sprite_draw(
         return;
     }
     
-    if (scale)vector2d_copy(drawScale,(*scale));
+    if (scale)gfc_vector2d_copy(drawScale,(*scale));
     if (center)
     {
-        vector2d_copy(drawRotation,(*center));
+        gfc_vector2d_copy(drawRotation,(*center));
     }
     if (rotation)drawRotation.z = *rotation;
-    if (flip)vector2d_copy(drawFlip,(*flip));
-    if (colorShift)drawColorShift = *colorShift;
-    if (clip)vector4d_copy(drawClip,(*clip));
+    if (flip)gfc_vector2d_copy(drawFlip,(*flip));
+    if (colorShift)drawGFC_ColorShift = *colorShift;
+    if (clip)gfc_vector4d_copy(drawClip,(*clip));
     
     
     spriteUBO = gf2d_sprite_get_uniform_buffer(
@@ -407,7 +408,7 @@ void gf2d_sprite_draw(
         position,
         drawScale,
         drawRotation,
-        drawColorShift,
+        drawGFC_ColorShift,
         drawClip,
         drawFlip,
         frame);
@@ -464,17 +465,17 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
 
 void gf2d_sprite_draw_to_surface(
     Sprite *sprite,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     Uint32 frame,
     SDL_Surface *surface
 )
 {
     SDL_Rect cell,target;
     int fpl;
-    Vector2D scaleFactor = {1,1};
-    Vector2D scaleOffset = {0,0};
+    GFC_Vector2D scaleFactor = {1,1};
+    GFC_Vector2D scaleOffset = {0,0};
     if (!sprite)
     {
         slog("no sprite provided to draw");
@@ -492,11 +493,11 @@ void gf2d_sprite_draw_to_surface(
     }
     if (scale)
     {
-        vector2d_copy(scaleFactor,(*scale));
+        gfc_vector2d_copy(scaleFactor,(*scale));
     }
     if (center)
     {
-        vector2d_copy(scaleOffset,(*center));
+        gfc_vector2d_copy(scaleOffset,(*center));
     }
     fpl = (sprite->framesPerLine)?sprite->framesPerLine:1;
     gfc_rect_set(
@@ -520,16 +521,16 @@ void gf2d_sprite_draw_to_surface(
 
 SpriteUBO gf2d_sprite_get_uniform_buffer(
     Sprite *sprite,
-    Vector2D position,
-    Vector2D scale,
-    Vector3D rotation,
-    Color color,
-    Vector4D clip,
-    Vector2D flip,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
+    GFC_Vector3D rotation,
+    GFC_Color color,
+    GFC_Vector4D clip,
+    GFC_Vector2D flip,
     Uint32 frame)
 {
     SpriteUBO spriteUBO = {0};
-    spriteUBO.size = vector2d(sprite->texture->width,sprite->texture->height);
+    spriteUBO.size = gfc_vector2d(sprite->texture->width,sprite->texture->height);
     spriteUBO.extent = gf3d_vgraphics_get_view_extent_as_vector2d();;
     spriteUBO.colorMod = gfc_color_to_vector4f(color);
     spriteUBO.position = position;
@@ -552,7 +553,7 @@ SpriteUBO gf2d_sprite_get_uniform_buffer(
         scale.y = fabs(scale.y)*-1;
     }
     
-    vector4d_copy(spriteUBO.clip,clip);
+    gfc_vector4d_copy(spriteUBO.clip,clip);
     spriteUBO.frame_offset.x = (frame%sprite->framesPerLine * sprite->frameWidth)/(float)sprite->texture->width;
     spriteUBO.frame_offset.y = (frame/sprite->framesPerLine * sprite->frameHeight)/(float)sprite->texture->height;
     return spriteUBO;

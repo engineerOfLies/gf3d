@@ -14,9 +14,9 @@
 
 typedef struct
 {
-    Vector3D position;
-    Color color;
-    Color color2;   //for color blending
+    GFC_Vector3D position;
+    GFC_Color color;
+    GFC_Color color2;   //for color blending
     float size;
 }Particle;
 
@@ -30,7 +30,7 @@ void gf3d_particle_manager_init(Uint32 max_particles);
  * @brief set a particle
  * @return a set particle
  */
-Particle gf3d_particle(Vector3D position, Color color, float size);
+Particle gf3d_particle(GFC_Vector3D position, GFC_Color color, float size);
 
 /**
  * @brief needs to be called once at the beginning of each render frame
@@ -70,7 +70,7 @@ void gf3d_particle_draw_sprite(Particle particle,Sprite *sprite,int frame);
  * @param count how many particles to fill in
  * @param trail the path of particles to draw
  */
-void gf3d_particle_trail_draw(Color color, float size, Uint8 count, Edge3D trail);
+void gf3d_particle_trail_draw(GFC_Color color, float size, Uint8 count, GFC_Edge3D trail);
 
 /**
  * @brief draw an array of particles
@@ -81,7 +81,7 @@ void gf3d_particle_draw_array(Particle *particle,Uint32 count);
  * @brief draw a list of particles this frame
  * @param list list of GF3D_Particle's
  */
-void gf3d_particle_draw_list(List *list);
+void gf3d_particle_draw_list(GFC_List *list);
 
 /**
  * @brief get the related pipeline for the particle system
@@ -96,6 +96,6 @@ Pipeline *gf3d_particle_get_pipeline();
  * @param width how far apart the lines will be
  * @param length how long the lines will be
  */
-void draw_guiding_lights(Vector3D position,Vector3D rotation,float width, float length);
+void draw_guiding_lights(GFC_Vector3D position,GFC_Vector3D rotation,float width, float length);
 
 #endif

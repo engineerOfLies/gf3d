@@ -53,7 +53,7 @@ Entity *gf3d_entity_new()
             gf3d_model_mat_reset(&entity_manager.entity_list[i].mat);
             
             entity_manager.entity_list[i].color = gfc_color(1,1,1,1);
-            entity_manager.entity_list[i].selectedColor = gfc_color(1,1,1,1);
+            entity_manager.entity_list[i].selectedGFC_Color = gfc_color(1,1,1,1);
             
             return &entity_manager.entity_list[i];
         }
@@ -76,9 +76,9 @@ void gf3d_entity_free(Entity *self)
     memset(self,0,sizeof(Entity));
 }
 
-Vector3D gf3d_entity_get_position(Entity *self)
+GFC_Vector3D gf3d_entity_get_position(Entity *self)
 {
-    Vector3D position = {0};
+    GFC_Vector3D position = {0};
     if (!self)return position;
     return self->mat.position;
 }
@@ -86,8 +86,8 @@ Vector3D gf3d_entity_get_position(Entity *self)
 
 void gf3d_entity_draw_2d(Entity *self)
 {
-    Vector2D drawPosition = {0},camera;
-    Vector2D scale = {0};
+    GFC_Vector2D drawPosition = {0},camera;
+    GFC_Vector2D scale = {0};
     if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->hidden)return;
@@ -96,8 +96,8 @@ void gf3d_entity_draw_2d(Entity *self)
         if ((self->actor)&& (self->actor->sprite))
         {
             camera = gf2d_camera_get_offset();
-            vector2d_add(drawPosition,self->body.position,camera);
-            vector2d_scale_by(scale,self->mat.scale,self->actor->scale);
+            gfc_vector2d_add(drawPosition,self->body.position,camera);
+            gfc_vector2d_scale_by(scale,self->mat.scale,self->actor->scale);
             gf2d_actor_draw(
                 self->actor,
                 self->frame,
@@ -126,7 +126,7 @@ void gf3d_entity_draw_all_2d()
     }
 }
 
-void gf3d_entity_draw_list(List *entities)
+void gf3d_entity_draw_list(GFC_List *entities)
 {
     if (!entities)return;
     gfc_list_foreach(entities,(gfc_work_func*)gf3d_entity_draw);
@@ -134,7 +134,7 @@ void gf3d_entity_draw_list(List *entities)
 
 void gf3d_entity_draw(Entity *self)
 {
-    Matrix4 mat;
+    GFC_Matrix4 mat;
     if (!entity_manager.initialized)return;
     if (!self)return;
     if (self->hidden)return;
@@ -142,20 +142,20 @@ void gf3d_entity_draw(Entity *self)
     {
         if (self->mat.model)
         {
-            gfc_matrix4_from_vectors(mat,vector3d(0,0,0),vector3d(self->roll,0,0),vector3d(1,1,1));
+            gfc_matrix4_from_vectors(mat,gfc_vector3d(0,0,0),gfc_vector3d(self->roll,0,0),gfc_vector3d(1,1,1));
             
             gf3d_model_mat_set_matrix(&self->mat);
             
             gfc_matrix_multiply(self->mat.mat,mat,self->mat.mat);
             
-            gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailColor),vector4d(1,1,1,1),self->frame);
+            gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailGFC_Color),gfc_vector4d(1,1,1,1),self->frame);
             if (self->selected)
             {
                 gf3d_model_draw_highlight(
                     self->mat.model,
                     0,
                     self->mat.mat,
-                    gfc_color_to_vector4f(self->selectedColor));
+                    gfc_color_to_vector4f(self->selectedGFC_Color));
             }
         }
     }
@@ -212,26 +212,26 @@ Entity *gf3d_entity_get_by_name(const char *name)
     return NULL;
 }
 
-void gf3d_entity_rotate_to_dir(Entity *self,Vector2D dir)
+void gf3d_entity_rotate_to_dir(Entity *self,GFC_Vector2D dir)
 {
     if (!self)return;
-    if (!vector2d_is_zero(dir))
+    if (!gfc_vector2d_is_zero(dir))
     {
-        self->rotation = (vector2d_angle(dir) * GFC_DEGTORAD) + GFC_PI;
+        self->rotation = (gfc_vector2d_angle(dir) * GFC_DEGTORAD) + GFC_PI;
     }    
 }
 
 void gf3d_entity_update_position_3d(Entity *self)
 {
     if (!self)return;
-    vector3d_add(self->mat.position,self->mat.position,self->velocity);
+    gfc_vector3d_add(self->mat.position,self->mat.position,self->velocity);
 }
 
-void gf3d_entity_rotate_to_dir_3d(Entity *self,Vector3D dir)
+void gf3d_entity_rotate_to_dir_3d(Entity *self,GFC_Vector3D dir)
 {
     if (!self)return;
-    if (vector2d_is_zero(dir))return;
-    vector3d_angles (dir, &self->mat.rotation);
+    if (gfc_vector2d_is_zero(dir))return;
+    gfc_vector3d_angles (dir, &self->mat.rotation);
     self->mat.rotation.y = self->mat.rotation.x;
     self->mat.rotation.x = 0;
     self->mat.rotation.z += GFC_HALF_PI;

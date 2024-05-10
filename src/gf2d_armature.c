@@ -12,7 +12,7 @@
 typedef struct
 {
     Uint32 maxArmatures;
-    Armature2D *armatureList;
+    Armature2D *armatureGFC_List;
 }ArmatureManager;
 
 void gf2d_armature_delete(Armature2D *armature);
@@ -20,21 +20,21 @@ void gf2d_armature_bone_free(Bone *bone);
 void gf2d_armature_pose_free(Pose *pose);
 BonePose *gf2d_armature_bone_pose_new();
 Pose *gf2d_armature_pose_new();
-void gf2d_armature_bone_scale(Bone *bone,Vector2D scale, Vector2D center);
-Bone gf2d_armature_bone_scaled_copy(Bone *bone,Vector2D scale,Vector2D center);
+void gf2d_armature_bone_scale(Bone *bone,GFC_Vector2D scale, GFC_Vector2D center);
+Bone gf2d_armature_bone_scaled_copy(Bone *bone,GFC_Vector2D scale,GFC_Vector2D center);
 
 static ArmatureManager armature_manager = {0};
 
 void gf2d_armature_system_close()
 {
     int i;
-    if (armature_manager.armatureList != NULL)
+    if (armature_manager.armatureGFC_List != NULL)
     {
         for (i = 0;i < armature_manager.maxArmatures;i++)
         {
-            gf2d_armature_free(&armature_manager.armatureList[i]);
+            gf2d_armature_free(&armature_manager.armatureGFC_List[i]);
         }
-        free(armature_manager.armatureList);
+        free(armature_manager.armatureGFC_List);
     }
     memset(&armature_manager,0,sizeof(ArmatureManager));
     slog("armature system closed");
@@ -49,14 +49,14 @@ void gf2d_armature_init(Uint32 maxArmatures)
     }
     memset(&armature_manager,0,sizeof(ArmatureManager));
     
-    armature_manager.armatureList = (Armature2D*)malloc(sizeof(Armature2D)*maxArmatures);
-    if (!armature_manager.armatureList)
+    armature_manager.armatureGFC_List = (Armature2D*)malloc(sizeof(Armature2D)*maxArmatures);
+    if (!armature_manager.armatureGFC_List)
     {
         slog("failed to allocate armature list");
         gf2d_armature_system_close();
         return;
     }
-    memset(armature_manager.armatureList,0,sizeof(Armature2D)*maxArmatures);
+    memset(armature_manager.armatureGFC_List,0,sizeof(Armature2D)*maxArmatures);
     armature_manager.maxArmatures = maxArmatures;
     atexit(gf2d_armature_system_close);
     slog("armature system initialized");
@@ -68,29 +68,29 @@ Armature2D *gf2d_armature_new()
     /*search for an unused armature address*/
     for (i = 0;i < armature_manager.maxArmatures;i++)
     {
-        if ((armature_manager.armatureList[i].refCount == 0)&&(armature_manager.armatureList[i].bones == NULL))
+        if ((armature_manager.armatureGFC_List[i].refCount == 0)&&(armature_manager.armatureGFC_List[i].bones == NULL))
         {
-            memset(&armature_manager.armatureList[i],0,sizeof(Armature2D));
-            armature_manager.armatureList[i].refCount = 1;//set ref count
-            armature_manager.armatureList[i].bones = gfc_list_new();
-            armature_manager.armatureList[i].poses = gfc_list_new();
-            armature_manager.armatureList[i].actions = gfc_list_new();
+            memset(&armature_manager.armatureGFC_List[i],0,sizeof(Armature2D));
+            armature_manager.armatureGFC_List[i].refCount = 1;//set ref count
+            armature_manager.armatureGFC_List[i].bones = gfc_list_new();
+            armature_manager.armatureGFC_List[i].poses = gfc_list_new();
+            armature_manager.armatureGFC_List[i].actions = gfc_list_new();
 
 
-            return &armature_manager.armatureList[i];//return address of this array element        }
+            return &armature_manager.armatureGFC_List[i];//return address of this array element        }
         }
     }
     /*find an unused armature address and clean up the old data*/
     for (i = 0;i < armature_manager.maxArmatures;i++)
     {
-        if (armature_manager.armatureList[i].refCount <= 0)
+        if (armature_manager.armatureGFC_List[i].refCount <= 0)
         {
-            gf2d_armature_delete(&armature_manager.armatureList[i]);// clean up the old data
-            armature_manager.armatureList[i].refCount = 1;//set ref count
-            armature_manager.armatureList[i].bones = gfc_list_new();
-            armature_manager.armatureList[i].poses = gfc_list_new();
-            armature_manager.armatureList[i].actions = gfc_list_new();
-            return &armature_manager.armatureList[i];//return address of this array element
+            gf2d_armature_delete(&armature_manager.armatureGFC_List[i]);// clean up the old data
+            armature_manager.armatureGFC_List[i].refCount = 1;//set ref count
+            armature_manager.armatureGFC_List[i].bones = gfc_list_new();
+            armature_manager.armatureGFC_List[i].poses = gfc_list_new();
+            armature_manager.armatureGFC_List[i].actions = gfc_list_new();
+            return &armature_manager.armatureGFC_List[i];//return address of this array element
         }
     }
     slog("error: out of armature addresses");
@@ -262,7 +262,7 @@ Bone *gf2d_armature_duplicate_bone(Armature2D *armature, Bone *bone)
     gfc_line_sprintf(newbone->name,"%s.dup",bone->name);
     newbone->baseAngle = bone->baseAngle;
     newbone->length = bone->length;
-    vector2d_copy(newbone->rootPosition,bone->rootPosition);
+    gfc_vector2d_copy(newbone->rootPosition,bone->rootPosition);
     
     c = gfc_list_get_count(bone->children);
     for (i = 0; i < c; i++)
@@ -406,25 +406,25 @@ BonePose *gf2d_armature_get_bone_pose(Armature2D *armature,Uint32 poseIndex, Uin
     return bonepose;
 }
 
-Vector2D gf2d_armature_get_pose_bone_position(BonePose *posebone)
+GFC_Vector2D gf2d_armature_get_pose_bone_position(BonePose *posebone)
 {
-    Vector2D position = {0};
+    GFC_Vector2D position = {0};
     if ((!posebone)||(!posebone->bone))return position;
-    vector2d_add(position,posebone->position,posebone->bone->rootPosition);
+    gfc_vector2d_add(position,posebone->position,posebone->bone->rootPosition);
     return position;
 }
 
-Vector2D gf2d_armature_get_pose_bone_draw_position(BonePose *posebone,Vector2D scale,float rotation)
+GFC_Vector2D gf2d_armature_get_pose_bone_draw_position(BonePose *posebone,GFC_Vector2D scale,float rotation)
 {
-    Vector2D posePoint;
+    GFC_Vector2D posePoint;
     Bone drawbone;
-    Vector2D drawPosition = {0};
+    GFC_Vector2D drawPosition = {0};
     if ((!posebone)||(!posebone->bone))return drawPosition;
-    drawbone = gf2d_armature_bone_scaled_copy(posebone->bone,scale, vector2d(0,0));
+    drawbone = gf2d_armature_bone_scaled_copy(posebone->bone,scale, gfc_vector2d(0,0));
 
-    vector2d_scale_by(posePoint,posebone->position,scale);
+    gfc_vector2d_scale_by(posePoint,posebone->position,scale);
     
-    vector2d_add(drawPosition,drawbone.rootPosition,posePoint);
+    gfc_vector2d_add(drawPosition,drawbone.rootPosition,posePoint);
     
     return drawPosition;
 }
@@ -438,7 +438,7 @@ BonePose gf2d_armature_get_tweened_pose_bone(Armature2D *armature,Uint32 poseA, 
     memcpy(&result,A,sizeof(BonePose));
     B = gf2d_armature_get_bone_pose(armature,poseB, index);
     if (!B)return result;
-    d = angle_between_radians(A->angle, B->angle) * weight;
+    d = gfc_angle_between_radians(A->angle, B->angle) * weight;
     
 
     result.angle = A->angle + d;
@@ -452,10 +452,10 @@ void gf2d_armature_draw_tweened_pose(
     Uint32 poseA,
     Uint32 poseB,
     float fraction,
-    Vector2D position,
-    Vector2D scale,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
     float rotation,
-    Color color)
+    GFC_Color color)
 {
     BonePose drawPose;
     int i,c;
@@ -474,12 +474,12 @@ void gf2d_armature_draw_sprite_to_named_bone_pose(
     Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Vector2D * flip,
-    Color    * colorShift,
+    GFC_Vector2D * flip,
+    GFC_Color    * colorShift,
     Uint32 pose,
     const char *name)
 {
@@ -504,17 +504,17 @@ void gf2d_armature_draw_sprite_to_bone_pose(
     Armature2D *armature,
     Sprite *sprite,
     Uint32 frame,
-    Vector2D position,
-    Vector2D * scale,
-    Vector2D * center,
+    GFC_Vector2D position,
+    GFC_Vector2D * scale,
+    GFC_Vector2D * center,
     float    * rotation,
-    Vector2D * flip,
-    Color    * colorShift,
+    GFC_Vector2D * flip,
+    GFC_Color    * colorShift,
     Uint32 pose,
     Uint32 bone)
 {
     float drawRotation = 0;
-    Vector2D drawPosition;
+    GFC_Vector2D drawPosition;
     BonePose *bonePose = NULL;
     if ((!armature)||(!sprite))return;// nothing to do
     
@@ -528,8 +528,8 @@ void gf2d_armature_draw_sprite_to_bone_pose(
     // apply bonepose delta to base bone and requested information
     drawRotation += bonePose->bone->baseAngle + bonePose->angle;
     drawRotation *= GFC_RADTODEG;
-    vector2d_add(drawPosition,bonePose->bone->rootPosition,bonePose->position);
-    vector2d_add(drawPosition,drawPosition,position);
+    gfc_vector2d_add(drawPosition,bonePose->bone->rootPosition,bonePose->position);
+    gfc_vector2d_add(drawPosition,drawPosition,position);
     
     gf2d_sprite_draw(
         sprite,
@@ -543,44 +543,44 @@ void gf2d_armature_draw_sprite_to_bone_pose(
         frame);
 }
 
-void gf2d_armature_bone_draw(Vector2D position, float angle, float length, Color color)
+void gf2d_armature_bone_draw(GFC_Vector2D position, float angle, float length, GFC_Color color)
 {
-    Vector2D dir,p2;
-    dir = vector2d_from_angle(angle);
-    vector2d_scale(dir,dir,length);
-    vector2d_add(p2,position,dir);
+    GFC_Vector2D dir,p2;
+    dir = gfc_vector2d_from_angle(angle);
+    gfc_vector2d_scale(dir,dir,length);
+    gfc_vector2d_add(p2,position,dir);
     gf2d_draw_line(position,p2, color);
     gf2d_draw_circle(position, 5, color);
     gf2d_draw_circle(p2, 3, color);
 }
 
-void gf2d_armature_draw_pose_bone(BonePose *bonePose,Vector2D position,Vector2D scale, float rotation, Color color)
+void gf2d_armature_draw_pose_bone(BonePose *bonePose,GFC_Vector2D position,GFC_Vector2D scale, float rotation, GFC_Color color)
 {
-    Vector2D drawPosition;
-    Vector2D drawPosePosition;
+    GFC_Vector2D drawPosition;
+    GFC_Vector2D drawPosePosition;
     float angle,length;
     Bone drawbone;
     if ((!bonePose)||(!bonePose->bone))return;
     
-    drawbone = gf2d_armature_bone_scaled_copy(bonePose->bone,scale, vector2d(0,0));
+    drawbone = gf2d_armature_bone_scaled_copy(bonePose->bone,scale, gfc_vector2d(0,0));
     
-    vector2d_scale_by(drawPosePosition,bonePose->position,scale);
+    gfc_vector2d_scale_by(drawPosePosition,bonePose->position,scale);
     
-    vector2d_add(drawPosition,drawbone.rootPosition,drawPosePosition);
+    gfc_vector2d_add(drawPosition,drawbone.rootPosition,drawPosePosition);
     
-    vector2d_add(drawPosition,drawPosition,position);//draw offset
-    angle = drawbone.baseAngle + (bonePose->angle + rotation) * vector2d_scale_flip_rotation(scale);;
-    length = drawbone.length + (bonePose->length * vector2d_magnitude(scale));
+    gfc_vector2d_add(drawPosition,drawPosition,position);//draw offset
+    angle = drawbone.baseAngle + (bonePose->angle + rotation) * gfc_vector2d_scale_flip_rotation(scale);;
+    length = drawbone.length + (bonePose->length * gfc_vector2d_magnitude(scale));
     gf2d_armature_bone_draw(drawPosition, angle, length, color);    
 }
 
 void gf2d_armature_draw_pose(
     Armature2D *armature,
     Uint32 poseindex,
-    Vector2D position,
-    Vector2D scale,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
     float rotation,
-    Color color)
+    GFC_Color color)
 {
     Pose *pose;
     BonePose *bonePose;
@@ -598,18 +598,18 @@ void gf2d_armature_draw_pose(
     }
 }
 
-void gf2d_armature_draw_bone(Bone *bone,Vector2D position, Vector2D scale, float rotation, Color color)
+void gf2d_armature_draw_bone(Bone *bone,GFC_Vector2D position, GFC_Vector2D scale, float rotation, GFC_Color color)
 {
     Bone drawbone;
-    Vector2D drawPosition;
-    drawbone = gf2d_armature_bone_scaled_copy(bone,scale,vector2d(0,0));
-    vector2d_add(drawPosition,position,drawbone.rootPosition);
+    GFC_Vector2D drawPosition;
+    drawbone = gf2d_armature_bone_scaled_copy(bone,scale,gfc_vector2d(0,0));
+    gfc_vector2d_add(drawPosition,position,drawbone.rootPosition);
     gf2d_armature_bone_draw(drawPosition, drawbone.baseAngle + rotation, drawbone.length, color);
 }
 
-void gf2d_armature_draw_bones(Armature2D *armature,Vector2D position, Vector2D scale, float rotation, Color color)
+void gf2d_armature_draw_bones(Armature2D *armature,GFC_Vector2D position, GFC_Vector2D scale, float rotation, GFC_Color color)
 {
-    Vector2D drawPosition;
+    GFC_Vector2D drawPosition;
     Bone *bone;
     Bone drawbone;
     int i,c;
@@ -619,8 +619,8 @@ void gf2d_armature_draw_bones(Armature2D *armature,Vector2D position, Vector2D s
     {
         bone = gfc_list_get_nth(armature->bones,i);
         if (!bone)continue;
-        drawbone = gf2d_armature_bone_scaled_copy(bone,scale,vector2d(0,0));
-        vector2d_add(drawPosition,position,drawbone.rootPosition);
+        drawbone = gf2d_armature_bone_scaled_copy(bone,scale,gfc_vector2d(0,0));
+        gfc_vector2d_add(drawPosition,position,drawbone.rootPosition);
         gf2d_armature_bone_draw(drawPosition, drawbone.baseAngle + rotation, drawbone.length, color);
     }
 }
@@ -741,7 +741,7 @@ void gf2d_armature_save(Armature2D *armature, const char *filepath)
     gfc_line_cpy(armature->filepath,filepath);
     sj_object_insert(save,"filepath",sj_new_str(filepath));
     sj_object_insert(save,"name",sj_new_str(armature->name));
-    sj_object_insert(save,"actionList",gf2d_action_list_to_json(armature->actions));
+    sj_object_insert(save,"actionGFC_List",gf2d_action_list_to_json(armature->actions));
     sj_object_insert(save,"bones",gf2d_armature_bones_to_json(armature));
     sj_object_insert(save,"poses",gf2d_armature_poses_to_json(armature));
     sj_save(save,filepath);
@@ -836,9 +836,9 @@ Armature2D *gf2d_armature_get_by_filename(const char *filepath)
     if (!filepath)return NULL;
     for (i = 0;i < armature_manager.maxArmatures;i++)
     {
-        if (strcmp(armature_manager.armatureList[i].filepath,filepath) == 0)
+        if (strcmp(armature_manager.armatureGFC_List[i].filepath,filepath) == 0)
         {
-            return &armature_manager.armatureList[i];//found it
+            return &armature_manager.armatureGFC_List[i];//found it
         }
     }
     return NULL;
@@ -875,7 +875,7 @@ Armature2D *gf2d_armature_load(const char *filepath)
         gfc_line_cpy(armature->name,name);
     }
     //base bones pass
-    armature->actions =  gf2d_action_list_parse(armature->actions,sj_object_get_value(json,"actionList"));
+    armature->actions =  gf2d_action_list_parse(armature->actions,sj_object_get_value(json,"actionGFC_List"));
 
     jBones = sj_object_get_value(json,"bones");
     c = sj_array_get_count(jBones);
@@ -918,22 +918,22 @@ void gf2d_armature_bone_rotate_by_name(Armature2D *armature,const char *name, fl
     gf2d_armature_bone_rotate(bone, bone->rootPosition, angle);
 }
 
-Vector2D gf2d_armature_get_bone_tip(Bone *bone)
+GFC_Vector2D gf2d_armature_get_bone_tip(Bone *bone)
 {
-    Vector2D dir;
-    Vector2D tip = {0,0};
+    GFC_Vector2D dir;
+    GFC_Vector2D tip = {0,0};
     if (!bone)return tip;
-    dir = vector2d_from_angle(bone->baseAngle);
-    vector2d_scale(dir,dir,bone->length);
-    vector2d_add(tip,bone->rootPosition,dir);
+    dir = gfc_vector2d_from_angle(bone->baseAngle);
+    gfc_vector2d_scale(dir,dir,bone->length);
+    gfc_vector2d_add(tip,bone->rootPosition,dir);
     return tip;
 }
 
-Vector2D gf2d_armature_get_bonepose_tip_by_name(
+GFC_Vector2D gf2d_armature_get_bonepose_tip_by_name(
     Armature2D *armature,
     const char *bonename,
     Uint32 pose,
-    Vector2D scale,
+    GFC_Vector2D scale,
     float rotation)
 {
     BonePose *posebone;
@@ -941,17 +941,17 @@ Vector2D gf2d_armature_get_bonepose_tip_by_name(
     return gf2d_armature_get_bonepose_tip(posebone,scale, rotation);
 }
 
-Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,Vector2D scale, float rotation)
+GFC_Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,GFC_Vector2D scale, float rotation)
 {
     Bone bonecopy;
-    Vector2D dir;
-    Vector2D tip = {0,0};
+    GFC_Vector2D dir;
+    GFC_Vector2D tip = {0,0};
     if ((!posebone)||(!posebone->bone))return tip;
-    bonecopy = gf2d_armature_bone_scaled_copy(posebone->bone,scale,vector2d(0,0));
-    dir = vector2d_from_angle(bonecopy.baseAngle + posebone->angle + rotation);
-    vector2d_scale(dir,dir,(bonecopy.length + (posebone->length * vector2d_magnitude(scale))));
-    vector2d_add(tip,bonecopy.rootPosition,vector2d(posebone->position.x*scale.x,posebone->position.y*scale.y));
-    vector2d_add(tip,tip,dir);
+    bonecopy = gf2d_armature_bone_scaled_copy(posebone->bone,scale,gfc_vector2d(0,0));
+    dir = gfc_vector2d_from_angle(bonecopy.baseAngle + posebone->angle + rotation);
+    gfc_vector2d_scale(dir,dir,(bonecopy.length + (posebone->length * gfc_vector2d_magnitude(scale))));
+    gfc_vector2d_add(tip,bonecopy.rootPosition,gfc_vector2d(posebone->position.x*scale.x,posebone->position.y*scale.y));
+    gfc_vector2d_add(tip,tip,dir);
     return tip;
 }
 
@@ -959,13 +959,13 @@ Vector2D gf2d_armature_get_bonepose_tip(BonePose *posebone,Vector2D scale, float
 BonePose *gf2d_armature_get_bonepose_by_position(
     Armature2D *armature,
     Uint32 poseindex,
-    Vector2D position,
-    Vector2D scale,
+    GFC_Vector2D position,
+    GFC_Vector2D scale,
     float rotation,
     BonePose *ignore)
 {
     int i,c;
-    Vector2D tip;
+    GFC_Vector2D tip;
     Pose *pose;
     BonePose *bonepose;
     if (!armature)return NULL;
@@ -986,11 +986,11 @@ BonePose *gf2d_armature_get_bonepose_by_position(
     return NULL;
 }
 
-Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,Vector2D position,Vector2D scale,Bone *ignore)
+Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,GFC_Vector2D position,GFC_Vector2D scale,Bone *ignore)
 {
     Bone *bone;
     Bone bonescale;
-    Vector2D tip;
+    GFC_Vector2D tip;
     int i,c;
     if (!armature)return NULL;
     c = gfc_list_get_count(armature->bones);
@@ -999,7 +999,7 @@ Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,Vector2D position,
         bone = gfc_list_get_nth(armature->bones,i);
         if (!bone)continue;
         if ((ignore)&&(ignore == bone))continue;
-        bonescale = gf2d_armature_bone_scaled_copy(bone,scale,vector2d(0,0));
+        bonescale = gf2d_armature_bone_scaled_copy(bone,scale,gfc_vector2d(0,0));
         tip = gf2d_armature_get_bone_tip(&bonescale);
         if (gfc_point_in_cicle(position,gfc_circle(tip.x,tip.y,10)))
         {
@@ -1011,32 +1011,32 @@ Bone *gf2d_armature_get_bone_by_position(Armature2D *armature,Vector2D position,
 
 
 
-void gf2d_armature_bone_calculate_from_tip(Bone *bone,Vector2D tip)
+void gf2d_armature_bone_calculate_from_tip(Bone *bone,GFC_Vector2D tip)
 {
-    Vector2D delta;
+    GFC_Vector2D delta;
     if (!bone)return;
-    vector2d_sub(delta,tip,bone->rootPosition);
-    bone->length = vector2d_magnitude(delta);
-    bone->baseAngle = (vector2d_angle(delta) + 180) * GFC_DEGTORAD;
+    gfc_vector2d_sub(delta,tip,bone->rootPosition);
+    bone->length = gfc_vector2d_magnitude(delta);
+    bone->baseAngle = (gfc_vector2d_angle(delta) + 180) * GFC_DEGTORAD;
 }
 
-void gf2d_armature_bone_tip_move(Bone *bone,Vector2D offset)
+void gf2d_armature_bone_tip_move(Bone *bone,GFC_Vector2D offset)
 {
-    Vector2D tip;
+    GFC_Vector2D tip;
     if (!bone)return;
     tip = gf2d_armature_get_bone_tip(bone);
-    vector2d_add(tip,tip,offset);
+    gfc_vector2d_add(tip,tip,offset);
     gf2d_armature_bone_calculate_from_tip(bone,tip);
 }
 
 
-void gf2d_armature_bone_move(Bone *bone,Vector2D offset)
+void gf2d_armature_bone_move(Bone *bone,GFC_Vector2D offset)
 {
     Bone *child;
     int i,c;
     if (!bone)return;
     c = gfc_list_get_count(bone->children);
-    vector2d_add(bone->rootPosition,bone->rootPosition,offset);
+    gfc_vector2d_add(bone->rootPosition,bone->rootPosition,offset);
     for (i = 0;i < c;i++)
     {
         child = gfc_list_get_nth(bone->children,i);
@@ -1045,15 +1045,15 @@ void gf2d_armature_bone_move(Bone *bone,Vector2D offset)
     }
 }
 
-void gf2d_armature_bone_move_to(Bone *bone,Vector2D newPosition)
+void gf2d_armature_bone_move_to(Bone *bone,GFC_Vector2D newPosition)
 {
-    Vector2D offset;
+    GFC_Vector2D offset;
     if (!bone)return;
-    vector2d_sub(offset,newPosition,bone->rootPosition);
+    gfc_vector2d_sub(offset,newPosition,bone->rootPosition);
     gf2d_armature_bone_move(bone,offset);
 }
 
-void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D delta)
+void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, GFC_Vector2D delta)
 {
     Bone *bone;
     Bone *child;
@@ -1061,7 +1061,7 @@ void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32
     if (!bonepose)return;
     bone = bonepose->bone;
     if (!bone)return;
-    vector2d_add(bonepose->position,delta,bonepose->position);
+    gfc_vector2d_add(bonepose->position,delta,bonepose->position);
     
     c = gfc_list_get_count(bone->children);
     for (i = 0;i < c;i++)
@@ -1076,18 +1076,18 @@ void gf2d_armature_bonepose_move(Armature2D *armature, BonePose *bonepose,Uint32
     }    
 }
 
-void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, Vector2D center, float angle)
+void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint32 poseindex, GFC_Vector2D center, float angle)
 {
     Bone *bone;
     Bone *child;
-    Vector2D posePosition;
+    GFC_Vector2D posePosition;
     int i,c;
     if (!bonepose)return;
     bone = bonepose->bone;
     if (!bone)return;
-    vector2d_add(posePosition,bone->rootPosition,bonepose->position);
-    posePosition = vector2d_rotate_around_center(posePosition,angle, center);
-    vector2d_sub(bonepose->position,posePosition,bone->rootPosition);
+    gfc_vector2d_add(posePosition,bone->rootPosition,bonepose->position);
+    posePosition = gfc_vector2d_rotate_around_center(posePosition,angle, center);
+    gfc_vector2d_sub(bonepose->position,posePosition,bone->rootPosition);
     bonepose->angle += angle;
     c = gfc_list_get_count(bone->children);
     for (i = 0;i < c;i++)
@@ -1103,12 +1103,12 @@ void gf2d_armature_bonepose_rotate(Armature2D *armature, BonePose *bonepose,Uint
     }    
 }
 
-void gf2d_armature_bone_rotate(Bone *bone, Vector2D center, float angle)
+void gf2d_armature_bone_rotate(Bone *bone, GFC_Vector2D center, float angle)
 {
     Bone *child;
     int i,c;
     if (!bone)return;
-    bone->rootPosition = vector2d_rotate_around_center(bone->rootPosition,angle, center);
+    bone->rootPosition = gfc_vector2d_rotate_around_center(bone->rootPosition,angle, center);
     bone->baseAngle += angle;
     c = gfc_list_get_count(bone->children);
     for (i = 0;i < c;i++)
@@ -1156,22 +1156,22 @@ Bone *gf2d_armature_add_bone(Armature2D * armature,Bone *parent)
 }
 
 
-void gf2d_armature_bone_scale(Bone *bone,Vector2D scale, Vector2D center)
+void gf2d_armature_bone_scale(Bone *bone,GFC_Vector2D scale, GFC_Vector2D center)
 {
-    Vector2D point,tip,delta;
+    GFC_Vector2D point,tip,delta;
     if (!bone)return;
-    vector2d_sub(point,bone->rootPosition,center);
-    vector2d_scale_by(point,point,scale);
+    gfc_vector2d_sub(point,bone->rootPosition,center);
+    gfc_vector2d_scale_by(point,point,scale);
     tip = gf2d_armature_get_bone_tip(bone);
-    vector2d_sub(tip,tip,center);
-    vector2d_scale_by(tip,tip,scale);
-    vector2d_sub(delta,tip,point);
-    bone->length = vector2d_magnitude(delta);
-    vector2d_add(bone->rootPosition,point,center);
-    bone->baseAngle *= vector2d_scale_flip_rotation(scale);
+    gfc_vector2d_sub(tip,tip,center);
+    gfc_vector2d_scale_by(tip,tip,scale);
+    gfc_vector2d_sub(delta,tip,point);
+    bone->length = gfc_vector2d_magnitude(delta);
+    gfc_vector2d_add(bone->rootPosition,point,center);
+    bone->baseAngle *= gfc_vector2d_scale_flip_rotation(scale);
 }
 
-void gf2d_armature_bone_scale_children(Bone *bone,Vector2D scale, Vector2D center)
+void gf2d_armature_bone_scale_children(Bone *bone,GFC_Vector2D scale, GFC_Vector2D center)
 {
     Bone *child;
     int i,c;
@@ -1239,7 +1239,7 @@ Uint32 gf2d_armature_get_pose_count(Armature2D *armature)
     return gfc_list_get_count(armature->poses);
 }
 
-Bone gf2d_armature_bone_scaled_copy(Bone *bone,Vector2D scale,Vector2D center)
+Bone gf2d_armature_bone_scaled_copy(Bone *bone,GFC_Vector2D scale,GFC_Vector2D center)
 {
     Bone copy = {0};
     if (!bone)return copy;
@@ -1316,7 +1316,7 @@ Pose *gf2d_armature_pose_duplicate(Armature2D *armature,Pose *pose)
     return newpose;
 }
 
-void gf2d_armature_scale(Armature2D *armature,Vector2D scale,Vector2D center)
+void gf2d_armature_scale(Armature2D *armature,GFC_Vector2D scale,GFC_Vector2D center)
 {
     Bone *bone;
     int i,c;
@@ -1365,7 +1365,7 @@ int gf2d_armature_bone_name_lr_flip(char *newname,const char *oldname)
 /*  TODO: solve inverse kinematics
 void gf2d_armature_rotate_pose_bones_to_length(Armature2D *armature,Uint32 poseIndex, BonePose *tipbone,BonePose *rootbone,float length)
 {
-    Vector2D rootPosition,rootToTip;
+    GFC_Vector2D rootPosition,rootToTip;
     float chainreach = 0;
     float currentLength = 0;
     float deltaAngle = 0;
@@ -1409,8 +1409,8 @@ void gf2d_armature_rotate_pose_bones_to_length(Armature2D *armature,Uint32 poseI
             gf2d_armature_get_pose_bone_position(posebone), -deltaAngle);
         return;
     }
-    vector2d_sub(rootToTip,gf2d_armature_get_pose_bone_position(tipbone),gf2d_armature_get_pose_bone_position(rootbone));
-    currentLength = vector2d_magnitude(rootToTip);
+    gfc_vector2d_sub(rootToTip,gf2d_armature_get_pose_bone_position(tipbone),gf2d_armature_get_pose_bone_position(rootbone));
+    currentLength = gfc_vector2d_magnitude(rootToTip);
     if (currentLength > length)
     {
         //flexion
@@ -1422,12 +1422,12 @@ void gf2d_armature_rotate_pose_bones_to_length(Armature2D *armature,Uint32 poseI
 }
 
 //target must be in armature space
-void gf2d_armature_pose_bone_ik_to(Armature2D *armature,Uint32 poseIndex, BonePose *posebone,Vector2D target,Uint32 chainlength)
+void gf2d_armature_pose_bone_ik_to(Armature2D *armature,Uint32 poseIndex, BonePose *posebone,GFC_Vector2D target,Uint32 chainlength)
 {
     Bone *bone;
     BonePose *rootPose;
     int i;
-    Vector2D D,rootPosition,chainTip,CD;
+    GFC_Vector2D D,rootPosition,chainTip,CD;
     float cd;//distance from chain root to chain tip
     float d;//distance from chain root to target;
     float targetAngle,chainAngle,deltaAngle;
@@ -1446,20 +1446,20 @@ void gf2d_armature_pose_bone_ik_to(Armature2D *armature,Uint32 poseIndex, BonePo
     //now bone is the root of the chain
     rootPose = gf2d_armature_get_bone_pose_by_name(armature,poseIndex, bone->name);
     if (!rootPose)return;// again, bad
-    vector2d_add(rootPosition,bone->rootPosition,rootPose->position);
-    vector2d_sub(D,target,rootPosition);// now we have the vector from the root bone to the target position
-    d = vector2d_magnitude(D);
-    chainTip = gf2d_armature_get_bonepose_tip(posebone,vector2d(1,1), 0);
-    vector2d_sub(CD,chainTip,rootPosition);//vector from root to tip
-    cd = vector2d_magnitude(CD); //length from root to tip
+    gfc_vector2d_add(rootPosition,bone->rootPosition,rootPose->position);
+    gfc_vector2d_sub(D,target,rootPosition);// now we have the gfc_vector from the root bone to the target position
+    d = gfc_vector2d_magnitude(D);
+    chainTip = gf2d_armature_get_bonepose_tip(posebone,gfc_vector2d(1,1), 0);
+    gfc_vector2d_sub(CD,chainTip,rootPosition);//gfc_vector from root to tip
+    cd = gfc_vector2d_magnitude(CD); //length from root to tip
     if (d != cd)//already stretched to the correct length just need to rotation skip ahead to the rotation
     {                                            
         gf2d_armature_rotate_pose_bones_to_length(armature,poseIndex,posebone,rootPose,d);
-        chainTip = gf2d_armature_get_bonepose_tip(posebone,vector2d(1,1), 0);//get this again in case it has moved
-        vector2d_sub(CD,chainTip,rootPosition);//vector from root to tip
+        chainTip = gf2d_armature_get_bonepose_tip(posebone,gfc_vector2d(1,1), 0);//get this again in case it has moved
+        gfc_vector2d_sub(CD,chainTip,rootPosition);//gfc_vector from root to tip
     }
-    targetAngle = vector2d_angle(D);    
-    chainAngle = vector2d_angle(CD);
+    targetAngle = gfc_vector2d_angle(D);    
+    chainAngle = gfc_vector2d_angle(CD);
     deltaAngle = targetAngle - chainAngle;
     gf2d_armature_bonepose_rotate(armature, rootPose,poseIndex, rootPosition, deltaAngle);
 }

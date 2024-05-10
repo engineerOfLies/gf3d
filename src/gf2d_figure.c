@@ -11,7 +11,7 @@
 typedef struct
 {
     Uint32 maxFigures;
-    Figure *figureList;
+    Figure *figureGFC_List;
 }FigureManager;
 
 static FigureManager figure_manager = {0};
@@ -20,13 +20,13 @@ void gf2d_figure_instance_delete_links(FigureInstance *instance);
 void gf2d_figure_system_close()
 {
     int i;
-    if (figure_manager.figureList != NULL)
+    if (figure_manager.figureGFC_List != NULL)
     {
         for (i = 0;i < figure_manager.maxFigures;i++)
         {
-            gf2d_figure_free(&figure_manager.figureList[i]);
+            gf2d_figure_free(&figure_manager.figureGFC_List[i]);
         }
-        free(figure_manager.figureList);
+        free(figure_manager.figureGFC_List);
     }
     memset(&figure_manager,0,sizeof(FigureManager));
     slog("figure system closed");
@@ -41,8 +41,8 @@ void gf2d_figure_init(Uint32 maxFigures)
     }
     memset(&figure_manager,0,sizeof(FigureManager));
     
-    figure_manager.figureList = (Figure*)gfc_allocate_array(sizeof(Figure),maxFigures);
-    if (!figure_manager.figureList)
+    figure_manager.figureGFC_List = (Figure*)gfc_allocate_array(sizeof(Figure),maxFigures);
+    if (!figure_manager.figureGFC_List)
     {
         slog("failed to allocate figure list");
         gf2d_figure_system_close();
@@ -76,12 +76,12 @@ Figure *gf2d_figure_new()
     int i;
     for (i = 0; i < figure_manager.maxFigures;i++)
     {
-        if (figure_manager.figureList[i]._inuse)continue;
-        memset(&figure_manager.figureList[i],0,sizeof(Figure));
-        figure_manager.figureList[i]._inuse = 1;
-        figure_manager.figureList[i].links = gfc_list_new();
-        gfc_line_cpy(figure_manager.figureList[i].name,"<new figure>");
-        return &figure_manager.figureList[i];
+        if (figure_manager.figureGFC_List[i]._inuse)continue;
+        memset(&figure_manager.figureGFC_List[i],0,sizeof(Figure));
+        figure_manager.figureGFC_List[i]._inuse = 1;
+        figure_manager.figureGFC_List[i].links = gfc_list_new();
+        gfc_line_cpy(figure_manager.figureGFC_List[i].name,"<new figure>");
+        return &figure_manager.figureGFC_List[i];
     }
     return NULL;
 }
@@ -110,7 +110,7 @@ FigureLink *gf2d_figure_link_new()
     FigureLink *link;
     link = gfc_allocate_array(sizeof(FigureLink),1);
     if (!link)return NULL;
-    link->scale = vector2d(1,1);
+    link->scale = gfc_vector2d(1,1);
     return link;
 }
 
@@ -305,18 +305,18 @@ void gf2d_figure_link_instance_draw(
     Figure *figure,
     FigureLinkInstance *linkInstance,
     Uint32   poseIndex,
-    Vector2D position,
-    Vector2D *scale,
+    GFC_Vector2D position,
+    GFC_Vector2D *scale,
     float    *rotation,
-    Color    *color
+    GFC_Color    *color
 )
 {
-    Vector2D flip = {0};
+    GFC_Vector2D flip = {0};
     FigureLink *link;
     BonePose *bonepose;
-    Vector2D drawPosition,offset;
+    GFC_Vector2D drawPosition,offset;
     float drawRotation;
-    Vector2D drawScale = {1,1};
+    GFC_Vector2D drawScale = {1,1};
     if (!figure)return;
     if (!linkInstance)return;
     if (!linkInstance->link)return;
@@ -330,21 +330,21 @@ void gf2d_figure_link_instance_draw(
     if (rotation)drawRotation += *rotation;
     drawRotation += bonepose->angle;
 
-    vector2d_add(drawPosition,bonepose->position,link->bone->rootPosition);
+    gfc_vector2d_add(drawPosition,bonepose->position,link->bone->rootPosition);
     
-    offset = vector2d_rotate(link->offset, drawRotation);
+    offset = gfc_vector2d_rotate(link->offset, drawRotation);
     drawRotation *= GFC_RADTODEG;
     if (scale)
     {
-        vector2d_scale_by(drawPosition,drawPosition,(*scale));
-        if (drawRotation)drawRotation *= vector2d_scale_flip_rotation(*scale);
+        gfc_vector2d_scale_by(drawPosition,drawPosition,(*scale));
+        if (drawRotation)drawRotation *= gfc_vector2d_scale_flip_rotation(*scale);
     }
-    vector2d_add(drawPosition,drawPosition,position);
+    gfc_vector2d_add(drawPosition,drawPosition,position);
 
-     vector2d_add(drawPosition,drawPosition,offset);
+     gfc_vector2d_add(drawPosition,drawPosition,offset);
     if (scale)
     {
-        vector2d_copy(drawScale,(*scale));
+        gfc_vector2d_copy(drawScale,(*scale));
     }
     
     gf2d_actor_draw(
@@ -364,18 +364,18 @@ void gf2d_figure_link_instance_draw_tweened(
     Uint32   poseA,
     Uint32   poseB,
     float    fraction,
-    Vector2D position,
-    Vector2D *scale,
+    GFC_Vector2D position,
+    GFC_Vector2D *scale,
     float    *rotation,
-    Color    *color
+    GFC_Color    *color
 )
 {
-    Vector2D flip = {0};
+    GFC_Vector2D flip = {0};
     FigureLink *link;
     BonePose bonepose;
-    Vector2D drawPosition,offset;
+    GFC_Vector2D drawPosition,offset;
     float drawRotation;
-    Vector2D drawScale = {1,1};
+    GFC_Vector2D drawScale = {1,1};
     if (!figure)return;
     if (!linkInstance)return;
     if (!linkInstance->link)return;
@@ -390,21 +390,21 @@ void gf2d_figure_link_instance_draw_tweened(
     if (rotation)drawRotation += *rotation;
     drawRotation += bonepose.angle;
 
-    vector2d_add(drawPosition,bonepose.position,link->bone->rootPosition);
+    gfc_vector2d_add(drawPosition,bonepose.position,link->bone->rootPosition);
     
-    offset = vector2d_rotate(link->offset, drawRotation);
+    offset = gfc_vector2d_rotate(link->offset, drawRotation);
     drawRotation *= GFC_RADTODEG;
     if (scale)
     {
-        vector2d_scale_by(drawPosition,drawPosition,(*scale));
-        if (drawRotation)drawRotation *= vector2d_scale_flip_rotation(*scale);
+        gfc_vector2d_scale_by(drawPosition,drawPosition,(*scale));
+        if (drawRotation)drawRotation *= gfc_vector2d_scale_flip_rotation(*scale);
     }
-    vector2d_add(drawPosition,drawPosition,position);
+    gfc_vector2d_add(drawPosition,drawPosition,position);
 
-     vector2d_add(drawPosition,drawPosition,offset);
+     gfc_vector2d_add(drawPosition,drawPosition,offset);
     if (scale)
     {
-        vector2d_copy(drawScale,(*scale));
+        gfc_vector2d_copy(drawScale,(*scale));
     }
     
     gf2d_actor_draw(
@@ -594,16 +594,16 @@ int gf2d_figure_instance_load(FigureInstance *instance,const char *figurename)
 
 void gf2d_figure_instance_draw(
     FigureInstance *instance,
-    Vector2D position,
-    Vector2D *scale,
+    GFC_Vector2D position,
+    GFC_Vector2D *scale,
     float *rotation,
-    Color *color,
+    GFC_Color *color,
     int tween)
 {
     int i,c;
     Uint32   poseA;
     float    fraction;
-    TextLine bonename;
+    GFC_TextLine bonename;
     FigureLinkInstance *linkInstance;
     FigureLinkInstance *linkInstanceOther;
     if (!instance)

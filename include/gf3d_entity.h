@@ -13,7 +13,7 @@
 typedef struct Entity_S
 {
     Uint8       _inuse;         /**<keeps track of memory usage*/
-    TextLine    name;
+    GFC_TextLine    name;
     int         state;          /**<used for keeping track of state indices*/
     int         noDrawGeneric;  /**<if true, this entity won't use the generic draw method*/
     ModelMat    mat;            /**<orientation matrix for the model for 3D*/
@@ -22,16 +22,16 @@ typedef struct Entity_S
     float       frame;          /**<current animation frame*/
     int         actionReturn;   /**<from the last frame this entity updated*/
     
-    Shape       shape;          /**<2d shape for collisions in 2D space*/
+    GFC_Shape       shape;          /**<2d shape for collisions in 2D space*/
     Body        body;           /**<instance for collisions in 2D space*/
     
-    Color       color;          /**<default color for the model*/
-    Color       detailColor;    /**<detail color for the model*/
-    Color       selectedColor;  /**<Color for highlighting*/
+    GFC_Color       color;          /**<default color for the model*/
+    GFC_Color       detailGFC_Color;    /**<detail color for the model*/
+    GFC_Color       selectedGFC_Color;  /**<GFC_Color for highlighting*/
     Uint8       hidden;         /**<if true, not drawn*/
     Uint8       selected;
     
-    Box         bounds;         // for collisions
+    GFC_Box         bounds;         // for collisions
     int         team;           //same team dont clip
     int         clips;          // if false, skip collisions
 
@@ -44,10 +44,10 @@ typedef struct Entity_S
         
     float       roll;           //kept separate 
     float       rotation;       /**<for 2D actor rotation*/
-    Vector2D    flip;           /**<for 2d actor drawing*/
-    Vector3D    velocity;
-    Vector3D    acceleration;
-    Vector3D    targetPosition;
+    GFC_Vector2D    flip;           /**<for 2d actor drawing*/
+    GFC_Vector3D    velocity;
+    GFC_Vector3D    acceleration;
+    GFC_Vector3D    targetPosition;
     
     float       speed;// how fast it moves
     Bool        targetComplete;
@@ -98,7 +98,7 @@ void gf3d_entity_draw_all();
  * @brief draw JUST the entities in the list provided.
  * @note list should contain pointers to entities and nothing else
  */
-void gf3d_entity_draw_list(List *entities);
+void gf3d_entity_draw_list(GFC_List *entities);
 
 /**
  * @brief draw an entity in 2D mode
@@ -122,7 +122,7 @@ void gf3d_entity_update_position_3d(Entity *self);
  * @param self the entity to rotate
  * @param dir the direction to rotate it by
  */
-void gf3d_entity_rotate_to_dir_3d(Entity *self,Vector3D dir);
+void gf3d_entity_rotate_to_dir_3d(Entity *self,GFC_Vector3D dir);
 
 /**
  * @brief Call an entity's think function if it exists
@@ -143,9 +143,9 @@ void gf3d_entity_update_all();
 /**
  * @brief get the entity's position
  * @param self the entity to check
- * @return a vector with their position
+ * @return a gfc_vector with their position
  */
-Vector3D gf3d_entity_get_position(Entity *self);
+GFC_Vector3D gf3d_entity_get_position(Entity *self);
 
 /**
  * @brief get an entity by its name.  Names are not guaranteed to be unique, so be careful
@@ -156,6 +156,6 @@ Entity *gf3d_entity_get_by_name(const char *name);
 
 
 
-void gf3d_entity_rotate_to_dir(Entity *self,Vector2D dir);
+void gf3d_entity_rotate_to_dir(Entity *self,GFC_Vector2D dir);
 
 #endif

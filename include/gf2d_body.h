@@ -11,22 +11,22 @@
 
 typedef struct Body_S
 {
-    TextLine    name;           /**<name for debugging purposes*/
+    GFC_TextLine    name;           /**<name for debugging purposes*/
     int         inactive;       /**<internal use only*/
     float       gravity;        /**<the factor this body adheres to gravity*/
     Uint8       worldclip;      /**<if this body should clip the world bounds and static shapes*/
     Uint32      cliplayer;      /**<only bodies that share one or more layers will collide with each other*/
     Uint32      touchlayer;     /**<only bodies that share one or more layers will have their touch functions called*/
     Uint32      team;           /**<bodies that share a team will NOT interact*/
-    Vector2D    position;       /**<position of the center of mass*/
-    Vector2D    velocity;       /**<rate of change of position over time*/
-    Vector2D    newvelocity;    /**<after a collision this is the new calculated velocity*/
+    GFC_Vector2D    position;       /**<position of the center of mass*/
+    GFC_Vector2D    velocity;       /**<rate of change of position over time*/
+    GFC_Vector2D    newvelocity;    /**<after a collision this is the new calculated velocity*/
     float       mass;           /**<used for inertia*/
     float       elasticity;     /**<how much bounce this body has*/
-    Shape      *shape;          /**<which shape data will be used to collide for this body*/
+    GFC_Shape      *shape;          /**<which shape data will be used to collide for this body*/
     void       *data;           /**<custom data pointer*/
     struct Body_S *ignore;      /**<if true, ignore this body   */
-    int       (*touch)(struct Body_S *self, List *collision);/**< function to call when two bodies collide*/
+    int       (*touch)(struct Body_S *self, GFC_List *collision);/**< function to call when two bodies collide*/
 }Body;
 
 /**
@@ -38,11 +38,11 @@ typedef struct Body_S
 Uint8 gf2d_body_body_collide(Body *a,Body *b);
 
 /**
- * @brief draw a body to the screen.  Shape will be magenta, center point will be a green pixel
+ * @brief draw a body to the screen.  GFC_Shape will be magenta, center point will be a green pixel
  * @param body the body to draw, a no-op if this is NULL
  * @param offset to adjust for camera or other position change relative to the body center
  */
-void gf2d_body_draw(Body *body,Vector2D offset);
+void gf2d_body_draw(Body *body,GFC_Vector2D offset);
 
 
 /**
@@ -76,28 +76,28 @@ void gf2d_body_set(
     Uint32      cliplayer,
     Uint32      touchlayer, 
     Uint32      team,
-    Vector2D    position,
-    Vector2D    velocity,
+    GFC_Vector2D    position,
+    GFC_Vector2D    velocity,
     float       mass,
     float       gravity,
     float       elasticity,
-    Shape      *shape,
+    GFC_Shape      *shape,
     void       *data,
-    int     (*bodyTouch)(struct Body_S *self, List *collision));
+    int     (*bodyTouch)(struct Body_S *self, GFC_List *collision));
 /**
  * @brief apply a force to a body taking into account momentum
  * @param body the body to move
- * @param direction a unit vector for direction (Does not have to be)
+ * @param direction a unit gfc_vector for direction (Does not have to be)
  * @param force the amount of force to apply
  */
-void gf2d_body_push(Body *body,Vector2D direction,float force);
+void gf2d_body_push(Body *body,GFC_Vector2D direction,float force);
 
 /**
  * @brief get the shape, adjusted for position for the provided body
  * @param a the body to get the shape for
  * @return an empty {0} shape on error, or the body shape information otherwise
  */
-Shape gf2d_body_to_shape(Body *a);
+GFC_Shape gf2d_body_to_shape(Body *a);
 
 /**
  * @brief configure a body from json

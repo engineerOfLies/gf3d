@@ -32,7 +32,7 @@ typedef enum
 
 typedef enum
 {
-    ET_List,
+    ET_GFC_List,
     ET_Label,
     ET_Actor,
     ET_Button,
@@ -44,23 +44,23 @@ typedef enum
 struct Element_S
 {
     int      index;             /**<order of highlight in the menu, -1 for does not receive highlight*/
-    TextLine name;              /**<name of the element should be unique per window*/
+    GFC_TextLine name;              /**<name of the element should be unique per window*/
     
     Uint8   canHasFocus;        /**<if true, this element can be the focus for keyboard input*/
     Uint8   hasFocus;           /**<if true, this element does have focus*/
-    Rect bounds;                /**<drawing bounds for the element*/
-    Vector2D lastDrawPosition;  /**<location of the element on the screen of its last draw position*/
-    Color color;                /**<color for the element*/
+    GFC_Rect bounds;                /**<drawing bounds for the element*/
+    GFC_Vector2D lastDrawPosition;  /**<location of the element on the screen of its last draw position*/
+    GFC_Color color;                /**<color for the element*/
     
-    Color backgroundColor;      /**<color for background of element*/
+    GFC_Color backgroundGFC_Color;      /**<color for background of element*/
     int   backgroundDraw;       /**<if true, draw the background*/
     
     int hidden;                 /**<if true, do not draw or update*/
     int state;                  /**<if true, drawn with highlight*/
     int type;                   /**<which type of element this is*/
-    void (*draw)        (struct Element_S *element,Vector2D offset); /**<draw function, offset comes from draw position of window*/
+    void (*draw)        (struct Element_S *element,GFC_Vector2D offset); /**<draw function, offset comes from draw position of window*/
     struct Element_S *(*get_next)(struct Element_S *element,struct Element_S *from); /**<search for the next element from (if NULL, it returns itself*/
-    List *(*update)     (struct Element_S *element,Vector2D offset); /**<function called for updates  returns alist of all elements updated with input*/
+    GFC_List *(*update)     (struct Element_S *element,GFC_Vector2D offset); /**<function called for updates  returns alist of all elements updated with input*/
     void (*free_data)   (struct Element_S *element);    /**<free function for the element to clean up any loaded custom data*/
     struct Element_S *(*get_by_name)(struct Element_S *element,const char *name);/**<get element by name, searches sub elements as well*/
     Window *win;                /**<my parent window*/
@@ -82,7 +82,7 @@ Element *gf2d_element_new();
  * @param color the dra    return NULL;
 w color of the element
  * @param state the initial state of the element
- * @param backgroundColor the color to draw for the background
+ * @param backgroundGFC_Color the color to draw for the background
  * @param backgroundDraw if true, draw a background for the element
  * @param win the window this element ultimately belongs to
  * @return NULL on error or a new element otherwise;
@@ -90,11 +90,11 @@ w color of the element
 Element *gf2d_element_new_full(
     Element *parent,
     int      index,
-    TextLine name,
-    Rect bounds,
-    Color color,
+    GFC_TextLine name,
+    GFC_Rect bounds,
+    GFC_Color color,
     int state,
-    Color backgroundColor,
+    GFC_Color backgroundGFC_Color,
     int backgroundDraw,
     Window *win
 );
@@ -110,14 +110,14 @@ void gf2d_element_free(Element *element);
  * @param element the element to draw
  * @param offset comes from parent window position
  */
-void gf2d_element_draw(Element *element, Vector2D offset);
+void gf2d_element_draw(Element *element, GFC_Vector2D offset);
 
 /**
  * @brief get the screen position of the last time this element was drawn
  * @param e the element to draw
- * @return a zero vector on NULL entity, or the entity's position
+ * @return a zero gfc_vector on NULL entity, or the entity's position
  */
-Vector2D gf2d_element_get_draw_position(Element *e);
+GFC_Vector2D gf2d_element_get_draw_position(Element *e);
 
 /**
  * @brief set if the element has the focus.
@@ -139,22 +139,22 @@ void gf2d_element_set_hidden(Element *element, int hidden);
  * @param element the element to set
  * @param color the color to set it to
  */
-void gf2d_element_set_color(Element *element,Color color);
+void gf2d_element_set_color(Element *element,GFC_Color color);
 
 /**
  * @brief set the backgrond color for the given element
  * @param element the element to set
  * @param color the color to set it to
  */
-void gf2d_element_set_background_color(Element *element,Color color);
+void gf2d_element_set_background_color(Element *element,GFC_Color color);
 
 /**
  * @brief update an element.  checks input
  * @param element the element to draw
  * @param offset comes from parent window position
- * @return NULL if there was nothing to report or a pointer to a List of elements that have been updated.  This list needs to be freed
+ * @return NULL if there was nothing to report or a pointer to a GFC_List of elements that have been updated.  This list needs to be freed
  */
-List *gf2d_element_update(Element *element, Vector2D offset);
+GFC_List *gf2d_element_update(Element *element, GFC_Vector2D offset);
 
 /**
  * @brief create a new element based on the information from a json config
@@ -165,7 +165,7 @@ List *gf2d_element_update(Element *element, Vector2D offset);
  */
 Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win);
 
-Rect gf2d_element_get_absolute_bounds(Element *element,Vector2D offset);
+GFC_Rect gf2d_element_get_absolute_bounds(Element *element,GFC_Vector2D offset);
 
 /**
  * @brief checks element and sub elements for element with the provided id

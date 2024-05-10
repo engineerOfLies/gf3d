@@ -16,7 +16,7 @@ typedef enum
 {
     BCA_Default = 0,
     BCA_Nothing,        // do nothing at all
-    BCA_BackgroundHighlight //use the highColors for the background
+    BCA_BackgroundHighlight //use the highGFC_Colors for the background
 }ButtonCustomAction;
 
 typedef struct
@@ -24,13 +24,13 @@ typedef struct
     Element *label;
     Element *actor;
     BE_Style style;
-    TextLine hotkey; /**<input used to hotkey the button*/
+    GFC_TextLine hotkey; /**<input used to hotkey the button*/
     Bool     repeat; /**<if true, enable continuous updates while held*/
     Bool     customActions;
     // base color comes from element
-    Color highColor;    /**<color used when button is in highlight*/
-    Color pressColor;   /**<color used while pressed*/
-    TextLine sound;//sound file to play when pressed
+    GFC_Color highGFC_Color;    /**<color used when button is in highlight*/
+    GFC_Color pressGFC_Color;   /**<color used while pressed*/
+    GFC_TextLine sound;//sound file to play when pressed
 }ButtonElement;
 
 /**
@@ -45,12 +45,12 @@ void gf2d_element_make_button(Element *e,ButtonElement *button);
  * @brief allocate a new button and set the parameters
  * @param label (optional) use this element for the text display for the button
  * @param actor (optional) use this element for the image display for the button
- * @param highColor this color will be used when drawing the button when it has highlight
- * @param pressColor this color will be used when drawing the button when it is pressed
+ * @param highGFC_Color this color will be used when drawing the button when it has highlight
+ * @param pressGFC_Color this color will be used when drawing the button when it is pressed
  * @param customActions if true, this will not look for actions idle, high and press for the button
  * @return NULL on error or a newly create button element
  */
-ButtonElement *gf2d_element_button_new_full(Element *label,Element *actor,Color highColor,Color pressColor,int customActions);
+ButtonElement *gf2d_element_button_new_full(Element *label,Element *actor,GFC_Color highGFC_Color,GFC_Color pressGFC_Color,int customActions);
 
 /**
  * @brief load button configuration for a button element from config
@@ -78,7 +78,7 @@ Element *gf2d_element_button_get_by_id(Element *e,int id);
  * @param color the color of the text
  * @return NULL on error, or a button element.  It will need to be parented or placed still
  */
-Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, Vector2D size, Color color);
+Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, GFC_Vector2D size, GFC_Color color);
 
 /**
  * @brief quickly make an actor button based on actor, name and color of the text
@@ -98,8 +98,8 @@ Element *gf2d_button_new_simple(
     const char *name,
     const char *actorFile,
     const char *text,
-    Vector2D scale,
-    Vector2D size,
-    Color color);
+    GFC_Vector2D scale,
+    GFC_Vector2D size,
+    GFC_Color color);
 
 #endif

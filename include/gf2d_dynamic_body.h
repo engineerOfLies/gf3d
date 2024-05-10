@@ -8,14 +8,14 @@ typedef struct
 {
     Uint32      id;
     Body       *body;
-    Shape       shape;          /**<shape with offset from the body*/
+    GFC_Shape       shape;          /**<shape with offset from the body*/
     Uint8       blocked;        /**<true once this body has been blocked and no longer moves*/
-    Vector2D    position;       /**<temp position during update*/
-    Vector2D    oldPosition;    /**<previous position during update*/
-    Vector2D    velocity;       /**<scaled velocity based on space step*/
+    GFC_Vector2D    position;       /**<temp position during update*/
+    GFC_Vector2D    oldPosition;    /**<previous position during update*/
+    GFC_Vector2D    velocity;       /**<scaled velocity based on space step*/
     double      speed;          /**<scalar speed of velocity of the body*/
-    List       *collisionList;  /**<list of collisions accrued during space update*/
-    List       *bucketList;     /**<list of space buckets we sit in*/
+    GFC_List       *collisionGFC_List;  /**<list of collisions accrued during space update*/
+    GFC_List       *bucketGFC_List;     /**<list of space buckets we sit in*/
 }DynamicBody;
 
 DynamicBody *gf2d_dynamic_body_new();
@@ -25,7 +25,7 @@ DynamicBody *gf2d_dynamic_body_new();
  * @param a the dynamic body to get the shape for
  * @returns a shape
  */
-Shape gf2d_dynamic_body_to_shape(DynamicBody *a);
+GFC_Shape gf2d_dynamic_body_to_shape(DynamicBody *a);
 
 void gf2d_dynamic_body_free(DynamicBody *db);
 
@@ -61,7 +61,7 @@ Collision *gf2d_dynamic_body_collision_check(DynamicBody *dba,DynamicBody *dbb,f
  * @param timeStep the time segment for the current update round
  * @return NULL on error or no collision, a pointer to the collision data otherwise
  */
-Collision *gf2d_dynamic_body_shape_collision_check(DynamicBody *dba,Shape shape,float timeStep);
+Collision *gf2d_dynamic_body_shape_collision_check(DynamicBody *dba,GFC_Shape shape,float timeStep);
 
 /**
  * @brief check if a dynamic body is clipping the bounds of a space
@@ -71,15 +71,15 @@ Collision *gf2d_dynamic_body_shape_collision_check(DynamicBody *dba,Shape shape,
  * @param timeStep the time segment for the current update round
  * @return NULL on error or no collision, a pointer to the collision data otherwise
  */
-Collision *gf2d_dynamic_body_bounds_collision_check(DynamicBody *dba,Rect bounds,float timeStep);
+Collision *gf2d_dynamic_body_bounds_collision_check(DynamicBody *dba,GFC_Rect bounds,float timeStep);
 
 /**
- * @brief calculate a bounce vector for the given dynamic body based on the provided normal
+ * @brief calculate a bounce gfc_vector for the given dynamic body based on the provided normal
  * @param dba the body to bounce
  * @param normal the direction of reflection
- * @return an empty vector on error or a new vector based on the bounce
+ * @return an empty gfc_vector on error or a new gfc_vector based on the bounce
  */
-Vector2D gf2d_dynamic_body_bounce(DynamicBody *dba,Vector2D normal);
+GFC_Vector2D gf2d_dynamic_body_bounce(DynamicBody *dba,GFC_Vector2D normal);
 
 /**
  * @brief removes collisions from the dynamic body
@@ -89,7 +89,7 @@ void gf2d_dynamic_body_clear_collisions(DynamicBody *db);
 
 /**
  * @brief attempt to back a dynamic body away from static shapes that it is overlapping
- * @note this relies on the collisioList being previously populated
+ * @note this relies on the collisioGFC_List being previously populated
  * @param db the dynamic body to adjust
  * @param backoff use this as a factor to move the body off any static shapes the body is clipping  too large will look wrong, too small will not work  0 becomes a no-op
  */

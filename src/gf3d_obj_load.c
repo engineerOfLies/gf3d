@@ -83,27 +83,27 @@ void gf3d_obj_load_reorg(ObjData *obj)
         for (f = 0; f < 3;f++,vert++)
         {
             vertexIndex = obj->faceVerts[i].verts[f];
-            vector3d_copy(obj->faceVertices[vert].vertex,obj->vertices[vertexIndex]);
+            gfc_vector3d_copy(obj->faceVertices[vert].vertex,obj->vertices[vertexIndex]);
 
             if (obj->faceNormals)
             {
                 normalIndex = obj->faceNormals[i].verts[f];
-                vector3d_copy(obj->faceVertices[vert].normal,obj->normals[normalIndex]);
+                gfc_vector3d_copy(obj->faceVertices[vert].normal,obj->normals[normalIndex]);
             }
             if (obj->faceTexels)
             {
                 texelIndex = obj->faceTexels[i].verts[f];
-                vector2d_copy(obj->faceVertices[vert].texel,obj->texels[texelIndex]);
+                gfc_vector2d_copy(obj->faceVertices[vert].texel,obj->texels[texelIndex]);
             }
             if (obj->faceBones)
             {
                 boneIndex = obj->faceBones[i].verts[f];
-                vector4d_copy(obj->faceVertices[vert].bones,obj->boneIndices[boneIndex]);
+                gfc_vector4d_copy(obj->faceVertices[vert].bones,obj->boneIndices[boneIndex]);
             }
             if (obj->faceWeights)
             {
                 weightIndex = obj->faceWeights[i].verts[f];
-                vector4d_copy(obj->faceVertices[vert].weights,obj->boneWeights[weightIndex]);
+                gfc_vector4d_copy(obj->faceVertices[vert].weights,obj->boneWeights[weightIndex]);
             }
             
             obj->outFace[i].verts[f] = vert;
@@ -144,9 +144,9 @@ ObjData *gf3d_obj_load_from_file(const char *filename)
     
     gf3d_obj_get_counts_from_file(obj, mem,fileSize);
     
-    obj->vertices = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->vertex_count);
-    obj->normals = (Vector3D *)gfc_allocate_array(sizeof(Vector3D),obj->normal_count);
-    obj->texels = (Vector2D *)gfc_allocate_array(sizeof(Vector2D),obj->texel_count);
+    obj->vertices = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),obj->vertex_count);
+    obj->normals = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),obj->normal_count);
+    obj->texels = (GFC_Vector2D *)gfc_allocate_array(sizeof(GFC_Vector2D),obj->texel_count);
     
     obj->faceVerts = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     obj->faceNormals = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);

@@ -8,13 +8,13 @@ typedef enum
 {
     LS_Horizontal,
     LS_Vertical
-}ListStyle;
+}GFC_ListStyle;
 
 typedef struct
 {
-    List *list;
-    Vector2D itemSize;
-    ListStyle listStyle;
+    GFC_List *list;
+    GFC_Vector2D itemSize;
+    GFC_ListStyle listStyle;
     int   cropped;          /**<if true, check for items being out bounds of the list, skip the ones that are*/
     int   packed;           /**<if true, items are spaced by their individual size, otherwise by the list itemSize*/
     int   wraps;            /**<if true, this will wrap when the items clip the edge*/
@@ -23,7 +23,7 @@ typedef struct
     int   itemsPerLine;     /**<how many items will fit per line*/
     int   itemsPerColumn;   /**<how many items will fit per columns*/
     Element *scrollbar;     /**<sub_element*/
-}ListElement;
+}GFC_ListElement;
 
 
 /**
@@ -37,10 +37,10 @@ typedef struct
  * @param packed if true, items will be skipped if they are out of bounds of the list
  * @return NULL on error or a formatted listElement otherwise
  */
-ListElement *gf2d_element_list_new_full(
-    Rect bounds,
-    Vector2D itemSize,
-    ListStyle ls,
+GFC_ListElement *gf2d_element_list_new_full(
+    GFC_Rect bounds,
+    GFC_Vector2D itemSize,
+    GFC_ListStyle ls,
     int wraps,
     int scrolls,
     int packed,
@@ -64,7 +64,7 @@ void gf2d_element_list_add_item(Element *e,Element *item);
  * @param e the element to set
  * @param list the list to set it too
  */
-void gf2d_element_make_list(Element *e,ListElement *list);
+void gf2d_element_make_list(Element *e,GFC_ListElement *list);
 
 /**
  * @brief load list configuration for a list element from config
@@ -121,13 +121,13 @@ Element *gf2d_element_list_new_complete(
     Element *parent,
     Window *win,
     int      index,
-    TextLine name,
-    Rect bounds,
-    Color color,
-    Color backgroundColor,
+    GFC_TextLine name,
+    GFC_Rect bounds,
+    GFC_Color color,
+    GFC_Color backgroundGFC_Color,
     int backgroundDraw,
-    Vector2D itemSize,
-    ListStyle ls,
+    GFC_Vector2D itemSize,
+    GFC_ListStyle ls,
     int wraps,
     int scrolls,
     int packed,

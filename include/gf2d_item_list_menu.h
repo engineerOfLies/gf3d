@@ -15,6 +15,6 @@
  * @param result integer to be populated when a decision is made
  * @return a pointer to the newly created window, or NULL otherwise
  */
-Window *item_list_menu(Window *parent,Vector2D position,float width,char *question,List *options,void(*onSelect)(void *),void *callbackData,int *result);
+Window *item_list_menu(Window *parent,GFC_Vector2D position,float width,char *question,GFC_List *options,void(*onSelect)(void *),void *callbackData,int *result);
 
 #endif

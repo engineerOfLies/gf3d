@@ -8,16 +8,16 @@ typedef struct
 {
     Actor       *actor;
     Action      *action;
-    Vector2D    scale;
-    Vector2D    flip;
+    GFC_Vector2D    scale;
+    GFC_Vector2D    flip;
     Sprite      *image;
-    Vector2D    center;
+    GFC_Vector2D    center;
     float       frame;
 }ActorElement;
 
 ActorElement *gf2d_element_actor_new();
 
-ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,Vector2D scale,const char *image,Vector2D center,Vector2D flip  );
+ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,GFC_Vector2D scale,const char *image,GFC_Vector2D center,GFC_Vector2D flip  );
 
 /**
  * @brief get a pointer to the actor data in this element

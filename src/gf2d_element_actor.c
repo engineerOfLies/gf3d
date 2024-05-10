@@ -4,25 +4,25 @@
 
 #include "gf2d_element_actor.h"
 
-void gf2d_element_actor_draw(Element *element,Vector2D offset)
+void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
 {
     ActorElement *actor;
-    Vector2D position;
+    GFC_Vector2D position;
     if (!element)return;
     actor = (ActorElement*)element->data;
     if (!actor)return;
-    vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->bounds);
     if (actor->image)
     {
         gf2d_sprite_draw_full(
             actor->image,
             position,
             actor->scale,
-            vector2d(0,0),
+            gfc_vector2d(0,0),
             0,
             actor->flip,
             element->color,
-            vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             actor->frame);
     }
     else if (actor->actor)
@@ -47,7 +47,7 @@ void gf2d_element_actor_draw(Element *element,Vector2D offset)
     }
 }
 
-List * gf2d_element_actor_update(Element *element,Vector2D offset)
+GFC_List * gf2d_element_actor_update(Element *element,GFC_Vector2D offset)
 {
     ActorElement *actor;
     if (!element)return NULL;
@@ -83,7 +83,7 @@ ActorElement *gf2d_element_actor_new()
 }
 
 
-ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,Vector2D scale,const char *image,Vector2D center,Vector2D flip)
+ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,GFC_Vector2D scale,const char *image,GFC_Vector2D center,GFC_Vector2D flip)
 {
     ActorElement *ae;
     ae = gf2d_element_actor_new();
@@ -91,9 +91,9 @@ ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *act
     {
         return NULL;
     }
-    vector2d_copy(ae->scale,scale);
-    vector2d_copy(ae->center,center);
-    vector2d_copy(ae->flip,flip);
+    gfc_vector2d_copy(ae->scale,scale);
+    gfc_vector2d_copy(ae->center,center);
+    gfc_vector2d_copy(ae->flip,flip);
     if ((actorFile)&&(strlen(actorFile)))
     {
         ae->actor = gf2d_actor_load(actorFile);
@@ -208,13 +208,13 @@ void gf2d_element_make_actor(Element *e,ActorElement *actor)
 
 void gf2d_element_load_actor_from_config(Element *e,SJson *json)
 {
-    Vector2D flip = {0};
-    Vector2D center = {0};
+    GFC_Vector2D flip = {0};
+    GFC_Vector2D center = {0};
     SJson *value;
     const char *buffer = NULL;
     const char *action = NULL;
     const char *image = NULL;
-    Vector2D scale;
+    GFC_Vector2D scale;
     if ((!e) || (!json))
     {
         slog("call missing parameters");

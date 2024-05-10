@@ -454,9 +454,9 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh,Vertex *ve
     gf3d_mesh_setup_face_buffers(mesh,faces,fcount);
 }
 
-Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,Vector3D size)
+GFC_Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,GFC_Vector3D size)
 {
-    Vector3D outScale = {1,1,1};
+    GFC_Vector3D outScale = {1,1,1};
     if (!mesh)return outScale;
     if (size.x)outScale.x = mesh->bounds.w / size.x;
     if (size.y)outScale.y = mesh->bounds.h / size.y;
@@ -489,7 +489,7 @@ Mesh *gf3d_mesh_load(const char *filename)
     primitive = gfc_allocate_array(sizeof(MeshPrimitive),1);
     gf3d_mesh_create_vertex_buffer_from_vertices(primitive,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
     mesh->primitives = gfc_list_append(mesh->primitives,primitive);
-    memcpy(&mesh->bounds,&obj->bounds,sizeof(Box));
+    memcpy(&mesh->bounds,&obj->bounds,sizeof(GFC_Box));
     gf3d_obj_free(obj);
     gfc_line_cpy(mesh->filename,filename);
     

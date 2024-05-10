@@ -26,7 +26,7 @@ typedef struct
     VkLayerProperties *availableLayers;
     const char **enabledLayers;
     Uint32 enabledCount;
-    List *layers;
+    GFC_List *layers;
 }GF3D_Validation_Manager;
 
 static GF3D_Validation_Manager gf3d_validation = {0};

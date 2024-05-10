@@ -5,11 +5,11 @@
 
 typedef struct
 {
-    Matrix4 cameraMat;      //final matrix to become the view matrix
-    Matrix4 cameraMatInv;   //final matrix to become the inverse view matrix
-    Vector3D scale;
-    Vector3D position;
-    Vector3D rotation;      // pitch, roll, yaw
+    GFC_Matrix4 cameraMat;      //final matrix to become the view matrix
+    GFC_Matrix4 cameraMatInv;   //final matrix to become the inverse view matrix
+    GFC_Vector3D scale;
+    GFC_Vector3D position;
+    GFC_Vector3D rotation;      // pitch, roll, yaw
 }Camera;
 
 /**
@@ -22,19 +22,19 @@ void gf3d_camera_update_view();
  * @brief get the current camera view
  * @param view output, the matrix provided will be populated with the current camera information
  */
-void gf3d_camera_get_view_mat4(Matrix4 *view);
+void gf3d_camera_get_view_mat4(GFC_Matrix4 *view);
 
 /**
  * @brief set the current camera based on the matrix provided
  */
-void gf3d_camera_set_view_mat4(Matrix4 *view);
+void gf3d_camera_set_view_mat4(GFC_Matrix4 *view);
 
 /**
  * @brief have the camera point towards a point in space
  * @param target the point to look at
  * @param position [optional] if provided this will move the camera here first
  */
-void gf3d_camera_look_at(Vector3D target,const Vector3D *position);
+void gf3d_camera_look_at(GFC_Vector3D target,const GFC_Vector3D *position);
 
 /**
  * @brief move the camera "FORWARD" relative to the view angles of the camera
@@ -154,39 +154,39 @@ void gf3d_camera_roll(float magnitude);
  * @brief get the current camera position in world space;
  * @return the camera position.
  */
-Vector3D gf3d_camera_get_position();
+GFC_Vector3D gf3d_camera_get_position();
 
 
 /**
  * @brief explicitely set the camera positon, holding all other parameters the same
  * @param position the new position for the camera
  */
-void gf3d_camera_set_position(Vector3D position);
+void gf3d_camera_set_position(GFC_Vector3D position);
 
 /**
  * @brief explicitely set the camera scale (to be applied to the entire scene)
  * @param scale the new scale for the camera
  */
-void gf3d_camera_set_scale(Vector3D scale);
+void gf3d_camera_set_scale(GFC_Vector3D scale);
 
 /**
  * @brief explicitely set the camera positon, holding all other parameters the same
  * @param rotation the new rotation for the camera (pitch[x], roll[y], yaw[z])
  */
-void gf3d_camera_set_rotation(Vector3D rotation);
+void gf3d_camera_set_rotation(GFC_Vector3D rotation);
 
 /**
- * @brief get the rotation angles of the camera that can be used with vector3d_angle_vectors()
+ * @brief get the rotation angles of the camera that can be used with gfc_vector3d_angle_vectors()
  * @return the angle, in radians of the camera
  */
-Vector3D gf3d_camera_get_angles();
+GFC_Vector3D gf3d_camera_get_angles();
 
 /**
- * @brief get the vectors for forward, right, and up based on the camera view angles
- * @param forward   [output] if provided, it will be set with the normal vector in the direction the camera is looking
- * @param right     [output] if provided, it will be set with the normal vector to the right of where the camera is looking
- * @param up        [output] if provided, it will be set with the normal vector directly up from where the camera is looking
+ * @brief get the gfc_vectors for forward, right, and up based on the camera view angles
+ * @param forward   [output] if provided, it will be set with the normal gfc_vector in the direction the camera is looking
+ * @param right     [output] if provided, it will be set with the normal gfc_vector to the right of where the camera is looking
+ * @param up        [output] if provided, it will be set with the normal gfc_vector directly up from where the camera is looking
  */
-void gf3d_camera_get_view_vectors(Vector3D *forward, Vector3D *right, Vector3D *up);
+void gf3d_camera_get_view_vectors(GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up);
 
 #endif

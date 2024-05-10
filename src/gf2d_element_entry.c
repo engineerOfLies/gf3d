@@ -6,14 +6,14 @@
 #include "gf2d_element_label.h"
 #include "gf2d_mouse.h"
 
-void gf2d_element_entry_draw(Element *element,Vector2D offset)
+void gf2d_element_entry_draw(Element *element,GFC_Vector2D offset)
 {
     EntryElement *entry;
-    Vector2D position;
+    GFC_Vector2D position;
     if (!element)return;
     entry = (EntryElement*)element->data;
     if (!entry)return;
-    vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->bounds);
     gf2d_element_draw(entry->label,position);
     if (!element->hasFocus)
     {
@@ -37,11 +37,11 @@ void gf2d_element_entry_draw(Element *element,Vector2D offset)
     }
 }
 
-List *gf2d_element_entry_update(Element *element,Vector2D offset)
+GFC_List *gf2d_element_entry_update(Element *element,GFC_Vector2D offset)
 {
-    Rect bounds;
-    List *list;
-    TextLine input = {0};
+    GFC_Rect bounds;
+    GFC_List *list;
+    GFC_TextLine input = {0};
     char newLet = 0;
     SDL_Keymod mods;
     EntryElement *entry;

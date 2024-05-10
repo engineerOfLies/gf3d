@@ -5,12 +5,12 @@
 #include "gf2d_font.h"
 #include "gf2d_element_label.h"
 
-void gf2d_element_label_draw(Element *element,Vector2D offset)
+void gf2d_element_label_draw(Element *element,GFC_Vector2D offset)
 {
     LabelElement *label;
-    Vector2D position;
-    Vector2D size = {0};
-    Rect r;
+    GFC_Vector2D position;
+    GFC_Vector2D size = {0};
+    GFC_Rect r;
     if (!element)return;
     label = (LabelElement*)element->data;
     if (!label)return;
@@ -34,7 +34,7 @@ void gf2d_element_label_draw(Element *element,Vector2D offset)
         return;
     }
     // adjust position to top left
-    vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->bounds);
     switch(label->justify)
     {
         case LJ_Left:
@@ -67,7 +67,7 @@ void gf2d_element_label_draw(Element *element,Vector2D offset)
     }
 }
 
-List *gf2d_element_label_update(Element *element,Vector2D offset)
+GFC_List *gf2d_element_label_update(Element *element,GFC_Vector2D offset)
 {
     return NULL;
 }
@@ -106,7 +106,7 @@ LabelElement *gf2d_element_label_new()
 }
 
 
-LabelElement *gf2d_element_label_new_full(const char *text,Color color,int style,int justify,int align,int wraps)
+LabelElement *gf2d_element_label_new_full(const char *text,GFC_Color color,int style,int justify,int align,int wraps)
 {
     LabelElement *label;
     label = gf2d_element_label_new();
@@ -126,7 +126,7 @@ LabelElement *gf2d_element_label_new_full(const char *text,Color color,int style
     return label;
 }
 
-Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int style,Vector2D size, Color color)
+Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int style,GFC_Vector2D size, GFC_Color color)
 {
     Element *le;
     LabelElement *label;
@@ -146,7 +146,7 @@ Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int s
     return le;
 }
 
-Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,Color color)
+Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,GFC_Color color)
 {
     Element *le;
     LabelElement *label;
@@ -205,8 +205,8 @@ void gf2d_element_label_set_text(Element *e,const char *text)
 void gf2d_element_load_label_from_config(Element *e,SJson *json)
 {
     SJson *value;
-    Vector4D vector;
-    Color color;
+    GFC_Vector4D gfc_vector;
+    GFC_Color color;
     const char *buffer;
     int style = FT_Normal;
     int justify = LJ_Left;  
@@ -296,9 +296,9 @@ void gf2d_element_load_label_from_config(Element *e,SJson *json)
         }
     }
     value = sj_object_get_value(json,"color");
-    vector4d_set(vector,255,255,255,255);
-    sj_value_as_vector4d(value,&vector);
-    color = gfc_color_from_vector4(vector);
+    gfc_vector4d_set(gfc_vector,255,255,255,255);
+    sj_value_as_vector4d(value,&gfc_vector);
+    color = gfc_color_from_vector4(gfc_vector);
 
     value = sj_object_get_value(json,"text");
     buffer = sj_get_string_value(value);

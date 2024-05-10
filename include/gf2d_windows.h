@@ -26,19 +26,19 @@ typedef struct Window_S
 {
     int _inuse;             /**<do not touch*/
     int hidden;             /**<if true, no drawing or updating*/
-    TextLine    name;       /**<name of window*/
+    GFC_TextLine    name;       /**<name of window*/
     int no_draw_generic;    /**<if true, do not use the generic window draw style*/
-    List *elements;         /**<all the components of the window*/
-    List *focus_elements;   /**<pointers to all of the elements that can have focus*/
+    GFC_List *elements;         /**<all the components of the window*/
+    GFC_List *focus_elements;   /**<pointers to all of the elements that can have focus*/
     Element *focus;         /**<this element has the focus*/
-    Rect dimensions;        /**<where on the screen*/
-    Rect canvas;            /**<Where within the window we draw things*/
-    Color color;         /**<color to draw the window with*/
+    GFC_Rect dimensions;        /**<where on the screen*/
+    GFC_Rect canvas;            /**<Where within the window we draw things*/
+    GFC_Color color;         /**<color to draw the window with*/
     int blocks_input;       /**<if true, windows below will not be checked for input updates, but will update*/
     struct Window_S *parent;/**<pointer to a parent window*/
     struct Window_S *child; /**<pointer to a child window, used when only one at a time is allowed*/
     void (*close_child)(struct Window_S *win,struct Window_S *child);
-    int (*update)(struct Window_S *win,List *updateList);//update function to be called whenever a window element is updated
+    int (*update)(struct Window_S *win,GFC_List *updateGFC_List);//update function to be called whenever a window element is updated
     int (*draw)(struct Window_S *win);                   //custom draw function, if it returns 1, skip the standard draw
     void(*refresh)(struct Window_S *win);                //custom refresh function.  Called when window content is changed
     int (*free_data)(struct Window_S *win);              //if you have custom data, you need to specify this to free it
@@ -161,15 +161,15 @@ void gf2d_window_draw(Window *win);
  * @param rect the dimensions of the window to draw
  * @param color the color to draw the window with
  */
-void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,Rect rect,Color color);
-void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,Rect rect,Color color);
+void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_Color color);
+void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_Color color);
 
 /**
  * @brief draw a generic window using the common border assets
  * @param rect the dimensions of the window to draw
  * @param color the color to draw the window with
  */
-void gf2d_draw_window_border_generic(Rect rect,Color color);
+void gf2d_draw_window_border_generic(GFC_Rect rect,GFC_Color color);
 
 /**
  * @brief get the element from the window with the matching id
@@ -238,14 +238,14 @@ int gf2d_window_mouse_in(Window *win);
  * @param win the window to move
  * @param position the place to the move the window to
  */
-void gf2d_window_set_position(Window *win,Vector2D position);
+void gf2d_window_set_position(Window *win,GFC_Vector2D position);
 
 /**
  * @brief change a window's dimensions
  * @param win the window to resize
  * @param dimensions the dimensions of the window
  */
-void gf2d_window_set_dimensions(Window *win,Rect dimensions);
+void gf2d_window_set_dimensions(Window *win,GFC_Rect dimensions);
 
 /**
  * @brief get the first window in the window list by the name provided

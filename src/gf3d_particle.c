@@ -11,14 +11,14 @@
 extern int __DEBUG;
 typedef struct
 {
-    Matrix4     model;
-    Matrix4     view;
-    Matrix4     proj;
-    Vector4D    color;
-    Vector4D    color2;
-    Vector2D    viewportSize;
-    Vector2D    texture_offset;// as a percent
-    Vector2D    texture_size;// as a percent
+    GFC_Matrix4     model;
+    GFC_Matrix4     view;
+    GFC_Matrix4     proj;
+    GFC_Vector4D    color;
+    GFC_Vector4D    color2;
+    GFC_Vector2D    viewportSize;
+    GFC_Vector2D    texture_offset;// as a percent
+    GFC_Vector2D    texture_size;// as a percent
     Uint32      textured;
     float       size;
 }ParticleUBO;
@@ -39,7 +39,7 @@ static ParticleManager gf3d_particle_manager = {0};
 void gf3d_particle_create_vertex_buffer();
 
 
-Particle gf3d_particle(Vector3D position, Color color, float size)
+Particle gf3d_particle(GFC_Vector3D position, GFC_Color color, float size)
 {
     Particle p = {position, color, color, size};
     return p;
@@ -62,7 +62,7 @@ void gf3d_particles_manager_close()
 void gf3d_particle_manager_init(Uint32 max_particles)
 {
     gf3d_particle_manager.bindingDescription.binding = 0;
-    gf3d_particle_manager.bindingDescription.stride = sizeof(Vector3D);
+    gf3d_particle_manager.bindingDescription.stride = sizeof(GFC_Vector3D);
     gf3d_particle_manager.bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     gf3d_particle_manager.attributeDescriptions[0].binding = 0;
@@ -112,9 +112,9 @@ void gf3d_particle_create_vertex_buffer()
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
     VkDevice device = gf3d_vgraphics_get_default_logical_device();
-    Vector3D particle = {0};
+    GFC_Vector3D particle = {0};
 
-    bufferSize = sizeof(Vector3D);
+    bufferSize = sizeof(GFC_Vector3D);
     
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     
@@ -158,8 +158,8 @@ ParticleUBO gf3d_particle_get_uniform_buffer(Particle *particle)
     particleUBO.texture_size.x = 1.00;
     particleUBO.texture_size.y = 1.00;
     
-    vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
-    vector4d_copy(particleUBO.color2,gfc_color_to_vector4f(particle->color2));
+    gfc_vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
+    gfc_vector4d_copy(particleUBO.color2,gfc_color_to_vector4f(particle->color2));
     particleUBO.size = particle->size;
     particleUBO.viewportSize = gf3d_vgraphics_get_view_extent_as_vector2d();
     return particleUBO;
@@ -179,7 +179,7 @@ void gf3d_particle_update_uniform_buffer(Particle *particle,UniformBuffer *ubo)
     gfc_matrix_copy(particleUBO.view,graphics_ubo.view);
     gfc_matrix_copy(particleUBO.proj,graphics_ubo.proj);
     
-    vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
+    gfc_vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
     particleUBO.size = particle->size;
     particleUBO.viewportSize = gf3d_vgraphics_get_view_extent_as_vector2d();
     
@@ -242,53 +242,53 @@ void gf3d_particle_draw_sprite(Particle particle,Sprite *sprite,int frame)
 
 
 
-void gf3d_particle_trail_draw(Color color, float size, Uint8 count, Edge3D trail)
+void gf3d_particle_trail_draw(GFC_Color color, float size, Uint8 count, GFC_Edge3D trail)
 {
     int i;
     Particle particle;
-    Vector3D position;
-    Vector3D step;
-    vector3d_copy(position,trail.a);
-    vector3d_sub(step,trail.b,trail.a);//vector to b
+    GFC_Vector3D position;
+    GFC_Vector3D step;
+    gfc_vector3d_copy(position,trail.a);
+    gfc_vector3d_sub(step,trail.b,trail.a);//gfc_vector to b
     gfc_color_copy(particle.color,color);
     particle.color2 = gfc_color8(255,255,255,255);
     particle.size = size;
     if (count > 1)
     {
-        vector3d_scale(step,step,1/(float)count);
+        gfc_vector3d_scale(step,step,1/(float)count);
     }
     for (i = 0; i < count; i++)
     {
-        vector3d_copy(particle.position,position);
-        vector3d_add(position,position,step);
+        gfc_vector3d_copy(particle.position,position);
+        gfc_vector3d_add(position,position,step);
         gf3d_particle_draw(particle);
     }
 }
 
-void draw_guiding_lights(Vector3D position,Vector3D rotation,float width, float length)
+void draw_guiding_lights(GFC_Vector3D position,GFC_Vector3D rotation,float width, float length)
 {
-    Vector3D start = {0};
-    Vector3D forward = {0};
-    Vector3D right = {0};
-    Vector3D offset= {0};
+    GFC_Vector3D start = {0};
+    GFC_Vector3D forward = {0};
+    GFC_Vector3D right = {0};
+    GFC_Vector3D offset= {0};
         //draw guiding lights
-    vector3d_angle_vectors(rotation, &right, &forward,NULL);
-    vector3d_scale(right,right,width);
-    vector3d_copy(offset,forward);
-    vector3d_scale(offset,offset,10 * fabs(cos(SDL_GetTicks()*0.001)));
-    vector3d_add(start,position,offset);
+    gfc_vector3d_angle_vectors(rotation, &right, &forward,NULL);
+    gfc_vector3d_scale(right,right,width);
+    gfc_vector3d_copy(offset,forward);
+    gfc_vector3d_scale(offset,offset,10 * fabs(cos(SDL_GetTicks()*0.001)));
+    gfc_vector3d_add(start,position,offset);
 
-    vector3d_scale(forward,forward,length);
-    vector3d_add(forward,forward,offset);
-    vector3d_add(forward,forward,position);
-    vector3d_add(forward,forward,right);
-    vector3d_add(start,start,right);
+    gfc_vector3d_scale(forward,forward,length);
+    gfc_vector3d_add(forward,forward,offset);
+    gfc_vector3d_add(forward,forward,position);
+    gfc_vector3d_add(forward,forward,right);
+    gfc_vector3d_add(start,start,right);
     
     gf3d_particle_trail_draw(GFC_COLOR_RED, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
     
-    vector3d_scale(right,right,-2);
-    vector3d_add(forward,forward,right);
-    vector3d_add(start,start,right);
+    gfc_vector3d_scale(right,right,-2);
+    gfc_vector3d_add(forward,forward,right);
+    gfc_vector3d_add(start,start,right);
     gf3d_particle_trail_draw(GFC_COLOR_GREEN, 10, length *0.05, gfc_edge3d_from_vectors(start,forward));
 
 }

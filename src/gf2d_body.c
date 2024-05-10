@@ -9,7 +9,7 @@
 #include "gf2d_body.h"
 
 
-Uint8 gf2d_body_shape_collide(Body *a,Shape *s,Vector2D *poc, Vector2D *normal);
+Uint8 gf2d_body_shape_collide(Body *a,GFC_Shape *s,GFC_Vector2D *poc, GFC_Vector2D *normal);
 
 void gf2d_body_clear(Body *body)
 {
@@ -17,26 +17,26 @@ void gf2d_body_clear(Body *body)
     memset(body,0,sizeof(Body));
 }
 
-void gf2d_body_push(Body *body,Vector2D direction,float force)
+void gf2d_body_push(Body *body,GFC_Vector2D direction,float force)
 {
     if (!body)return;
     if (body->mass != 0)
     {
         force = force / body->mass;
     }
-    vector2d_set_magnitude(&direction,force);
-    vector2d_add(body->velocity,body->velocity,direction);
+    gfc_vector2d_set_magnitude(&direction,force);
+    gfc_vector2d_add(body->velocity,body->velocity,direction);
 }
 
-void gf2d_body_draw(Body *body,Vector2D offset)
+void gf2d_body_draw(Body *body,GFC_Vector2D offset)
 {
-    Color color;
-    Shape shape;
-    Vector2D center;
+    GFC_Color color;
+    GFC_Shape shape;
+    GFC_Vector2D center;
     if (!body)return;
     color = gfc_color8(0,255,255,255);
     // draw center point
-    vector2d_add(center,body->position,offset);
+    gfc_vector2d_add(center,body->position,offset);
     gf2d_draw_circle(center,2,color);
         
     color = gfc_color8(255,0,255,255);
@@ -52,22 +52,22 @@ void gf2d_body_set(
     Uint32      cliplayer,
     Uint32      touchlayer,
     Uint32      team,
-    Vector2D    position,
-    Vector2D    velocity,
+    GFC_Vector2D    position,
+    GFC_Vector2D    velocity,
     float       mass,
     float       gravity,
     float       elasticity,
-    Shape      *shape,
+    GFC_Shape      *shape,
     void       *data,
-    int         (*touch)(struct Body_S *self, List *collision))
+    int         (*touch)(struct Body_S *self, GFC_List *collision))
 {
     if (!body)return;
     body->cliplayer = cliplayer;
     body->touchlayer = touchlayer;
     body->team = team;
     body->worldclip = worldclip;
-    vector2d_copy(body->position,position);
-    vector2d_copy(body->velocity,velocity);
+    gfc_vector2d_copy(body->position,position);
+    gfc_vector2d_copy(body->velocity,velocity);
     body->mass = mass;
     body->gravity = gravity;
     body->elasticity = elasticity;
@@ -77,9 +77,9 @@ void gf2d_body_set(
     gfc_word_cpy(body->name,name);
 }
 
-Shape gf2d_body_to_shape(Body *a)
+GFC_Shape gf2d_body_to_shape(Body *a)
 {
-    Shape aS = {0};
+    GFC_Shape aS = {0};
     if (!a)return aS;
     gfc_shape_copy(&aS,*a->shape);
     gfc_shape_move(&aS,a->position);

@@ -16,39 +16,39 @@ void gf3d_uniform_buffer_setup(UniformBuffer *buffer,VkDeviceSize bufferSize)
         &buffer->uniformBufferMemory);
 }
 
-UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize bufferSize, Uint32 bufferCount,Uint32 bufferFrames)
+UniformBufferGFC_List *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize bufferSize, Uint32 bufferCount,Uint32 bufferFrames)
 {
     int i,j;
-    UniformBufferList *bufferList;
+    UniformBufferGFC_List *bufferGFC_List;
     if ((!bufferCount)||(!bufferFrames))
     {
         slog("cannot allocate zero buffers!");
         return NULL;
     }
-    bufferList = gfc_allocate_array(sizeof(UniformBufferList),1);
-    if (!bufferList)
+    bufferGFC_List = gfc_allocate_array(sizeof(UniformBufferGFC_List),1);
+    if (!bufferGFC_List)
     {
         slog("failed to allocate unform buffers list");
         return NULL;
     }
     
-    bufferList->device = device;
+    bufferGFC_List->device = device;
     
-    bufferList->buffers = gfc_allocate_array(sizeof(UniformBuffer  *),bufferFrames);
+    bufferGFC_List->buffers = gfc_allocate_array(sizeof(UniformBuffer  *),bufferFrames);
     
-    if (!bufferList->buffers)
+    if (!bufferGFC_List->buffers)
     {
-        gf3d_uniform_buffer_list_free(bufferList);
+        gf3d_uniform_buffer_list_free(bufferGFC_List);
         slog("failed to allocate unform buffers list");
         return NULL;
     }
     
     for (j = 0; j < bufferFrames; j ++)
     {
-        bufferList->buffers[j] = gfc_allocate_array(sizeof(UniformBuffer),bufferCount);
-        if (!bufferList->buffers[j])
+        bufferGFC_List->buffers[j] = gfc_allocate_array(sizeof(UniformBuffer),bufferCount);
+        if (!bufferGFC_List->buffers[j])
         {
-            gf3d_uniform_buffer_list_free(bufferList);
+            gf3d_uniform_buffer_list_free(bufferGFC_List);
             slog("failed to allocate unform buffers");
             return NULL;
         }
@@ -58,20 +58,20 @@ UniformBufferList *gf3d_uniform_buffer_list_new(VkDevice device,VkDeviceSize buf
                 bufferSize,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                &bufferList->buffers[j][i].uniformBuffer,
-                &bufferList->buffers[j][i].uniformBufferMemory);
-                bufferList->buffers[j][i].bufferSize = bufferSize;
+                &bufferGFC_List->buffers[j][i].uniformBuffer,
+                &bufferGFC_List->buffers[j][i].uniformBufferMemory);
+                bufferGFC_List->buffers[j][i].bufferSize = bufferSize;
         }
         
     }
-    bufferList->buffer_count = bufferCount;
-    bufferList->buffer_frames = bufferFrames;
+    bufferGFC_List->buffer_count = bufferCount;
+    bufferGFC_List->buffer_frames = bufferFrames;
     
     
-    return bufferList;
+    return bufferGFC_List;
 }
 
-void gf3d_uniform_buffer_list_free(UniformBufferList *list)
+void gf3d_uniform_buffer_list_free(UniformBufferGFC_List *list)
 {
     int i,j;
     if (!list)return;
@@ -91,7 +91,7 @@ void gf3d_uniform_buffer_list_free(UniformBufferList *list)
     }
 }
 
-UniformBuffer *gf3d_uniform_buffer_list_get_nth_buffer(UniformBufferList *list, Uint32 nth, Uint32 bufferFrame)
+UniformBuffer *gf3d_uniform_buffer_list_get_nth_buffer(UniformBufferGFC_List *list, Uint32 nth, Uint32 bufferFrame)
 {
     if (!list)return NULL;
     if (bufferFrame >= list->buffer_frames)
@@ -107,7 +107,7 @@ UniformBuffer *gf3d_uniform_buffer_list_get_nth_buffer(UniformBufferList *list, 
     return &list->buffers[bufferFrame][nth];
 }
 
-UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferList *list, Uint32 bufferFrame)
+UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferGFC_List *list, Uint32 bufferFrame)
 {
     int i;
     if (!list)return NULL;
@@ -126,7 +126,7 @@ UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferList *list, Uint
     return NULL;
 }
 
-void gf3d_uniform_buffer_list_clear(UniformBufferList *list, Uint32 bufferFrame)
+void gf3d_uniform_buffer_list_clear(UniformBufferGFC_List *list, Uint32 bufferFrame)
 {
     int i;
     if (!list)return;

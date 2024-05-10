@@ -25,7 +25,7 @@ void gf2d_collision_free(Collision *collision)
     free(collision);
 }
 
-void gf2d_collision_list_clear(List *list)
+void gf2d_collision_list_clear(GFC_List *list)
 {
     int i, count;
     Collision *collision;
@@ -40,7 +40,7 @@ void gf2d_collision_list_clear(List *list)
     gfc_list_clear(list);
 }
 
-void gf2d_collision_list_free(List *list)
+void gf2d_collision_list_free(GFC_List *list)
 {
     int i, count;
     Collision *collision;
@@ -55,10 +55,10 @@ void gf2d_collision_list_free(List *list)
     gfc_list_delete(list);
 }
 
-Collision *gf2d_collision_space_static_shape_clip(Shape a, Shape s)
+Collision *gf2d_collision_space_static_shape_clip(GFC_Shape a, GFC_Shape s)
 {
     Collision *collision;
-    Vector2D poc,normal;
+    GFC_Vector2D poc,normal;
     if (!gfc_shape_overlap_poc(a, s, &poc, &normal))
     {
         return NULL;
@@ -66,8 +66,8 @@ Collision *gf2d_collision_space_static_shape_clip(Shape a, Shape s)
     collision = gf2d_collision_new();
     collision->collided = 1;
     collision->blocked = 1;
-    vector2d_copy(collision->pointOfContact,poc);
-    vector2d_copy(collision->normal,normal);
+    gfc_vector2d_copy(collision->pointOfContact,poc);
+    gfc_vector2d_copy(collision->normal,normal);
     collision->shape = s;
     collision->body = NULL;
     collision->bounds = 0;
@@ -75,11 +75,11 @@ Collision *gf2d_collision_space_static_shape_clip(Shape a, Shape s)
     return collision;
 }
 
-Collision *gf2d_collision_space_dynamic_body_clip(Shape a, DynamicBody *d)
+Collision *gf2d_collision_space_dynamic_body_clip(GFC_Shape a, DynamicBody *d)
 {
-    Shape s;
+    GFC_Shape s;
     Collision *collision;
-    Vector2D poc,normal;
+    GFC_Vector2D poc,normal;
     if (!d)return NULL;
     s = gf2d_dynamic_body_to_shape(d);
     if (!gfc_shape_overlap_poc(a, s, &poc, &normal))
@@ -89,8 +89,8 @@ Collision *gf2d_collision_space_dynamic_body_clip(Shape a, DynamicBody *d)
     collision = gf2d_collision_new();
     collision->collided = 1;
     collision->blocked = 1;
-    vector2d_copy(collision->pointOfContact,poc);
-    vector2d_copy(collision->normal,normal);
+    gfc_vector2d_copy(collision->pointOfContact,poc);
+    gfc_vector2d_copy(collision->normal,normal);
     collision->shape = *d->body->shape;
     collision->body = d->body;
     collision->bounds = 0;
@@ -98,16 +98,16 @@ Collision *gf2d_collision_space_dynamic_body_clip(Shape a, DynamicBody *d)
     return collision;
 }
 
-List *gf2d_collision_dynamic_body_check(Space *space, Shape shape, CollisionFilter filter, List *collisionList)
+GFC_List *gf2d_collision_dynamic_body_check(Space *space, GFC_Shape shape, CollisionFilter filter, GFC_List *collisionGFC_List)
 {
     int i,c;
     DynamicBody *db;
     SpaceBucket *bucket;
     Collision *collision;
     if (!space)return NULL;
-    if (!collisionList)
+    if (!collisionGFC_List)
     {
-        collisionList = gfc_list_new();
+        collisionGFC_List = gfc_list_new();
     }
     if (space->usesBuckets)
     {
@@ -132,17 +132,17 @@ List *gf2d_collision_dynamic_body_check(Space *space, Shape shape, CollisionFilt
                 // check for layer compatibility
                 collision = gf2d_collision_space_dynamic_body_clip(shape, db);
                 if (collision == NULL)continue;
-                collisionList = gfc_list_append(collisionList,(void*)collision);
+                collisionGFC_List = gfc_list_append(collisionGFC_List,(void*)collision);
             }
             bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(shape),bucket);
         }
     }
     else
     {
-        c = gfc_list_get_count(space->dynamicBodyList);
+        c = gfc_list_get_count(space->dynamicBodyGFC_List);
         for (i = 0; i < c;i++)
         {
-            db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
+            db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
             if (!db)continue;
             if (db->body == filter.ignore)continue;
             if (filter.team != 0)
@@ -153,39 +153,39 @@ List *gf2d_collision_dynamic_body_check(Space *space, Shape shape, CollisionFilt
             // check for layer compatibility
             collision = gf2d_collision_space_dynamic_body_clip(shape, db);
             if (collision == NULL)continue;
-            collisionList = gfc_list_append(collisionList,(void*)collision);
+            collisionGFC_List = gfc_list_append(collisionGFC_List,(void*)collision);
         }
     }
-    return collisionList;
+    return collisionGFC_List;
 }
 
-List *gf2d_collision_check_space_shape(Space *space, Shape shape,CollisionFilter filter)
+GFC_List *gf2d_collision_check_space_shape(Space *space, GFC_Shape shape,CollisionFilter filter)
 {
-    List *collisionList = NULL;
-    collisionList = gfc_list_new();
+    GFC_List *collisionGFC_List = NULL;
+    collisionGFC_List = gfc_list_new();
     if (filter.worldclip)
     {
-        collisionList = gf2d_space_static_shape_check(space, shape, collisionList);
+        collisionGFC_List = gf2d_space_static_shape_check(space, shape, collisionGFC_List);
         //check if the shape clips the level bounds
 /*        collision = gf2d_dynamic_body_bounds_collision_check(db,space->bounds,t);
         if (collision != NULL)
         {
-            db->collisionList = gfc_list_append(db->collisionList,(void*)collision);
+            db->collisionGFC_List = gfc_list_append(db->collisionGFC_List,(void*)collision);
         }*/
     }
     if (filter.cliplayer)
     {
-        collisionList = gf2d_collision_dynamic_body_check(space, shape, filter, collisionList);
+        collisionGFC_List = gf2d_collision_dynamic_body_check(space, shape, filter, collisionGFC_List);
     }
-    if (gfc_list_get_count(collisionList) == 0)
+    if (gfc_list_get_count(collisionGFC_List) == 0)
     {
-        gfc_list_delete(collisionList);
+        gfc_list_delete(collisionGFC_List);
         return NULL;
     }
-    return collisionList;
+    return collisionGFC_List;
 }
 
-Collision gf2d_collision_trace_space(Space *space, Vector2D start, Vector2D end ,CollisionFilter filter)
+Collision gf2d_collision_trace_space(Space *space, GFC_Vector2D start, GFC_Vector2D end ,CollisionFilter filter)
 {
     Collision out = {0};
     Collision *collision = NULL;
@@ -194,24 +194,24 @@ Collision gf2d_collision_trace_space(Space *space, Vector2D start, Vector2D end 
     double     distance;
     double     length;
     int count,i;
-    List *collisionList;
-    collisionList = gf2d_collision_check_space_shape(space, gfc_shape_from_edge(gfc_edge_from_vectors(start,end)),filter);
-    if (!collisionList)
+    GFC_List *collisionGFC_List;
+    collisionGFC_List = gf2d_collision_check_space_shape(space, gfc_shape_from_edge(gfc_edge_from_vectors(start,end)),filter);
+    if (!collisionGFC_List)
     {
         return out;
     }
-    count = gfc_list_get_count(collisionList);
+    count = gfc_list_get_count(collisionGFC_List);
     for (i =0; i < count;i++)
     {
-        collision = (Collision*)gfc_list_get_nth(collisionList,i);
+        collision = (Collision*)gfc_list_get_nth(collisionGFC_List,i);
         if (!collision)continue;
         if (!best)
         {
             best = collision;
-            bestDistance = vector2d_magnitude_between(start,collision->pointOfContact);
+            bestDistance = gfc_vector2d_magnitude_between(start,collision->pointOfContact);
             continue;
         }
-        distance = vector2d_magnitude_between(start,collision->pointOfContact);
+        distance = gfc_vector2d_magnitude_between(start,collision->pointOfContact);
         if (distance < bestDistance)
         {
             best = collision;
@@ -220,7 +220,7 @@ Collision gf2d_collision_trace_space(Space *space, Vector2D start, Vector2D end 
     }
     if (best != NULL)
     {
-        length = vector2d_magnitude_between(start,end);
+        length = gfc_vector2d_magnitude_between(start,end);
         if (!length)
         {
             best->timeStep = 0;
@@ -231,7 +231,7 @@ Collision gf2d_collision_trace_space(Space *space, Vector2D start, Vector2D end 
         }
         memcpy(&out,best,sizeof(Collision));
     }
-    gf2d_collision_list_free(collisionList);
+    gf2d_collision_list_free(collisionGFC_List);
     return out;
 }
 
