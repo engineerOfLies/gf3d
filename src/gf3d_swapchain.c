@@ -11,7 +11,7 @@ extern int __DEBUG;
 
 typedef struct
 {
-    VkDevice                    device;
+    VkDevice                    device;             
     VkSurfaceCapabilitiesKHR    capabilities;
     Uint32                      formatCount;
     VkSurfaceFormatKHR         *formats;
@@ -33,6 +33,7 @@ typedef struct
 }vSwapChain;
 
 static vSwapChain gf3d_swapchain = {0};
+
 
 void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface);
 void gf3d_swapchain_close();
@@ -201,6 +202,7 @@ void gf3d_swapchain_create(VkDevice device,VkSurfaceKHR surface)
         gf3d_swapchain_close();
         return;
     }
+    slog("swap chain length: %i\nswap image count: %i",gf3d_swapchain.swapChainCount,gf3d_swapchain.swapImageCount);
     gf3d_swapchain.swapImages = (VkImage *)gfc_allocate_array(sizeof(VkImage),gf3d_swapchain.swapImageCount);
     vkGetSwapchainImagesKHR(device, gf3d_swapchain.swapChain, &gf3d_swapchain.swapImageCount,gf3d_swapchain.swapImages );
     

@@ -173,7 +173,7 @@ void gf3d_armature_calc_child_bone(Bone3D *parent)
         child = gfc_list_get_nth(parent->children,i);
         if (!child)continue;
         //update child bone's matrix based on parent's matrix
-        gfc_matrix_multiply(
+        gfc_matrix4_multiply(
             child->mat,
             child->mat,
             parent->mat
@@ -207,7 +207,7 @@ void gf3d_armature_bone_calc_joint_matrices(Bone3D *bone,GFC_Matrix4 inverseBind
     {
         pose = gfc_list_get_nth(bone->poses,i);
         if (!pose)continue;
-        gfc_matrix_multiply(
+        gfc_matrix4_multiply(
             pose->jointMat,
             inverseBindGFC_Matrix,
             pose->globalMat);
@@ -245,7 +245,7 @@ void gf3d_armature_calc_child_posebone(Bone3D *parent,Uint32 frame)
         //update child psoe bone's matrix based on parent's matrix
         childPose = gfc_list_get_nth(child->poses,frame);
         if (!childPose)continue;//bad frame
-        gfc_matrix_multiply(
+        gfc_matrix4_multiply(
             childPose->globalMat,
             childPose->globalMat,
             myPose->globalMat
@@ -280,7 +280,7 @@ void gf3d_armature_calculate_poses(Armature3D *armature)
             if (!bone)continue;
             bonePose = gfc_list_get_nth(bone->poses,i);//for this frame
             if (!bonePose)continue;
-            gfc_matrix_copy(
+            gfc_matrix4_copy(
                 pose->bones[j],
                 bonePose->jointMat);
         }
@@ -613,7 +613,7 @@ void gf3d_armature_bone_build_poses(Bone3D *bone,Uint32 maxFrames, float maxTime
             rotation,
             scale);
         
-        gfc_matrix_copy(
+        gfc_matrix4_copy(
             pose->globalMat,
             pose->localMat);//for later, this will be updated to global
         //slog("pose matrix for bone %s frame %i timestamp %f",bone->name,i,pose->timestamp);
@@ -1053,9 +1053,9 @@ BonePose3D *gf3d_armature_bone_pose_new()
     BonePose3D *pose;
     pose = gfc_allocate_array(sizeof(BonePose3D),1);
     if (!pose)return NULL;
-    gfc_matrix_identity(pose->localMat);
-    gfc_matrix_identity(pose->globalMat);
-    gfc_matrix_identity(pose->jointMat);
+    gfc_matrix4_identity(pose->localMat);
+    gfc_matrix4_identity(pose->globalMat);
+    gfc_matrix4_identity(pose->jointMat);
     return pose;
 }
 

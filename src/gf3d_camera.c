@@ -54,7 +54,7 @@ void gf3d_camera_update_view()
     position.x = gf3d_camera.position.x;
     position.y = -gf3d_camera.position.z;        //inverting for Z-up
     position.z = gf3d_camera.position.y;
-    gfc_matrix_identity(gf3d_camera.cameraMat);
+    gfc_matrix4_identity(gf3d_camera.cameraMat);
 
     gfc_vector3d_set(xaxis, cosYaw,                     0,  -sinYaw);
     gfc_vector3d_set(yaxis, sinYaw * sinPitch,   cosPitch,   cosYaw * sinPitch);

@@ -346,7 +346,7 @@ void gf3d_model_mat_reset(ModelMat *mat)
 {
     if (!mat)return;
     memset(mat,0,sizeof(ModelMat));
-    gfc_matrix_identity(mat->mat);
+    gfc_matrix4_identity(mat->mat);
     mat->scale = gfc_vector3d(1,1,1);
     mat->scaleDelta = gfc_vector3d(1,1,1);
 }
@@ -407,7 +407,7 @@ void mat_from_parent(
 {
     GFC_Matrix4 temp;
     gfc_matrix4_from_vectors(temp,position,rotation,scale);
-    gfc_matrix_multiply(out,temp,parent);
+    gfc_matrix4_multiply(out,temp,parent);
 }
 
 
@@ -416,7 +416,7 @@ void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
     const char *str;
     if (!mat)return;
     if (!config)return;
-    gfc_matrix_identity(mat->mat);
+    gfc_matrix4_identity(mat->mat);
     str = sj_object_get_value_as_string(config,"model");
     if (str)mat->model= gf3d_model_load(str);
     sj_value_as_vector3d(sj_object_get_value(config,"position"),&mat->position);
@@ -434,7 +434,7 @@ ModelMat *gf3d_model_mat_new()
     ModelMat *modelMat;
     modelMat = gfc_allocate_array(sizeof(ModelMat),1);
     if (!modelMat)return NULL;
-    gfc_matrix_identity(modelMat->mat);
+    gfc_matrix4_identity(modelMat->mat);
     gfc_vector3d_set(modelMat->scale,1,1,1);
     gfc_vector3d_set(modelMat->scaleDelta,1,1,1);
     return modelMat;
@@ -452,9 +452,9 @@ MeshUBO gf3d_model_get_mesh_ubo(
     MeshUBO modelUBO = {0};
     
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
-    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(modelUBO.model,modelMat);
+    gfc_matrix4_copy(modelUBO.view,graphics_ubo.view);
+    gfc_matrix4_copy(modelUBO.proj,graphics_ubo.proj);
     gfc_vector4d_copy(modelUBO.color,colorMod);
     gfc_vector4d_copy(modelUBO.detailGFC_Color,detail);
     cameraPosition = gf3d_camera_get_position();
@@ -476,15 +476,15 @@ SkyUBO gf3d_model_get_sky_ubo(
     
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
     
-    gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
+    gfc_matrix4_copy(modelUBO.model,modelMat);
+    gfc_matrix4_copy(modelUBO.view,graphics_ubo.view);
      modelUBO.view[0][3] = 0;
      modelUBO.view[1][3] = 0;
      modelUBO.view[2][3] = 0;
      modelUBO.view[3][0] = 0;
      modelUBO.view[3][1] = 0;
      modelUBO.view[3][2] = 0;
-    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(modelUBO.proj,graphics_ubo.proj);
     gfc_vector4d_copy(modelUBO.color,colorMod);
     return modelUBO;
 }
@@ -498,9 +498,9 @@ HighlightUBO gf3d_model_get_highlight_ubo(
     
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
     
-    gfc_matrix_copy(modelUBO.model,modelMat);
-    gfc_matrix_copy(modelUBO.view,graphics_ubo.view);
-    gfc_matrix_copy(modelUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(modelUBO.model,modelMat);
+    gfc_matrix4_copy(modelUBO.view,graphics_ubo.view);
+    gfc_matrix4_copy(modelUBO.proj,graphics_ubo.proj);
     
     gfc_vector4d_copy(modelUBO.color,highlightGFC_Color);
     return modelUBO;

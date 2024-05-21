@@ -148,11 +148,11 @@ void gf3d_vgraphics_init(const char *config)
         return;
     }
 
-    gfc_matrix_identity(gf3d_vgraphics.ubo.model);
-    gfc_matrix_identity(gf3d_vgraphics.ubo.view);
-    gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
+    gfc_matrix4_identity(gf3d_vgraphics.ubo.model);
+    gfc_matrix4_identity(gf3d_vgraphics.ubo.view);
+    gfc_matrix4_identity(gf3d_vgraphics.ubo.proj);
     
-    gfc_matrix_perspective(
+    gfc_matrix4_perspective(
         gf3d_vgraphics.ubo.proj,
         45 * GFC_DEGTORAD,
         resolution.x/resolution.y,
@@ -608,7 +608,7 @@ GFC_Matrix4 *gf3d_vgraphics_get_view_matrix()
 
 void gf3d_vgraphics_rotate_camera(float degrees)
 {
-    gfc_matrix_rotate(
+    gfc_matrix4_rotate(
         gf3d_vgraphics.ubo.view,
         gf3d_vgraphics.ubo.view,
         degrees,
@@ -659,20 +659,20 @@ GFC_Vector2D vgraphics_3d_position_to_screen(GFC_Vector3D position)
     
     res = gf3d_vgraphics_get_resolution();
     
-    gfc_matrix_make_translation(
+    gfc_matrix4_make_translation(
         model,
         position);
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    gfc_matrix_multiply(
+    gfc_matrix4_multiply(
         mvp,
         graphics_ubo.view,
         graphics_ubo.proj
     );
     
-    gfc_matrix_v_multiply_M(
+    gfc_matrix4_v_multiply(
         &transformed,
-        mvp,
-        gfc_vector4d(position.x,position.y,position.z,1.0));
+        gfc_vector4d(position.x,position.y,position.z,1.0),
+        mvp);
     
     out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
     out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;
@@ -690,20 +690,20 @@ GFC_Vector3D vgraphics_3d_position_to_screen_depth(GFC_Vector3D position)
     
     res = gf3d_vgraphics_get_resolution();
     
-    gfc_matrix_make_translation(
+    gfc_matrix4_make_translation(
         model,
         position);
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    gfc_matrix_multiply(
+    gfc_matrix4_multiply(
         mvp,
         graphics_ubo.view,
         graphics_ubo.proj
     );
     
-    gfc_matrix_v_multiply_M(
+    gfc_matrix4_v_multiply(
         &transformed,
-        mvp,
-        gfc_vector4d(position.x,position.y,position.z,1.0));
+        gfc_vector4d(position.x,position.y,position.z,1.0),
+        mvp);
     
     out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
     out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;

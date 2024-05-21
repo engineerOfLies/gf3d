@@ -535,7 +535,7 @@ SpriteUBO gf2d_sprite_get_uniform_buffer(
     spriteUBO.colorMod = gfc_color_to_vector4f(color);
     spriteUBO.position = position;
     spriteUBO.scale = scale;
-    gfc_matrix_identity(spriteUBO.rotation);
+    gfc_matrix4_identity(spriteUBO.rotation);
     spriteUBO.rotation[0][0] = cos(rotation.z);
     spriteUBO.rotation[0][1] = sin(rotation.z);
     spriteUBO.rotation[1][0] = sin(rotation.z) * -1;//clockwise rotation

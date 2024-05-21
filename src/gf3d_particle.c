@@ -149,11 +149,11 @@ ParticleUBO gf3d_particle_get_uniform_buffer(Particle *particle)
     
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
     
-    gfc_matrix_identity(particleUBO.model);
-    gfc_matrix_translate(particleUBO.model,particle->position);    
+    gfc_matrix4_identity(particleUBO.model);
+    gfc_matrix4_translate(particleUBO.model,particleUBO.model,particle->position);    
     
-    gfc_matrix_copy(particleUBO.view,graphics_ubo.view);
-    gfc_matrix_copy(particleUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(particleUBO.view,graphics_ubo.view);
+    gfc_matrix4_copy(particleUBO.proj,graphics_ubo.proj);
     
     particleUBO.texture_size.x = 1.00;
     particleUBO.texture_size.y = 1.00;
@@ -173,11 +173,11 @@ void gf3d_particle_update_uniform_buffer(Particle *particle,UniformBuffer *ubo)
     
     graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
     
-    gfc_matrix_identity(particleUBO.model);
-    gfc_matrix_translate(particleUBO.model,particle->position);    
+    gfc_matrix4_identity(particleUBO.model);
+    gfc_matrix4_translate(particleUBO.model,particleUBO.model,particle->position);    
     
-    gfc_matrix_copy(particleUBO.view,graphics_ubo.view);
-    gfc_matrix_copy(particleUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(particleUBO.view,graphics_ubo.view);
+    gfc_matrix4_copy(particleUBO.proj,graphics_ubo.proj);
     
     gfc_vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
     particleUBO.size = particle->size;

@@ -1,6 +1,6 @@
 # gf3d
 a collection of utlitity functions designed to facilitate creating 3D games with Vulkan and SDL2
-This project is specifically intended to function as an educational tool for my students taking 3D Game Programming.
+This project is specifically intended to function as an educational tool for my students taking 3D Game Programming and to challenge myself to learn the underlying systems necessary for a 3D Game Engine.
 
 This branch, MASTER, is designed to have all of the most advanced features that have been developed.  It is compiled as a library in the /libs folder and can be linked statically or dynamically.  This branch is more complex and not intended for beginners just learning.
 
@@ -39,6 +39,23 @@ a submodule, like gf3d, meant to be core files common to both 2d and 3d games
 sample menu definition files used by the gf2d_window system
 ## shaders/
 sample shaders in glsl and spir-v
+
 ## test/
 a test game.c and makefile showing how you can use the library / link against it (it least in linux)
+
+# Window Build Process - Visual Studio
+You will need to download the development libraries for Vulkan, SDL2, SDL2_image, SDL2_mixer, and SDL2_ttf.  I recommend extracting them to a libs folder in a folder alongside your project (so they can be re-used with other projects).  
+
+Make a new empty c/c++ project
+Set the runtime path and output directory to be the root of your project.  Remember that all file access is relative to the root of the project.
+
+Add additional include directories to be your project's include, gf3d/include, gf3d/gfc/include, gf3d/gfc/simple_json/incude, gf3d/gfc/simple_logger/include as well as all the include directories within the SDL2 libraries and vulkan
+
+Now add addition library directories to be the lib folders within sdl2 and vulkan.  be sure to match the x86/32 for 32 bit projects or x64 for 64 bit projects.
+
+Add the .lib files for each of the SDL2 libraries to the additional libraries section under linker section.  sdl2main.lib, sdl2.lib, sdl2_image.lib,sdl2_mixer.lib, sdl2_ttf.lib and the vulkan-1.lib 
+
+Add existing items: all the .c and .h files from each of the submodules gf3d,gfc,simple_logger, simple_json 
+
+If this is your first project you can try using the sample in the test folder.
 

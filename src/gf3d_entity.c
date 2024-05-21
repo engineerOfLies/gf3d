@@ -146,7 +146,7 @@ void gf3d_entity_draw(Entity *self)
             
             gf3d_model_mat_set_matrix(&self->mat);
             
-            gfc_matrix_multiply(self->mat.mat,mat,self->mat.mat);
+            gfc_matrix4_multiply(self->mat.mat,mat,self->mat.mat);
             
             gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailGFC_Color),gfc_vector4d(1,1,1,1),self->frame);
             if (self->selected)

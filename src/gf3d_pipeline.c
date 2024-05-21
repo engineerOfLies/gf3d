@@ -44,7 +44,7 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
         return;
     }
     gf3d_pipeline.maxPipelines = max_pipelines;
-    gf3d_pipeline.chainLength = gf3d_swapchain_get_chain_length();
+    gf3d_pipeline.chainLength = gf3d_swapchain_get_swap_image_count();
     atexit(gf3d_pipeline_close);
     if (__DEBUG)slog("pipeline system initialized");
 }
@@ -97,7 +97,7 @@ void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawC
     bufferInfo.range = pipe->uboDataSize;
 
     descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[0].dstSet = *drawCall->descriptorSet;
+    descriptorWrite[0].dstSet = *(drawCall->descriptorSet);
     descriptorWrite[0].dstBinding = 0;
     descriptorWrite[0].dstArrayElement = 0;
     descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
