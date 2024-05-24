@@ -27,7 +27,8 @@ typedef struct
     GFC_Vector2D scale;
     GFC_Vector2D frame_offset;
     GFC_Vector2D center;
-    alignas(64) float drawOrder;
+    float drawOrder;
+    GFC_Vector3D padding;
 }SpriteUBO;
 
 typedef struct
@@ -97,7 +98,7 @@ void gf2d_sprite_manager_close()
 
 void gf2d_sprite_manager_init(Uint32 max_sprites)
 {
-    size_t uboSizes[1] = {sizeof(SpriteUBO)};
+    size_t uboSizes[2] = {0};
     void* data;
     Uint32 count;
     SpriteFace faces[2];
@@ -139,6 +140,8 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     vkFreeMemory(gf2d_sprite.device, stagingBufferMemory, NULL);
 
     gf2d_sprite_get_attribute_descriptions(&count);
+    uboSizes[0] = sizeof(SpriteUBO);
+    
     gf2d_sprite.pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/overlay_pipeline.cfg",
@@ -148,8 +151,7 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
         gf2d_sprite_get_attribute_descriptions(NULL),
         count,
         uboSizes,1,
-        VK_INDEX_TYPE_UINT16
-    );     
+        VK_INDEX_TYPE_UINT16);     
     
     if(__DEBUG)slog("sprite manager initiliazed");
     atexit(gf2d_sprite_manager_close);
@@ -415,6 +417,7 @@ void gf2d_sprite_draw(
         drawClip,
         drawFlip,
         frame);
+    
     uboList = gfc_list_new();
     tuple = gf3d_pipeline_tuple_new();
     tuple->data = &spriteUBO;
@@ -423,7 +426,6 @@ void gf2d_sprite_draw(
     gfc_list_append(uboList,tuple);
     
     textureList = gfc_list_new();
-    
     tuple = gf3d_pipeline_tuple_new();
     tuple->data = sprite->texture;
     tuple->index = 1;//binding location in the shaders

@@ -85,7 +85,6 @@ void gf3d_mesh_init(Uint32 mesh_max)
     gf3d_mesh_get_attribute_descriptions(&count);
     
     bufferSizes[0] = sizeof(MeshUBO);
-    bufferSizes[1] = sizeof(MaterialUBO);
     gf3d_mesh.sky_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/sky_pipeline.cfg",
@@ -94,7 +93,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        bufferSizes,2,
+        bufferSizes,1,
         VK_INDEX_TYPE_UINT16
     );
     
@@ -126,20 +125,19 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
         bufferSizes,4,
-        VK_INDEX_TYPE_UINT16
-    );
-
-    gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/model_alpha_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        bufferSizes,4,
-        VK_INDEX_TYPE_UINT16
-    );
+        VK_INDEX_TYPE_UINT16);
+//TODO
+//     gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
+//         gf3d_vgraphics_get_default_logical_device(),
+//         "config/model_alpha_pipeline.cfg",
+//         gf3d_vgraphics_get_view_extent(),
+//         mesh_max,
+//         gf3d_mesh_get_bind_description(),
+//         gf3d_mesh_get_attribute_descriptions(NULL),
+//         count,
+//         bufferSizes,4,
+//         VK_INDEX_TYPE_UINT16
+//     );
     
     if (__DEBUG)slog("mesh system initialized");
 }

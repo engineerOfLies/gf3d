@@ -12,6 +12,8 @@
 #include "gf3d_shaders.h"
 #include "gf3d_pipeline.h"
 
+#include "gf3d_mesh.h"
+
 extern int __DEBUG;
 
 typedef struct
@@ -125,9 +127,9 @@ void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawC
         //get the buffer for this frame for this ubo
         buffer = gf3d_uniform_buffer_list_get_nth_buffer(ubuBufferData->uboBigBuffer, 0, frame);
         if (!buffer)continue;
-        bufferInfo.buffer = buffer->uniformBuffer;
-        
         //note: I may be able to pack my multiple UBOs in here with offsets.
+
+        bufferInfo.buffer = buffer->uniformBuffer;
         bufferInfo.offset = drawCall->index * ubuBufferData->uboDataSize;
         bufferInfo.range = ubuBufferData->uboDataSize;
 
@@ -138,6 +140,7 @@ void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawC
         descriptorWrite[i].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         descriptorWrite[i].descriptorCount = 1;
         descriptorWrite[i].pBufferInfo = &bufferInfo;
+        slog("descriptorWrite written for ubo %i at bind %i and memory size %i",i,tuple->index,bufferInfo.range);
     }    
 
     //this is going to iterate through the textureDataList
@@ -152,14 +155,16 @@ void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawC
         imageInfo.sampler = texture->textureSampler;
         descriptorWrite[i + uboCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrite[i + uboCount].dstSet = *drawCall->descriptorSet;
-        descriptorWrite[i + uboCount].dstBinding = tuple->index;;
+        descriptorWrite[i + uboCount].dstBinding = tuple->index;
         descriptorWrite[i + uboCount].dstArrayElement = 0;
         descriptorWrite[i + uboCount].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         descriptorWrite[i + uboCount].descriptorCount = 1;                        
         descriptorWrite[i + uboCount].pImageInfo = &imageInfo;
         descriptorWrite[i + uboCount].pTexelBufferView = NULL; // Optional
     }
+    slog("updating %i elements in the pDescriptorWrites array.",uboCount + textureCount);
     vkUpdateDescriptorSets(pipe->device, uboCount + textureCount, descriptorWrite, 0, NULL);
+    free(descriptorWrite);
 }
 
 void gf3d_pipeline_render_drawcall(Pipeline *pipe,PipelineDrawCall *drawCall)
@@ -223,6 +228,8 @@ void gf3d_pipeline_queue_render(
 {
     int i,c;
     char *ptr;
+    MaterialUBO *material;
+    MeshUBO *meshUbo;
     PipelineUboData *uboData;
     PipelineTuple *tuple;
     PipelineDrawCall *drawCall;
@@ -248,10 +255,8 @@ void gf3d_pipeline_queue_render(
         uboData = gfc_list_get_nth(pipe->uboList,tuple->uboIndex);
         if (!uboData)continue;//should probably remove this ubo from the call at this point
         ptr = uboData->uboData;
-        ptr = ptr + (i * uboData->uboDataSize);
-        memcpy(ptr,tuple->data,sizeof(uboData->uboDataSize));
-        tuple->data = ptr;//switch the data that we are using to the new copy, don't save whatever we were given
-
+        ptr = ptr + (drawCall->index * uboData->uboDataSize);
+        memcpy(ptr,tuple->data,uboData->uboDataSize);
     }
     drawCall->uboDataList = uboDataList;
 }
@@ -268,7 +273,6 @@ void gf3_pipeline_update_ubos(Pipeline *pipe)
 
     device = gf3d_vgraphics_get_default_logical_device();
     frame = gf3d_vgraphics_get_current_buffer_frame();
-    
     
     //for each ubo data set
     c = gfc_list_get_count(pipe->uboList);

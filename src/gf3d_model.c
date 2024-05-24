@@ -557,7 +557,7 @@ void gf3d_model_draw(
     tuple->index = 0;
     tuple->uboIndex = 0;
     gfc_list_append(uboList,tuple);
-
+    
     //materials
     tuple = gf3d_pipeline_tuple_new();
     tuple->data = &materialUbo;
@@ -583,14 +583,13 @@ void gf3d_model_draw(
     tuple->uboIndex = 3;
     gfc_list_append(uboList,tuple);
     
-    if (model->texture)
-    {
-        tuple = gf3d_pipeline_tuple_new();
-        tuple->data = model->texture;
-        tuple->index = 4;//the start of the textures in the shaders
-        textureList = gfc_list_new();
-        gfc_list_append(textureList,tuple);
-    }   
+    textureList = gfc_list_new();
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->index = 4;//the start of the textures in the shaders
+    if (model->texture)tuple->data = model->texture;
+    else tuple->data = gf3d_model.defaultTexture;
+    gfc_list_append(textureList,tuple);
+    
     //TODO: support the rest of texture layers & normalMap, specular, and emit
 
     // queue up a render for batch rendering
