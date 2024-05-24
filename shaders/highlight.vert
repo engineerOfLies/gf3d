@@ -6,6 +6,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 proj;
     vec4 highlight;
+    vec4 flags;
 } ubo;
 
 out gl_PerVertex

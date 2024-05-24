@@ -1085,4 +1085,24 @@ Pose3D *gf3d_armature_pose_new(Uint32 boneCount)
     return pose;
 }
 
+ArmatureUBO gf3d_armature_get_ubo(
+    Armature3D *armature,
+    Uint32      frame)
+{
+    GFC_Matrix4 *bones;
+    Uint32 boneCount = 0;
+    ArmatureUBO boneUbo = {0};
+    
+    if (!armature)return boneUbo;
+    
+    bones = gf3d_armature_get_pose_matrices(armature,frame,&boneCount);
+    if (bones)
+    {
+        memcpy(boneUbo.bones,bones,sizeof(GFC_Matrix4)*boneCount);
+    }
+    else slog("no bones for armature %s at frame %i",armature->filepath,frame);
+
+    return boneUbo;
+}
+
 /*eol@eof*/

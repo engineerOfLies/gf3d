@@ -13,7 +13,9 @@
 typedef struct Entity_S
 {
     Uint8       _inuse;         /**<keeps track of memory usage*/
+    
     GFC_TextLine    name;
+    
     int         state;          /**<used for keeping track of state indices*/
     int         noDrawGeneric;  /**<if true, this entity won't use the generic draw method*/
     ModelMat    mat;            /**<orientation matrix for the model for 3D*/
@@ -22,16 +24,16 @@ typedef struct Entity_S
     float       frame;          /**<current animation frame*/
     int         actionReturn;   /**<from the last frame this entity updated*/
     
-    GFC_Shape       shape;          /**<2d shape for collisions in 2D space*/
+    GFC_Shape   shape;          /**<2d shape for collisions in 2D space*/
     Body        body;           /**<instance for collisions in 2D space*/
     
-    GFC_Color       color;          /**<default color for the model*/
-    GFC_Color       detailGFC_Color;    /**<detail color for the model*/
-    GFC_Color       selectedGFC_Color;  /**<GFC_Color for highlighting*/
+    GFC_Color   color;          /**<default color for the model*/
+    GFC_Color   detailColor;    /**<detail color for the model*/
+    GFC_Color   selectedColor;  /**<GFC_Color for highlighting*/
     Uint8       hidden;         /**<if true, not drawn*/
     Uint8       selected;
     
-    GFC_Box         bounds;         // for collisions
+    GFC_Box     bounds;         // for collisions
     int         team;           //same team dont clip
     int         clips;          // if false, skip collisions
 
@@ -42,8 +44,8 @@ typedef struct Entity_S
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     void       (*free)(struct Entity_S *self); /**<pointer to the custom free function, necessar when there is custom data*/
         
-    float       roll;           //kept separate 
-    float       rotation;       /**<for 2D actor rotation*/
+    float           roll;           //kept separate 
+    float           rotation;       /**<for 2D actor rotation*/
     GFC_Vector2D    flip;           /**<for 2d actor drawing*/
     GFC_Vector3D    velocity;
     GFC_Vector3D    acceleration;

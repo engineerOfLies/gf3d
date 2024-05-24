@@ -12,49 +12,29 @@
 
 #include "gf3d_pipeline.h"
 
+#define MAX_TEXTURE_LAYERS 4
 
-#define MESH_LIGHTS_MAX 8
-
-typedef struct
-{
-    GFC_Vector4D color;
-    GFC_Vector4D position;
-}MeshLights;
-
+//unified UBO for all mesh data bind point 0, sent to vertex shader
 typedef struct
 {
     GFC_Matrix4 model;
     GFC_Matrix4 view;
     GFC_Matrix4 proj;
-    GFC_Matrix4 bones[100]; //I hate that this is how it is done.  I want to move this to a buffer on the GPU and index into it in the shader
-    GFC_Vector4D ambientGFC_Color;
-    GFC_Vector4D ambientDir;
-    GFC_Vector4D color; //color mod
-    GFC_Vector4D detailGFC_Color; //color mod
-    GFC_Vector4D cameraPosition;
-    GFC_Vector4D flags;  //.x is bone flag
-
+    GFC_Vector4D flags;  //.x is bone flag,.y is uses lights,z will be normal and speculae maps,w will be texture layers
 }MeshUBO;
 
-/**
- * @purpose to send to calls to draw via the highlight pipeline
- */
+//any mesh containing material data will use this ubo, bind point 1, sent to fragment shader
 typedef struct
 {
-    GFC_Matrix4 model;
-    GFC_Matrix4 view;
-    GFC_Matrix4 proj;
-    GFC_Vector4D color; 
-}HighlightUBO;
+    GFC_Vector4D baseColorMod;      //colorMod for all of it, pre-light
+    float shininess;                //overall how shiny / rough the surface is
+    GFC_Vector3D specular;          //overall how much specularity is here for the model.
+    GFC_Vector4D colorMods[MAX_TEXTURE_LAYERS];      //colorMods for each texture layer.  if .w is 0, the textLayer is not used
+    GFC_Vector4D cameraPosition;    //needed for many light calculations
+    GFC_Vector4D flags;             //.x > 0 for solid only, < 0 for translucent only,.y for normalMap, .z for specular map, .w for emit map
+}MaterialUBO;
 
-typedef struct
-{
-    GFC_Matrix4 model;
-    GFC_Matrix4 view;
-    GFC_Matrix4 proj;
-    GFC_Vector4D color; 
-}SkyUBO;
-
+//this is the order of attributes as they appear in order in the vertex buffer
 typedef struct
 {
     GFC_Vector3D vertex;
@@ -67,7 +47,7 @@ typedef struct
 
 typedef struct
 {
-    Uint16  verts[3];
+    Uint16  verts[3];       //this must match the vkIndexType for the pipeline
 }Face;
 
 typedef struct
@@ -85,7 +65,7 @@ typedef struct
     GFC_TextLine        filename;
     Uint32          _refCount;
     Uint8           _inuse;
-    GFC_List           *primitives;
+    GFC_List           *primitives; //what its called from gltf, all the sub meshes
     GFC_Box             bounds;    
 }Mesh;
 
@@ -159,11 +139,14 @@ VkCommandBuffer gf3d_mesh_get_sky_command_buffer();
  * @brief queue up a render for the current draw frame
  * @param mesh the mesh to render
  * @param pipe the pipeline to use
- * @param uboData the data to use to draw the mesh
- * @param texture texture data to use
+ * @param uboTupleList A list of PipelineTuples containing pointers to the uboData, the buffer index and the uboIndex for the pipeline
+ * @param textureTupleList A list of PipelineTuples containing pointers to the texture and the buffer index for the texture, the uboIndex is not used.
  */
-void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture);
-
+void gf3d_mesh_queue_render(
+    Mesh *mesh,
+    Pipeline *pipe,
+    GFC_List *uboTupleList,
+    GFC_List *textureTupleList);
 
 /**
  * @brief adds a mesh to the render pass rendered as an outline highlight
@@ -200,5 +183,12 @@ Pipeline *gf3d_mesh_get_pipeline();
 Pipeline *gf3d_mesh_get_alpha_pipeline();
 Pipeline *gf3d_mesh_get_highlight_pipeline();
 Pipeline *gf3d_mesh_get_sky_pipeline();
+
+/**
+ * @brief get a baasic material material with just the color and cameraPosition set
+ * @param color the color to base it on
+ * @return the materialUbo populated with baseColorMod, the transparency flag, and the camera position
+ */
+MaterialUBO gf3d_mesh_basic_material_from_color(GFC_Color color);
 
 #endif

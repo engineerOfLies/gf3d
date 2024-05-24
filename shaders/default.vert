@@ -1,24 +1,19 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
 
-struct dynamicLight
+layout(binding = 0) uniform UniformBufferObject
 {
-    vec4 color;
-    vec4 position;
-};
-
-layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-    vec4 ambientColor;
-    vec4 ambientDir;
     vec4 color;
-    vec4 detailColor;
-    vec4 cameraPostion;
-    dynamicLight dynamicLights[8];
-    float dynamicLightCount;
+    vec4 flags;
 } ubo;
+
+layout(binding = 1) uniform UniformBufferObject
+{
+    mat4 bones[100];
+} armature;
 
 out gl_PerVertex
 {
@@ -43,19 +38,31 @@ layout(location = 7) out vec4 detailColor;
 void main()
 {
     vec4 tempNormal;
+    mat4 bone;
     mat4 model = ubo.model;
-    //zero out the translation component
+    mat4 mvp = ubo.proj * ubo.view * ubo.model;
     model[3][0] = 0;
     model[3][1] = 0;
     model[3][2] = 0;
-    tempNormal = model * vec4(inNormal,1.0);
-    fragNormal = normalize(tempNormal.xyz);
-    //
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
-    camPosition = ubo.cameraPostion.xyz;
     fragTexCoord = inTexCoord;
     colorMod = ubo.color;
     fragAmbient = ubo.ambientColor;
     fragAmbientDir = ubo.ambientDir.xyz;
     detailColor = ubo.detailColor;
+    if (ubo.flags.x != 0.0)
+    {
+        bone = (boneWeights.x * ubo.bones[int(boneIndices.x)])
+             + (boneWeights.y * ubo.bones[int(boneIndices.y)])
+             + (boneWeights.z * ubo.bones[int(boneIndices.z)])
+             + (boneWeights.w * ubo.bones[int(boneIndices.w)]);
+        gl_Position =  mvp * bone * vec4(inPosition, 1.0);
+        //colorMod = boneWeights;
+    }
+    else
+    {
+        gl_Position = mvp * vec4(inPosition, 1.0);
+    }
+    tempNormal = model * vec4(inNormal,1.0);
+    fragNormal = normalize(tempNormal.xyz);
+    camPosition = ubo.cameraPostion.xyz;
 }

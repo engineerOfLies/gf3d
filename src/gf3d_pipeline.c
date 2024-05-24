@@ -24,10 +24,15 @@ typedef struct
 static PipelineManager gf3d_pipeline = {0};
 
 void gf3d_pipeline_close();
-void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolSize *poolSize,int poolSizeCount);
+void gf3d_pipeline_create_basic_descriptor_pool(
+    Pipeline *pipe,
+    SJson *descriptorSetLayouts,
+    VkDescriptorPoolSize *poolSize,
+    int poolSizeCount);
 void gf3d_pipeline_create_basic_descriptor_pool_from_config(Pipeline *pipe,SJson *config);
 void gf3d_pipeline_create_basic_descriptor_set_layout_from_config(Pipeline *pipe,SJson *config);
 void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe);
+void gf3d_pipeline_ubo_data_free(PipelineUboData *pipeUbo);
 VkFormat gf3d_pipeline_find_depth_format();
 
 void gf3d_pipeline_init(Uint32 max_pipelines)
@@ -82,44 +87,79 @@ void gf3d_pipeline_call_render(
 
 void gf3d_pipeline_update_descriptor_set(Pipeline *pipe, PipelineDrawCall *drawCall)
 {
-    int count = 1;
+    int i;
+    Texture *texture;
+    Uint32 uboCount = 0,textureCount = 0;
     int frame;
+    PipelineUboData *ubuBufferData;
+    PipelineTuple *tuple;
     UniformBuffer *buffer;
     VkDescriptorImageInfo imageInfo = {0};
-    VkWriteDescriptorSet descriptorWrite[2] = {0};
+    VkWriteDescriptorSet *descriptorWrite = NULL;
     VkDescriptorBufferInfo bufferInfo = {0};
     if ((!pipe)||(!drawCall))return;    
 
     frame = gf3d_vgraphics_get_current_buffer_frame();
-    buffer = gf3d_uniform_buffer_list_get_nth_buffer(pipe->uboBigBuffer, 0, frame);
-    bufferInfo.buffer = buffer->uniformBuffer;
-    bufferInfo.offset = drawCall->index * pipe->uboDataSize;
-    bufferInfo.range = pipe->uboDataSize;
+    uboCount = gfc_list_get_count(drawCall->uboDataList);
+    textureCount = gfc_list_get_count(drawCall->textureDataList);
 
-    descriptorWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    descriptorWrite[0].dstSet = *(drawCall->descriptorSet);
-    descriptorWrite[0].dstBinding = 0;
-    descriptorWrite[0].dstArrayElement = 0;
-    descriptorWrite[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    descriptorWrite[0].descriptorCount = 1;
-    descriptorWrite[0].pBufferInfo = &bufferInfo;
-
-    if (drawCall->texture)
+    if (!uboCount)
     {
-        count = 2;
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = drawCall->texture->textureImageView;
-        imageInfo.sampler = drawCall->texture->textureSampler;
-        descriptorWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrite[1].dstSet = *drawCall->descriptorSet;
-        descriptorWrite[1].dstBinding = 1;
-        descriptorWrite[1].dstArrayElement = 0;
-        descriptorWrite[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptorWrite[1].descriptorCount = 1;                        
-        descriptorWrite[1].pImageInfo = &imageInfo;
-        descriptorWrite[1].pTexelBufferView = NULL; // Optional
+        if (__DEBUG)slog("no ubos for render call for pipeline %s",pipe->name);
+        return;
     }
-    vkUpdateDescriptorSets(pipe->device, count, descriptorWrite, 0, NULL);
+    
+    descriptorWrite = gfc_allocate_array(sizeof(VkWriteDescriptorSet),uboCount + textureCount);
+    if (!descriptorWrite)
+    {
+        if (__DEBUG)slog("failed to allocate descriptorWrite in render call for pipeline %s",pipe->name);
+        return;
+    }
+
+    for (i = 0; i < uboCount; i++)
+    {
+        tuple = gfc_list_get_nth(drawCall->uboDataList,i);
+        if (!tuple)continue;
+        ubuBufferData = gfc_list_get_nth(pipe->uboList,tuple->uboIndex);
+        if (!ubuBufferData)continue;
+        //get the buffer for this frame for this ubo
+        buffer = gf3d_uniform_buffer_list_get_nth_buffer(ubuBufferData->uboBigBuffer, 0, frame);
+        if (!buffer)continue;
+        bufferInfo.buffer = buffer->uniformBuffer;
+        
+        //note: I may be able to pack my multiple UBOs in here with offsets.
+        bufferInfo.offset = drawCall->index * ubuBufferData->uboDataSize;
+        bufferInfo.range = ubuBufferData->uboDataSize;
+
+        descriptorWrite[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrite[i].dstSet = *(drawCall->descriptorSet);
+        descriptorWrite[i].dstBinding = tuple->index;
+        descriptorWrite[i].dstArrayElement = 0;
+        descriptorWrite[i].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptorWrite[i].descriptorCount = 1;
+        descriptorWrite[i].pBufferInfo = &bufferInfo;
+    }    
+
+    //this is going to iterate through the textureDataList
+    for (i = 0; i < textureCount;i++)
+    {
+        tuple = gfc_list_get_nth(drawCall->textureDataList,i);
+        if (!tuple)continue;
+        texture = (Texture *)tuple->data;
+
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = texture->textureImageView;
+        imageInfo.sampler = texture->textureSampler;
+        descriptorWrite[i + uboCount].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrite[i + uboCount].dstSet = *drawCall->descriptorSet;
+        descriptorWrite[i + uboCount].dstBinding = tuple->index;;
+        descriptorWrite[i + uboCount].dstArrayElement = 0;
+        descriptorWrite[i + uboCount].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrite[i + uboCount].descriptorCount = 1;                        
+        descriptorWrite[i + uboCount].pImageInfo = &imageInfo;
+        descriptorWrite[i + uboCount].pTexelBufferView = NULL; // Optional
+    }
+    vkUpdateDescriptorSets(pipe->device, uboCount + textureCount, descriptorWrite, 0, NULL);
 }
 
 void gf3d_pipeline_render_drawcall(Pipeline *pipe,PipelineDrawCall *drawCall)
@@ -139,8 +179,8 @@ void gf3d_pipeline_render_all_drawcalls(Pipeline *pipe)
     if (!pipe)return;
     for (i = 0; i < pipe->drawCallCount; i++)
     {
-        if (!pipe->drawCallGFC_List[i].inuse)continue;
-        gf3d_pipeline_render_drawcall(pipe,&pipe->drawCallGFC_List[i]);
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_render_drawcall(pipe,&pipe->drawCallList[i]);
     }
 }
 
@@ -150,26 +190,22 @@ void gf3d_pipeline_update_descriptor_sets(Pipeline *pipe)
     int i;
     for (i = 0;i < pipe->drawCallCount;i++)
     {
-        if (!pipe->drawCallGFC_List[i].inuse)continue;
-        gf3d_pipeline_update_descriptor_set(pipe, &pipe->drawCallGFC_List[i]);
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_update_descriptor_set(pipe, &pipe->drawCallList[i]);
     }    
 }
 
 PipelineDrawCall *gf3d_pipeline_draw_call_new(Pipeline *pipe)
 {
     int i;
-    char *ptr;
     if (!pipe)return NULL;
-    ptr = pipe->uboData;
     for (i = 0;i < pipe->descriptorSetCount;i++)
     {
-        if (pipe->drawCallGFC_List[i].inuse)continue;
-        pipe->drawCallGFC_List[i].inuse = 1;
-        ptr = ptr + (i * pipe->uboDataSize);
-        pipe->drawCallGFC_List[i].uboData = ptr;
+        if (pipe->drawCallList[i].inuse)continue;
+        pipe->drawCallList[i].inuse = 1;
         pipe->drawCallCount++;
-        pipe->drawCallGFC_List[i].index = i;
-        return &pipe->drawCallGFC_List[i];
+        pipe->drawCallList[i].index = i;
+        return &pipe->drawCallList[i];
     }
     if (__DEBUG)slog("cannot queue up any more draw calls this frame");
     return NULL;
@@ -180,9 +216,15 @@ void gf3d_pipeline_queue_render(
     VkBuffer vertexBuffer,
     Uint32 vertexCount,
     VkBuffer indexBuffer,
-    void *uboData,
-    Texture *texture)
+    //list of PipelineTuples containing uboData
+    GFC_List *uboDataList,
+    //list of PipelineTuple containing texture data
+    GFC_List *textureList)
 {
+    int i,c;
+    char *ptr;
+    PipelineUboData *uboData;
+    PipelineTuple *tuple;
     PipelineDrawCall *drawCall;
     if (!pipe)return;
     drawCall = gf3d_pipeline_draw_call_new(pipe);
@@ -195,25 +237,50 @@ void gf3d_pipeline_queue_render(
     drawCall->vertexBuffer = vertexBuffer;
     drawCall->vertexCount = vertexCount;
     drawCall->indexBuffer = indexBuffer;
-    drawCall->texture = texture;
-    memcpy(drawCall->uboData,uboData,pipe->uboDataSize);
+    //handle lists
+    drawCall->textureDataList = textureList;
+    //need to copy the ubo data into the bigBuffer and update the tuple pointer to THAT data
+    c = gfc_list_get_count(uboDataList);
+    for (i = 0;i < c; i++)
+    {
+        tuple = gfc_list_get_nth(uboDataList,i);
+        if (!tuple)continue;
+        uboData = gfc_list_get_nth(pipe->uboList,tuple->uboIndex);
+        if (!uboData)continue;//should probably remove this ubo from the call at this point
+        ptr = uboData->uboData;
+        ptr = ptr + (i * uboData->uboDataSize);
+        memcpy(ptr,tuple->data,sizeof(uboData->uboDataSize));
+        tuple->data = ptr;//switch the data that we are using to the new copy, don't save whatever we were given
+
+    }
+    drawCall->uboDataList = uboDataList;
 }
 
 void gf3_pipeline_update_ubos(Pipeline *pipe)
 {
+    int i,c;
+    PipelineUboData *uboData;
     int frame;
     void *data;
     UniformBuffer *buffer;
     VkDevice device;
     if ((!pipe)||(!pipe->drawCallCount))return;//skip if there are no queued calls
-    
+
     device = gf3d_vgraphics_get_default_logical_device();
     frame = gf3d_vgraphics_get_current_buffer_frame();
-    buffer = gf3d_uniform_buffer_list_get_nth_buffer(pipe->uboBigBuffer, 0, frame);
     
-    vkMapMemory(device, buffer->uniformBufferMemory, 0, buffer->bufferSize, 0, &data);
-        memcpy(data, pipe->uboData, buffer->bufferSize);
-    vkUnmapMemory(device, buffer->uniformBufferMemory);
+    
+    //for each ubo data set
+    c = gfc_list_get_count(pipe->uboList);
+    for (i = 0; i < c;i++)
+    {
+        uboData = gfc_list_get_nth(pipe->uboList,i);
+        if (!uboData)continue;
+        buffer = gf3d_uniform_buffer_list_get_nth_buffer(uboData->uboBigBuffer, 0, frame);
+        vkMapMemory(device, buffer->uniformBufferMemory, 0, buffer->bufferSize, 0, &data);
+            memcpy(data, uboData->uboData, buffer->bufferSize);
+        vkUnmapMemory(device, buffer->uniformBufferMemory);
+    }
 }
 
 Pipeline *gf3d_pipeline_new()
@@ -223,6 +290,7 @@ Pipeline *gf3d_pipeline_new()
     {
         if (gf3d_pipeline.pipelineGFC_List[i].inUse)continue;
         gf3d_pipeline.pipelineGFC_List[i].inUse = true;
+        gf3d_pipeline.pipelineGFC_List[i].uboList = gfc_list_new();
         return &gf3d_pipeline.pipelineGFC_List[i];
     }
     slog("no free pipelines");
@@ -278,19 +346,19 @@ int gf3d_pipeline_render_pass_create(VkDevice device,SJson *config,VkRenderPass 
     if (!renderPass)return 0;
     
 
-    item = sj_object_get_value(config,"depthAttachment");
-    if (item)
-    {
-        depthAttachment = gf3d_config_attachment_description(item,gf3d_pipeline_find_depth_format());
-        depthAttachmentRef.attachment = 1;
-        depthAttachmentRef.layout = depthAttachment.finalLayout;
-    }
     item = sj_object_get_value(config,"colorAttachment");
     if (item)
     {
         colorAttachment = gf3d_config_attachment_description(item,gf3d_swapchain_get_format());
         colorAttachmentRef.attachment = 0;
         colorAttachmentRef.layout = colorAttachment.finalLayout;
+    }
+    item = sj_object_get_value(config,"depthAttachment");
+    if (item)
+    {
+        depthAttachment = gf3d_config_attachment_description(item,gf3d_pipeline_find_depth_format());
+        depthAttachmentRef.attachment = 1;
+        depthAttachmentRef.layout = depthAttachment.finalLayout;
     }
     
     item = sj_object_get_value(config,"dependency");
@@ -362,6 +430,36 @@ int gf3d_pipelin_depth_stencil_create_info_from_json(SJson *json,VkPipelineDepth
     return 1;
 }
 
+void gf3d_pipeline_ubo_data_free(PipelineUboData *pipeUbo)
+{
+    if (!pipeUbo)return;
+    
+    if (pipeUbo->uboBigBuffer)
+    {
+        gf3d_uniform_buffer_list_free(pipeUbo->uboBigBuffer);
+    }
+    if (pipeUbo->uboData)free(pipeUbo->uboData);
+    free(pipeUbo);
+}
+
+PipelineUboData *gf3d_pipeline_ubo_data_new()
+{
+    PipelineUboData *pipeUbo;
+    pipeUbo = gfc_allocate_array(sizeof(PipelineUboData),1);
+    return pipeUbo;
+}
+
+PipelineUboData *gf3d_pipeline_ubo_data(Pipeline *pipe,Uint32 descriptorCount,size_t bufferSize)
+{
+    PipelineUboData *pipeUbo;
+    pipeUbo = gf3d_pipeline_ubo_data_new();
+    if (!pipeUbo)return NULL;
+    pipeUbo->uboData = gfc_allocate_array(bufferSize,descriptorCount);
+    pipeUbo->uboDataSize = bufferSize;
+    pipeUbo->uboBigBuffer = gf3d_uniform_buffer_list_new(pipe->device,bufferSize*descriptorCount,1,gf3d_swapchain_get_swap_image_count());
+    return pipeUbo;
+}
+
 Pipeline *gf3d_pipeline_create_from_config(
     VkDevice device,
     const char *configFile,
@@ -370,10 +468,13 @@ Pipeline *gf3d_pipeline_create_from_config(
     const VkVertexInputBindingDescription* vertexInputDescription,
     const VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
     Uint32 vertexAttributeCount,
-    VkDeviceSize bufferSize,
+    VkDeviceSize *bufferSizes,
+    Uint32 unformBufferCount,
     VkIndexType indexType
 )
 {
+    int i;
+    PipelineUboData *pipeUbo;
     SJson *config,*file, *item;
     const char *str;
     Pipeline *pipe;
@@ -500,7 +601,6 @@ Pipeline *gf3d_pipeline_create_from_config(
     multisampling = gf3d_config_pipline_multisample_state_create_info(sj_object_get_value(config,"multisampling"));
 
     colorBlendAttachment = gf3d_config_pipeline_color_blend_attachment(sj_object_get_value(config,"colorBlendAttachment"));
-
     
     colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     colorBlending.logicOpEnable = VK_FALSE;
@@ -572,10 +672,19 @@ Pipeline *gf3d_pipeline_create_from_config(
         gf3d_pipeline_free(pipe);
         return NULL;
     }
-    pipe->drawCallGFC_List = gfc_allocate_array(sizeof(PipelineDrawCall),descriptorCount);
-    pipe->uboData = gfc_allocate_array(bufferSize,descriptorCount);
-    pipe->uboDataSize = bufferSize;
-    pipe->uboBigBuffer = gf3d_uniform_buffer_list_new(device,bufferSize*descriptorCount,1,gf3d_swapchain_get_swap_image_count());
+    pipe->drawCallList = gfc_allocate_array(sizeof(PipelineDrawCall),descriptorCount);
+    
+    for (i = 0; i < unformBufferCount;i++)
+    {
+        pipeUbo = gf3d_pipeline_ubo_data(pipe,descriptorCount,bufferSizes[i]);
+        if (!pipeUbo)
+        {
+            slog("failed to create pipeline ubo buffers");
+            continue;
+        }
+        gfc_list_append(pipe->uboList,pipeUbo);
+    }
+
     gfc_line_cpy(pipe->name,configFile);
     pipe->indexType = indexType;
     if (__DEBUG)slog("pipeline created from file '%s'",configFile);
@@ -587,15 +696,15 @@ void gf3d_pipeline_free(Pipeline *pipe)
     int i;
     if (!pipe)return;
     if (!pipe->inUse)return;
-    if (pipe->drawCallGFC_List)
+    if (pipe->drawCallList)
     {
-        free(pipe->drawCallGFC_List);
+        free(pipe->drawCallList);
     }
-    if (pipe->uboBigBuffer)
+    if (pipe->uboList)
     {
-        gf3d_uniform_buffer_list_free(pipe->uboBigBuffer);
+        gfc_list_foreach(pipe->uboList,(gfc_work_func*)gf3d_pipeline_ubo_data_free);
+        gfc_list_delete(pipe->uboList);
     }
-    if (pipe->uboData)free(pipe->uboData);
     if (pipe->descriptorCursor)
     {
         free(pipe->descriptorCursor);
@@ -659,34 +768,40 @@ void gf3d_pipeline_create_basic_descriptor_pool_from_config(Pipeline *pipe,SJson
         slog("no pipeline or config provided");
         return;
     }
-    list = sj_object_get_value(config,"descriptorPools");
+    list = sj_object_get_value(config,"descriptorSetLayout");
     if (!list)
     {
-        slog("no descriptorPools found in config");
+        slog("no descriptorSetLayout found in config");
         return;
     }
     c = sj_array_get_count(list);
-    if (!c)return;// no descriptorPools
+    if (!c)return;// no descriptorSetLayouts
     poolSize = gfc_allocate_array(sizeof(VkDescriptorPoolSize),c);
     for (i = 0,pools = 0;i < c;i++)
     {
         item = sj_array_get_nth(list,i);
         if (!item)continue;
-        str = sj_get_string_value(item);
+        str = sj_object_get_value_as_string(item,"descriptorType");
         if (!str)continue;
         poolSize[pools].type = gf3d_config_descriptor_type_from_str(str);
-        poolSize[pools].descriptorCount = pipe->descriptorSetCount;
+        poolSize[pools].descriptorCount = pipe->descriptorSetCount;//chain length
         pools++;
     }
     
-    gf3d_pipeline_create_basic_descriptor_pool(pipe,poolSize,pools);
+    gf3d_pipeline_create_basic_descriptor_pool(pipe,list,poolSize,pools);
     free(poolSize);
 }
 
 
-void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolSize *poolSize,int poolSizeCount)
+void gf3d_pipeline_create_basic_descriptor_pool(
+    Pipeline *pipe,
+    SJson *descriptorSetLayouts,
+    VkDescriptorPoolSize *poolSize,
+    int poolSizeCount)
 {
-    int i;
+    int i,c;
+    const char *str;
+    SJson *item;
     VkDescriptorPoolCreateInfo poolInfo = {0};
     
     if (!pipe)
@@ -694,10 +809,16 @@ void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolS
         slog("no pipeline provided");
         return;
     }
-    poolSize[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSize[0].descriptorCount = pipe->descriptorSetCount;
-    poolSize[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSize[1].descriptorCount = pipe->descriptorSetCount;
+    c = sj_array_get_count(descriptorSetLayouts);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(descriptorSetLayouts,i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"descriptorType");
+        if (!str)continue;
+        poolSize[i].type = gf3d_config_descriptor_type_from_str(str);
+        poolSize[i].descriptorCount = pipe->descriptorSetCount;
+    }
     
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = poolSizeCount;
@@ -729,6 +850,8 @@ void gf3d_pipeline_reset_all_pipes()
 
 void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame)
 {
+    int i,c;
+    PipelineUboData *uboData;
     if (!pipe)return;
     if (frame >= gf3d_pipeline.chainLength)
     {
@@ -739,8 +862,21 @@ void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame)
     
     pipe->commandBuffer = gf3d_command_rendering_begin(frame,pipe);
     pipe->drawCallCount = 0;
-    memset(pipe->drawCallGFC_List,0,sizeof(PipelineDrawCall)*pipe->descriptorSetCount);//clear this out
-    memset(pipe->uboData,0,pipe->uboDataSize*pipe->descriptorSetCount);
+    //need to clear all the tuples used this frame before wiping the list
+    for (i = 0; i < pipe->descriptorSetCount;i++)
+    {
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_tuple_list_delete(pipe->drawCallList[i].uboDataList);
+        gf3d_pipeline_tuple_list_delete(pipe->drawCallList[i].textureDataList);
+    }
+    memset(pipe->drawCallList,0,sizeof(PipelineDrawCall)*pipe->descriptorSetCount);//clear this out
+    c = gfc_list_get_count(pipe->uboList);
+    for (i = 0;i < c; i++)
+    {
+        uboData = gfc_list_get_nth(pipe->uboList,i);
+        if (!uboData)continue;
+        memset(uboData->uboData,0,uboData->uboDataSize*pipe->descriptorSetCount);
+    }
 }
 
 void gf3d_pipeline_submit_commands(Pipeline *pipe)
@@ -871,6 +1007,63 @@ VkDescriptorSet * gf3d_pipeline_get_descriptor_set(Pipeline *pipe, Uint32 frame)
         return NULL;
     }
     return &pipe->descriptorSets[frame][pipe->descriptorCursor[frame]++];
+}
+
+void gf3d_pipeline_tuple_free(PipelineTuple *tuple)
+{
+    if (!tuple)return;
+    free(tuple);//the tuple doesn't own its data
+}
+
+PipelineTuple *gf3d_pipeline_tuple_duplicate(PipelineTuple *tupleIn)
+{
+    PipelineTuple *tupleOut;
+    if (!tupleIn)return NULL;
+    tupleOut = gf3d_pipeline_tuple_new();
+    if (!tupleOut)return NULL;
+    memcpy(tupleOut,tupleIn,sizeof(PipelineTuple));
+    return tupleOut;
+}
+
+PipelineTuple *gf3d_pipeline_tuple_new()
+{
+    PipelineTuple *tuple;
+    tuple = gfc_allocate_array(sizeof(PipelineTuple),1);
+    return tuple;
+}
+
+PipelineTuple *gf3d_pipeline_tuple(Uint32 index,void *data)
+{
+    PipelineTuple *tuple;
+    tuple = gf3d_pipeline_tuple_new();
+    if (!tuple)return NULL;
+    tuple->index = index;
+    tuple->data = data;
+    return tuple;
+}
+
+GFC_List *gf3d_pipeline_duplicate_tuple_list(GFC_List *list)
+{
+    int i,c;
+    PipelineTuple *tuple;
+    GFC_List *outList;
+    if (!list)return NULL;
+    outList = gfc_list_new();
+    c = gfc_list_get_count(list);
+    for (i = 0;i < c; i++)
+    {
+        tuple = gfc_list_get_nth(list,i);
+        if (!tuple)continue;
+        gfc_list_append(outList,gf3d_pipeline_tuple_duplicate(tuple));
+    }
+    return outList;
+}
+
+void gf3d_pipeline_tuple_list_delete(GFC_List *list)
+{
+    if (!list)return;
+    gfc_list_foreach(list,(gfc_work_func*)gf3d_pipeline_tuple_free);
+    gfc_list_delete(list);
 }
 
 /*eol@eof*/

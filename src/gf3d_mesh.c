@@ -8,8 +8,13 @@
 #include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
 #include "gf3d_pipeline.h"
+#include "gf3d_armature.h"
+#include "gf3d_lights.h"
+#include "gf3d_camera.h"
 #include "gf3d_mesh.h"
 
+//below is how many different variables are packed into a row of the vertex buffer
+//position, normal, uv texel, etc
 #define ATTRIBUTE_COUNT 5
 
 extern int __DEBUG;
@@ -36,6 +41,7 @@ Mesh *gf3d_mesh_get_by_filename(const char *filename);
 void gf3d_mesh_init(Uint32 mesh_max)
 {
     Uint32 count = 0;
+    size_t bufferSizes [4] = {0};
     if (!mesh_max)
     {
         slog("failed to initialize mesh system: cannot allocate 0 mesh_max");
@@ -44,6 +50,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     atexit(gf3d_mesh_close);
     gf3d_mesh.mesh_max = mesh_max;
     
+    //The following describes the 'stride' of the vertex buffer, the order of data that is packed into a single row of the vertex buffer and how the shaders will pull that information out
     gf3d_mesh.bindingDescription.binding = 0;
     gf3d_mesh.bindingDescription.stride = sizeof(Vertex);
     gf3d_mesh.bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
@@ -77,6 +84,8 @@ void gf3d_mesh_init(Uint32 mesh_max)
     
     gf3d_mesh_get_attribute_descriptions(&count);
     
+    bufferSizes[0] = sizeof(MeshUBO);
+    bufferSizes[1] = sizeof(MaterialUBO);
     gf3d_mesh.sky_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/sky_pipeline.cfg",
@@ -85,9 +94,28 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(SkyUBO),
+        bufferSizes,2,
         VK_INDEX_TYPE_UINT16
     );
+    
+    bufferSizes[0] = sizeof(MeshUBO);
+    bufferSizes[1] = sizeof(MaterialUBO);
+    gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/highlight_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        bufferSizes,2,
+        VK_INDEX_TYPE_UINT16
+    );
+
+    bufferSizes[0] = sizeof(MeshUBO);
+    bufferSizes[1] = sizeof(MaterialUBO);
+    bufferSizes[2] = sizeof(ArmatureUBO);
+    bufferSizes[3] = sizeof(GF3D_Light_UBO);
 
     gf3d_mesh.pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
@@ -97,7 +125,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO),
+        bufferSizes,4,
         VK_INDEX_TYPE_UINT16
     );
 
@@ -109,22 +137,10 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO),
+        bufferSizes,4,
         VK_INDEX_TYPE_UINT16
     );
-
-    gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/highlight_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        sizeof(HighlightUBO),
-        VK_INDEX_TYPE_UINT16
-    );
-
+    
     if (__DEBUG)slog("mesh system initialized");
 }
 
@@ -307,9 +323,15 @@ void gf3d_mesh_scene_add(Mesh *mesh)
     if (!mesh)return;
 }
 
-void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture)
+void gf3d_mesh_queue_render(
+    Mesh *mesh,
+    Pipeline *pipe,
+    GFC_List *uboTupleList,
+    GFC_List *textureTupleList)
 {
     int i,c;
+    GFC_List *uboList = NULL;
+    GFC_List *textureList = NULL;
     MeshPrimitive *primitive;
     if (!mesh)
     {
@@ -321,9 +343,9 @@ void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *tex
         slog("cannot render with NULL pipe");
         return;
     }
-    if (!uboData)
+    if (!uboTupleList)
     {
-        slog("cannot render with NULL descriptor set");
+        slog("cannot render with no uboTupleList");
         return;
     }
     c = gfc_list_get_count(mesh->primitives);
@@ -331,15 +353,22 @@ void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *tex
     {
         primitive = gfc_list_get_nth(mesh->primitives,i);
         if (!primitive)continue;
+        uboList = gf3d_pipeline_duplicate_tuple_list(uboTupleList);
+        if (textureTupleList)textureList = gf3d_pipeline_duplicate_tuple_list(textureTupleList);
         gf3d_pipeline_queue_render(
             pipe,
             primitive->vertexBuffer,
             primitive->faceCount * 3,
             primitive->faceBuffer,
-            uboData,
-            texture);
+            uboList,
+            textureList);
     }
+    gf3d_pipeline_tuple_list_delete(uboTupleList);
+    if (textureTupleList)gf3d_pipeline_tuple_list_delete(textureTupleList);
 }
+
+//NOTE PICK UP WHERE I AM LEAVING OFF HERE
+//mesh now takes two generic lists of tuples that need to be set by the caller. Update gf3d_model.c accordingly
 
 void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descriptorSet)
 {
@@ -496,4 +525,15 @@ Mesh *gf3d_mesh_load(const char *filename)
     return mesh;
 }
 
+MaterialUBO gf3d_mesh_basic_material_from_color(GFC_Color color)
+{
+    MaterialUBO material = {0};
+    
+    material.baseColorMod = gfc_color_to_vector4f(color);
+    if (material.baseColorMod.w < 0.99999)material.flags.x = -1;
+    else material.flags.x = 1;
+    material.cameraPosition = gfc_vector3dw(gf3d_camera_get_position(),1.0);
+
+    return material;
+}
 /*eol@eof*/

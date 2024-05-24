@@ -10,6 +10,19 @@
 
 #include "gf3d_gltf_parse.h"
 
+//this must be kept in sync with the shader
+#define MAX_SHADER_BONES 100
+
+
+/**
+ * @brief the armature information sent to the gpu.
+ * Binding point 2, sent to vertex shader
+ */
+typedef struct
+{
+    GFC_Matrix4 bones[MAX_SHADER_BONES];
+}ArmatureUBO;
+
 typedef struct Bone3D_S
 {
     GFC_TextLine            name;           /**<name of bone*/
@@ -154,5 +167,15 @@ void gf3d_armature_draw_bone_poses(Armature3D *arm,Uint32 frame);
  * @return -1 on error or not found, the index starting from zero otherwise
  */
 int gf3d_armature_get_bone_index(Armature3D *armature,Uint32 boneId);
+
+/**
+ * @brief get the armature uniform buffer for the given pose
+ * @param armature the armature in question
+ * @param frame the pose to use
+ * @return the armature UBO populated if there were any bones
+ */
+ArmatureUBO gf3d_armature_get_ubo(
+    Armature3D *armature,
+    Uint32      frame);
 
 #endif

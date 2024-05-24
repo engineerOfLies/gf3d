@@ -61,6 +61,7 @@ void gf3d_particles_manager_close()
 
 void gf3d_particle_manager_init(Uint32 max_particles)
 {
+    size_t uboSize = sizeof(ParticleUBO);
     gf3d_particle_manager.bindingDescription.binding = 0;
     gf3d_particle_manager.bindingDescription.stride = sizeof(GFC_Vector3D);
     gf3d_particle_manager.bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
@@ -79,7 +80,7 @@ void gf3d_particle_manager_init(Uint32 max_particles)
         &gf3d_particle_manager.bindingDescription,
         gf3d_particle_manager.attributeDescriptions,
         PARTICLE_ATTRIBUTE_COUNT,
-        sizeof(ParticleUBO),
+        &uboSize,1,
         VK_INDEX_TYPE_UINT16
     );
     if(__DEBUG)slog("particle manager initiliazed");
@@ -192,33 +193,70 @@ void gf3d_particle_update_uniform_buffer(Particle *particle,UniformBuffer *ubo)
 
 void gf3d_particle_draw(Particle particle)
 {
+    PipelineTuple *tuple;
+    GFC_List *uboList;
+    GFC_List *textureList;
     ParticleUBO ubo = {0};
     ubo = gf3d_particle_get_uniform_buffer(&particle);
+
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = &ubo;
+    tuple->index = 0;
+    tuple->uboIndex = 0;
+    uboList = gfc_list_new();
+    gfc_list_append(uboList,tuple);
+
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = gf3d_particle_manager.defaultTexture;
+    tuple->index = 1;//the start of the textures in the shaders
+    textureList = gfc_list_new();
+    gfc_list_append(textureList,tuple);
+
     gf3d_pipeline_queue_render(
         gf3d_particle_manager.pipe,
         gf3d_particle_manager.buffer,
         1,//its a single vertex
         VK_NULL_HANDLE,
-        &ubo,
-        gf3d_particle_manager.defaultTexture);
+        uboList,
+        textureList);
 }
 
 void gf3d_particle_draw_textured(Particle particle,Texture *texture)
 {
+    PipelineTuple *tuple;
+    GFC_List *uboList;
+    GFC_List *textureList;
     ParticleUBO ubo = {0};
     ubo = gf3d_particle_get_uniform_buffer(&particle);
     if (texture)ubo.textured = 1;
+
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = &ubo;
+    tuple->index = 0;
+    tuple->uboIndex = 0;
+    uboList = gfc_list_new();
+    gfc_list_append(uboList,tuple);
+
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = texture;
+    tuple->index = 1;//the start of the textures in the shaders
+    textureList = gfc_list_new();
+    gfc_list_append(textureList,tuple);
+
     gf3d_pipeline_queue_render(
         gf3d_particle_manager.pipe,
         gf3d_particle_manager.buffer,
         1,//its a single vertex
         VK_NULL_HANDLE,
-        &ubo,
-        texture);
+        uboList,
+        textureList);
 }
 
 void gf3d_particle_draw_sprite(Particle particle,Sprite *sprite,int frame)
 {
+    PipelineTuple *tuple;
+    GFC_List *uboList;
+    GFC_List *textureList;
     Texture *texture = NULL;
     ParticleUBO ubo = {0};
     ubo = gf3d_particle_get_uniform_buffer(&particle);
@@ -231,16 +269,28 @@ void gf3d_particle_draw_sprite(Particle particle,Sprite *sprite,int frame)
         ubo.texture_offset.y = (frame/sprite->framesPerLine)* sprite->heightPercent;
         texture = sprite->texture;
     }
+    
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = &ubo;
+    tuple->index = 0;
+    tuple->uboIndex = 0;
+    uboList = gfc_list_new();
+    gfc_list_append(uboList,tuple);
+
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = texture;
+    tuple->index = 1;//the start of the textures in the shaders
+    textureList = gfc_list_new();
+    gfc_list_append(textureList,tuple);
+
     gf3d_pipeline_queue_render(
         gf3d_particle_manager.pipe,
         gf3d_particle_manager.buffer,
         1,//its a single quad
         VK_NULL_HANDLE,
-        &ubo,
-        texture);
+        uboList,
+        textureList);
 }
-
-
 
 void gf3d_particle_trail_draw(GFC_Color color, float size, Uint8 count, GFC_Edge3D trail)
 {

@@ -53,7 +53,7 @@ Entity *gf3d_entity_new()
             gf3d_model_mat_reset(&entity_manager.entity_list[i].mat);
             
             entity_manager.entity_list[i].color = gfc_color(1,1,1,1);
-            entity_manager.entity_list[i].selectedGFC_Color = gfc_color(1,1,1,1);
+            entity_manager.entity_list[i].selectedColor = gfc_color(1,1,1,1);
             
             return &entity_manager.entity_list[i];
         }
@@ -147,15 +147,23 @@ void gf3d_entity_draw(Entity *self)
             gf3d_model_mat_set_matrix(&self->mat);
             
             gfc_matrix4_multiply(self->mat.mat,mat,self->mat.mat);
-            
-            gf3d_model_draw(self->mat.model,0,self->mat.mat,gfc_color_to_vector4f(self->color),gfc_color_to_vector4(self->detailGFC_Color),gfc_vector4d(1,1,1,1),self->frame);
+                        
+            //TODO handle better lighting
+            gf3d_model_draw(
+                self->mat.model,
+                0,
+                self->mat.mat,
+                gf3d_mesh_basic_material_from_color(self->color),
+                gf3d_light_basic_ambient_ubo(),
+                self->frame);
+
             if (self->selected)
             {
                 gf3d_model_draw_highlight(
                     self->mat.model,
                     0,
                     self->mat.mat,
-                    gfc_color_to_vector4f(self->selectedGFC_Color));
+                    gfc_color_to_vector4f(self->selectedColor));
             }
         }
     }

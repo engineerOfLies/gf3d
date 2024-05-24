@@ -1,7 +1,7 @@
 #include "simple_logger.h"
 
 #include "gf3d_model.h"
-
+#include "gf3d_camera.h"
 #include "gf3d_draw.h"
 
 typedef struct
@@ -64,7 +64,14 @@ void gf3d_draw_edge_3d(GFC_Edge3D edge,GFC_Vector3D position,GFC_Vector3D rotati
         gfc_vector3d(position.x + edge.a.x,position.y + edge.a.y,position.z + edge.a.z),
         gfc_vector3d(rotation.x + angles.x,rotation.y + angles.y,rotation.z + angles.z),
         scale);
-    gf3d_model_draw(gf3d_draw_manager.icylinder,0,modelMat,gfc_color_to_vector4f(color),gfc_vector4d(1,1,1,1),gfc_vector4d(1,1,1,0),0);
+    
+    gf3d_model_draw(
+        gf3d_draw_manager.icylinder,
+        0,
+        modelMat,
+        gf3d_mesh_basic_material_from_color(color),
+        gf3d_light_basic_ambient_ubo(),
+        0);
 }
 
 void gf3d_draw_cube_wireframe(GFC_Box cube,GFC_Vector3D position,GFC_Vector3D rotation,GFC_Vector3D scale,GFC_Color color)
@@ -100,13 +107,21 @@ void gf3d_draw_box_wireframe(GFC_Box cube,GFC_Color color)
 void gf3d_draw_cube_solid(GFC_Box cube,GFC_Vector3D position,GFC_Vector3D rotation,GFC_Vector3D scale,GFC_Color color)
 {
     GFC_Matrix4 modelMat;
-    
+
     gfc_matrix4_from_vectors(
         modelMat,
         gfc_vector3d(position.x + cube.x,position.y + cube.y,position.z + cube.z),
         rotation,
         gfc_vector3d(scale.x * cube.w,scale.y * cube.h,scale.z * cube.d));
-    gf3d_model_draw(gf3d_draw_manager.cube,0,modelMat,gfc_color_to_vector4f(color),gfc_vector4d(1,1,1,1),gfc_vector4d(1,1,1,1),0);
+            
+    gf3d_model_draw(
+        gf3d_draw_manager.cube,
+        0,
+        modelMat,
+        gf3d_mesh_basic_material_from_color(color),
+        gf3d_light_basic_ambient_ubo(),
+        0);
+
 }
 
 
@@ -131,12 +146,21 @@ void gf3d_draw_sphere_solid(GFC_Sphere sphere,GFC_Vector3D position,GFC_Vector3D
         gfc_vector3d(position.x + sphere.x,position.y + sphere.y,position.z + sphere.z),
         rotation,
         gfc_vector3d(scale.x * sphere.r,scale.y * sphere.r,scale.z * sphere.r));
-    gf3d_model_draw(gf3d_draw_manager.sphere,0,modelMat,gfc_color_to_vector4f(color),gfc_vector4d(1,1,1,1),gfc_color_to_vector4f(ambient),0);
+    
+    gf3d_model_draw(
+        gf3d_draw_manager.sphere,
+        0,
+        modelMat,
+        gf3d_mesh_basic_material_from_color(color),
+        gf3d_light_basic_ambient_ubo(),
+        0);
+
 }
 
 
 void gf3d_draw_circle(GFC_Circle circle,GFC_Vector3D position,GFC_Vector3D rotation,GFC_Vector3D scale,GFC_Color color)
 {
+    GF3D_Light_UBO lightUbo = {0};
     GFC_Matrix4 modelMat;
     Mesh *mesh;
     
@@ -149,7 +173,18 @@ void gf3d_draw_circle(GFC_Circle circle,GFC_Vector3D position,GFC_Vector3D rotat
         gfc_vector3d(position.x + circle.x,position.y + circle.y,position.z),
         rotation,
         gfc_vector3d(scale.x * circle.r,scale.y * circle.r,scale.z * circle.r));
-    gf3d_model_draw(gf3d_draw_manager.sphere,0,modelMat,gfc_vector4d(0,0,0,0),gfc_vector4d(1,1,1,1),gfc_vector4d(0,0,0,0),0);
+        
+    gf3d_model_draw(
+        gf3d_draw_manager.sphere,
+        0,
+        modelMat,
+        gf3d_mesh_basic_material_from_color(GFC_COLOR_BLACK),
+        lightUbo,
+        0);
+    
+    lightUbo = gf3d_light_basic_ambient_ubo();
+    //TODO: support better lighting for basic drawing
+
     gf3d_model_draw_highlight(gf3d_draw_manager.sphere,0,modelMat,gfc_color_to_vector4f(color));
 }
 

@@ -97,6 +97,7 @@ void gf2d_sprite_manager_close()
 
 void gf2d_sprite_manager_init(Uint32 max_sprites)
 {
+    size_t uboSizes[1] = {sizeof(SpriteUBO)};
     void* data;
     Uint32 count;
     SpriteFace faces[2];
@@ -146,7 +147,7 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
         gf2d_sprite_get_bind_description(),
         gf2d_sprite_get_attribute_descriptions(NULL),
         count,
-        sizeof(SpriteUBO),
+        uboSizes,1,
         VK_INDEX_TYPE_UINT16
     );     
     
@@ -379,6 +380,9 @@ void gf2d_sprite_draw(
     GFC_Vector4D * clip,
     Uint32     frame)
 {
+    PipelineTuple *tuple;
+    GFC_List *uboList;
+    GFC_List *textureList;
     SpriteUBO spriteUBO = {0};
     GFC_Vector2D drawScale = {1,1};
     GFC_Vector3D drawRotation = {0,0,0};
@@ -402,7 +406,6 @@ void gf2d_sprite_draw(
     if (colorShift)drawGFC_ColorShift = *colorShift;
     if (clip)gfc_vector4d_copy(drawClip,(*clip));
     
-    
     spriteUBO = gf2d_sprite_get_uniform_buffer(
         sprite,
         position,
@@ -412,14 +415,27 @@ void gf2d_sprite_draw(
         drawClip,
         drawFlip,
         frame);
+    uboList = gfc_list_new();
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = &spriteUBO;
+    tuple->index = 0;
+    tuple->uboIndex = 0;//only the one anyway
+    gfc_list_append(uboList,tuple);
+    
+    textureList = gfc_list_new();
+    
+    tuple = gf3d_pipeline_tuple_new();
+    tuple->data = sprite->texture;
+    tuple->index = 1;//binding location in the shaders
+    gfc_list_append(textureList,tuple);
 
     gf3d_pipeline_queue_render(
         gf2d_sprite.pipe,
         sprite->buffer,
         6,//its a single quad
         gf2d_sprite.faceBuffer,
-        &spriteUBO,
-        sprite->texture);
+        uboList,
+        textureList);
 }
 
 void gf2d_sprite_create_vertex_buffer(Sprite *sprite)

@@ -4,9 +4,17 @@
 #include <vulkan/vulkan.h>
 
 #include "gfc_types.h"
+#include "gfc_list.h"
 
 #include "gf3d_uniform_buffers.h"
 #include "gf3d_texture.h"
+
+typedef struct
+{
+    Uint32 uboIndex;//the PipelineUboData index for this ubo.
+    Uint32 index;   //the binding index for the ubo/texture
+    void  *data;    //the ubo / sampler data to bind there
+}PipelineTuple;
 
 typedef struct
 {
@@ -16,14 +24,24 @@ typedef struct
     VkBuffer                vertexBuffer;
     Uint32                  vertexCount;
     VkBuffer                indexBuffer;
-    void                   *uboData;        //pointer to corresponding memory in the pipeline uboData
-    Texture                *texture;        //optional!!
+    //make the following a list, but insert blanks
+    GFC_List               *uboDataList;    //list of all tuples with index and ubo to bind
+    //make the following a list
+    GFC_List               *textureDataList;//list of all tuples with index and texture to bind
 }PipelineDrawCall;
+
+
+typedef struct
+{
+    char                   *uboData;                /**<pre-allocated cpu side UBO data*/
+    size_t                  uboDataSize;            /**<size of a single UBO for this pipeline*/
+    UniformBufferList      *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
+}PipelineUboData;
 
 typedef struct
 {
     Bool                    inUse;
-    GFC_TextLine                name;                   /**<name of pipeline for debugging*/
+    GFC_TextLine            name;                   /**<name of pipeline for debugging*/
     VkPipeline              pipeline;               /**<pipeline handle*/
     VkRenderPass            renderPass;
     VkPipelineLayout        pipelineLayout;
@@ -41,12 +59,11 @@ typedef struct
     Uint32                  descriptorPoolCount;
     Uint32                  descriptorSetCount;
     Uint32                  drawCallCount;          /**<how many drawCalls have been queued*/
-    PipelineDrawCall       *drawCallGFC_List;           /**<cached draw calls for this frame*/
-    char                   *uboData;                /**<pre-allocated cpu side UBO data*/
-    size_t                  uboDataSize;            /**<size of a single UBO for this pipeline*/
-    UniformBufferGFC_List      *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
-    VkCommandBuffer         commandBuffer;          /**<for current command*/
+    PipelineDrawCall       *drawCallList;       /**<cached draw calls for this frame*/
     VkIndexType             indexType;              /**<size of the indices in the index buffer*/
+    VkCommandBuffer         commandBuffer;          /**<for current command*/
+    
+    GFC_List               *uboList;                //list of ubo data buffers
 }Pipeline;
 
 /**
@@ -80,7 +97,8 @@ Pipeline *gf3d_pipeline_graphics_load(VkDevice device,const char *vertFile,const
  * @param vertexInputDescription the vertex input description to use
  * @param vertextInputAttributeDescriptions list of how the attributes are described
  * @param vertexAttributeCount how many of the above are provided in the list
- * @param bufferSize the sizeof() the ubo to be used with this pipeline
+ * @param bufferSizes an array of the sizeof()'s the ubo(s) to be used with this pipeline
+ * @param unformBufferCount how many unform buffers to make for this pipeline
  * @param indexType VK_INDEX_TYPE_UINT16, VK_INDEX_TYPE_UINT32, or VK_INDEX_TYPE_UINT8_EXT
  * @returns NULL on error (see logs) or a pointer to a pipeline
 */
@@ -92,7 +110,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     const VkVertexInputBindingDescription* vertexInputDescription,
     const VkVertexInputAttributeDescription * vertextInputAttributeDescriptions,
     Uint32 vertexAttributeCount,
-    VkDeviceSize bufferSize,
+    VkDeviceSize *bufferSizes,
+    Uint32 unformBufferCount,
     VkIndexType indexType);
 
 /**
@@ -126,16 +145,17 @@ void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame);
  * @param vertexBuffer which buffer to bind
  * @param vertexCount how many vertices to draw (usually 3 per face)
  * @param indexBuffer which face buffer to use for the draw
- * @param uboData the UBO data to draw with.  Note this is copied by the function, feel free to change it after use
- * @param texture [optional] if you have a texture to render with, provide it here.  Note if the pipeline needs one, you MUST provide one
+ * @param uboDataList list of PipelineTuples containing uboData
+ * @param textureList list of PipelineTuples containing texture data
+ * @note the above PipelineTuples will be freed by the pipeline, but you need to make them
  */
 void gf3d_pipeline_queue_render(
     Pipeline *pipe,
     VkBuffer vertexBuffer,
     Uint32 vertexCount,
     VkBuffer indexBuffer,
-    void *uboData,
-    Texture *texture);
+    GFC_List *uboDataList,
+    GFC_List *textureList);
 
 /**
  * @brief bind a draw call to the current command
@@ -165,5 +185,48 @@ void gf3d_pipeline_submit_commands(Pipeline *pipe);
 void gf3d_pipeline_submit_all_pipe_commands();
 
 VkFormat gf3d_pipeline_find_depth_format();
+
+/**
+ * @brief free a tuple, but not the data pointed to by it
+ * @param tuple the tuple to delete
+ */
+void gf3d_pipeline_tuple_free(PipelineTuple *tuple);
+
+/**
+ * @brief allocate a new blank tuple
+ * @return NULL on failure, or the blank tuple
+ * @note free it with gf3d_pipeline_tuple_free
+ */
+PipelineTuple *gf3d_pipeline_tuple_new();
+
+/**
+ * @brief allocate a new tuple and set its values
+ * @param index the shader binding index
+ * @param data the uboData or the texture
+ * @return NULL on failure, or the set tuple
+ * @note free it with gf3d_pipeline_tuple_free
+ */
+PipelineTuple *gf3d_pipeline_tuple(Uint32 index,void *data);
+
+/**
+ * @brief make a new copy of the tuple provided
+ * @param tupleIn the one to copy
+ * @return a new copy
+ * @note free it with gf3d_pipeline_tuple_free
+ */
+PipelineTuple *gf3d_pipeline_tuple_duplicate(PipelineTuple *tupleIn);
+
+/**
+ * @brief duplicate a whole list of tuples
+ * @param list the list to duplicate
+ * @return NULL on error, or the duplicated list
+ */
+GFC_List *gf3d_pipeline_duplicate_tuple_list(GFC_List *list);
+
+/**
+ * @brief delete all the tuples and the list itself for a tuple list
+ * @param list the list to delete
+ */
+void gf3d_pipeline_tuple_list_delete(GFC_List *list);
 
 #endif

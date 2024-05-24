@@ -1,33 +1,144 @@
 #ifndef __GF3D_LIGHTS_H__
 #define __GF3D_LIGHTS_H__
 
-#include "gf3d_vgraphics.h"
-#include "gf3d_mesh.h"
+#include "gfc_list.h"
 
+#include "gf3d_vgraphics.h"
+
+/**
+ * needs to remain in sync with the shader ubo
+ */
+#define MAX_SHADER_LIGHTS 8
+
+/**
+ * @brief describes a standard light
+ */
 typedef struct
 {
-    Uint8   _inuse;
-    GFC_Vector4D color;
-    GFC_Vector4D position;
-}Gf3D_Light;
+    GFC_Vector3D color;         //color of light
+    GFC_Vector3D direction;     //used for directional light
+    GFC_Vector4D position;      //where the light is from.  w determines if its a directional light or attenuated light
+    float        attenuation;   //how fast this light falls off
+    float        angle;         //If nonzero, it is a spot light.  
+}GF3D_Light;
 
 /**
- * @brief initialize the lighting system
+ * @brief the data sent to the fragment shader for lighting calculations
+ * this will be binding point 3, sent to fragment shader
  */
-void gf3d_lights_init(Uint32 max_light);
+typedef struct
+{
+    GF3D_Light ambient;                     //globalAmbientLight
+    GF3D_Light lights[MAX_SHADER_LIGHTS];   //list of all lights
+    GFC_Vector4D cameraPosition;            //needed for many light calculations
+    GFC_Vector2D flags;                     //.x is uses ambient, .y is the count for other lights
+}GF3D_Light_UBO;
 
 /**
- * @brief sets a single global light source from infinitely far away
- * @param color the color of the light
- * @param direction the direction of the light
+ * @brief initialize the lighting system and queue up its close atexit
  */
-void gf3d_lights_set_global_light(GFC_Vector4D color,GFC_Vector4D direction);
+void gf3d_lights_init();
+
 
 /**
- * @brief get the stats for a single global light source
- * @param color populated with the color of the global light
- * @param direciton the unit gfc_vector for the direction of the light
+ * @brief clear all of the current active lights.  This will invalidate all active light pointers
+ * This also zeroes out the ambient light.
+ * This is meant to be used between level transitions.
  */
-void gf3d_lights_get_global_light(GFC_Vector4D *color, GFC_Vector4D *direction);
+void gf3d_lights_clear_all();
+
+/**
+ * @brief free a previously allocated light
+ * @param light the light to free
+ */
+void gf3d_light_free(GF3D_Light *light);
+
+/**
+ * @brief get a pointer to a new blank light
+ * @return NULL on error or a pointer to a blank light otherwise
+ * @note free it with gf3d_light_free();
+ */
+GF3D_Light *gf3d_light_new();
+
+/**
+ * @brief set the global ambient light
+ * @param color the color it should be set to
+ * @param direction the direction the light should be in.  
+ */
+void gf3d_light_set_ambient_light(GFC_Color color,GFC_Vector3D direction);
+
+/**
+ * @brief get a pointer to the global ambient light
+ * @return a pointer to the global ambient light.
+ */
+GF3D_Light *gf3d_light_get_ambient_light();
+
+/**
+ * @brief create a new area light and return a pointer to it
+ * @note area lights emit light in all directions
+ * @param color the color the new light should be
+ * @param position where the light should be
+ * @param attenuation power of the light
+ * @return NULL on error, or a pointer to the newly created light otherwise;
+ * @note free it with gf3d_light_free();
+ */
+GF3D_Light *gf3d_light_new_area(GFC_Color color, GFC_Vector3D position, float attenuation);
+
+/**
+ * @brief create a new spot light and return a pointer to it
+ * @note spot lights are cone shaped
+ * @param color the color the new light should be
+ * @param position where the light should be
+ * @param attenuation power of the light
+ * @param angle the angle of the spotlight. Note that an angle of zero is treated like an area light
+ * @return NULL on error, or a pointer to the newly created light otherwise;
+ * @note free it with gf3d_light_free();
+ */
+GF3D_Light *gf3d_light_new_spot(GFC_Color color, GFC_Vector3D position, GFC_Vector3D direction, float attenuation, float angle);
+
+/**
+ * @brief add an ambient light to the light ubo
+ * @param ubo [output] set the ambient light information based on the provided light
+ * @param ambient the light to use for ambient light in the ubo
+ */
+void gf3d_light_add_ambient_to_ubo(GF3D_Light_UBO *ubo,GF3D_Light *ambient);
+
+/**
+ * @brief add the global ambient light to the light ubo
+ * @param ubo [output] set the ambient light information based on the global light
+ */
+void gf3d_light_add_global_ambient_to_ubo(GF3D_Light_UBO *ubo);
+
+/**
+ * @brief build a lighting ubo based on the list provided
+ * @param ubo [output] this will be populated with up to the first MAX_SHADER_LIGHTS
+ * @param lights the list of lights to populate from
+ * @note ubo->flags.y will be set to the number of lights set.
+ */
+void gf3d_light_build_ubo_from_list(GF3D_Light_UBO *ubo,GFC_List *lights);
+
+/**
+ * @brief build a lighting ubo based on the closest lights in the global list
+ * @param ubo [output] this will be populated with up to MAX_SHADER_LIGHTS
+ * @param relative this will be the reference point for chosing which lights will be added.
+ * @note ubo->flags.y will be set to the number of lights set.
+ */
+void gf3d_light_build_ubo_from_closest(GF3D_Light_UBO *ubo,GFC_Vector3D relative);
+
+/**
+ * @brief build a lighting ubo based on the closest lights in the provided list
+ * @param ubo [output] this will be populated with up to MAX_SHADER_LIGHTS
+ * @param lights the list of lights to check against
+ * @param relative this will be the reference point for chosing which lights will be added.
+ * @note ubo->flags.y will be set to the number of lights set.
+ */
+void gf3d_light_build_ubo_from_closest_list(GF3D_Light_UBO *ubo,GFC_List *lights, GFC_Vector3D relative);
+
+/**
+ * @brief build a basic lightUbo from just the ambient light info.
+ * @note this is a good starting point for making a light ubo
+ * @return a light Ubo with just the ambient light set based on the global setting
+ */
+GF3D_Light_UBO gf3d_light_basic_ambient_ubo();
 
 #endif
