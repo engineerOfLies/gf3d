@@ -6,6 +6,8 @@
 #include "gf3d_draw.h"
 #include "gf3d_armature.h"
 
+extern int __DEBUG;
+
 typedef struct
 {
     Uint32 maxArmatures;
@@ -926,7 +928,7 @@ void gf3d_armature_system_close()
         free(armature_manager3d.armatureGFC_List);
     }
     memset(&armature_manager3d,0,sizeof(ArmatureManager3D));
-    slog("armature system closed");
+    if(__DEBUG)slog("armature system closed");
 }
 
 void gf3d_armature_system_init(Uint32 maxArmatures)
@@ -947,7 +949,7 @@ void gf3d_armature_system_init(Uint32 maxArmatures)
     memset(armature_manager3d.armatureGFC_List,0,sizeof(Armature3D)*maxArmatures);
     armature_manager3d.maxArmatures = maxArmatures;
     atexit(gf3d_armature_system_close);
-    slog("3d armature system initialized");
+    if(__DEBUG)slog("3d armature system initialized");
 }
 
 Armature3D *gf3d_armature_new()
@@ -1083,6 +1085,26 @@ Pose3D *gf3d_armature_pose_new(Uint32 boneCount)
         pose->boneCount = boneCount;
     }
     return pose;
+}
+
+ArmatureUBO gf3d_armature_get_ubo(
+    Armature3D *armature,
+    Uint32      frame)
+{
+    GFC_Matrix4 *bones;
+    Uint32 boneCount = 0;
+    ArmatureUBO boneUbo = {0};
+    
+    if (!armature)return boneUbo;
+    
+    bones = gf3d_armature_get_pose_matrices(armature,frame,&boneCount);
+    if ((bones)&&(boneCount <= MAX_SHADER_BONES))
+    {
+        memcpy(boneUbo.bones,bones,sizeof(GFC_Matrix4)*boneCount);
+    }
+    else if (__DEBUG)slog("no bones for armature %s at frame %i",armature->filepath,frame);
+
+    return boneUbo;
 }
 
 /*eol@eof*/

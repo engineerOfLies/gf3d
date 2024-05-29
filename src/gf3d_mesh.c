@@ -7,7 +7,9 @@
 #include "gf3d_obj_load.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
+#include "gf3d_camera.h"
 #include "gf3d_pipeline.h"
+#include "gf3d_model.h"
 #include "gf3d_mesh.h"
 
 #define ATTRIBUTE_COUNT 5
@@ -85,7 +87,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(SkyUBO),
+        sizeof(MeshUBO),
         VK_INDEX_TYPE_UINT16
     );
 
@@ -97,22 +99,23 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO),
+        sizeof(ModelUBO),
         VK_INDEX_TYPE_UINT16
     );
 
-    gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/model_alpha_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        sizeof(MeshUBO),
-        VK_INDEX_TYPE_UINT16
-    );
-
+    //while reworking
+//     gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
+//         gf3d_vgraphics_get_default_logical_device(),
+//         "config/model_alpha_pipeline.cfg",
+//         gf3d_vgraphics_get_view_extent(),
+//         mesh_max,
+//         gf3d_mesh_get_bind_description(),
+//         gf3d_mesh_get_attribute_descriptions(NULL),
+//         count,
+//         sizeof(MeshUBO),
+//         VK_INDEX_TYPE_UINT16
+//     );
+// 
     gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/highlight_pipeline.cfg",
@@ -121,7 +124,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(HighlightUBO),
+        sizeof(MeshUBO),
         VK_INDEX_TYPE_UINT16
     );
 
@@ -495,5 +498,25 @@ Mesh *gf3d_mesh_load(const char *filename)
     
     return mesh;
 }
+
+MeshUBO gf3d_mesh_get_ubo(
+    GFC_Matrix4 modelMat,
+    GFC_Color colorMod)
+{
+    ModelViewProjection mvp;
+    MeshUBO modelUBO = {0};
+    GFC_Vector4D color = gfc_color_to_vector4f(colorMod);
+    
+    mvp = gf3d_vgraphics_get_mvp();
+    gfc_matrix4_copy(modelUBO.model,modelMat);
+    gfc_matrix4_copy(modelUBO.view,mvp.view);
+    gfc_matrix4_copy(modelUBO.proj,mvp.proj);
+    gfc_vector4d_copy(modelUBO.color,color);
+    
+    modelUBO.camera = gfc_vector3dw(gf3d_camera_get_position(),1.0);
+    
+    return modelUBO;
+}
+
 
 /*eol@eof*/

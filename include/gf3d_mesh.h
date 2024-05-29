@@ -13,47 +13,15 @@
 #include "gf3d_pipeline.h"
 
 
-#define MESH_LIGHTS_MAX 8
-
+//absolute basics of the mesh information sent to the graphics card
 typedef struct
 {
-    GFC_Vector4D color;
-    GFC_Vector4D position;
-}MeshLights;
-
-typedef struct
-{
-    GFC_Matrix4 model;
-    GFC_Matrix4 view;
-    GFC_Matrix4 proj;
-    GFC_Matrix4 bones[100]; //I hate that this is how it is done.  I want to move this to a buffer on the GPU and index into it in the shader
-    GFC_Vector4D ambientGFC_Color;
-    GFC_Vector4D ambientDir;
-    GFC_Vector4D color; //color mod
-    GFC_Vector4D detailGFC_Color; //color mod
-    GFC_Vector4D cameraPosition;
-    GFC_Vector4D flags;  //.x is bone flag
-
+    GFC_Matrix4     model;
+    GFC_Matrix4     view;
+    GFC_Matrix4     proj;
+    GFC_Vector4D    color;
+    GFC_Vector4D    camera;
 }MeshUBO;
-
-/**
- * @purpose to send to calls to draw via the highlight pipeline
- */
-typedef struct
-{
-    GFC_Matrix4 model;
-    GFC_Matrix4 view;
-    GFC_Matrix4 proj;
-    GFC_Vector4D color; 
-}HighlightUBO;
-
-typedef struct
-{
-    GFC_Matrix4 model;
-    GFC_Matrix4 view;
-    GFC_Matrix4 proj;
-    GFC_Vector4D color; 
-}SkyUBO;
 
 typedef struct
 {
@@ -200,5 +168,15 @@ Pipeline *gf3d_mesh_get_pipeline();
 Pipeline *gf3d_mesh_get_alpha_pipeline();
 Pipeline *gf3d_mesh_get_highlight_pipeline();
 Pipeline *gf3d_mesh_get_sky_pipeline();
+
+/**
+ * @brief given a model matrix and basic color, build the meshUBO needed to render a model
+ * @param modelMat the model Matrix
+ * @param colorMod the color for the UBO
+ */
+MeshUBO gf3d_mesh_get_ubo(
+    GFC_Matrix4 modelMat,
+    GFC_Color colorMod);
+
 
 #endif

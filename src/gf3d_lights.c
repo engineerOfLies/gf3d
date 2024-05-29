@@ -1,122 +1,180 @@
 #include "simple_logger.h"
 
-#include "gfc_list.h"
-
 #include "gf3d_lights.h"
 
 typedef struct
 {
-    GFC_Vector4D  globalGFC_Color;
-    GFC_Vector3D  globalDir;
-    Gf3D_Light *lights;
-    Uint32      max_lights;
+    GF3D_Light  ambientLight;
+    GFC_List   *lights;
 }LightManager;
 
 static LightManager light_manager = {0};
 
 void gf3d_lights_close()
 {
-    free(light_manager.lights);
+    if (light_manager.lights)
+    {
+        gfc_list_foreach(light_manager.lights,(gfc_work_func*)free);
+        gfc_list_delete(light_manager.lights);
+    }
     memset(&light_manager,0,sizeof(LightManager));
 }
 
-void gf3d_lights_init(Uint32 max_lights)
+void gf3d_lights_init()
 {
-    if (!max_lights)
-    {
-        slog("cannot allocate 0 lights");
-        return;
-    }
-    light_manager.lights = gfc_allocate_array(sizeof(Gf3D_Light),max_lights);
+    light_manager.lights = gfc_list_new();
     if (!light_manager.lights)
     {
-        slog("failed to allocate %i lights",max_lights);
+        slog("failed to allocate lights");
     }
-    light_manager.max_lights = max_lights;
     atexit(gf3d_lights_close);
 }
 
-void gf3d_lights_get_global_light(GFC_Vector4D *color, GFC_Vector4D *direction)
+void gf3d_lights_clear_all()
 {
-    if (color)gfc_vector4d_copy((*color),light_manager.globalGFC_Color);
-    if (direction)gfc_vector3d_copy((*direction),light_manager.globalDir);
+    if (!light_manager.lights)return;
+    gfc_list_foreach(light_manager.lights,(gfc_work_func*)free);
+    memset(&light_manager.ambientLight,0,sizeof(GF3D_Light));
 }
 
-void gf3d_lights_set_global_light(GFC_Vector4D color,GFC_Vector4D direction)
-{
-    gfc_vector4d_copy(light_manager.globalGFC_Color,color);
-    gfc_vector3d_copy(light_manager.globalDir,direction);
-    gfc_vector3d_normalize(&light_manager.globalDir);//sanity check
-}
-
-void gf3d_light_free(Gf3D_Light *light)
+void gf3d_light_free(GF3D_Light *light)
 {
     if (!light)return;
-    memset(light,0,sizeof(Gf3D_Light));
+    gfc_list_delete_data(light_manager.lights,light);
+    free(light);
 }
 
-Gf3D_Light *gf3d_light_new()
+GF3D_Light *gf3d_light_new()
 {
-    int i;
-    for ( i = 0; i < light_manager.max_lights; i++)
-    {
-        if (light_manager.lights[i]._inuse)continue;
-        light_manager.lights[i]._inuse = 1;
-        return &light_manager.lights[i];
-    }
+    GF3D_Light *light;
+    light = gfc_allocate_array(sizeof(GF3D_Light),1);
+    if (!light)return NULL;
+    gfc_list_append(light_manager.lights,light);
     return NULL;
 }
 
-void gf3d_lights_insert(GFC_Vector3D position,MeshLights *dynamicLights,Uint32 count,Gf3D_Light *light)
+void gf3d_light_set_ambient_light(GFC_Color color,GFC_Vector3D direction)
 {
-    int i;
-    float magnitude_to_new;
-    if ((!dynamicLights)||(!light))return;
-    if (count < MESH_LIGHTS_MAX)
-    {
-        gfc_vector4d_copy(dynamicLights[count].color,light->color);
-        gfc_vector3d_copy(dynamicLights[count].position,light->position);
-        return;
-    }
-    magnitude_to_new = gfc_vector3d_magnitude_squared(gfc_vector3d(light->position.x - position.x,light->position.y - position.y,light->position.z - position.z));
-
-    for (i = 0; i < MESH_LIGHTS_MAX; i++)
-    {
-        if (gfc_vector3d_magnitude_squared(gfc_vector3d(position.x - dynamicLights[i].position.x,position.y - dynamicLights[i].position.y,position.z - dynamicLights[i].position.z)) > magnitude_to_new)
-        {
-            gfc_vector4d_copy(dynamicLights[i].color,light->color);
-            gfc_vector3d_copy(dynamicLights[i].position,light->position);
-            return;
-        }
-    }
+    memset(&light_manager.ambientLight,0,sizeof(GF3D_Light));
+    light_manager.ambientLight.color = gfc_color_to_vector4f(color);
+    gfc_vector3d_copy(light_manager.ambientLight.direction,direction);
 }
 
-void gf3d_lights_get_closest_dynamic_lights(GFC_Vector3D position,float radius, float * dynamicLightCount,MeshLights dynamicLights[MESH_LIGHTS_MAX])
+GF3D_Light *gf3d_light_get_ambient_light()
 {
-    int i,count = 0;
-    if (!dynamicLightCount)return;
-    for (i = 0;i < light_manager.max_lights; i++)
-    {
-        if (!light_manager.lights[i]._inuse)continue;
-        if (gfc_vector3d_magnitude_compare(gfc_vector3d(position.x - light_manager.lights[i].position.x,position.y - light_manager.lights[i].position.y,position.z - light_manager.lights[i].position.z),radius))
-        {
-            gf3d_lights_insert(position,dynamicLights,count,&light_manager.lights[i]);
-            if (count < MESH_LIGHTS_MAX)count++;
-        }
-    }
-    *dynamicLightCount = count;
+    return &light_manager.ambientLight;
 }
 
-
-Gf3D_Light *gf3d_light_make(GFC_Vector4D color,GFC_Vector3D position,GFC_Vector3D direction)
+GF3D_Light *gf3d_light_new_spot(GFC_Color color, GFC_Vector3D position, GFC_Vector3D direction, float attenuation, float angle)
 {
-    Gf3D_Light *light;
+    GF3D_Light *light;
     light = gf3d_light_new();
     if (!light)return NULL;
-    gfc_vector3d_copy(light->color,color);
-    gfc_vector3d_copy(light->position,position);
+    light->color = gfc_color_to_vector4f(color);
+    light->direction = gfc_vector3dw(direction,1.0);
+    light->position = gfc_vector3dw(position,1.0);
+    light->attenuation = attenuation;
+    light->angle = angle;
     return light;
 }
 
+GF3D_Light *gf3d_light_new_area(GFC_Color color, GFC_Vector3D position, float attenuation)
+{
+    GF3D_Light *light;
+    light = gf3d_light_new();
+    if (!light)return NULL;
+    light->color = gfc_color_to_vector4f(color);
+    gfc_vector3d_copy(light->position,position);
+    light->position.w = 1.0;
+    light->attenuation = attenuation;
+    return light;
+}
+
+
+void gf3d_light_add_ambient_to_ubo(LightUBO *ubo,GF3D_Light *ambient)
+{
+    if ((!ubo)||(!ambient))return;
+    memcpy(&ubo->ambient,ambient,sizeof(GF3D_Light));
+}
+
+void gf3d_light_add_global_ambient_to_ubo(LightUBO *ubo)
+{
+    gf3d_light_add_ambient_to_ubo(ubo,&light_manager.ambientLight);
+}
+
+void gf3d_light_build_ubo_from_list(LightUBO *ubo,GFC_List *lights)
+{
+    int i,c;
+    GF3D_Light *light;
+    if ((!ubo)||(!lights))return;
+    memset(ubo,0,sizeof(LightUBO));
+    c = gfc_list_get_count(lights);
+    for (i = 0;i < MIN(c,MAX_SHADER_LIGHTS);i++)
+    {
+        light = gfc_list_get_nth(lights,i);
+        if (!light)continue;
+        memcpy(&ubo->lights[i],light,sizeof(GF3D_Light));
+    }
+    ubo->flags.y = i;
+}
+
+void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative)
+{
+    int i,j,c;
+    float newDist;
+    int least = -1;
+    float bestDistances[MAX_SHADER_LIGHTS];
+    GF3D_Light *bestLights[MAX_SHADER_LIGHTS] = {0};
+    GF3D_Light *light;
+    if (!ubo)return;
+    c = gfc_list_get_count(lights);
+    for (i = 0;i < c;i++)
+    {
+        light = gfc_list_get_nth(lights,i);
+        if (!light)continue;
+        if (i < MAX_SHADER_LIGHTS)
+        {
+            bestLights[i] = light;
+            bestDistances[i] = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
+            if (least == -1)least = i;
+            else if (bestDistances[i] < bestDistances[least])least = i;
+        }
+        else //replace the least of the best
+        {
+            newDist = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
+            if (newDist < bestDistances[least])
+            {
+                bestLights[least] = light;
+                bestDistances[least] = newDist;
+                least = 0;
+                for (j = 1;j < MAX_SHADER_LIGHTS;j++)
+                {
+                    if (bestDistances[j] < bestDistances[least])least = j;
+                }
+            }
+        }
+    }
+    for (i = 0;i < MIN(c,MAX_SHADER_LIGHTS);i++)
+    {
+        memcpy(&ubo->lights[i],bestLights[i],sizeof(GF3D_Light));
+    }
+    ubo->flags.y = i;
+}
+
+void gf3d_light_build_ubo_from_closest(LightUBO *ubo,GFC_Vector3D relative)
+{
+    gf3d_light_build_ubo_from_closest_list(ubo,light_manager.lights, relative);
+}
+
+LightUBO gf3d_light_basic_ambient_ubo()
+{
+    GF3D_Light *ambient;
+    LightUBO lightUbo = {0};
+    ambient = gf3d_light_get_ambient_light();
+    if (!ambient)return lightUbo;
+    memcpy(&lightUbo.ambient,ambient,sizeof(GF3D_Light));
+    lightUbo.flags.x = 1;
+    return lightUbo;
+}
 
 /*eol@eof*/

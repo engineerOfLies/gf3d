@@ -65,7 +65,7 @@ typedef struct
     VkSemaphore                 renderFinishedSemaphore;
 
     Command                 *   graphicsCommandPool; 
-    UniformBufferObject         ubo;
+    ModelViewProjection         ubo;
     
     //render frame and command buffer for the current render pass
     Uint32                      bufferFrame;
@@ -621,7 +621,7 @@ Command *gf3d_vgraphics_get_graphics_command_pool()
     return gf3d_vgraphics.graphicsCommandPool;
 }
 
-UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object()
+ModelViewProjection gf3d_vgraphics_get_mvp()
 {
     return gf3d_vgraphics.ubo;
 }
@@ -655,18 +655,18 @@ GFC_Vector2D vgraphics_3d_position_to_screen(GFC_Vector3D position)
     GFC_Vector2D res,out;
     GFC_Matrix4 mvp,model;
     GFC_Vector4D transformed = {0};
-    UniformBufferObject graphics_ubo;
+    ModelViewProjection graphics_mvp;
     
     res = gf3d_vgraphics_get_resolution();
     
     gfc_matrix4_make_translation(
         model,
         position);
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    graphics_mvp = gf3d_vgraphics_get_mvp();
     gfc_matrix4_multiply(
         mvp,
-        graphics_ubo.view,
-        graphics_ubo.proj
+        graphics_mvp.view,
+        graphics_mvp.proj
     );
     
     gfc_matrix4_v_multiply(
@@ -686,18 +686,18 @@ GFC_Vector3D vgraphics_3d_position_to_screen_depth(GFC_Vector3D position)
     GFC_Vector3D out;
     GFC_Matrix4 mvp,model;
     GFC_Vector4D transformed = {0};
-    UniformBufferObject graphics_ubo;
+    ModelViewProjection graphics_mvp;
     
     res = gf3d_vgraphics_get_resolution();
     
     gfc_matrix4_make_translation(
         model,
         position);
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    graphics_mvp = gf3d_vgraphics_get_mvp();
     gfc_matrix4_multiply(
         mvp,
-        graphics_ubo.view,
-        graphics_ubo.proj
+        graphics_mvp.view,
+        graphics_mvp.proj
     );
     
     gfc_matrix4_v_multiply(

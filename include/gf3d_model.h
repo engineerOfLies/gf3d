@@ -33,6 +33,19 @@
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
 #include "gf3d_armature.h"
+#include "gf3d_lights.h"
+#include "gf3d_materials.h"
+
+
+//all inclusive of features
+typedef struct
+{
+    MeshUBO         mesh;
+    ArmatureUBO     armature;
+    MaterialUBO     material;   //this may become an array
+    LightUBO        lights;
+    GFC_Vector4D    flags;      //.x is for bones, .y is for 
+}ModelUBO;
 
 /**
  * @purpose the model is a single instance of 3d mesh data.  Each can be drawn individually in the rendering pipeline.
@@ -41,13 +54,13 @@
 typedef struct
 {
     Uint32              refCount;
-    GFC_TextLine            filename;
+    GFC_TextLine        filename;
     
-    GFC_List               *mesh_list;
+    GFC_List           *mesh_list;
     Texture            *texture;
     Texture            *normalMap;
     Armature3D         *armature;
-    GFC_Box                 bounds;         //copied from the mesh
+    GFC_Box             bounds;         //copied from the mesh
 }Model;
 
 typedef struct
@@ -105,11 +118,14 @@ Model * gf3d_model_load_from_config(SJson *json);
  * @param index the mesh to render from the mesh_list, could be animation frames if a sequence of objs, or sub-meshes
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
- * @param detailGFC_Color color to swap in for sections of PURE red of the texture
- * @param ambient how much ambient light there is
  * @param frame the animation frame to use for armature based animations
  */
-void gf3d_model_draw(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D colorMod,GFC_Vector4D detailGFC_Color, GFC_Vector4D ambientLight, Uint32 frame);
+void gf3d_model_draw(
+    Model *model,
+    Uint32 index,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    Uint32 frame);
 
 /**
  * @brief draw all of the meshes of a model.  This is meant for multi-mesh models
@@ -120,7 +136,11 @@ void gf3d_model_draw(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D
  * @param ambient how much ambient light there is
  * @param frame used to access a frame of armature based animation
  */
-void gf3d_model_draw_all_meshes(Model *model,GFC_Matrix4 modelMat,GFC_Color colorMod,GFC_Color detailGFC_Color, GFC_Color ambientLight,Uint32 frame);
+void gf3d_model_draw_all_meshes(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    Uint32 frame);
 
 /**
  * @brief queue up a model for rendering as highlight wireframe
@@ -128,7 +148,7 @@ void gf3d_model_draw_all_meshes(Model *model,GFC_Matrix4 modelMat,GFC_Color colo
  * @param modelMat the model matrix (MVP)
  * @param highlightGFC_Color the color of the outline
  */
-void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D highlight);
+void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight);
 
 /**
  * @brief queue up a model for rendering as a sky

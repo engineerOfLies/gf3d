@@ -19,8 +19,8 @@ typedef struct
     GFC_Vector2D    viewportSize;
     GFC_Vector2D    texture_offset;// as a percent
     GFC_Vector2D    texture_size;// as a percent
-    Uint32      textured;
-    float       size;
+    Uint32          textured;
+    float           size;
 }ParticleUBO;
 
 typedef struct
@@ -145,15 +145,15 @@ VkVertexInputAttributeDescription * gf3d_particle_get_attribute_descriptions(Uin
 ParticleUBO gf3d_particle_get_uniform_buffer(Particle *particle)
 {
     ParticleUBO particleUBO = {0};
-    UniformBufferObject graphics_ubo;
+    ModelViewProjection mvp;
     
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    mvp = gf3d_vgraphics_get_mvp();
     
     gfc_matrix4_identity(particleUBO.model);
     gfc_matrix4_translate(particleUBO.model,particleUBO.model,particle->position);    
     
-    gfc_matrix4_copy(particleUBO.view,graphics_ubo.view);
-    gfc_matrix4_copy(particleUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(particleUBO.view,mvp.view);
+    gfc_matrix4_copy(particleUBO.proj,mvp.proj);
     
     particleUBO.texture_size.x = 1.00;
     particleUBO.texture_size.y = 1.00;
@@ -169,15 +169,15 @@ void gf3d_particle_update_uniform_buffer(Particle *particle,UniformBuffer *ubo)
 {
     void* data;
     ParticleUBO particleUBO = {0};
-    UniformBufferObject graphics_ubo;
+    ModelViewProjection mvp;
     
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    mvp = gf3d_vgraphics_get_mvp();
     
     gfc_matrix4_identity(particleUBO.model);
     gfc_matrix4_translate(particleUBO.model,particleUBO.model,particle->position);    
     
-    gfc_matrix4_copy(particleUBO.view,graphics_ubo.view);
-    gfc_matrix4_copy(particleUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(particleUBO.view,mvp.view);
+    gfc_matrix4_copy(particleUBO.proj,mvp.proj);
     
     gfc_vector4d_copy(particleUBO.color,gfc_color_to_vector4f(particle->color));
     particleUBO.size = particle->size;

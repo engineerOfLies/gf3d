@@ -12,6 +12,7 @@
 #include "gf3d_obj_load.h"
 #include "gf3d_uniform_buffers.h"
 #include "gf3d_lights.h"
+#include "gf3d_materials.h"
 #include "gf3d_camera.h"
 
 #include "gf3d_gltf_parse.h"
@@ -47,9 +48,9 @@ void gf3d_model_update_uniform_buffer(
     GFC_Vector4D ambientLight
 );
 
-HighlightUBO gf3d_model_get_highlight_ubo(
+MeshUBO gf3d_model_get_highlight_ubo(
     GFC_Matrix4 modelMat,
-    GFC_Vector4D highlightGFC_Color);
+    GFC_Color highlightGFC_Color);
 
 
 VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
@@ -440,108 +441,82 @@ ModelMat *gf3d_model_mat_new()
     return modelMat;
 }
 
-MeshUBO gf3d_model_get_mesh_ubo(
-    GFC_Matrix4 modelMat,
-    GFC_Vector4D colorMod,
-    GFC_Vector4D ambient,
-    GFC_Vector4D detail)
-
-{
-    GFC_Vector3D cameraPosition;
-    UniformBufferObject graphics_ubo;
-    MeshUBO modelUBO = {0};
-    
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
-    gfc_matrix4_copy(modelUBO.model,modelMat);
-    gfc_matrix4_copy(modelUBO.view,graphics_ubo.view);
-    gfc_matrix4_copy(modelUBO.proj,graphics_ubo.proj);
-    gfc_vector4d_copy(modelUBO.color,colorMod);
-    gfc_vector4d_copy(modelUBO.detailGFC_Color,detail);
-    cameraPosition = gf3d_camera_get_position();
-    gfc_vector3d_copy(modelUBO.cameraPosition,cameraPosition);
-    modelUBO.cameraPosition.w = 1;
-    
-    gf3d_lights_get_global_light(&modelUBO.ambientGFC_Color, &modelUBO.ambientDir);
-    gfc_vector4d_scale_by(modelUBO.ambientGFC_Color,modelUBO.ambientGFC_Color,ambient);
-
-    return modelUBO;
-}
-
-SkyUBO gf3d_model_get_sky_ubo(
+MeshUBO gf3d_model_get_sky_ubo(
     GFC_Matrix4 modelMat,
     GFC_Vector4D colorMod)
 {
-    UniformBufferObject graphics_ubo;
-    SkyUBO modelUBO;
+    ModelViewProjection mvp;
+    MeshUBO modelUBO;
     
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    mvp = gf3d_vgraphics_get_mvp();
     
     gfc_matrix4_copy(modelUBO.model,modelMat);
-    gfc_matrix4_copy(modelUBO.view,graphics_ubo.view);
+    gfc_matrix4_copy(modelUBO.view,mvp.view);
      modelUBO.view[0][3] = 0;
      modelUBO.view[1][3] = 0;
      modelUBO.view[2][3] = 0;
      modelUBO.view[3][0] = 0;
      modelUBO.view[3][1] = 0;
      modelUBO.view[3][2] = 0;
-    gfc_matrix4_copy(modelUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(modelUBO.proj,mvp.proj);
     gfc_vector4d_copy(modelUBO.color,colorMod);
     return modelUBO;
 }
 
-HighlightUBO gf3d_model_get_highlight_ubo(
+MeshUBO gf3d_model_get_highlight_ubo(
     GFC_Matrix4 modelMat,
-    GFC_Vector4D highlightGFC_Color)
+    GFC_Color highlightColor)
 {
-    UniformBufferObject graphics_ubo;
-    HighlightUBO modelUBO = {0};
-    
-    graphics_ubo = gf3d_vgraphics_get_uniform_buffer_object();
+    ModelViewProjection mvp;
+    MeshUBO modelUBO = {0};
+    GFC_Vector4D color = gfc_color_to_vector4f(highlightColor);
+    mvp = gf3d_vgraphics_get_mvp();
     
     gfc_matrix4_copy(modelUBO.model,modelMat);
-    gfc_matrix4_copy(modelUBO.view,graphics_ubo.view);
-    gfc_matrix4_copy(modelUBO.proj,graphics_ubo.proj);
+    gfc_matrix4_copy(modelUBO.view,mvp.view);
+    gfc_matrix4_copy(modelUBO.proj,mvp.proj);
     
-    gfc_vector4d_copy(modelUBO.color,highlightGFC_Color);
+    gfc_vector4d_copy(modelUBO.color,color);
     return modelUBO;
 }
 
-void gf3d_model_draw_all_meshes(Model *model,GFC_Matrix4 modelMat,GFC_Color colorMod,GFC_Color detailGFC_Color, GFC_Color ambientLight,Uint32 frame)
+void gf3d_model_draw_all_meshes(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color colorMod,
+    Uint32 frame)
 {
     int i,c;
     if (!model)return;
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw(model,i,modelMat,gfc_color_to_vector4f(colorMod),gfc_color_to_vector4f(detailGFC_Color),gfc_color_to_vector4f(ambientLight),frame);
+        gf3d_model_draw(model,i,modelMat,colorMod,frame);
     }
 }
 
-void gf3d_model_draw(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D colorMod,GFC_Vector4D detailGFC_Color, GFC_Vector4D ambientLight,Uint32 frame)
+void gf3d_model_draw(
+    Model *model,
+    Uint32 index,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    Uint32 frame)
 {
-    GFC_Matrix4 *bones;
-    Uint32 boneCount = 0;
     Mesh *mesh;
-    MeshUBO uboData = {0};
+    ModelUBO uboData = {0};
     Texture *texture;
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
-    uboData = gf3d_model_get_mesh_ubo(
-        modelMat,
-        colorMod,
-        ambientLight,
-        detailGFC_Color);
+    mesh = gfc_list_get_nth(model->mesh_list,index);
+    if (!mesh)return;
+    
+    uboData.mesh = gf3d_mesh_get_ubo(modelMat,colorMod);
+    uboData.lights = gf3d_light_basic_ambient_ubo();
+    uboData.material = gf3d_material_make_basic(colorMod);
     if (model->armature)
     {
-        bones = gf3d_armature_get_pose_matrices(model->armature,frame,&boneCount);
-        if (bones)
-        {
-            memcpy(uboData.bones,bones,sizeof(GFC_Matrix4)*boneCount);
-//             slog("frame %i bone 5 matrix:",frame);
-//             gfc_matrix4_slog(bones[5]);
-            uboData.flags.x = 1;
-        }
-        else slog("no bones for model %s at frame %i",model->filename,frame);
+        uboData.armature = gf3d_armature_get_ubo(model->armature,frame);
+        uboData.flags.x = 1;
     }
     if (!model->texture)
     {
@@ -549,17 +524,15 @@ void gf3d_model_draw(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D
     }
     else texture = model->texture;
         // queue up a render for batch rendering
-    mesh = gfc_list_get_nth(model->mesh_list,index);
-    if (!mesh)return;
     gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
-    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
+//    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
 }
 
-void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Vector4D highlight)
+void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
 {
     Mesh *mesh;
     Texture *texture;
-    HighlightUBO uboData = {0};
+    MeshUBO uboData = {0};
     
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
@@ -578,7 +551,7 @@ void gf3d_model_draw_sky(Model *model,GFC_Matrix4 modelMat,GFC_Color color)
 {
     Mesh *mesh;
     Texture *texture;
-    SkyUBO uboData = {0};
+    MeshUBO uboData = {0};
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
     uboData = gf3d_model_get_sky_ubo(modelMat,gfc_color_to_vector4f(color));

@@ -17,7 +17,7 @@ typedef struct
     GFC_Matrix4 model;
     GFC_Matrix4 view;
     GFC_Matrix4 proj;
-}UniformBufferObject;
+}ModelViewProjection;
 
 /**
  * @brief init Vulkan / SDL, setup device and initialize infrastructure for 3d graphics
@@ -123,7 +123,7 @@ VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 /**
  * @brief get the current MVP matrix for the render calls.
  */
-UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
+ModelViewProjection gf3d_vgraphics_get_mvp();
 
 /**
  * @brief get the pipeline that is used to render 2d images to the overlay

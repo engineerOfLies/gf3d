@@ -23,7 +23,7 @@ typedef struct
 typedef struct
 {
     Bool                    inUse;
-    GFC_TextLine                name;                   /**<name of pipeline for debugging*/
+    GFC_TextLine            name;                   /**<name of pipeline for debugging*/
     VkPipeline              pipeline;               /**<pipeline handle*/
     VkRenderPass            renderPass;
     VkPipelineLayout        pipelineLayout;
@@ -44,7 +44,7 @@ typedef struct
     PipelineDrawCall       *drawCallGFC_List;           /**<cached draw calls for this frame*/
     char                   *uboData;                /**<pre-allocated cpu side UBO data*/
     size_t                  uboDataSize;            /**<size of a single UBO for this pipeline*/
-    UniformBufferGFC_List      *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
+    UniformBufferGFC_List  *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
     VkCommandBuffer         commandBuffer;          /**<for current command*/
     VkIndexType             indexType;              /**<size of the indices in the index buffer*/
 }Pipeline;

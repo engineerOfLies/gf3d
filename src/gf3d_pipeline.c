@@ -659,10 +659,10 @@ void gf3d_pipeline_create_basic_descriptor_pool_from_config(Pipeline *pipe,SJson
         slog("no pipeline or config provided");
         return;
     }
-    list = sj_object_get_value(config,"descriptorPools");
+    list = sj_object_get_value(config,"descriptorSetLayout");
     if (!list)
     {
-        slog("no descriptorPools found in config");
+        slog("no descriptorSetLayout found in config");
         return;
     }
     c = sj_array_get_count(list);
