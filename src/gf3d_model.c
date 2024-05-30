@@ -484,6 +484,7 @@ void gf3d_model_draw_all_meshes(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color colorMod,
+    LightUBO *lighting,
     Uint32 frame)
 {
     int i,c;
@@ -491,7 +492,7 @@ void gf3d_model_draw_all_meshes(
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw(model,i,modelMat,colorMod,frame);
+        gf3d_model_draw(model,i,modelMat,colorMod,lighting,frame);
     }
 }
 
@@ -500,6 +501,7 @@ void gf3d_model_draw(
     Uint32 index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
+    LightUBO *lighting,
     Uint32 frame)
 {
     Mesh *mesh;
@@ -511,7 +513,12 @@ void gf3d_model_draw(
     if (!mesh)return;
     
     uboData.mesh = gf3d_mesh_get_ubo(modelMat,colorMod);
-    uboData.lights = gf3d_light_basic_ambient_ubo();
+    
+    if (lighting)
+    {
+        memcpy(&uboData.lights,lighting,sizeof(LightUBO));
+    }
+    
     uboData.material = gf3d_material_make_basic(colorMod);
     if (model->armature)
     {

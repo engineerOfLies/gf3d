@@ -15,12 +15,13 @@
  */
 typedef struct
 {
-    GFC_Vector4D color;         //color of light
-    GFC_Vector4D direction;     //used for directional light
-    GFC_Vector4D position;      //where the light is from.  w determines if its a directional light or attenuated light
-    float        attenuation;   //how fast this light falls off
-    float        angle;         //If nonzero, it is a spot light.  
-    GFC_Vector2D padding;
+    GFC_Vector4D    color;         //color of light
+    GFC_Vector4D    direction;     //used for directional light
+    GFC_Vector4D    position;      //where the light is from.  w determines if its a directional light or attenuated light
+    float           ambientCoefficient;
+    float           attenuation;   //how fast this light falls off
+    float           angle;         //If nonzero, it is a spot light.  
+    float           padding;
 }GF3D_Light;
 
 /**
@@ -29,9 +30,8 @@ typedef struct
  */
 typedef struct
 {
-    GF3D_Light ambient;                     //globalAmbientLight
     GF3D_Light lights[MAX_SHADER_LIGHTS];   //list of all lights
-    GFC_Vector4D flags;
+    GFC_Vector4D flags;                     //.x is how many lights are in use
 }LightUBO;
 
 /**
@@ -64,8 +64,9 @@ GF3D_Light *gf3d_light_new();
  * @brief set the global ambient light
  * @param color the color it should be set to
  * @param direction the direction the light should be in.  
+ * @param strength how strong the ambient light should factor into the render (0.5 is average)
  */
-void gf3d_light_set_ambient_light(GFC_Color color,GFC_Vector3D direction);
+void gf3d_light_set_ambient_light(GFC_Color color,GFC_Vector3D direction,float strength);
 
 /**
  * @brief get a pointer to the global ambient light
@@ -97,11 +98,11 @@ GF3D_Light *gf3d_light_new_area(GFC_Color color, GFC_Vector3D position, float at
 GF3D_Light *gf3d_light_new_spot(GFC_Color color, GFC_Vector3D position, GFC_Vector3D direction, float attenuation, float angle);
 
 /**
- * @brief add an ambient light to the light ubo
+ * @brief add a light to the light ubo
  * @param ubo [output] set the ambient light information based on the provided light
- * @param ambient the light to use for ambient light in the ubo
+ * @param light the light to use for ambient light in the ubo
  */
-void gf3d_light_add_ambient_to_ubo(LightUBO *ubo,GF3D_Light *ambient);
+void gf3d_light_add_light_to_ubo(LightUBO *ubo,GF3D_Light *light);
 
 /**
  * @brief add the global ambient light to the light ubo
@@ -140,5 +141,18 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
  * @return a light Ubo with just the ambient light set based on the global setting
  */
 LightUBO gf3d_light_basic_ambient_ubo();
+
+/**
+ * @brief build a lightUBO from the global ambient light and the first few lights in the light manager
+ * @return a light Ubo with the ambient and other lights set based on the global settings
+ */
+LightUBO gf3d_light_get_global_lights_ubo();
+
+/**
+ * @brief draw a light to show where it is and where it is pointing
+ * @note this is mostly for debugging purposes
+ * @param light the light to draw
+ */
+void gf3d_light_draw(GF3D_Light *light);
 
 #endif

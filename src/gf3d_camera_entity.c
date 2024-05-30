@@ -17,7 +17,7 @@ typedef struct
     int                 autoPan;
     int                 freeLook;
     Entity             *lookTargetEntity;
-    GFC_Vector3D            lookTargetPosition;
+    GFC_Vector3D        lookTargetPosition;
     CameraTargetType    targetType;
 }CameraEntityData;
 
@@ -123,7 +123,7 @@ void gf3d_camera_entity_enable_free_look(Uint8 enable)
 
 void gf3d_camera_entity_think(Entity *self)
 {
-    float moveSpeed = 2;
+    float moveSpeed = 0.1;
     GFC_Vector3D position,rotation;
     const Uint8 * keys;
     CameraEntityData *data;

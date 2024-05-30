@@ -1,5 +1,7 @@
 #include "simple_logger.h"
 
+#include "gf3d_draw.h"
+#include "gf3d_particle.h"
 #include "gf3d_lights.h"
 
 typedef struct
@@ -50,14 +52,16 @@ GF3D_Light *gf3d_light_new()
     light = gfc_allocate_array(sizeof(GF3D_Light),1);
     if (!light)return NULL;
     gfc_list_append(light_manager.lights,light);
-    return NULL;
+    return light;
 }
 
-void gf3d_light_set_ambient_light(GFC_Color color,GFC_Vector3D direction)
+void gf3d_light_set_ambient_light(GFC_Color color,GFC_Vector3D direction,float strength)
 {
     memset(&light_manager.ambientLight,0,sizeof(GF3D_Light));
     light_manager.ambientLight.color = gfc_color_to_vector4f(color);
     gfc_vector3d_copy(light_manager.ambientLight.direction,direction);
+    light_manager.ambientLight.direction.w = 1.0;
+    light_manager.ambientLight.ambientCoefficient = strength;
 }
 
 GF3D_Light *gf3d_light_get_ambient_light()
@@ -91,15 +95,25 @@ GF3D_Light *gf3d_light_new_area(GFC_Color color, GFC_Vector3D position, float at
 }
 
 
-void gf3d_light_add_ambient_to_ubo(LightUBO *ubo,GF3D_Light *ambient)
+void gf3d_light_add_light_to_ubo(LightUBO *ubo,GF3D_Light *light)
 {
-    if ((!ubo)||(!ambient))return;
-    memcpy(&ubo->ambient,ambient,sizeof(GF3D_Light));
+    if ((!ubo)||(!light))return;
+    if (ubo->flags.x >= MAX_SHADER_LIGHTS)return;//can't fit any more lights
+    memcpy(&ubo->lights[(Uint32)ubo->flags.x],light,sizeof(GF3D_Light));
+    ubo->flags.x++;
+}
+
+LightUBO gf3d_light_get_global_lights_ubo()
+{
+    LightUBO ubo = {0};
+//    gf3d_light_add_global_ambient_to_ubo(&ubo);
+    gf3d_light_build_ubo_from_list(&ubo,light_manager.lights);
+    return ubo;
 }
 
 void gf3d_light_add_global_ambient_to_ubo(LightUBO *ubo)
 {
-    gf3d_light_add_ambient_to_ubo(ubo,&light_manager.ambientLight);
+    gf3d_light_add_light_to_ubo(ubo,&light_manager.ambientLight);
 }
 
 void gf3d_light_build_ubo_from_list(LightUBO *ubo,GFC_List *lights)
@@ -107,15 +121,27 @@ void gf3d_light_build_ubo_from_list(LightUBO *ubo,GFC_List *lights)
     int i,c;
     GF3D_Light *light;
     if ((!ubo)||(!lights))return;
-    memset(ubo,0,sizeof(LightUBO));
+    if (ubo->flags.x >= MAX_SHADER_LIGHTS)return;
     c = gfc_list_get_count(lights);
-    for (i = 0;i < MIN(c,MAX_SHADER_LIGHTS);i++)
+    for (i = 0;i < c;i++)
     {
         light = gfc_list_get_nth(lights,i);
         if (!light)continue;
-        memcpy(&ubo->lights[i],light,sizeof(GF3D_Light));
+        gf3d_light_add_light_to_ubo(ubo,light);
+        if (ubo->flags.x >= MAX_SHADER_LIGHTS)break;
     }
-    ubo->flags.y = i;
+}
+
+void gf3d_light_build_ubo_from_array(LightUBO *ubo, GF3D_Light *lights[],Uint32 count)
+{
+    int i;
+    if ((!ubo)||(!lights)||(!count))return;
+    if (ubo->flags.x >= MAX_SHADER_LIGHTS)return;//all full
+    for (i =0; i < count;i++)
+    {
+        gf3d_light_add_light_to_ubo(ubo,lights[i]);
+        if (ubo->flags.x >= MAX_SHADER_LIGHTS)break;
+    }
 }
 
 void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative)
@@ -154,11 +180,7 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
             }
         }
     }
-    for (i = 0;i < MIN(c,MAX_SHADER_LIGHTS);i++)
-    {
-        memcpy(&ubo->lights[i],bestLights[i],sizeof(GF3D_Light));
-    }
-    ubo->flags.y = i;
+    gf3d_light_build_ubo_from_array(ubo, bestLights,MIN(c,MAX_SHADER_LIGHTS));
 }
 
 void gf3d_light_build_ubo_from_closest(LightUBO *ubo,GFC_Vector3D relative)
@@ -168,13 +190,34 @@ void gf3d_light_build_ubo_from_closest(LightUBO *ubo,GFC_Vector3D relative)
 
 LightUBO gf3d_light_basic_ambient_ubo()
 {
-    GF3D_Light *ambient;
     LightUBO lightUbo = {0};
-    ambient = gf3d_light_get_ambient_light();
-    if (!ambient)return lightUbo;
-    memcpy(&lightUbo.ambient,ambient,sizeof(GF3D_Light));
-    lightUbo.flags.x = 1;
+    gf3d_light_add_global_ambient_to_ubo(&lightUbo);
     return lightUbo;
+}
+
+void gf3d_light_draw(GF3D_Light *light)
+{
+    GFC_Vector3D dir;
+    float size;
+    if (!light)return;
+    size = 0.1 * light->attenuation;
+    if (light->position.w)
+    {
+        gf3d_particle_draw(
+            gf3d_particle(
+                gfc_vector4dxyz(light->position),
+                gfc_color_from_vector4f(light->color),
+                size));
+    }
+    if (light->direction.w)
+    {
+        gfc_vector3d_copy(dir,light->direction);
+        gfc_vector3d_set_magnitude(&dir,size * 5);
+        gfc_vector3d_add(dir,dir,light->position);
+        gf3d_draw_edge_3d(
+        gfc_edge3d_from_vectors(gfc_vector4dxyz(light->position),dir),
+        gfc_vector3d(0,0,0),gfc_vector3d(0,0,0),gfc_vector3d(1,1,1),0.01 * size,gfc_color_from_vector4f(light->color));
+    }
 }
 
 /*eol@eof*/

@@ -118,13 +118,15 @@ Model * gf3d_model_load_from_config(SJson *json);
  * @param index the mesh to render from the mesh_list, could be animation frames if a sequence of objs, or sub-meshes
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
+ * @param lighting the lighting that should be applied
  * @param frame the animation frame to use for armature based animations
  */
 void gf3d_model_draw(
     Model *model,
     Uint32 index,
     GFC_Matrix4 modelMat,
-    GFC_Color   colorMod,
+    GFC_Color   colorMod,//TODO pass a material instead
+    LightUBO *lighting,
     Uint32 frame);
 
 /**
@@ -132,14 +134,14 @@ void gf3d_model_draw(
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation
- * @param detailGFC_Color color to swap in for sections of PURE red of the texture
- * @param ambient how much ambient light there is
+ * @param lighting the lighting that should be applied
  * @param frame used to access a frame of armature based animation
  */
 void gf3d_model_draw_all_meshes(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
+    LightUBO *lighting,
     Uint32 frame);
 
 /**
