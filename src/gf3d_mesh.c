@@ -79,6 +79,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     
     gf3d_mesh_get_attribute_descriptions(&count);
     
+    //the order of the pipeline creation is the order they are submitted in.
     gf3d_mesh.sky_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/sky_pipeline.cfg",
@@ -103,19 +104,20 @@ void gf3d_mesh_init(Uint32 mesh_max)
         VK_INDEX_TYPE_UINT16
     );
 
-    //while reworking
-//     gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
-//         gf3d_vgraphics_get_default_logical_device(),
-//         "config/model_alpha_pipeline.cfg",
-//         gf3d_vgraphics_get_view_extent(),
-//         mesh_max,
-//         gf3d_mesh_get_bind_description(),
-//         gf3d_mesh_get_attribute_descriptions(NULL),
-//         count,
-//         sizeof(MeshUBO),
-//         VK_INDEX_TYPE_UINT16
-//     );
-// 
+    //pretty much identical to model pipe
+    //TODO: make these separate sub passes
+    gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
+        gf3d_vgraphics_get_default_logical_device(),
+        "config/model_pipeline.cfg",
+        gf3d_vgraphics_get_view_extent(),
+        mesh_max,
+        gf3d_mesh_get_bind_description(),
+        gf3d_mesh_get_attribute_descriptions(NULL),
+        count,
+        sizeof(ModelUBO),
+        VK_INDEX_TYPE_UINT16
+    );
+
     gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/highlight_pipeline.cfg",

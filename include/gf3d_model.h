@@ -44,7 +44,7 @@ typedef struct
     ArmatureUBO     armature;
     MaterialUBO     material;   //this may become an array
     LightUBO        lights;
-    GFC_Vector4D    flags;      //.x is for bones, .y is for 
+    GFC_Vector4D    flags;      //.x is for bones, .y is for transparency/opaque pass 
 }ModelUBO;
 
 /**

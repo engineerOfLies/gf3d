@@ -581,8 +581,14 @@ void gf3d_model_draw_index(
     }
     else texture = model->texture;
         // queue up a render for batch rendering
-    gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
-//    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
+    if ((uboData.material.diffuse.w * uboData.material.transparency) >= 1.0)
+    {
+        //if the global transparency values are set, then no need to draw opaque
+        gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
+    }
+    //queue up the translucent pass, we can't skip this one because there MIGHT be transparency in the skins
+    uboData.flags.y = 1.0;//setup the pipeline to know
+    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
 }
 
 void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
