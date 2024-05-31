@@ -35,21 +35,21 @@ typedef enum
 typedef struct Action_S
 {
     GFC_TextLine    name;
-    int         startFrame;
-    int         endFrame;
-    float       frameRate;
-    ActionType  type;
+    int             startFrame;
+    int             endFrame;
+    float           frameRate;
+    ActionType      type;
 }Action;
 
 typedef struct
 {
-    int         _refCount;      /**<set if the actor is in use*/
+    int             _refCount;      /**<set if the actor is in use*/
     GFC_TextLine    filename;       /**<filename of the actor json file*/
-    Sprite     *sprite;         /**<which sprite to draw this entity with*/
+    Sprite         *sprite;         /**<which sprite to draw this entity with*/
     GFC_TextLine    spriteFile;
-    int         frameWidth;
-    int         frameHeight;
-    int         framesPerLine;
+    int             frameWidth;
+    int             frameHeight;
+    int             framesPerLine;
     GFC_Vector2D    size;           /**<scaled heigth and width*/
     GFC_Vector2D    scale;          /**<scale to draw at*/
     GFC_Vector2D    center;         /**<center for rotation and scale*/
@@ -128,11 +128,10 @@ void gf2d_action_list_delete(GFC_List *list);
 
 /**
  * @brief parse out an action list from json
- * @param al list to be populated with actions
- * @param actionGFC_List json contain a list of actions
+ * @param actionList json contain a list of actions
  * @return the parsed list
  */
-GFC_List *gf2d_action_list_parse(GFC_List *al,SJson *actionGFC_List);
+GFC_List *gf2d_action_list_parse(SJson *actionList);
 
 /**
  * @brief encode an action list into json

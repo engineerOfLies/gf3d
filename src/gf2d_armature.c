@@ -875,7 +875,7 @@ Armature2D *gf2d_armature_load(const char *filepath)
         gfc_line_cpy(armature->name,name);
     }
     //base bones pass
-    armature->actions =  gf2d_action_list_parse(armature->actions,sj_object_get_value(json,"actionGFC_List"));
+    armature->actions =  gf2d_action_list_parse(sj_object_get_value(json,"actionGFC_List"));
 
     jBones = sj_object_get_value(json,"bones");
     c = sj_array_get_count(jBones);

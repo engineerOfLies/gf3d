@@ -5,6 +5,8 @@
 #include "gfc_config.h"
 #include "gfc_pak.h"
 
+#include "gf2d_actor.h"
+
 #include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_commands.h"
@@ -234,6 +236,13 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     
     if (filename)gfc_line_cpy(model->filename,filename);
     
+    item = sj_object_get_value(json,"actionList");
+    if (item)
+    {
+        slog("loading action list for model %s",filename);
+        model->action_list = gf2d_action_list_parse(item);
+    }
+    
     item = sj_object_get_value(json,"material");
     if (item)
     {
@@ -279,6 +288,8 @@ void gf3d_model_delete(Model *model)
         if (!mesh)continue;
         gf3d_mesh_free(mesh);
     }
+    gf3d_material_free(model->material);
+    gf2d_action_list_delete(model->action_list);
     gfc_list_delete(model->mesh_list);
     gf3d_texture_free(model->texture);
     gf3d_armature_free(model->armature);

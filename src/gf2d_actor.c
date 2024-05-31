@@ -12,7 +12,7 @@
 typedef struct
 {
     Uint32 maxActors;
-    Actor * actorGFC_List;
+    Actor * actorList;
 }ActorManager;
 
 static ActorManager actor_manager = {0};
@@ -29,11 +29,11 @@ void gf2d_actor_clear_all();
 void gf2d_actor_close()
 {
     gf2d_actor_clear_all();
-    if (actor_manager.actorGFC_List != NULL)
+    if (actor_manager.actorList != NULL)
     {
-        free(actor_manager.actorGFC_List);
+        free(actor_manager.actorList);
     }
-    actor_manager.actorGFC_List = NULL;
+    actor_manager.actorList = NULL;
     actor_manager.maxActors = 0;
 }
 
@@ -45,7 +45,7 @@ void gf2d_actor_init(Uint32 max)
         return;
     }
     actor_manager.maxActors = max;
-    actor_manager.actorGFC_List = (Actor *)gfc_allocate_array(sizeof(Actor),max);
+    actor_manager.actorList = (Actor *)gfc_allocate_array(sizeof(Actor),max);
     atexit(gf2d_actor_close);
 }
 
@@ -83,7 +83,7 @@ void gf2d_actor_clear_all()
     int i;
     for (i = 0;i < actor_manager.maxActors;i++)
     {
-        gf2d_actor_delete(&actor_manager.actorGFC_List[i]);// clean up the data
+        gf2d_actor_delete(&actor_manager.actorList[i]);// clean up the data
     }
 }
 
@@ -93,22 +93,22 @@ Actor *gf2d_actor_new()
     /*search for an unused actor address*/
     for (i = 0;i < actor_manager.maxActors;i++)
     {
-        if ((actor_manager.actorGFC_List[i]._refCount == 0)&&(actor_manager.actorGFC_List[i].al == NULL))
+        if ((actor_manager.actorList[i]._refCount == 0)&&(actor_manager.actorList[i].al == NULL))
         {
-            actor_manager.actorGFC_List[i]._refCount = 1;//set ref count
-            actor_manager.actorGFC_List[i].al = gfc_list_new();
-            return &actor_manager.actorGFC_List[i];//return address of this array element        }
+            actor_manager.actorList[i]._refCount = 1;//set ref count
+            actor_manager.actorList[i].al = gfc_list_new();
+            return &actor_manager.actorList[i];//return address of this array element        }
         }
     }
     /*find an unused actor address and clean up the old data*/
     for (i = 0;i < actor_manager.maxActors;i++)
     {
-        if (actor_manager.actorGFC_List[i]._refCount == 0)
+        if (actor_manager.actorList[i]._refCount == 0)
         {
-            gf2d_actor_delete(&actor_manager.actorGFC_List[i]);// clean up the old data
-            actor_manager.actorGFC_List[i]._refCount = 1;//set ref count
-            actor_manager.actorGFC_List[i].al = gfc_list_new();
-            return &actor_manager.actorGFC_List[i];//return address of this array element
+            gf2d_actor_delete(&actor_manager.actorList[i]);// clean up the old data
+            actor_manager.actorList[i]._refCount = 1;//set ref count
+            actor_manager.actorList[i].al = gfc_list_new();
+            return &actor_manager.actorList[i];//return address of this array element
         }
     }
     slog("error: out of actor addresses");
@@ -124,9 +124,9 @@ Actor *gf2d_actor_get_by_filename(const char * filename)
     }
     for (i = 0;i < actor_manager.maxActors;i++)
     {
-        if (gfc_line_cmp(actor_manager.actorGFC_List[i].filename,filename)==0)
+        if (gfc_line_cmp(actor_manager.actorList[i].filename,filename)==0)
         {
-            return &actor_manager.actorGFC_List[i];
+            return &actor_manager.actorList[i];
         }
     }
     return NULL;// not found
@@ -256,19 +256,20 @@ void gf2d_actor_save(Actor *actor,const char *filename)
     sj_free(actorjs);
 }
 
-GFC_List *gf2d_action_list_parse(GFC_List *al,SJson *actionGFC_List)
+GFC_List *gf2d_action_list_parse(SJson *actionList)
 {
+    GFC_List *al;
     SJson *item;
     int i,c;
-    if (!actionGFC_List)return al;
-    if (!al)al = gfc_list_new();
+    if (!actionList)return NULL;
+    al = gfc_list_new();
     if (!al)return NULL;
-    c = sj_array_get_count(actionGFC_List);
+    c = sj_array_get_count(actionList);
     for (i = 0; i < c; i++)
     {
-        item = sj_array_get_nth(actionGFC_List,i);
+        item = sj_array_get_nth(actionList,i);
         if (!item)continue;
-        al = gfc_list_append(al,gf2d_action_json_parse(item));
+        gfc_list_append(al,gf2d_action_json_parse(item));
     }
     return al;
 }
@@ -314,7 +315,7 @@ Actor *gf2d_actor_load_json(SJson *json)
     actor->size.x = actor->frameWidth * actor->scale.x;
     actor->size.y = actor->frameHeight * actor->scale.y;
 
-    actor->al = gf2d_action_list_parse(actor->al,sj_object_get_value(actorJS,"actionList"));
+    actor->al = gf2d_action_list_parse(sj_object_get_value(actorJS,"actionList"));
     return actor;
 }
 

@@ -63,6 +63,7 @@ typedef struct
     Texture            *normalMap;
     Armature3D         *armature;
     GFC_Box             bounds;         //copied from the mesh
+    GFC_List           *action_list;    //list of animation actions
 }Model;
 
 typedef struct

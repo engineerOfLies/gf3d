@@ -5,6 +5,7 @@
 #include "gfc_pak.h"
 #include "gfc_config.h"
 
+#include "gf2d_actor.h"
 #include "gf3d_materials.h"
 
 typedef struct
@@ -259,6 +260,11 @@ void gf3d_material_free(GF3D_Material *material)
 {
     if (!material)return;
     material->_refCount--;
+    if (material->_refCount == 0)
+    {
+        gfc_list_delete_data(material_manager.materials,material);
+        gf3d_material_delete(material);
+    }
 }
 
 void gf3d_material_delete(GF3D_Material *material)
