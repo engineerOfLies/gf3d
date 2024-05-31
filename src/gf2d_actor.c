@@ -314,7 +314,7 @@ Actor *gf2d_actor_load_json(SJson *json)
     actor->size.x = actor->frameWidth * actor->scale.x;
     actor->size.y = actor->frameHeight * actor->scale.y;
 
-    actor->al = gf2d_action_list_parse(actor->al,sj_object_get_value(actorJS,"actionGFC_List"));
+    actor->al = gf2d_action_list_parse(actor->al,sj_object_get_value(actorJS,"actionList"));
     return actor;
 }
 
