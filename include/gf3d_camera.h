@@ -5,11 +5,15 @@
 
 typedef struct
 {
-    GFC_Matrix4 cameraMat;      //final matrix to become the view matrix
-    GFC_Matrix4 cameraMatInv;   //final matrix to become the inverse view matrix
-    GFC_Vector3D scale;
-    GFC_Vector3D position;
-    GFC_Vector3D rotation;      // pitch, roll, yaw
+    GFC_Matrix4         cameraMat;      //final matrix to become the view matrix
+    GFC_Matrix4         cameraMatInv;   //final matrix to become the inverse view matrix
+    GFC_Vector3D        scale;          //for building camera matrix
+    GFC_Vector3D        position;       //for building camera matrix
+    GFC_Vector3D        rotation;       //pitch, roll, yaw for building camera matrix
+    int                 autoPan;
+    int                 freeLook;
+    Uint8               cameraTargetLock;
+    GFC_Vector3D        lookTargetPosition;
 }Camera;
 
 /**
@@ -188,5 +192,51 @@ GFC_Vector3D gf3d_camera_get_angles();
  * @param up        [output] if provided, it will be set with the normal gfc_vector directly up from where the camera is looking
  */
 void gf3d_camera_get_view_vectors(GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up);
+
+/**
+ * @brief update the camera based on keyboard controls, autopan, and look target
+ */
+void gf3d_camera_controls_update();
+
+/**
+ * @brief set a look target for the camera to point at
+ * @param target the position to target
+ * @note it may still need to be enabled and you will need to call gf3d_camera_controls_update
+ */
+void gf3d_camera_set_look_target(GFC_Vector3D target);
+
+/**
+ * @brief get the look target for the camera
+ * @return position of target
+ */
+GFC_Vector3D gf3d_camera_get_look_target();
+
+/**
+ * @brief toggle the current free look status
+ */
+void gf3d_camera_toggle_free_look();
+
+/**
+ * @brief turn on or off free look
+ * @param enable if true then turn on, else turn off
+ */
+void gf3d_camera_enable_free_look(Uint8 enable);
+
+/**
+ * @brief turn on or off auto pan
+ * @param enable if true then turn on, else turn off
+ */
+void gf3d_camera_set_auto_pan(Bool enable);
+
+/**
+ * @brief check if the camera currently has free look enabled
+ * @return if it is
+ */
+Bool gf3d_camera_free_look_enabled();
+
+/**
+ * @brief set a look target for the camera
+ */
+void gf3d_camera_set_look_target(GFC_Vector3D target);
 
 #endif

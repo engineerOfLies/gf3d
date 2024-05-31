@@ -1,5 +1,7 @@
 #include <string.h>
 
+#include "simple_logger.h"
+
 #include "gfc_matrix.h"
 
 #include "gf3d_camera.h"
@@ -200,6 +202,95 @@ void gf3d_camera_set_scale(GFC_Vector3D scale)
     else gf3d_camera.scale.y = 1/scale.y;
     if (!scale.z)gf3d_camera.scale.z = 0;
     else gf3d_camera.scale.z = 1/scale.z;
+}
+
+void gf3d_camera_set_look_target(GFC_Vector3D target)
+{
+    gfc_vector3d_copy(gf3d_camera.lookTargetPosition,target);
+    gf3d_camera_look_at(target,NULL);
+}
+
+GFC_Vector3D gf3d_camera_get_look_target()
+{
+    return gf3d_camera.lookTargetPosition;
+}
+
+void gf3d_camera_toggle_free_look()
+{
+    gf3d_camera_enable_free_look(!gf3d_camera.freeLook);
+}
+
+void gf3d_camera_enable_free_look(Uint8 enable)
+{
+    gf3d_camera.freeLook = enable;
+}
+
+
+void gf3d_camera_set_auto_pan(Bool enable)
+{
+    gf3d_camera.autoPan = enable;
+}
+
+
+Bool gf3d_camera_free_look_enabled()
+{
+    return gf3d_camera.freeLook;
+}
+
+void gf3d_camera_controls_update()
+{
+    float moveSpeed = 0.1;
+    GFC_Vector3D position,rotation;
+    const Uint8 * keys;
+    
+    keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+
+    if (gf3d_camera.freeLook)
+    {
+        if (keys[SDL_SCANCODE_R])
+        {
+            rotation = gf3d_camera_get_angles();
+            slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
+        }
+        if (keys[SDL_SCANCODE_P])
+        {
+            position = gf3d_camera_get_position();
+            slog("position: %f,%f,%f",position.x,position.y,position.z);
+        }
+        if (keys[SDL_SCANCODE_W])
+        {
+            gf3d_camera_walk_forward(moveSpeed);
+        }
+        if (keys[SDL_SCANCODE_S])
+        {
+            gf3d_camera_walk_forward(-moveSpeed);
+        }
+        if (keys[SDL_SCANCODE_D])
+        {
+            gf3d_camera_walk_right(moveSpeed);
+        }
+        if (keys[SDL_SCANCODE_A])    
+        {
+            gf3d_camera_walk_right(-moveSpeed);
+        }
+        if (keys[SDL_SCANCODE_SPACE])gf3d_camera_move_up(moveSpeed);
+        if (keys[SDL_SCANCODE_Z])gf3d_camera_move_up(-moveSpeed);
+        
+        if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-0.01);
+        if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(0.01);
+        if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.01);
+        if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.01);
+        
+        return;
+    }
+    if (gf3d_camera.autoPan)
+    {
+        gf3d_camera_walk_right(moveSpeed/5);
+    }
+    if (gf3d_camera.cameraTargetLock)
+    {
+        gf3d_camera_look_at(gf3d_camera.lookTargetPosition,NULL);
+    }
 }
 
 /*eol@eof*/
