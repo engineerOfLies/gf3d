@@ -60,6 +60,7 @@ typedef struct
 /**
  * @brief initializes the mesh system / configures internal data about mesh based rendering
  * @param mesh_max the maximum allowed simultaneous meshes supported at once.  Must be > 0
+ * @note keep in mind that many models will be comprised of multiple sub meshes.  So this number may need to be very large
  */
 void gf3d_mesh_init(Uint32 mesh_max);
 

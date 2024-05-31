@@ -145,16 +145,12 @@ Model *gf3d_model_load(const char * filename)
         sj_free(json);
         return NULL;
     }
-    model = gf3d_model_load_from_config(config);
-    if (model)
-    {
-        gfc_line_cpy(model->filename,filename);
-    }
+    model = gf3d_model_load_from_config(config,filename);
     sj_free(json);
     return model;
 }
 
-Model *gf3d_model_load_from_config(SJson *json)
+Model *gf3d_model_load_from_config(SJson *json,const char *filename)
 {
     int i,c;
     Mesh *mesh;
@@ -171,23 +167,79 @@ Model *gf3d_model_load_from_config(SJson *json)
     {
         model = gf3d_gltf_parse_model(modelFile);
         if (!model)return NULL;
-
-        textureFile = sj_get_string_value(sj_object_get_value(json,"texture"));
-        if (textureFile)
-        {
-            model->texture = gf3d_texture_load(textureFile);
-        }
         armatureFile = sj_get_string_value(sj_object_get_value(json,"armature"));
         if (armatureFile)
         {
             model->armature = gf3d_armature_load(armatureFile);
         }
-        return model;
     }    
+    else
+    {
+        model = gf3d_model_new();
+        if (!model)return NULL;
+        
+        if (sj_object_get_value(json,"obj_list"))
+        {
+            array = sj_object_get_value(json,"obj_list");
+            if (!array)
+            {
+                slog("model file %s obj_list missing objects");
+                gf3d_model_free(model);
+                return NULL;
+            }
+            model->mesh_as_frame = 1;
+            c = sj_array_get_count(array);
+            for (i = 0; i < c; i++)
+            {
+                item = sj_array_get_nth(array,i);
+                if (!item)continue;
+                modelFile = sj_get_string_value(item);
+                if (modelFile)
+                {
+                    mesh = gf3d_mesh_load(modelFile);
+                    if (mesh)
+                    {
+                        gfc_box_cpy(model->bounds,mesh->bounds);
+                        gfc_list_append(model->mesh_list,mesh);
+                    }
+                }
+            }
+        }
+        else if (sj_get_string_value(sj_object_get_value(json,"obj")))
+        {
+            modelFile = sj_get_string_value(sj_object_get_value(json,"obj"));
+            if (!modelFile)
+            {
+                slog("model file %s obj missing filename");
+                gf3d_model_free(model);
+                return NULL;                
+            }
+            mesh = gf3d_mesh_load(modelFile);
+            if (!mesh)
+            {
+                slog("failed to parse mesh data from obj file");
+                gf3d_model_free(model);
+                return NULL;
+            }
+            gfc_box_cpy(model->bounds,mesh->bounds);
+            gfc_list_append(model->mesh_list,mesh);
+        }
+        else
+        {
+            if (__DEBUG)slog("no known way to parse model file");
+            gf3d_model_free(model);
+            return NULL;
+        }
+    }
     
-    model = gf3d_model_new();
-    if (!model)return NULL;
+    if (filename)gfc_line_cpy(model->filename,filename);
     
+    item = sj_object_get_value(json,"material");
+    if (item)
+    {
+        model->material = gf3d_material_parse_js(item,filename);
+    }
+
     textureFile = sj_get_string_value(sj_object_get_value(json,"normalMap"));
     if (textureFile)
     {
@@ -199,45 +251,7 @@ Model *gf3d_model_load_from_config(SJson *json)
     {
         model->texture = gf3d_texture_load(textureFile);
     }
-
-    modelFile = sj_get_string_value(sj_object_get_value(json,"obj"));
-    if (modelFile)
-    {
-        mesh = gf3d_mesh_load(modelFile);
-        if (!mesh)
-        {
-            slog("failed to parse mesh data from obj file");
-            gf3d_model_free(model);
-            return NULL;
-        }
-        gfc_box_cpy(model->bounds,mesh->bounds);
-        model->mesh_list = gfc_list_append(model->mesh_list,mesh);
-        return model;
-    }
-    array = sj_object_get_value(json,"obj_list");
-    if (array)
-    {
-        c = sj_array_get_count(array);
-        for (i = 0; i < c; i++)
-        {
-            item = sj_array_get_nth(array,i);
-            if (!item)continue;
-            modelFile = sj_get_string_value(item);
-            if (modelFile)
-            {
-                mesh = gf3d_mesh_load(modelFile);
-                if (mesh)
-                {
-                    gfc_box_cpy(model->bounds,mesh->bounds);
-                    model->mesh_list = gfc_list_append(model->mesh_list,mesh);
-                }
-            }
-        }
-        return model;
-    }
-    slog("no known way to parse model file");
-    gf3d_model_free(model);
-    return NULL;
+    return model;
 }
 
 
@@ -492,11 +506,39 @@ void gf3d_model_draw_all_meshes(
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw(model,i,modelMat,colorMod,lighting,frame);
+        gf3d_model_draw_index(model,i,modelMat,colorMod,lighting,frame);
     }
 }
 
 void gf3d_model_draw(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    LightUBO *lighting,
+    Uint32 frame)
+{
+    if (!model)return;
+    if (model->mesh_as_frame)
+    {
+        gf3d_model_draw_index(
+            model,
+            frame,
+            modelMat,
+            colorMod,
+            lighting,
+            0);
+        return;
+    }
+    gf3d_model_draw_all_meshes(
+        model,
+        modelMat,
+        colorMod,
+        lighting,
+        frame);
+}
+
+
+void gf3d_model_draw_index(
     Model *model,
     Uint32 index,
     GFC_Matrix4 modelMat,
@@ -505,6 +547,7 @@ void gf3d_model_draw(
     Uint32 frame)
 {
     Mesh *mesh;
+    GFC_Vector4D modColor = {0};
     ModelUBO uboData = {0};
     Texture *texture;
     if (!gf3d_model.initiliazed)return;
@@ -519,7 +562,14 @@ void gf3d_model_draw(
         memcpy(&uboData.lights,lighting,sizeof(LightUBO));
     }
     
-    uboData.material = gf3d_material_make_basic(colorMod);
+    if (model->material)
+    {
+        uboData.material = gf3d_material_get_ubo(model->material);
+        modColor = gfc_color_to_vector4f(colorMod);
+        //modulate the diffuse color based on input colorMod
+        gfc_vector4d_scale_by(uboData.material.diffuse,uboData.material.diffuse,modColor);
+    }
+    else uboData.material = gf3d_material_make_basic_ubo(colorMod);
     if (model->armature)
     {
         uboData.armature = gf3d_armature_get_ubo(model->armature,frame);

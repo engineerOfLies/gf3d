@@ -56,7 +56,9 @@ typedef struct
     Uint32              refCount;
     GFC_TextLine        filename;
     
-    GFC_List           *mesh_list;
+    GFC_List           *mesh_list;      //sub meshes of the model
+    Uint8               mesh_as_frame;  //if true, this model is animated as a sequence of meshes
+    GF3D_Material      *material;       //if set, use this material when sending draw calls
     Texture            *texture;
     Texture            *normalMap;
     Armature3D         *armature;
@@ -108,14 +110,14 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile);
 /**
  * @brief load a model from config file
  * @param json the json config to parse
+ * @param filename the name of the file this was loaded from
  * @return NULL on error, or the json 
  */
-Model * gf3d_model_load_from_config(SJson *json);
+Model * gf3d_model_load_from_config(SJson *json,const char *filename);
 
 /**
- * @brief queue up a model for rendering, specifying one mesh in the model (this can be fore animation, or sub-meshes
+ * @brief queue up a model for rendering
  * @param model the model to render
- * @param index the mesh to render from the mesh_list, could be animation frames if a sequence of objs, or sub-meshes
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
  * @param lighting the lighting that should be applied
@@ -123,9 +125,25 @@ Model * gf3d_model_load_from_config(SJson *json);
  */
 void gf3d_model_draw(
     Model *model,
-    Uint32 index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,//TODO pass a material instead
+    LightUBO *lighting,
+    Uint32 frame);
+
+/**
+ * @brief queue up a model for rendering, specifying one mesh in the model (this can be for animation, or sub-meshes)
+ * @param model the model to render
+ * @param index the mesh to render from the mesh_list, could be animation frames of a sequence of objs, or sub-meshes
+ * @param modelMat the model matrix (MVP)
+ * @param colorMod color modulation (values from 0 to 1);
+ * @param lighting the lighting that should be applied
+ * @param frame the animation frame to use for armature based animations
+ */
+void gf3d_model_draw_index(
+    Model *model,
+    Uint32 index,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
     LightUBO *lighting,
     Uint32 frame);
 
@@ -136,6 +154,7 @@ void gf3d_model_draw(
  * @param colorMod color modulation
  * @param lighting the lighting that should be applied
  * @param frame used to access a frame of armature based animation
+ * @note this is called by gf3d_model_draw when not using a sequence of meshes
  */
 void gf3d_model_draw_all_meshes(
     Model *model,
