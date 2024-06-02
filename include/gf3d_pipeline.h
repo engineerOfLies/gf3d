@@ -12,7 +12,7 @@ typedef struct
 {
     Uint8                   inuse;
     Uint32                  index;          //which index in the UBO are we
-    VkDescriptorSet        *descriptorSet;
+    VkDescriptorSet        *descriptorSet;  //pointer to the descriptorSet we will use for this draw call
     VkBuffer                vertexBuffer;
     Uint32                  vertexCount;
     VkBuffer                indexBuffer;
@@ -41,10 +41,14 @@ typedef struct
     Uint32                  descriptorPoolCount;
     Uint32                  descriptorSetCount;
     Uint32                  drawCallCount;          /**<how many drawCalls have been queued*/
-    PipelineDrawCall       *drawCallGFC_List;           /**<cached draw calls for this frame*/
+    PipelineDrawCall       *drawCallList;           /**<cached draw calls for this frame*/
+    Uint32                  drawCallListCount;      /**<how many drawCalls are available*/
+    
     char                   *uboData;                /**<pre-allocated cpu side UBO data*/
+    size_t                  uboBufferSize;          /**<how large the whole buffer is*/
     size_t                  uboDataSize;            /**<size of a single UBO for this pipeline*/
-    UniformBufferGFC_List  *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
+    UniformBufferList      *uboBigBuffer;           /**<for batched draws.  This is the memory for ALL draws one per frame*/
+    
     VkCommandBuffer         commandBuffer;          /**<for current command*/
     VkIndexType             indexType;              /**<size of the indices in the index buffer*/
 }Pipeline;

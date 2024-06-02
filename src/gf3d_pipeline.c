@@ -17,7 +17,7 @@ extern int __DEBUG;
 typedef struct
 {
     Uint32              maxPipelines;
-    Pipeline           *pipelineGFC_List;
+    Pipeline           *pipelineList;
     Uint32              chainLength;
 }PipelineManager;
 
@@ -37,8 +37,8 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
         slog("cannot initialize zero pipelines");
         return;
     }
-    gf3d_pipeline.pipelineGFC_List = (Pipeline *)gfc_allocate_array(sizeof(Pipeline),max_pipelines);
-    if (!gf3d_pipeline.pipelineGFC_List)
+    gf3d_pipeline.pipelineList = (Pipeline *)gfc_allocate_array(sizeof(Pipeline),max_pipelines);
+    if (!gf3d_pipeline.pipelineList)
     {
         slog("failed to allocate pipeline manager");
         return;
@@ -52,13 +52,13 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
 void gf3d_pipeline_close()
 {
     int i;
-    if (gf3d_pipeline.pipelineGFC_List != 0)
+    if (gf3d_pipeline.pipelineList != 0)
     {
         for (i = 0; i < gf3d_pipeline.maxPipelines; i++)
         {
-            gf3d_pipeline_free(&gf3d_pipeline.pipelineGFC_List[i]);
+            gf3d_pipeline_free(&gf3d_pipeline.pipelineList[i]);
         }
-        free(gf3d_pipeline.pipelineGFC_List);
+        free(gf3d_pipeline.pipelineList);
     }
     memset(&gf3d_pipeline,0,sizeof(PipelineManager));
     if (__DEBUG)slog("pipeline system closed");
@@ -139,8 +139,8 @@ void gf3d_pipeline_render_all_drawcalls(Pipeline *pipe)
     if (!pipe)return;
     for (i = 0; i < pipe->drawCallCount; i++)
     {
-        if (!pipe->drawCallGFC_List[i].inuse)continue;
-        gf3d_pipeline_render_drawcall(pipe,&pipe->drawCallGFC_List[i]);
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_render_drawcall(pipe,&pipe->drawCallList[i]);
     }
 }
 
@@ -150,8 +150,8 @@ void gf3d_pipeline_update_descriptor_sets(Pipeline *pipe)
     int i;
     for (i = 0;i < pipe->drawCallCount;i++)
     {
-        if (!pipe->drawCallGFC_List[i].inuse)continue;
-        gf3d_pipeline_update_descriptor_set(pipe, &pipe->drawCallGFC_List[i]);
+        if (!pipe->drawCallList[i].inuse)continue;
+        gf3d_pipeline_update_descriptor_set(pipe, &pipe->drawCallList[i]);
     }    
 }
 
@@ -161,18 +161,19 @@ PipelineDrawCall *gf3d_pipeline_draw_call_new(Pipeline *pipe)
     char *ptr;
     if (!pipe)return NULL;
     ptr = pipe->uboData;
-    for (i = 0;i < pipe->descriptorSetCount;i++)
+    if (pipe->drawCallCount >= pipe->drawCallListCount)
     {
-        if (pipe->drawCallGFC_List[i].inuse)continue;
-        pipe->drawCallGFC_List[i].inuse = 1;
-        ptr = ptr + (i * pipe->uboDataSize);
-        pipe->drawCallGFC_List[i].uboData = ptr;
-        pipe->drawCallCount++;
-        pipe->drawCallGFC_List[i].index = i;
-        return &pipe->drawCallGFC_List[i];
+        if (__DEBUG)slog("cannot queue up any more draw calls this frame");
+        return NULL;
     }
-    if (__DEBUG)slog("cannot queue up any more draw calls this frame");
-    return NULL;
+    i = pipe->drawCallCount;
+    pipe->drawCallList[i].inuse = 1;
+    //setup the data pointer to write to our cpu side ubo buffer
+    ptr = ptr + (i * pipe->uboDataSize);
+    pipe->drawCallList[i].uboData = ptr;
+    pipe->drawCallList[i].index = i;
+    pipe->drawCallCount++;
+    return &pipe->drawCallList[i];
 }
 
 void gf3d_pipeline_queue_render(
@@ -221,9 +222,9 @@ Pipeline *gf3d_pipeline_new()
     int i;
     for (i = 0; i < gf3d_pipeline.maxPipelines; i++)
     {
-        if (gf3d_pipeline.pipelineGFC_List[i].inUse)continue;
-        gf3d_pipeline.pipelineGFC_List[i].inUse = true;
-        return &gf3d_pipeline.pipelineGFC_List[i];
+        if (gf3d_pipeline.pipelineList[i].inUse)continue;
+        gf3d_pipeline.pipelineList[i].inUse = true;
+        return &gf3d_pipeline.pipelineList[i];
     }
     slog("no free pipelines");
     return NULL;
@@ -572,7 +573,12 @@ Pipeline *gf3d_pipeline_create_from_config(
         gf3d_pipeline_free(pipe);
         return NULL;
     }
-    pipe->drawCallGFC_List = gfc_allocate_array(sizeof(PipelineDrawCall),descriptorCount);
+    pipe->drawCallList = gfc_allocate_array(sizeof(PipelineDrawCall),descriptorCount);
+    if (pipe->drawCallList)
+    {
+        pipe->drawCallListCount = descriptorCount;
+    }
+    pipe->uboBufferSize = bufferSize * descriptorCount;
     pipe->uboData = gfc_allocate_array(bufferSize,descriptorCount);
     pipe->uboDataSize = bufferSize;
     pipe->uboBigBuffer = gf3d_uniform_buffer_list_new(device,bufferSize*descriptorCount,1,gf3d_swapchain_get_swap_image_count());
@@ -587,9 +593,9 @@ void gf3d_pipeline_free(Pipeline *pipe)
     int i;
     if (!pipe)return;
     if (!pipe->inUse)return;
-    if (pipe->drawCallGFC_List)
+    if (pipe->drawCallList)
     {
-        free(pipe->drawCallGFC_List);
+        free(pipe->drawCallList);
     }
     if (pipe->uboBigBuffer)
     {
@@ -722,8 +728,8 @@ void gf3d_pipeline_reset_all_pipes()
     Uint32 bufferFrame = gf3d_vgraphics_get_current_buffer_frame();
     for (i = 0; i < gf3d_pipeline.maxPipelines;i++)
     {
-        if (!gf3d_pipeline.pipelineGFC_List[i].inUse)continue;
-        gf3d_pipeline_reset_frame(&gf3d_pipeline.pipelineGFC_List[i],bufferFrame);
+        if (!gf3d_pipeline.pipelineList[i].inUse)continue;
+        gf3d_pipeline_reset_frame(&gf3d_pipeline.pipelineList[i],bufferFrame);
     }
 }
 
@@ -739,8 +745,8 @@ void gf3d_pipeline_reset_frame(Pipeline *pipe,Uint32 frame)
     
     pipe->commandBuffer = gf3d_command_rendering_begin(frame,pipe);
     pipe->drawCallCount = 0;
-    memset(pipe->drawCallGFC_List,0,sizeof(PipelineDrawCall)*pipe->descriptorSetCount);//clear this out
-    memset(pipe->uboData,0,pipe->uboDataSize*pipe->descriptorSetCount);
+    memset(pipe->drawCallList,0,sizeof(PipelineDrawCall)*pipe->drawCallListCount);//clear this out
+    memset(pipe->uboData,0,pipe->uboBufferSize);
 }
 
 void gf3d_pipeline_submit_commands(Pipeline *pipe)
@@ -754,15 +760,15 @@ void gf3d_pipeline_submit_all_pipe_commands()
     int i;
     for (i = 0; i < gf3d_pipeline.maxPipelines;i++)
     {
-        if (!gf3d_pipeline.pipelineGFC_List[i].inUse)continue;
+        if (!gf3d_pipeline.pipelineList[i].inUse)continue;
         //Update UBOS
-        gf3_pipeline_update_ubos(&gf3d_pipeline.pipelineGFC_List[i]);
+        gf3_pipeline_update_ubos(&gf3d_pipeline.pipelineList[i]);
         //Update Descriptor sets
-        gf3d_pipeline_update_descriptor_sets(&gf3d_pipeline.pipelineGFC_List[i]);
+        gf3d_pipeline_update_descriptor_sets(&gf3d_pipeline.pipelineList[i]);
         //Set commands
-        gf3d_pipeline_render_all_drawcalls(&gf3d_pipeline.pipelineGFC_List[i]);
+        gf3d_pipeline_render_all_drawcalls(&gf3d_pipeline.pipelineList[i]);
         //submit commands
-        gf3d_pipeline_submit_commands(&gf3d_pipeline.pipelineGFC_List[i]);
+        gf3d_pipeline_submit_commands(&gf3d_pipeline.pipelineList[i]);
     }
 }
 
