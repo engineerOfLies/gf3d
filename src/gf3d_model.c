@@ -561,6 +561,7 @@ void gf3d_model_draw_index(
     GFC_Vector4D modColor = {0};
     ModelUBO uboData = {0};
     Texture *texture;
+    GFC_List *list;
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
     mesh = gfc_list_get_nth(model->mesh_list,index);
@@ -600,6 +601,8 @@ void gf3d_model_draw_index(
     //queue up the translucent pass, we can't skip this one because there MIGHT be transparency in the skins
     uboData.flags.y = 1.0;//setup the pipeline to know
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
+    list = gfc_list_new();
+    gfc_list_delete(list);
 }
 
 void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
