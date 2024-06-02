@@ -9,7 +9,7 @@ struct MeshUBO
     mat4    model;
     mat4    view;
     mat4    proj;
-    vec4    color; 
+    vec4    color;             
     vec4    camera;            //needed for many light calculations
 };
 
@@ -52,7 +52,7 @@ layout(binding = 0) uniform UniformBufferObject
     ArmatureUBO     armature;
     MaterialUBO     material;   //this may become an array
     LightUBO        lights;
-    vec4            flags;      //.x is for bones
+    vec4            flags;      //.x is for bones .y is for opaque (0) or transparent (1) pass
 } ubo;
 
 layout(binding = 1) uniform sampler2D texSampler;
@@ -75,16 +75,26 @@ void main()
     vec3 normal = fragNormal;
     vec3 surfaceToCamera = normalize(ubo.mesh.camera.xyz - position);
     
-    surfaceColor.xyz *= ubo.mesh.color.xyz * ubo.material.diffuse.xyz;
-    surfaceColor.w *= ubo.mesh.color.w * ubo.material.transparency;
+    surfaceColor.xyz *= ubo.material.diffuse.xyz;
+    surfaceColor.w *= ubo.material.diffuse.w * ubo.material.transparency;
 
-    if (outColor.w < 0.999999)
+    if (surfaceColor.w < 0.999999)//this is translucent
     {
         //drop if solid pass
+        if (ubo.flags.y == 0.0)
+        {
+            discard;
+            return;
+        }
     }
-    else
+    else    //this is solid
     {
         //drop if translucent pass
+        if (ubo.flags.y != 0.0)
+        {
+            discard;
+            return;
+        }
     }
 
     if (ubo.lights.flags.x > 0)

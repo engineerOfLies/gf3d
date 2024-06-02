@@ -108,7 +108,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     //TODO: make these separate sub passes
     gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
-        "config/model_pipeline.cfg",
+        "config/model_alpha_pipeline.cfg",
         gf3d_vgraphics_get_view_extent(),
         mesh_max,
         gf3d_mesh_get_bind_description(),

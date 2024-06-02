@@ -8,8 +8,8 @@
 typedef struct
 {
     Uint8                   _inuse;                 /**<if this buffer is currently being used*/
-    VkBuffer                uniformBuffer;      /**<buffer handle passed to render calls*/
-    VkDeviceMemory          uniformBufferMemory;/**<buffer memory for updating the data*/
+    VkBuffer                uniformBuffer;          /**<buffer handle passed to render calls*/
+    VkDeviceMemory          uniformBufferMemory;    /**<buffer memory for updating the data*/
     size_t                  bufferSize;
 }UniformBuffer;
 
