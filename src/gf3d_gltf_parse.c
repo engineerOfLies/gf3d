@@ -335,7 +335,7 @@ Mesh *gf3d_gltf_parse_mesh(SJson *meshData,GLTF *gltf)
     }
     primitives = sj_object_get_value(meshData,"primitives");
     c = sj_array_get_count(primitives);
-    for (i =0; i < c; i++)
+    for (i = 0; i < c; i++)
     {
         primitiveData = sj_array_get_nth(primitives,i);
         if (!primitiveData)continue;
@@ -351,8 +351,9 @@ Mesh *gf3d_gltf_parse_mesh(SJson *meshData,GLTF *gltf)
             continue;
         }
         
+        primitive->objData = obj;
+        gf3d_mesh_create_vertex_buffer_from_vertices(primitive);
         
-        gf3d_mesh_create_vertex_buffer_from_vertices(primitive,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
         mesh->primitives = gfc_list_append(mesh->primitives,primitive);
         mesh->bounds.x = MIN(mesh->bounds.x,obj->bounds.x);
         mesh->bounds.y = MIN(mesh->bounds.y,obj->bounds.y);

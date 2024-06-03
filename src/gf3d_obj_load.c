@@ -311,4 +311,185 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
     }
 }
 
+ObjData *gf3d_obj_new()
+{
+    ObjData *out = NULL;
+    out = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
+    return out;
+}
+
+ObjData *gf3d_obj_duplicate(ObjData *in)
+{
+    ObjData *out = NULL;
+    out = gf3d_obj_new();
+    if (!out)
+    {
+        slog("failed to duplicate obj data");
+        return NULL;
+    }
+    
+    if ((in->vertices)&&(in->vertex_count))
+    {
+        out->vertices = gfc_allocate_array(sizeof(GFC_Vector3D),in->vertex_count);
+        if (out->vertices)
+        {
+            memcpy(out->vertices,in->vertices,sizeof(GFC_Vector3D)*in->vertex_count);
+            out->vertex_count = in->vertex_count;
+        }
+    }
+    if ((in->normals)&&(in->normal_count))
+    {
+        out->normals = gfc_allocate_array(sizeof(GFC_Vector3D),in->normal_count);
+        if (out->normals)
+        {
+            memcpy(out->normals,in->normals,sizeof(GFC_Vector3D)*in->normal_count);
+            out->normal_count = in->normal_count;
+        }
+    }
+    if ((in->texels)&&(in->texel_count))
+    {
+        out->texels = gfc_allocate_array(sizeof(GFC_Vector2D),in->texel_count);
+        if (out->texels)
+        {
+            memcpy(out->texels,in->texels,sizeof(GFC_Vector2D)*in->texel_count);
+            out->texel_count = in->texel_count;
+        }
+    }
+    if ((in->boneIndices)&&(in->bone_count))
+    {
+        out->boneIndices = gfc_allocate_array(sizeof(GFC_Vector4UI8),in->bone_count);
+        if (out->boneIndices)
+        {
+            memcpy(out->boneIndices,in->boneIndices,sizeof(GFC_Vector4UI8)*in->bone_count);
+            out->bone_count = in->bone_count;
+        }
+    }
+    if ((in->boneWeights)&&(in->weight_count))
+    {
+        out->boneWeights = gfc_allocate_array(sizeof(GFC_Vector4D),in->weight_count);
+        if (out->boneWeights)
+        {
+            memcpy(out->boneWeights,in->boneWeights,sizeof(GFC_Vector4D)*in->weight_count);
+            out->weight_count = in->weight_count;
+        }
+    }
+    if (in->face_count)
+    {
+        if (in->faceVerts)
+        {
+            out->faceVerts = gfc_allocate_array(sizeof(Face),in->face_count);
+            if (out->faceVerts)
+            {
+                memcpy(out->faceVerts,in->faceVerts,sizeof(Face)*in->face_count);
+            }
+        }
+        if (in->faceNormals)
+        {
+            out->faceNormals = gfc_allocate_array(sizeof(Face),in->face_count);
+            if (out->faceNormals)
+            {
+                memcpy(out->faceNormals,in->faceNormals,sizeof(Face)*in->face_count);
+            }
+        }
+        if (in->faceTexels)
+        {
+            out->faceTexels = gfc_allocate_array(sizeof(Face),in->face_count);
+            if (out->faceTexels)
+            {
+                memcpy(out->faceTexels,in->faceTexels,sizeof(Face)*in->face_count);
+            }
+        }
+        if (in->faceBones)
+        {
+            out->faceBones = gfc_allocate_array(sizeof(Face),in->face_count);
+            if (out->faceBones)
+            {
+                memcpy(out->faceBones,in->faceBones,sizeof(Face)*in->face_count);
+            }
+        }
+        if (in->faceWeights)
+        {
+            out->faceWeights = gfc_allocate_array(sizeof(Face),in->face_count);
+            if (out->faceWeights)
+            {
+                memcpy(out->faceWeights,in->faceWeights,sizeof(Face)*in->face_count);
+            }
+        }
+        if (in->outFace)
+        {
+            out->outFace = gfc_allocate_array(sizeof(Face),in->face_count);
+            if (out->outFace)
+            {
+                memcpy(out->outFace,in->outFace,sizeof(Face)*in->face_count);
+            }
+        }
+        out->face_count = in->face_count;
+    }
+    if ((in->faceVertices)&&(in->face_vert_count))
+    {
+        out->faceVertices = gfc_allocate_array(sizeof(Vertex),in->face_vert_count);
+        if (out->faceVertices)
+        {
+            memcpy(out->faceVertices,in->faceVertices,sizeof(Vertex)*in->face_vert_count);
+            out->face_vert_count = in->face_vert_count;
+        }
+    }
+    memcpy(&out->bounds,&in->bounds,sizeof(GFC_Box));
+    return out;
+}
+
+ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vector3D offsetB)
+{
+    int i;
+    ObjData *ObjNew;
+    if ((!ObjA)||(!ObjB))return NULL;
+    if ((!ObjA->faceVertices)||(!ObjB->faceVertices))
+    {
+        slog("must reorg for memory buffer before calling");
+        return NULL;
+    }
+    ObjNew = gf3d_obj_new();
+    if (!ObjNew)return NULL;
+    //allocate space for new verices
+    ObjNew->faceVertices = gfc_allocate_array(sizeof(Vertex),ObjA->face_vert_count + ObjB->face_vert_count);
+    if (!ObjNew->faceVertices)
+    {
+        gf3d_obj_free(ObjNew);
+        return NULL;
+    }
+    ObjNew->outFace = gfc_allocate_array(sizeof(Face),ObjA->face_count + ObjB->face_count);
+    if (!ObjNew->outFace)
+    {
+        gf3d_obj_free(ObjNew);
+        return NULL;
+    }
+    //copy the old data into the ObjNew
+    for (i = 0; i < ObjA->face_count;i++)
+    {
+        memcpy(&ObjNew->outFace[i],&ObjA->outFace[i],sizeof(Face));
+    }
+    for (i = 0; i < ObjB->face_count;i++)
+    {
+        memcpy(&ObjNew->outFace[i + ObjA->face_count],&ObjB->outFace[i],sizeof(Face));
+        //the face indices need to be updated as well;
+        ObjNew->outFace[i + ObjA->face_count].verts[0]+= ObjA->face_vert_count;
+        ObjNew->outFace[i + ObjA->face_count].verts[1]+= ObjA->face_vert_count;
+        ObjNew->outFace[i + ObjA->face_count].verts[2]+= ObjA->face_vert_count;
+    }
+    for (i = 0; i < ObjA->face_vert_count;i++)
+    {
+        memcpy(&ObjNew->faceVertices[i],&ObjA->faceVertices[i],sizeof(Vertex));
+        gfc_vector3d_add(ObjNew->faceVertices[i].vertex,ObjNew->faceVertices[i].vertex,offsetA);
+    }
+    for (i = 0; i < ObjB->face_vert_count;i++)
+    {
+        memcpy(&ObjNew->faceVertices[i + ObjA->face_vert_count],&ObjB->faceVertices[i],sizeof(Vertex));
+        gfc_vector3d_add(
+            ObjNew->faceVertices[i + ObjA->face_vert_count].vertex,
+            ObjNew->faceVertices[i + ObjA->face_vert_count].vertex,
+            offsetA);
+    }
+    return ObjNew;
+}
+
 /*eol@eof*/

@@ -124,6 +124,71 @@ Model * gf3d_model_new()
     return NULL;
 }
 
+Model *gf3d_model_copy(Model *in)
+{
+    int i,c;
+    Mesh *mesh;
+    Mesh *meshNew;
+    Model *out;
+    if (!in)return NULL;
+    out = gf3d_model_new();
+    if (!out)return NULL;
+
+    gfc_line_sprintf(out->filename,"%s.dup",in->filename);
+    
+    if (in->mesh_list)
+    {
+        out->mesh_list = gfc_list_new();
+        c = gfc_list_get_count(in->mesh_list);
+        for (i = 0; i < c; i++)
+        {
+            mesh = gfc_list_get_nth(in->mesh_list,i);
+            if (!mesh)continue;
+            meshNew = gf3d_mesh_copy(mesh);
+            if (!meshNew)continue;
+            gfc_list_append(out->mesh_list,meshNew);
+        }
+    }
+    out->mesh_as_frame = in->mesh_as_frame;
+    if (in->material)
+    {
+        out->material = in->material;       //if set, use this material when sending draw calls
+        out->material->_refCount++;
+    }
+    
+    if (in->texture)
+    {
+        out->texture = in->texture;       //if set, use this material when sending draw calls
+        out->texture->_refcount++;
+    }
+    if (in->normalMap)
+    {
+        out->normalMap = in->normalMap;       //if set, use this material when sending draw calls
+        out->normalMap->_refcount++;
+    }
+    if (in->armature)
+    {
+        out->armature = in->armature;       //if set, use this material when sending draw calls
+        out->armature->refCount++;
+    }
+    
+    memcpy(&out->bounds,&in->bounds,sizeof(GFC_Box));
+
+    if (in->armature)
+    {
+        out->armature = in->armature;       //if set, use this material when sending draw calls
+        out->armature->refCount++;
+    }
+
+    //TODO: revisit when I fix actions
+    //GFC_List           *action_list;    //list of animation actions
+
+    
+    
+    return out;
+}
+
+
 Model *gf3d_model_load(const char * filename)
 {    
     SJson *json,*config;
@@ -198,7 +263,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
                 modelFile = sj_get_string_value(item);
                 if (modelFile)
                 {
-                    mesh = gf3d_mesh_load(modelFile);
+                    mesh = gf3d_mesh_load_obj(modelFile);
                     if (mesh)
                     {
                         gfc_box_cpy(model->bounds,mesh->bounds);
@@ -216,7 +281,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
                 gf3d_model_free(model);
                 return NULL;                
             }
-            mesh = gf3d_mesh_load(modelFile);
+            mesh = gf3d_mesh_load_obj(modelFile);
             if (!mesh)
             {
                 slog("failed to parse mesh data from obj file");
@@ -313,7 +378,7 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
     
     gfc_line_cpy(model->filename,modelFile);
 
-    mesh = gf3d_mesh_load(modelFile);
+    mesh = gf3d_mesh_load_obj(modelFile);
     if (!mesh)
     {
         gf3d_model_free(model);

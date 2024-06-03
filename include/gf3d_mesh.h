@@ -13,6 +13,9 @@
 #include "gf3d_pipeline.h"
 
 
+//forward declaration:
+typedef struct ObjData_S ObjData;
+
 //absolute basics of the mesh information sent to the graphics card
 typedef struct
 {
@@ -46,15 +49,16 @@ typedef struct
     Uint32          faceCount;
     VkBuffer        faceBuffer;
     VkDeviceMemory  faceBufferMemory;
+    ObjData        *objData;
 }MeshPrimitive;
 
 typedef struct
 {
     GFC_TextLine        filename;
-    Uint32          _refCount;
-    Uint8           _inuse;
+    Uint32              _refCount;
+    Uint8               _inuse;
     GFC_List           *primitives;
-    GFC_Box             bounds;    
+    GFC_Box             bounds;
 }Mesh;
 
 /**
@@ -64,7 +68,6 @@ typedef struct
  */
 void gf3d_mesh_init(Uint32 mesh_max);
 
-
 /**
  * @brief get a new empty model
  * @return NULL on error, or an empty model
@@ -72,12 +75,29 @@ void gf3d_mesh_init(Uint32 mesh_max);
 Mesh *gf3d_mesh_new();
 
 /**
- * @brief load mesh data from the filename.
+ * @brief load mesh data from an obj filename.
  * @note: currently only supporting obj files
+ * @note this free's the intermediate data loaded from the obj file, no longer needed for most applications
  * @param filename the name of the file to load
  * @return NULL on error or Mesh data
  */
-Mesh *gf3d_mesh_load(const char *filename);
+Mesh *gf3d_mesh_load_obj(const char *filename);
+
+/**
+ * @brief make an exact, but separate copy of the input mesh
+ * @param in the mesh to duplicate
+ * @return NULL on error, or a copy of in
+ */
+Mesh *gf3d_mesh_copy(Mesh *in);
+
+/**
+ * @brief append the primitive mesh data of B to the primitive mesh data of A.
+ * @note: this merges them at the vertex and face buffer level, making the primitives of A inclusive of the meshes from B.
+ * @note: this only applies for the N primitives, which is the smaller of the two lists
+ * @param meshA the mesh to gain geometry
+ * @param meshB the mesh to provide new geometry, this is unmodified after the process
+ */
+void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB);
 
 /**
  * @brief get the scaling factor necessary to make the mesh fit within the bounds
@@ -153,13 +173,10 @@ void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkDescriptorSet * descri
 
 /**
  * @brief create a mesh's internal buffers based on vertices
- * @param mesh the mesh handle to populate
- * @param vertices an array of vertices to make the mesh with
- * @param vcount how many vertices are in the array
- * @param faces an array of faces to make the mesh with
- * @param fcount how many faces are in the array
+ * @param primitive the mesh primitive to populate
+ * @note the primitive must have the objData set and it must have be organizes in buffer order
  */
-void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh,Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount);
+void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *primitive);
 
 /**
  * @brief get the pipeline that is used to render basic 3d meshes

@@ -117,6 +117,13 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile);
 Model * gf3d_model_load_from_config(SJson *json,const char *filename);
 
 /**
+ * @brief make a separate copy of the input model
+ * @param in the model to copy
+ * @return NULL on error or a new copy of the input model
+ */
+Model *gf3d_model_copy(Model *in);
+
+/**
  * @brief queue up a model for rendering
  * @param model the model to render
  * @param modelMat the model matrix (MVP)

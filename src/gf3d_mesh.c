@@ -31,9 +31,38 @@ typedef struct
 
 static MeshSystem gf3d_mesh = {0};
 
+/**
+ * @brief close the whole mesh subsystem, called atexit
+ */
 void gf3d_mesh_close();
+
+/**
+ * @brief delete a mesh and all its data
+ */
 void gf3d_mesh_delete(Mesh *mesh);
+
+/**
+ * @brief search for a mesh by its filename, returning it
+ * @param filename the search criteria
+ * @return NULL if not found, or a pointer to it
+ */
 Mesh *gf3d_mesh_get_by_filename(const char *filename);
+
+/**
+ * @brief make a copy of the input primitive
+ */
+MeshPrimitive *gf3d_mesh_primitive_copy(MeshPrimitive *in);
+
+/**
+ * @brief delete the vulkan buffers for the primitive
+ */
+void gf3d_mesh_primitive_delete_buffers(MeshPrimitive *primitive);
+
+/**
+ * @brief delete the whole primitive, obj data, buffers and the primitive itself
+ * @param primitive the primitive to delete
+ */
+void gf3d_mesh_primitive_free(MeshPrimitive *primitive);
 
 void gf3d_mesh_init(Uint32 mesh_max)
 {
@@ -207,6 +236,32 @@ VkVertexInputBindingDescription * gf3d_mesh_get_bind_description()
     return &gf3d_mesh.bindingDescription;
 }
 
+Mesh *gf3d_mesh_copy(Mesh *in)
+{
+    Mesh *out;
+    int i,c;
+    MeshPrimitive *primitive;
+    MeshPrimitive *primitiveNew;
+    out = gf3d_mesh_new();
+    if (!out)return NULL;
+    gfc_line_sprintf(out->filename,"%s.dup",in->filename);
+    memcpy(&out->bounds,&in->bounds,sizeof(GFC_Box));
+    if (in->primitives)
+    {
+        out->primitives = gfc_list_new();
+        c = gfc_list_get_count(in->primitives);
+        for (i = 0; i < c;i++)
+        {
+            primitive = gfc_list_get_nth(in->primitives,i);
+            if (!primitive)continue;
+            primitiveNew = gf3d_mesh_primitive_copy(primitive);
+            if (!primitiveNew)continue;
+            gfc_list_append(out->primitives,primitiveNew);
+        }
+    }
+    return out;
+}
+
 Mesh *gf3d_mesh_new()
 {
     int i;
@@ -275,6 +330,31 @@ void gf3d_mesh_close()
     if (__DEBUG)slog("mesh system closed");
 }
 
+void gf3d_mesh_primitive_delete_buffers(MeshPrimitive *primitive)
+{
+    if (!primitive)return;
+    if (primitive->faceBuffer != VK_NULL_HANDLE)
+    {
+        vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), primitive->faceBuffer, NULL);
+        primitive->faceBuffer = VK_NULL_HANDLE;
+    }
+    if (primitive->faceBufferMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), primitive->faceBufferMemory, NULL);
+        primitive->faceBufferMemory = VK_NULL_HANDLE;
+    }
+    if (primitive->vertexBuffer != VK_NULL_HANDLE)
+    {
+        vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), primitive->vertexBuffer, NULL);
+        primitive->vertexBuffer = VK_NULL_HANDLE;
+    }
+    if (primitive->vertexBufferMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), primitive->vertexBufferMemory, NULL);
+        primitive->vertexBufferMemory = VK_NULL_HANDLE;
+    }
+}
+
 void gf3d_mesh_delete(Mesh *mesh)
 {
     int i,c;
@@ -285,23 +365,7 @@ void gf3d_mesh_delete(Mesh *mesh)
     {
         primitive = gfc_list_get_nth(mesh->primitives,i);
         if (!primitive)continue;
-        if (primitive->faceBuffer != VK_NULL_HANDLE)
-        {
-            vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), primitive->faceBuffer, NULL);
-        }
-        if (primitive->faceBufferMemory != VK_NULL_HANDLE)
-        {
-            vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), primitive->faceBufferMemory, NULL);
-        }
-        if (primitive->vertexBuffer != VK_NULL_HANDLE)
-        {
-            vkDestroyBuffer(gf3d_vgraphics_get_default_logical_device(), primitive->vertexBuffer, NULL);
-        }
-        if (primitive->vertexBufferMemory != VK_NULL_HANDLE)
-        {
-            vkFreeMemory(gf3d_vgraphics_get_default_logical_device(), primitive->vertexBufferMemory, NULL);
-        }
-        free(primitive);
+        gf3d_mesh_primitive_free(primitive);
     }
     gfc_list_delete(mesh->primitives);
     memset(mesh,0,sizeof(Mesh));
@@ -425,10 +489,14 @@ void gf3d_mesh_setup_face_buffers(MeshPrimitive *mesh,Face *faces,Uint32 fcount)
     vkFreeMemory(device, stagingBufferMemory, NULL);
 }
 
-void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh,Vertex *vertices,Uint32 vcount,Face *faces,Uint32 fcount)
+void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh)
 {
     void *data = NULL;
     VkDevice device = gf3d_vgraphics_get_default_logical_device();
+    Vertex *vertices;
+    Uint32 vcount;
+    Face *faces;
+    Uint32 fcount;
     size_t bufferSize;    
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -438,7 +506,11 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh,Vertex *ve
         slog("no mesh primitive provided");
         return;
     }
-
+    
+    vertices = mesh->objData->faceVertices;
+    vcount = mesh->objData->face_vert_count;
+    faces = mesh->objData->outFace;
+    fcount = mesh->objData->face_count;
     bufferSize = sizeof(Vertex) * vcount;
     
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
@@ -469,7 +541,70 @@ GFC_Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,GFC_Vector3D size)
     return outScale;
 }
 
-Mesh *gf3d_mesh_load(const char *filename)
+Uint8 gf3d_mesh_primitive_append(MeshPrimitive * primitiveA,MeshPrimitive * primitiveB, GFC_Vector3D offsetB)
+{
+    ObjData *objNew;
+    if ((!primitiveA)||(!primitiveB))return 0;//fail
+    if ((!primitiveA->objData)||(!primitiveB->objData))return 0;
+    objNew = gf3d_obj_merge(primitiveA->objData,gfc_vector3d(0,0,0),primitiveB->objData,offsetB);
+    if (!objNew)return 0;
+    gf3d_mesh_primitive_delete_buffers(primitiveA);
+    gf3d_obj_free(primitiveA->objData);
+    primitiveA->objData = objNew;
+    gf3d_mesh_create_vertex_buffer_from_vertices(primitiveA);
+    return 1;
+}
+
+void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB)
+{
+    int i,c;
+    MeshPrimitive * primitiveA;
+    MeshPrimitive * primitiveB;
+    if ((!meshA)||(!meshB))return;
+    c = MIN(gfc_list_get_count(meshA->primitives),gfc_list_get_count(meshB->primitives));
+    for (i = 0; i < c;i++)
+    {
+        primitiveA = gfc_list_get_nth(meshA->primitives,i);
+        primitiveB = gfc_list_get_nth(meshB->primitives,i);
+        if ((!primitiveA)||(!primitiveB))continue;
+        gf3d_mesh_primitive_append(primitiveA,primitiveB, offsetB);
+    }
+}
+
+MeshPrimitive *gf3d_mesh_primitive_new()
+{
+    MeshPrimitive *out = NULL;
+    out = gfc_allocate_array(sizeof(MeshPrimitive),1);
+    //defaults
+    return out;
+}
+
+void gf3d_mesh_primitive_free(MeshPrimitive *primitive)
+{
+    if (!primitive)return;
+    gf3d_mesh_primitive_delete_buffers(primitive);
+    if (primitive->objData)gf3d_obj_free(primitive->objData);
+    free(primitive);
+}
+
+MeshPrimitive *gf3d_mesh_primitive_copy(MeshPrimitive *in)
+{
+    MeshPrimitive *out = NULL;
+    if (!in)return NULL;
+    out = gf3d_mesh_primitive_new();
+    if (!out)return NULL;
+    out->objData = gf3d_obj_duplicate(in->objData);
+    if (!out->objData)
+    {
+        gf3d_mesh_primitive_free(out);
+        return NULL;
+    }
+    //lets not copy the vulkan buffers, lets just make new
+    gf3d_mesh_create_vertex_buffer_from_vertices(out);
+    return out;
+}
+
+Mesh *gf3d_mesh_load_obj(const char *filename)
 {
     Mesh *mesh;
     MeshPrimitive *primitive;
@@ -491,11 +626,12 @@ Mesh *gf3d_mesh_load(const char *filename)
         return NULL;
     }
     
-    primitive = gfc_allocate_array(sizeof(MeshPrimitive),1);
-    gf3d_mesh_create_vertex_buffer_from_vertices(primitive,obj->faceVertices,obj->face_vert_count,obj->outFace,obj->face_count);
-    mesh->primitives = gfc_list_append(mesh->primitives,primitive);
+    primitive = gf3d_mesh_primitive_new();
+    primitive->objData = obj;
+    gf3d_mesh_create_vertex_buffer_from_vertices(primitive);
+
+    gfc_list_append(mesh->primitives,primitive);
     memcpy(&mesh->bounds,&obj->bounds,sizeof(GFC_Box));
-    gf3d_obj_free(obj);
     gfc_line_cpy(mesh->filename,filename);
     
     return mesh;
