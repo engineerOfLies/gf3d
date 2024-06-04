@@ -162,6 +162,27 @@ void gf3d_camera_roll(float magnitude)
     gf3d_camera.rotation.y -= magnitude;
 }
 
+GFC_Vector3D gf3d_camera_get_direction()
+{
+    GFC_Vector3D forward = {0};
+    gf3d_camera_get_view_vectors(&forward, NULL, NULL);
+    return forward;
+}
+
+GFC_Vector3D gf3d_camera_get_right()
+{
+    GFC_Vector3D right = {0};
+    gf3d_camera_get_view_vectors(NULL,&right, NULL);
+    return right;
+}
+
+GFC_Vector3D gf3d_camera_get_up()
+{
+    GFC_Vector3D up = {0};
+    gf3d_camera_get_view_vectors(NULL, NULL,&up);
+    return up;
+}
+
 
 void gf3d_camera_fly_forward(float magnitude)
 {
@@ -187,9 +208,30 @@ void gf3d_camera_fly_up(float magnitude)
     gf3d_camera_move(up);
 }
 
+void gf3d_camera_calc_view_vectors()
+{
+    gf3d_camera.forward = gfc_vector3d(0,-1,0);
+    gf3d_camera.right   = gfc_vector3d(1,0,0);
+    gf3d_camera.up      = gfc_vector3d(0,0,-1);
+    //first rotate by roll
+    gfc_vector3d_rotate_about_y(&gf3d_camera.right, -gf3d_camera.rotation.y);
+    gfc_vector3d_rotate_about_y(&gf3d_camera.up, -gf3d_camera.rotation.y);
+    //then rotate by pitch
+    gfc_vector3d_rotate_about_x(&gf3d_camera.forward, gf3d_camera.rotation.x);
+    gfc_vector3d_rotate_about_x(&gf3d_camera.right, gf3d_camera.rotation.x);
+    gfc_vector3d_rotate_about_x(&gf3d_camera.up, gf3d_camera.rotation.x);
+    //then by yaw
+    gfc_vector3d_rotate_about_z(&gf3d_camera.forward, -gf3d_camera.rotation.z);
+    gfc_vector3d_rotate_about_z(&gf3d_camera.right, -gf3d_camera.rotation.z);
+    gfc_vector3d_rotate_about_z(&gf3d_camera.up, -gf3d_camera.rotation.z);
+}
+
 void gf3d_camera_get_view_vectors(GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up)
 {
-    gfc_vector3d_angle_vectors(gf3d_camera_get_angles(), forward, right, up);
+    gf3d_camera_calc_view_vectors();
+    if (forward)*forward = gf3d_camera.forward;
+    if (right)*right = gf3d_camera.right;
+    if (up)*up = gf3d_camera.up;
 }
 
 GFC_Vector3D gf3d_camera_get_angles()

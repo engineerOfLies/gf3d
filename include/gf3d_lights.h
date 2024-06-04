@@ -149,6 +149,11 @@ LightUBO gf3d_light_basic_ambient_ubo();
 LightUBO gf3d_light_get_global_lights_ubo();
 
 /**
+ * @brief zero out a lightUBO for re-use
+ */
+void gf3d_list_reset_ubo(LightUBO *lights);
+
+/**
  * @brief draw a light to show where it is and where it is pointing
  * @note this is mostly for debugging purposes
  * @param light the light to draw

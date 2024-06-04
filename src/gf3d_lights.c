@@ -103,6 +103,12 @@ void gf3d_light_add_light_to_ubo(LightUBO *ubo,GF3D_Light *light)
     ubo->flags.x++;
 }
 
+void gf3d_list_reset_ubo(LightUBO *lights)
+{
+    if (!lights)return;
+    memset(lights,0,sizeof(LightUBO));
+}
+
 LightUBO gf3d_light_get_global_lights_ubo()
 {
     LightUBO ubo = {0};

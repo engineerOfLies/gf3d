@@ -16,6 +16,9 @@ typedef struct
     int             freeLook;           //if true, the amount gf3d_camera_controls_update will check user input for movement
     Uint8           cameraTargetLock;   //if true, the gf3d_camera_controls_update keeps the camera pointed towards the target
     GFC_Vector3D    lookTargetPosition; //the generic camera target to look at
+    GFC_Vector3D    forward;            //unit vector pointing in the forward direction relative to the camera
+    GFC_Vector3D    right;              //unit vector pointing in the right direction relative to the camera
+    GFC_Vector3D    up;                 //unit vector pointing in the up direction relative to the camera
 }Camera;
 
 /**
@@ -173,6 +176,24 @@ void gf3d_camera_roll(float magnitude);
  * @return the camera position.
  */
 GFC_Vector3D gf3d_camera_get_position();
+
+/**
+ * @brief get the direction the camera is looking in
+ * @return a zero vector on error, or the unit vector looking forward
+ */
+GFC_Vector3D gf3d_camera_get_direction();
+
+/**
+ * @brief get the direction right to what the camera is looking in
+ * @return a zero vector on error, or the unit vector looking forward
+ */
+GFC_Vector3D gf3d_camera_get_right();
+
+/**
+ * @brief get the direction up from wht the camera is looking in
+ * @return a zero vector on error, or the unit vector looking forward
+ */
+GFC_Vector3D gf3d_camera_get_up();
 
 
 /**
