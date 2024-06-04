@@ -569,7 +569,7 @@ void gf2d_window_make_focus_list(Window *win)
     {
         if (element->canHasFocus)
         {
-            win->focus_elements = gfc_list_append(win->focus_elements,element);
+            gfc_list_append(win->focus_elements,element);
         }
         element = gf2d_window_get_next_element(win,element);
     }
@@ -705,7 +705,7 @@ Window *gf2d_window_new()
         if (!window_manager.window_list[i]._inuse)
         {
            window_manager.window_list[i]._inuse = 1;
-           window_manager.window_deque = gfc_list_append(window_manager.window_deque,&window_manager.window_list[i]);
+           gfc_list_append(window_manager.window_deque,&window_manager.window_list[i]);
            window_manager.window_list[i].elements = gfc_list_new();
            window_manager.window_list[i].focus_elements = gfc_list_new();
            return &window_manager.window_list[i];
@@ -730,7 +730,7 @@ void gf2d_window_add_element(Window *win,Element *e)
 {
     if (!win)return;
     if (!e)return;
-    win->elements = gfc_list_append(win->elements,e);
+    gfc_list_append(win->elements,e);
 }
 
 void gf2d_windows_draw_all()
@@ -964,13 +964,13 @@ Element *gf2d_window_get_element_by_name(Window *win,const char *name)
 void gf2d_window_bring_to_front(Window *win)
 {
     gfc_list_delete_data(window_manager.window_deque,win);
-    window_manager.window_deque = gfc_list_append(window_manager.window_deque,win);
+    gfc_list_append(window_manager.window_deque,win);
 }
 
 void gf2d_window_send_to_back(Window *win)
 {
     gfc_list_delete_data(window_manager.window_deque,win);
-    window_manager.window_deque = gfc_list_prepend(window_manager.window_deque,win);
+    gfc_list_prepend(window_manager.window_deque,win);
 }
 
 Element *gf2d_window_get_element_by_id(Window *win,int id)

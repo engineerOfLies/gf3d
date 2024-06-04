@@ -82,7 +82,7 @@ void gf2d_draw_image_new(
     image->shape = shape;
     image->filled = filled;
     image->last_used = SDL_GetTicks();
-    draw_manager.draw_images = gfc_list_append(draw_manager.draw_images,image);
+    gfc_list_append(draw_manager.draw_images,image);
 }
 
 DrawImage *gf2d_draw_image_get(
@@ -571,7 +571,7 @@ GFC_List *gf2d_draw_get_bezier_points(GFC_Vector2D p0, GFC_Vector2D p1, GFC_Vect
         point = gfc_allocate_array(sizeof(GFC_Vector2D),1);
         if (!point)continue;
         gfc_vector2d_copy((*point),dp);
-        points = gfc_list_append(points,point);
+        gfc_list_append(points,point);
     }
     return points;
 }
@@ -845,7 +845,7 @@ GFC_List *gf2d_draw_get_bezier4_points(
         point = gfc_allocate_array(sizeof(GFC_Vector2D),1);
         if (!point)continue;
         gfc_vector2d_copy((*point),dp);
-        points = gfc_list_append(points,point);
+        gfc_list_append(points,point);
     }
     return points;
         */return NULL;

@@ -20,7 +20,7 @@ SpaceBucket *gf2d_space_bucket_new()
     bucket = gfc_allocate_array(sizeof(SpaceBucket),1);
     if (!bucket)return NULL;
     bucket->dynamicBodies = gfc_list_new();
-    bucket->staticGFC_Shapes = gfc_list_new();
+    bucket->staticShapes = gfc_list_new();
     return bucket;
 }
 
@@ -28,7 +28,7 @@ void gf2d_space_bucket_free(SpaceBucket *bucket)
 {
     if (!bucket)return;
     // bucket don't own any of their data.  So just free the list
-    gfc_list_delete(bucket->staticGFC_Shapes);
+    gfc_list_delete(bucket->staticShapes);
     gfc_list_delete(bucket->dynamicBodies);
     free(bucket);
 }
@@ -40,9 +40,9 @@ void gf2d_space_free(Space *space)
     if (!space)return;
     
     //static shapes ARE owned by the space, so are deleted when the space goes away
-    gfc_list_foreach(space->staticGFC_Shapes,free);
-    gfc_list_foreach(space->dynamicBodyGFC_List,(gfc_work_func*)gf2d_dynamic_body_free);
-    gfc_list_delete(space->staticGFC_Shapes);
+    gfc_list_foreach(space->staticShapes,free);
+    gfc_list_foreach(space->dynamicBodyList,(gfc_work_func*)gf2d_dynamic_body_free);
+    gfc_list_delete(space->staticShapes);
     gf2d_space_bucket_free(space->voidBucket);
     c = gfc_list_get_count(space->buckets);
     for (i = 0; i < c; i++)
@@ -66,7 +66,7 @@ void gf2d_space_buckets_clear(Space *space)
         bucket = gfc_list_get_nth(space->buckets,i);
         if (!bucket)continue;
         gfc_list_clear(bucket->dynamicBodies);
-        gfc_list_clear(bucket->staticGFC_Shapes);
+        gfc_list_clear(bucket->staticShapes);
     }
 }
 
@@ -177,11 +177,11 @@ void gf2d_space_bucket_add_dynamic_body(SpaceBucket *bucket,DynamicBody *db)
         slog("static shape already in the bucket");
         return;
     }
-    bucket->dynamicBodies = gfc_list_append(bucket->dynamicBodies,db);
-    index = gfc_list_get_item_index(db->bucketGFC_List,bucket);
+    gfc_list_append(bucket->dynamicBodies,db);
+    index = gfc_list_get_item_index(db->bucketList,bucket);
     if (index == -1)//not already in the bucket
     {
-        db->bucketGFC_List = gfc_list_append(db->bucketGFC_List,bucket);
+        gfc_list_append(db->bucketList,bucket);
     }
 }
 
@@ -189,27 +189,27 @@ void gf2d_space_bucket_add_shape(SpaceBucket *bucket, GFC_Shape *shape)
 {
     int index;
     if ((!bucket)||(!shape))return;
-    index = gfc_list_get_item_index(bucket->staticGFC_Shapes,shape);
+    index = gfc_list_get_item_index(bucket->staticShapes,shape);
     if (index != -1)
     {
 //        slog("static shape already in the bucket");
 //        gfc_shape_slog(*shape);
         return;
     }
-    bucket->staticGFC_Shapes = gfc_list_append(bucket->staticGFC_Shapes,shape);
+    gfc_list_append(bucket->staticShapes,shape);
 }
 
 void gf2d_space_bucket_index_remove_shape(SpaceBucket *bucket, GFC_Shape *shape)
 {
     int index;
     if ((!bucket)||(!shape))return;
-    index = gfc_list_get_item_index(bucket->staticGFC_Shapes,shape);
+    index = gfc_list_get_item_index(bucket->staticShapes,shape);
     if (index != -1)
     {
         //already here
         return;
     }
-    gfc_list_delete_data(bucket->staticGFC_Shapes,shape);
+    gfc_list_delete_data(bucket->staticShapes,shape);
 }
 
 void gf2d_space_buckets_remove_shape(Space *space,GFC_Shape *shape)
@@ -232,49 +232,49 @@ void gf2d_space_buckets_remove_shape(Space *space,GFC_Shape *shape)
     }
 }
 
-GFC_List *gf2d_space_static_shape_check(Space *space, GFC_Shape shape, GFC_List *collisionGFC_List)
+GFC_List *gf2d_space_static_shape_check(Space *space, GFC_Shape shape, GFC_List *collisionList)
 {
     int i,c;
     Collision *collision;
     SpaceBucket *bucket;
-    GFC_Shape *staticGFC_Shape;
+    GFC_Shape *staticShape;
     if (!space)return NULL;
-    if (!collisionGFC_List)
+    if (!collisionList)
     {
-        collisionGFC_List = gfc_list_new();
+        collisionList = gfc_list_new();
     }
     if (space->usesBuckets)
     {
         bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(shape),NULL);
         while(bucket != NULL)
         {
-            c = gfc_list_get_count(bucket->staticGFC_Shapes);
+            c = gfc_list_get_count(bucket->staticShapes);
             for (i = 0; i < c;i++)
             {
-                staticGFC_Shape = (GFC_Shape*)gfc_list_get_nth(bucket->staticGFC_Shapes,i);
-                if (!staticGFC_Shape)continue;
+                staticShape = (GFC_Shape*)gfc_list_get_nth(bucket->staticShapes,i);
+                if (!staticShape)continue;
                 // check for layer compatibility
-                collision = gf2d_collision_space_static_shape_clip(shape, *staticGFC_Shape);
+                collision = gf2d_collision_space_static_shape_clip(shape, *staticShape);
                 if (collision == NULL)continue;
-                collisionGFC_List = gfc_list_append(collisionGFC_List,(void*)collision);
+                gfc_list_append(collisionList,(void*)collision);
             }
             bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(shape),bucket);
         }
     }
     else
     {
-        c = gfc_list_get_count(space->staticGFC_Shapes);
+        c = gfc_list_get_count(space->staticShapes);
         for (i = 0; i < c;i++)
         {
-            staticGFC_Shape = (GFC_Shape*)gfc_list_get_nth(space->staticGFC_Shapes,i);
-            if (!staticGFC_Shape)continue;
+            staticShape = (GFC_Shape*)gfc_list_get_nth(space->staticShapes,i);
+            if (!staticShape)continue;
             // check for layer compatibility
-            collision = gf2d_collision_space_static_shape_clip(shape, *staticGFC_Shape);
+            collision = gf2d_collision_space_static_shape_clip(shape, *staticShape);
             if (collision == NULL)continue;
-            collisionGFC_List = gfc_list_append(collisionGFC_List,(void*)collision);
+            gfc_list_append(collisionList,(void*)collision);
         }
     }
-    return collisionGFC_List;
+    return collisionList;
 }
 
 void gf2d_space_buckets_add_shape(Space *space,GFC_Shape *shape)
@@ -369,7 +369,7 @@ Space *gf2d_space_new_full(
             if (!bucket)continue;
             bucket->coordinate.x = i % (int)space->bucketCount.x;
             bucket->coordinate.y = i / (int)space->bucketCount.x;
-            space->buckets = gfc_list_append(space->buckets,bucket);
+            gfc_list_append(space->buckets,bucket);
         }
     }
     return space;
@@ -385,8 +385,8 @@ Space *gf2d_space_new()
         return NULL;
     }
     memset(space,0,sizeof(Space));
-    space->dynamicBodyGFC_List = gfc_list_new();
-    space->staticGFC_Shapes = gfc_list_new();
+    space->dynamicBodyList = gfc_list_new();
+    space->staticShapes = gfc_list_new();
     return space;
 }
 
@@ -405,7 +405,7 @@ void gf2d_space_add_static_shape(Space *space,GFC_Shape shape)
         return;
     }
     memcpy(newGFC_Shape,&shape,sizeof(GFC_Shape));
-    space->staticGFC_Shapes = gfc_list_append(space->staticGFC_Shapes,(void *)newGFC_Shape);
+    gfc_list_append(space->staticShapes,(void *)newGFC_Shape);
     if (space->usesBuckets)gf2d_space_buckets_add_shape(space,newGFC_Shape);
 }
 
@@ -423,12 +423,12 @@ void gf2d_space_remove_body(Space *space,Body *body)
         slog("no body provided");
         return;
     }
-    if (space->dynamicBodyGFC_List)
+    if (space->dynamicBodyList)
     {
-        count = gfc_list_get_count(space->dynamicBodyGFC_List);
+        count = gfc_list_get_count(space->dynamicBodyList);
         for (i = 0; i < count;i++)
         {
-            db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+            db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
             if (!db)continue;
             if (db->body != body)continue;
             if (space->usesBuckets)
@@ -436,7 +436,7 @@ void gf2d_space_remove_body(Space *space,Body *body)
                 gf2d_space_remove_body_from_buckets(space, db);
             }
             gf2d_dynamic_body_free(db);
-            gfc_list_delete_nth(space->dynamicBodyGFC_List,i);
+            gfc_list_delete_nth(space->dynamicBodyList,i);
             break;
         }
     }
@@ -447,28 +447,28 @@ void gf2d_space_remove_body_from_buckets(Space *space, DynamicBody *db)
     int i,c;
     SpaceBucket *bucket;
     if ((!space)||(!db))return;
-    c = gfc_list_get_count(db->bucketGFC_List);
+    c = gfc_list_get_count(db->bucketList);
     for (i =0;i < c; i++)
     {
-        bucket = gfc_list_get_nth(db->bucketGFC_List,i);
+        bucket = gfc_list_get_nth(db->bucketList,i);
         if (!bucket)continue;
         gfc_list_delete_data(bucket->dynamicBodies,db);
     }
-    gfc_list_clear(db->bucketGFC_List);
+    gfc_list_clear(db->bucketList);
 }
 
 void gf2d_space_add_body_to_buckets(Space *space,DynamicBody *db)
 {
-    GFC_Shape bodyGFC_Shape;
+    GFC_Shape bodyShape;
     SpaceBucket *bucket;
     if ((!space)||(!db)||(!db->body)||(!db->body->shape))return;
-    bodyGFC_Shape = gf2d_dynamic_body_to_shape(db);
-    bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyGFC_Shape),NULL);
+    bodyShape = gf2d_dynamic_body_to_shape(db);
+    bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyShape),NULL);
     while(bucket != NULL)
     {
         //for each clipping bucket
         gf2d_space_bucket_add_dynamic_body(bucket,db);
-        bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyGFC_Shape),bucket);
+        bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyShape),bucket);
     }
 }
 
@@ -489,7 +489,7 @@ void gf2d_space_add_body(Space *space,Body *body)
     if (!db)return;
     db->body = body;
     db->id = space->idpool++;
-    space->dynamicBodyGFC_List = gfc_list_append(space->dynamicBodyGFC_List,(void *)db);
+    gfc_list_append(space->dynamicBodyList,(void *)db);
     if (space->usesBuckets)gf2d_space_add_body_to_buckets(space,db);
 }
 
@@ -498,10 +498,10 @@ void gf2d_bucket_draw(Space *space,SpaceBucket *bucket, GFC_Vector2D offset)
     DynamicBody *db = NULL;
     int i,count;
     if ((!space)||(!bucket))return;
-    count = gfc_list_get_count(bucket->staticGFC_Shapes);
+    count = gfc_list_get_count(bucket->staticShapes);
     for (i = 0; i < count;i++)
     {
-        gf2d_draw_shape(*(GFC_Shape *)gfc_list_get_nth(bucket->staticGFC_Shapes,i),gfc_color8(0,255,0,255),offset);
+        gf2d_draw_shape(*(GFC_Shape *)gfc_list_get_nth(bucket->staticShapes,i),gfc_color8(0,255,0,255),offset);
     }
     gf2d_draw_shape(
         gfc_shape_rect(
@@ -535,7 +535,7 @@ void gf2d_space_draw(Space *space,GFC_Vector2D offset)
     r = space->bounds;
     gfc_vector2d_add(r,r,offset);    
     gf2d_draw_rect(r,gfc_color8(255,0,0,255));
-    count = gfc_list_get_count(space->dynamicBodyGFC_List);
+    count = gfc_list_get_count(space->dynamicBodyList);
     if (space->usesBuckets)
     {
         count = gfc_list_get_count(space->buckets);
@@ -550,14 +550,14 @@ void gf2d_space_draw(Space *space,GFC_Vector2D offset)
     {
         for (i = 0; i < count;i++)
         {
-            db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+            db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
             if (!db)continue;
             gf2d_body_draw(db->body,offset);
         }
-        count = gfc_list_get_count(space->staticGFC_Shapes);
+        count = gfc_list_get_count(space->staticShapes);
         for (i = 0; i < count;i++)
         {
-            gf2d_draw_shape(*(GFC_Shape *)gfc_list_get_nth(space->staticGFC_Shapes,i),gfc_color8(0,255,0,255),offset);
+            gf2d_draw_shape(*(GFC_Shape *)gfc_list_get_nth(space->staticShapes,i),gfc_color8(0,255,0,255),offset);
         }
     }
 }
@@ -565,62 +565,62 @@ void gf2d_space_dynamic_bodies_world_clip(Space *space,DynamicBody *db, float t)
 {
     int i,c;
     GFC_Shape *shape;
-    GFC_Shape bodyGFC_Shape;
+    GFC_Shape bodyShape;
     SpaceBucket *bucket = NULL;
     Collision *collision;
     if ((!space)||(!db)||(!db->body))return;
     if (!db->body->worldclip)return;
     if (space->usesBuckets)
     {
-        bodyGFC_Shape = gf2d_dynamic_body_to_shape(db);
-        bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyGFC_Shape),NULL);
+        bodyShape = gf2d_dynamic_body_to_shape(db);
+        bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyShape),NULL);
         while(bucket != NULL)
         {
-            c = gfc_list_get_count(bucket->staticGFC_Shapes);
+            c = gfc_list_get_count(bucket->staticShapes);
             for (i = 0; i < c;i++)
             {
-                shape = (GFC_Shape*)gfc_list_get_nth(bucket->staticGFC_Shapes,i);
+                shape = (GFC_Shape*)gfc_list_get_nth(bucket->staticShapes,i);
                 if (!shape)continue;
                 // check for layer compatibility
                 collision = gf2d_dynamic_body_shape_collision_check(db,*shape,t);
                 if (collision == NULL)continue;
-                db->collisionGFC_List = gfc_list_append(db->collisionGFC_List,(void*)collision);
+                gfc_list_append(db->collisionList,(void*)collision);
             }
-            bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyGFC_Shape),bucket);
+            bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyShape),bucket);
         }
     }
     else
     {
-        c = gfc_list_get_count(space->staticGFC_Shapes);
+        c = gfc_list_get_count(space->staticShapes);
         for (i = 0; i < c;i++)
         {
-            shape = (GFC_Shape*)gfc_list_get_nth(space->staticGFC_Shapes,i);
+            shape = (GFC_Shape*)gfc_list_get_nth(space->staticShapes,i);
             if (!shape)continue;
             // check for layer compatibility
             collision = gf2d_dynamic_body_shape_collision_check(db,*shape,t);
             if (collision == NULL)continue;
-            db->collisionGFC_List = gfc_list_append(db->collisionGFC_List,(void*)collision);
+            gfc_list_append(db->collisionList,(void*)collision);
         }
     }
     //check if the dynamic body is leaving the level bounds
     collision = gf2d_dynamic_body_bounds_collision_check(db,space->bounds,t);
     if (collision != NULL)
     {
-        db->collisionGFC_List = gfc_list_append(db->collisionGFC_List,(void*)collision);
+        gfc_list_append(db->collisionList,(void*)collision);
     }
 }
 
 void gf2d_space_dynamic_bodies_body_step(Space *space,DynamicBody *db,float t)
 {
-    GFC_Shape bodyGFC_Shape;
+    GFC_Shape bodyShape;
     DynamicBody *other;
     SpaceBucket *bucket;
     Collision *collision;
     int i,c;
     if (space->usesBuckets)
     {
-        bodyGFC_Shape = gf2d_dynamic_body_to_shape(db);
-        bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyGFC_Shape),NULL);
+        bodyShape = gf2d_dynamic_body_to_shape(db);
+        bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyShape),NULL);
         while(bucket != NULL)
         {
             c = gfc_list_get_count(bucket->dynamicBodies);
@@ -632,23 +632,23 @@ void gf2d_space_dynamic_bodies_body_step(Space *space,DynamicBody *db,float t)
                 // check for layer compatibility
                 collision = gf2d_dynamic_body_collision_check(db,other,t);
                 if (collision == NULL)continue;
-                db->collisionGFC_List = gfc_list_append(db->collisionGFC_List,(void*)collision);
+                gfc_list_append(db->collisionList,(void*)collision);
             }
-            bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyGFC_Shape),bucket);
+            bucket = gf2d_space_bucket_foreach_clipped(space,gfc_shape_get_bounds(bodyShape),bucket);
         }
     }
     else
     {
-        c = gfc_list_get_count(space->dynamicBodyGFC_List);
+        c = gfc_list_get_count(space->dynamicBodyList);
         for (i = 0; i < c;i++)
         {
-            other = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+            other = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
             if (!other)continue;
             if (other == db)continue;   // skip checking outself
             // check for layer compatibility
             collision = gf2d_dynamic_body_collision_check(db,other,t);
             if (collision == NULL)continue;
-            db->collisionGFC_List = gfc_list_append(db->collisionGFC_List,(void*)collision);
+            gfc_list_append(db->collisionList,(void*)collision);
         }
     }
 }
@@ -677,12 +677,12 @@ void gf2d_space_dynamic_bodies_step(Space *space,DynamicBody *db, float t)
         gf2d_dynamic_body_resolve_overlap(db,space->slop);
         if (db->body->elasticity > 0)
         {
-            count = gfc_list_get_count(db->collisionGFC_List);
+            count = gfc_list_get_count(db->collisionList);
             gfc_vector2d_clear(total);
             normalCount = 0;
             for (i = 0; i < count; i++)
             {
-                collision = (Collision*)gfc_list_get_nth(db->collisionGFC_List,i);
+                collision = (Collision*)gfc_list_get_nth(db->collisionList,i);
                 if (!collision)continue;
                 gfc_vector2d_add(db->position,db->position,collision->normal);
                 reflected = gf2d_dynamic_body_bounce(db,collision->normal);
@@ -706,10 +706,10 @@ void gf2d_space_buckets_update_dynamic_bodies(Space *space)
 {
     DynamicBody *db;
     int i,c;
-    c = gfc_list_get_count(space->dynamicBodyGFC_List);
+    c = gfc_list_get_count(space->dynamicBodyList);
     for (i = 0; i < c;i++)
     {
-        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
         if (!db)continue;
         //if ((db->position.x == db->body->position.x)&&(db->position.y == db->body->position.y))continue;
         //skip anything that hasn't moved
@@ -727,11 +727,11 @@ void gf2d_space_step(Space *space,float t)
     {
         gf2d_space_buckets_update_dynamic_bodies(space);
     }
-    count = gfc_list_get_count(space->dynamicBodyGFC_List);
+    count = gfc_list_get_count(space->dynamicBodyList);
     
     for (i = 0; i < count;i++)
     {
-        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
         if (!db)continue;
         gf2d_space_dynamic_bodies_step(space,db, t);
     }
@@ -741,10 +741,10 @@ void gf2d_space_reset_bodies(Space *space)
 {
     int i,count;
     if (!space)return;
-    count = gfc_list_get_count(space->dynamicBodyGFC_List);
+    count = gfc_list_get_count(space->dynamicBodyList);
     for (i = 0; i < count;i++)
     {
-        gf2d_dynamic_body_reset((DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i),space->timeStep);
+        gf2d_dynamic_body_reset((DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i),space->timeStep);
     }
 }
 
@@ -753,10 +753,10 @@ void gf2d_space_update_bodies(Space *space,float loops)
     DynamicBody *db = NULL;
     int i,count;
     if (!space)return;
-    count = gfc_list_get_count(space->dynamicBodyGFC_List);
+    count = gfc_list_get_count(space->dynamicBodyList);
     for (i = 0; i < count;i++)
     {
-        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
         if (!db)continue;
         gf2d_dynamic_body_update(db,loops);
     }
@@ -790,13 +790,13 @@ Uint8 gf2d_space_resolve_overlap(Space *space)
     if (!space)return 1;
     gf2d_space_reset_bodies(space);
     // for each dynamic body, get list of staic shapes that are clipped
-    count = gfc_list_get_count(space->dynamicBodyGFC_List);
+    count = gfc_list_get_count(space->dynamicBodyList);
     for (i = 0; i < count;i++)
     {
-        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyGFC_List,i);
+        db = (DynamicBody*)gfc_list_get_nth(space->dynamicBodyList,i);
         if (!db)continue;
         gf2d_space_dynamic_bodies_world_clip(space,db, 0);
-        if (gfc_list_get_count(db->collisionGFC_List))
+        if (gfc_list_get_count(db->collisionList))
         {
             gf2d_dynamic_body_resolve_overlap(db,space->slop);
         }

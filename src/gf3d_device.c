@@ -175,7 +175,7 @@ int gf3d_devices_enumerate()
     {
         device = gf3d_device_get_info(gf3d_device_manager.devices[i]);
         if (!device)continue;
-        gf3d_device_manager.device_list = gfc_list_append(gf3d_device_manager.device_list,device);
+        gfc_list_append(gf3d_device_manager.device_list,device);
     }
     
     return 1;

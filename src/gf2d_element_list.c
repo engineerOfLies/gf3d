@@ -366,7 +366,7 @@ void gf2d_element_list_add_item(Element *e,Element *item)
     item->parent = e;
     if (item->bounds.w == 1)item->bounds.w = list->itemSize.x;
     if (item->bounds.h == 1)item->bounds.h = list->itemSize.y;
-    list->list = gfc_list_append(list->list,(void*)item);
+    gfc_list_append(list->list,(void*)item);
 }
 
 Element *gf2d_element_list_get_item_by_id(Element *e,int id)

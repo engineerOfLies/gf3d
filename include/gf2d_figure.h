@@ -20,37 +20,37 @@ typedef struct
     GFC_TextLine    actorname;      /**<name of the bone this is associated with*/
     GFC_TextLine    action;         /**<name of the action to use*/
     GFC_Vector2D    offset;         /**<position offset from the bone root*/
-    float       rotation;       /**<rotation offset from the bone*/
+    float           rotation;       /**<rotation offset from the bone*/
     GFC_Vector2D    scale;          /**<scale*/
-    Bone       *bone;           /**<link to the bone*/
+    Bone           *bone;           /**<link to the bone*/
 }FigureLink;
 
 typedef struct
 {
-    int         _inuse;       /**<set if the actor is in use*/
+    int             _inuse;       /**<set if the actor is in use*/
     GFC_TextLine    filename;     /**<the filename*/
     GFC_TextLine    name;         /**<figure name*/
-    Armature2D *armature;     /**<which armature is used for this figure*/
+    Armature2D     *armature;     /**<which armature is used for this figure*/
     GFC_List       *links;        /**<list of FigureLinks to draw this with*/
 }Figure;
 
 // below are for keeping track of individual instanes of figures
 typedef struct
 {
-    Actor      *actor;          /**<loaded actor file for drawing*/
-    Action     *action;         /**<configured action*/
-    float       frame;          /**<animation frame*/
-    FigureLink *link;           /**<pointer to the link*/
+    Actor          *actor;          /**<loaded actor file for drawing*/
+    GFC_Action     *action;         /**<configured action*/
+    float           frame;          /**<animation frame*/
+    FigureLink     *link;           /**<pointer to the link*/
 }FigureLinkInstance;
 
 typedef struct
 {
     Uint8    _inuse;
-    Figure  *figure;
-    GFC_List    *instances;
-    Action  *action;
-    float    frame;
-    Uint32   nextFrame;
+    Figure     *figure;
+    GFC_List   *instances;
+    GFC_Action *action;
+    float       frame;
+    Uint32      nextFrame;
 }FigureInstance;
 
 /**
@@ -92,7 +92,7 @@ void gf2d_figure_free(Figure *figure);
  * @param float (optional) if provided, the frame will be set to the start of the action
  * @return the new action
  */
-Action *gf2d_figure_set_action(Figure *figure, const char *name,float *frame);
+GFC_Action *gf2d_figure_get_action(Figure *figure, const char *name,float *frame);
 
 /**
  * @brief get the action from the figure by its index
@@ -100,7 +100,7 @@ Action *gf2d_figure_set_action(Figure *figure, const char *name,float *frame);
  * @param index the index of the action to get
  * @return NULL on bad index or no actions or no figure
  */
-Action *gf2d_figure_get_action_by_index(Figure *figure,Uint32 index);
+GFC_Action *gf2d_figure_get_action_by_index(Figure *figure,Uint32 index);
 
 /**
  * @brief free a figure link and clean up its data

@@ -4,6 +4,7 @@
 #include "gfc_types.h"
 #include "gfc_text.h"
 #include "gfc_list.h"
+#include "gfc_actions.h"
 #include "gfc_vector.h"
 
 #include "gf2d_sprite.h"
@@ -36,10 +37,10 @@ typedef struct
 {
     GFC_TextLine    filepath;       /**<the file that this has been loaded from / to*/
     GFC_TextLine    name;           /**<printing name*/
-    Uint32      refCount;       /**<resurce management*/
+    Uint32          refCount;       /**<resurce management*/
     GFC_List       *bones;          /**<list of Bones in the base armature*/
     GFC_List       *poses;          /**<list of poses for the armature*/
-    GFC_List       *actions;        /**<action list for managing animation of poses*/
+    GFC_ActionList *actions;        /**<action list for managing animation of poses*/
 }Armature2D;
 
 /**
@@ -130,13 +131,13 @@ void gf2d_armature_draw_sprite_to_named_bone_pose(
 void gf2d_armature_free(Armature2D *armature);
 
 /**
- * @brief set the action for an armature by name
+ * @brief get the action for an armature by name
  * @param armature the armature to set an action with
  * @param name the name of the action to search for
  * @param frame (optional output) set the starting frame for the named action if found
  * @return NULL on not found or error, the action information otherwise
  */
-Action *gf2d_armature_set_action(Armature2D *armature, const char *name,float *frame);
+GFC_Action *gf2d_armature_get_action(Armature2D *armature, const char *name,float *frame);
 
 /**
  * @brief get the action from the action list by index
@@ -144,7 +145,7 @@ Action *gf2d_armature_set_action(Armature2D *armature, const char *name,float *f
  * @param index the index of the action to get
  * @return NULL on not found, or the action in question
  */
-Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index);
+GFC_Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index);
 
 
 /**

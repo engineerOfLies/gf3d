@@ -7,6 +7,7 @@
 #include "gfc_list.h"
 #include "gfc_text.h"
 #include "gfc_matrix.h"
+#include "gfc_actions.h"
 
 #include "gf3d_gltf_parse.h"
 
@@ -71,7 +72,7 @@ typedef struct
     Uint32          bindCount;      /**<how many bones in the inverseBindGFC_Matrix*/
     GFC_Matrix4    *inverseBindMatrices;    /**<to make the math math*/
     GFC_List       *bones;          /**<list of Bones in the base armature*/
-    GFC_List       *actions;        /**<action list for managing animation of poses*/
+    GFC_ActionList *actions;        /**<action list for managing animation of poses*/
     GFC_List       *poses;          /**<list of Pose3Ds.*/
     Uint32          maxFrames;      /**<how many poses we store*/
     float           maxTimestamp;   /**<timestamp of the last from (starting from 0.0)*/

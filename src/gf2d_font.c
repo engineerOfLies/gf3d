@@ -75,7 +75,7 @@ void gf2d_font_image_new(
     image->color = color;
     image->font = font;
     image->last_used = SDL_GetTicks();
-    font_manager.font_images = gfc_list_append(font_manager.font_images,image);
+    gfc_list_append(font_manager.font_images,image);
 }
 
 FontImage *gf2d_font_image_get(

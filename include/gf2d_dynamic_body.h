@@ -6,16 +6,16 @@
 
 typedef struct
 {
-    Uint32      id;
-    Body       *body;
+    Uint32          id;
+    Body           *body;
     GFC_Shape       shape;          /**<shape with offset from the body*/
-    Uint8       blocked;        /**<true once this body has been blocked and no longer moves*/
+    Uint8           blocked;        /**<true once this body has been blocked and no longer moves*/
     GFC_Vector2D    position;       /**<temp position during update*/
     GFC_Vector2D    oldPosition;    /**<previous position during update*/
     GFC_Vector2D    velocity;       /**<scaled velocity based on space step*/
-    double      speed;          /**<scalar speed of velocity of the body*/
-    GFC_List       *collisionGFC_List;  /**<list of collisions accrued during space update*/
-    GFC_List       *bucketGFC_List;     /**<list of space buckets we sit in*/
+    double          speed;          /**<scalar speed of velocity of the body*/
+    GFC_List       *collisionList;  /**<list of collisions accrued during space update*/
+    GFC_List       *bucketList;     /**<list of space buckets we sit in*/
 }DynamicBody;
 
 DynamicBody *gf2d_dynamic_body_new();

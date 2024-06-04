@@ -64,6 +64,11 @@ void gf3d_mesh_primitive_delete_buffers(MeshPrimitive *primitive);
  */
 void gf3d_mesh_primitive_free(MeshPrimitive *primitive);
 
+/**
+ * @brief move the primitive
+ */
+void gf3d_mesh_primitive_move(MeshPrimitive *in,GFC_Vector3D offset);
+
 void gf3d_mesh_init(Uint32 mesh_max)
 {
     Uint32 count = 0;
@@ -260,6 +265,20 @@ Mesh *gf3d_mesh_copy(Mesh *in)
         }
     }
     return out;
+}
+
+void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset)
+{
+    int i,c;
+    MeshPrimitive *primitive;
+    if (!in)return;
+    c = gfc_list_get_count(in->primitives);
+    for (i = 0; i < c;i++)
+    {
+        primitive = gfc_list_get_nth(in->primitives,i);
+        if (!primitive)continue;
+        gf3d_mesh_primitive_move(primitive,offset);
+    }
 }
 
 Mesh *gf3d_mesh_new()
@@ -513,6 +532,22 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh)
     fcount = mesh->objData->face_count;
     bufferSize = sizeof(Vertex) * vcount;
     
+//     if (bufferSize == 0)
+//     {
+//         slog("buffer size is zero, cannot make buffers");
+//         return;
+//     }
+//     if (fcount == 0)
+//     {
+//         slog("face count is zero, cannot make buffers");
+//         return;
+//     }
+//     if (vcount == 0)
+//     {
+//         slog("vertex count is zero, cannot make buffers");
+//         return;
+//     }
+    
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
@@ -604,6 +639,15 @@ MeshPrimitive *gf3d_mesh_primitive_copy(MeshPrimitive *in)
     return out;
 }
 
+void gf3d_mesh_primitive_move(MeshPrimitive *in,GFC_Vector3D offset)
+{
+    if (!in)return;
+    if (!in->objData)return;
+    gf3d_obj_move(in->objData,offset);
+    gf3d_mesh_primitive_delete_buffers(in);
+    gf3d_mesh_create_vertex_buffer_from_vertices(in);
+}
+
 Mesh *gf3d_mesh_load_obj(const char *filename)
 {
     Mesh *mesh;
@@ -625,14 +669,14 @@ Mesh *gf3d_mesh_load_obj(const char *filename)
     {
         return NULL;
     }
+    gfc_line_cpy(mesh->filename,filename);
     
     primitive = gf3d_mesh_primitive_new();
     primitive->objData = obj;
     gf3d_mesh_create_vertex_buffer_from_vertices(primitive);
 
     gfc_list_append(mesh->primitives,primitive);
-    memcpy(&mesh->bounds,&obj->bounds,sizeof(GFC_Box));
-    gfc_line_cpy(mesh->filename,filename);
+    memcpy(&mesh->bounds,&obj->bounds,sizeof(GFC_Box));//TODO: this isn't right
     
     return mesh;
 }

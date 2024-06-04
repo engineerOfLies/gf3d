@@ -53,7 +53,7 @@ GFC_List * gf2d_element_actor_update(Element *element,GFC_Vector2D offset)
     if (!element)return NULL;
     actor = (ActorElement*)element->data;
     if (!actor)return NULL;
-    gf2d_action_next_frame(actor->action,&actor->frame);
+    gfc_action_next_frame(actor->action,&actor->frame);
     return NULL;
 }
 
@@ -99,7 +99,7 @@ ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *act
         ae->actor = gf2d_actor_load(actorFile);
         if ((action) && (strlen(action) > 0))
         {
-            ae->action = gf2d_actor_set_action(ae->actor, action ,&ae->frame);
+            ae->action = gf2d_actor_get_action(ae->actor, action ,&ae->frame);
         }
     }
     else if (image != NULL)
@@ -175,7 +175,7 @@ void gf2d_element_actor_set_action(Element *e, const char *action)
     if (e->type != ET_Actor)return;
     ae = (ActorElement *)e->data;
     if (!ae->actor)return;
-    ae->action = gf2d_actor_set_action(ae->actor, action,&ae->frame);
+    ae->action = gf2d_actor_get_action(ae->actor, action,&ae->frame);
 }
 
 

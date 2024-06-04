@@ -208,7 +208,7 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
     SJson *attributes,*accessor;
 
     if ((!gltf)||(!primitive))return NULL;
-    obj = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
+    obj = gf3d_obj_new();
     if (!obj)return NULL;
     
     attributes = sj_object_get_value(primitive,"attributes");
@@ -344,7 +344,7 @@ Mesh *gf3d_gltf_parse_mesh(SJson *meshData,GLTF *gltf)
         {
             continue;
         }
-        primitive = gfc_allocate_array(sizeof(MeshPrimitive),1);
+        primitive = gf3d_mesh_primitive_new();
         if (!primitive)
         {
             gf3d_obj_free(obj);
@@ -354,7 +354,7 @@ Mesh *gf3d_gltf_parse_mesh(SJson *meshData,GLTF *gltf)
         primitive->objData = obj;
         gf3d_mesh_create_vertex_buffer_from_vertices(primitive);
         
-        mesh->primitives = gfc_list_append(mesh->primitives,primitive);
+        gfc_list_append(mesh->primitives,primitive);
         mesh->bounds.x = MIN(mesh->bounds.x,obj->bounds.x);
         mesh->bounds.y = MIN(mesh->bounds.y,obj->bounds.y);
         mesh->bounds.z = MIN(mesh->bounds.z,obj->bounds.z);
@@ -362,8 +362,6 @@ Mesh *gf3d_gltf_parse_mesh(SJson *meshData,GLTF *gltf)
         mesh->bounds.w = MAX(mesh->bounds.w,obj->bounds.w);
         mesh->bounds.h = MAX(mesh->bounds.h,obj->bounds.h);
         mesh->bounds.d = MAX(mesh->bounds.d,obj->bounds.d);
-
-        gf3d_obj_free(obj);
     }
     return mesh;
 }
@@ -404,7 +402,7 @@ Model *gf3d_gltf_parse_model(const char *filename)
             gfc_line_cpy(mesh->filename,filename);
             gfc_box_cpy(model->bounds,mesh->bounds);
         }
-        model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+        gfc_list_append(model->mesh_list,mesh);
     }
     gfc_line_cpy(model->filename,filename);
     gf3d_gltf_free(gltf);

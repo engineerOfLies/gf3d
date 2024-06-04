@@ -31,6 +31,12 @@ struct ObjData_S
 };
 
 /**
+ * @brief allocate a blank obj
+ * @return NULL on memory error or a zero initialized obj
+ */
+ObjData *gf3d_obj_new();
+
+/**
  * @brief parse an OBJ file into ObjData;
  * @param filename the name of the file to parse
  * @return NULL on error or ObjData otherwise.  Note: this must be freed with gf3d_obj_free
@@ -43,6 +49,13 @@ ObjData *gf3d_obj_load_from_file(const char *filename);
  * @return NULL on error or a duplicate copy of in
  */
 ObjData *gf3d_obj_duplicate(ObjData *in);
+
+/**
+ * @brief update the vertex positions of all faceVerticies of an obj
+ * @param obj the obj to modify
+ * @param offset how much to move the faceVertices
+ */
+void gf3d_obj_move(ObjData *obj,GFC_Vector3D offset);
 
 /**
  * @brief re-organize the vertices into faceVertices for use with the rendering pipeline

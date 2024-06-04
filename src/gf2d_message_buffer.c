@@ -164,7 +164,7 @@ void message_new(const char *newMessage)
     gfc_color_copy(message->color,data->defaultGFC_Color);
     message->ttl = data->ttl;
     gfc_line_cpy(message->text,newMessage);
-    data->messages = gfc_list_append(data->messages,message);
+    gfc_list_append(data->messages,message);
 }
 
 void message_printf(const char *newMessage,...)

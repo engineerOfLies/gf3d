@@ -8,6 +8,17 @@
 
 static Camera gf3d_camera = {0};
 
+void gf3d_camera_set_move_step(float step)
+{
+    gf3d_camera.moveStep = step;
+}
+
+void gf3d_camera_set_rotate_step(float step)
+{
+    gf3d_camera.rotateStep = step;
+}
+
+
 void gf3d_camera_get_view_mat4(GFC_Matrix4 *view)
 {
     if (!view)return;
@@ -239,7 +250,7 @@ Bool gf3d_camera_free_look_enabled()
 
 void gf3d_camera_controls_update()
 {
-    float moveSpeed = 0.1;
+    float moveSpeed = gf3d_camera.moveStep;
     GFC_Vector3D position,rotation;
     const Uint8 * keys;
     
@@ -276,10 +287,10 @@ void gf3d_camera_controls_update()
         if (keys[SDL_SCANCODE_SPACE])gf3d_camera_move_up(moveSpeed);
         if (keys[SDL_SCANCODE_Z])gf3d_camera_move_up(-moveSpeed);
         
-        if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-0.01);
-        if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(0.01);
-        if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-0.01);
-        if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(0.01);
+        if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-gf3d_camera.rotateStep);
+        if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(gf3d_camera.rotateStep);
+        if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-gf3d_camera.rotateStep);
+        if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(gf3d_camera.rotateStep);
         
         return;
     }

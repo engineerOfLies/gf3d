@@ -86,13 +86,13 @@ Figure *gf2d_figure_new()
     return NULL;
 }
 
-Action *gf2d_figure_set_action(Figure *figure, const char *name,float *frame)
+GFC_Action *gf2d_figure_get_action(Figure *figure, const char *name,float *frame)
 {
     if ((!figure)||(!figure->armature))return NULL;
-    return gf2d_armature_set_action(figure->armature, name,frame);
+    return gf2d_armature_get_action(figure->armature, name,frame);
 }
 
-Action *gf2d_figure_get_action_by_index(Figure *figure,Uint32 index)
+GFC_Action *gf2d_figure_get_action_by_index(Figure *figure,Uint32 index)
 {
     if ((!figure)||(!figure->armature))return NULL;
     return gf2d_armature_get_action_by_index(figure->armature,index);
@@ -235,7 +235,7 @@ Figure *gf2d_figure_from_json(SJson *load,const char *filename)
     {
         link = sj_array_get_nth(array,i);
         if (!link)continue;
-        figure->links = gfc_list_append(figure->links,gf2d_figure_link_from_json(link));
+        gfc_list_append(figure->links,gf2d_figure_link_from_json(link));
     }
     gf2d_figure_link_armature(figure,NULL);
     return figure;
@@ -429,7 +429,7 @@ void gf2d_figure_link_instance_update_link(FigureLinkInstance *linkInstance)
     linkInstance->actor = gf2d_actor_load(linkInstance->link->actorname);
     if (linkInstance->actor)
     {
-        linkInstance->action = gf2d_actor_set_action(linkInstance->actor, linkInstance->link->action,&linkInstance->frame);
+        linkInstance->action = gf2d_actor_get_action(linkInstance->actor, linkInstance->link->action,&linkInstance->frame);
     }
 }
 
@@ -449,7 +449,7 @@ FigureLinkInstance *gf2d_figure_link_instance_new(FigureLink *link)
     linkInstance->actor = gf2d_actor_load(link->actorname);
     if (linkInstance->actor)
     {
-        linkInstance->action = gf2d_actor_set_action(linkInstance->actor, link->action,&linkInstance->frame);
+        linkInstance->action = gf2d_actor_get_action(linkInstance->actor, link->action,&linkInstance->frame);
     }
     linkInstance->link = link;
     return linkInstance;
@@ -463,7 +463,7 @@ void gf2d_figure_instance_add_link(FigureInstance *instance, FigureLink *link)
     {
         instance->instances = gfc_list_new();
     }
-    instance->instances = gfc_list_append(instance->instances,gf2d_figure_link_instance_new(link));
+    gfc_list_append(instance->instances,gf2d_figure_link_instance_new(link));
 }
 
 void gf2d_figure_instance_new(FigureInstance *instance)
@@ -532,7 +532,7 @@ void gf2d_figure_instance_link_change_actor(FigureInstance *instance,const char 
     if (!actor)return;// our work here is done
     link->actor = gf2d_actor_load(actor);
     if (!link->actor)return;
-    link->action = gf2d_actor_set_action(link->actor, action,&link->frame);
+    link->action = gf2d_actor_get_action(link->actor, action,&link->frame);
 }
 
 FigureLinkInstance *gf2d_figure_instance_get_link(FigureInstance *instance, const char *name)

@@ -91,6 +91,19 @@ Mesh *gf3d_mesh_load_obj(const char *filename);
 Mesh *gf3d_mesh_copy(Mesh *in);
 
 /**
+ * @brief move all of the vertices of the mesh by offset at the buffer level
+ * @param in the mesh to move
+ * @param offset how much to move it
+ */
+void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset);
+
+/**
+ * @brief allocate a zero initialized mesh primitive
+ * @return NULL on error or the primitive
+ */
+MeshPrimitive *gf3d_mesh_primitive_new();
+
+/**
  * @brief append the primitive mesh data of B to the primitive mesh data of A.
  * @note: this merges them at the vertex and face buffer level, making the primitives of A inclusive of the meshes from B.
  * @note: this only applies for the N primitives, which is the smaller of the two lists

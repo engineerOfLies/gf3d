@@ -5,15 +5,17 @@
 
 typedef struct
 {
-    GFC_Matrix4         cameraMat;      //final matrix to become the view matrix
-    GFC_Matrix4         cameraMatInv;   //final matrix to become the inverse view matrix
-    GFC_Vector3D        scale;          //for building camera matrix
-    GFC_Vector3D        position;       //for building camera matrix
-    GFC_Vector3D        rotation;       //pitch, roll, yaw for building camera matrix
-    int                 autoPan;
-    int                 freeLook;
-    Uint8               cameraTargetLock;
-    GFC_Vector3D        lookTargetPosition;
+    GFC_Matrix4     cameraMat;          //final matrix to become the view matrix
+    GFC_Matrix4     cameraMatInv;       //final matrix to become the inverse view matrix
+    GFC_Vector3D    scale;              //for building camera matrix
+    GFC_Vector3D    position;           //for building camera matrix
+    GFC_Vector3D    rotation;           //pitch, roll, yaw for building camera matrix
+    float           moveStep;           //when using gf3d_camera_controls_update, this is how much the camera will move per frame
+    float           rotateStep;         //when using gf3d_camera_controls_update, this is how much the camera will move per frame
+    int             autoPan;            //if true, the amount gf3d_camera_controls_update will pan the camera around
+    int             freeLook;           //if true, the amount gf3d_camera_controls_update will check user input for movement
+    Uint8           cameraTargetLock;   //if true, the gf3d_camera_controls_update keeps the camera pointed towards the target
+    GFC_Vector3D    lookTargetPosition; //the generic camera target to look at
 }Camera;
 
 /**
@@ -39,6 +41,18 @@ void gf3d_camera_set_view_mat4(GFC_Matrix4 *view);
  * @param position [optional] if provided this will move the camera here first
  */
 void gf3d_camera_look_at(GFC_Vector3D target,const GFC_Vector3D *position);
+
+/**
+ * @brief set the movement step for camera movement with gf3d_camera_controls_update
+ * @param step how much to move per update
+ */
+void gf3d_camera_set_move_step(float step);
+
+/**
+ * @brief set the rotation step for camera movement with gf3d_camera_controls_update
+ * @param step how much to move per update
+ */
+void gf3d_camera_set_rotate_step(float step);
 
 /**
  * @brief move the camera "FORWARD" relative to the view angles of the camera

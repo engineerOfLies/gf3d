@@ -114,11 +114,11 @@ Window *window_yes_no(char *text, void(*onYes)(void *),void(*onNo)(void *),void 
     callbacks = gfc_list_new();
     if (onYes)
     {
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onYes,data));
+        gfc_list_append(callbacks,gfc_callback_new(onYes,data));
     }
     if (onNo)
     {
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onNo,data));
+        gfc_list_append(callbacks,gfc_callback_new(onNo,data));
     }
     win->data = callbacks;
     return win;
@@ -212,7 +212,7 @@ Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData)
     if (onOK)
     {
         callbacks = gfc_list_new();
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onOK,okData));
+        gfc_list_append(callbacks,gfc_callback_new(onOK,okData));
         win->data = callbacks;
     }
     return win;
@@ -235,7 +235,7 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
     if (onOK)
     {
         callbacks = gfc_list_new();
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onOK,okData));
+        gfc_list_append(callbacks,gfc_callback_new(onOK,okData));
         win->data = callbacks;
     }
     return win;
@@ -260,11 +260,11 @@ Window *window_text_entry(char *question, char *defaultText,void *callbackData, 
     callbacks = gfc_list_new();
     if (onOk)
     {
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onOk,callbackData));
+        gfc_list_append(callbacks,gfc_callback_new(onOk,callbackData));
     }
     if (onCancel)
     {
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onCancel,callbackData));
+        gfc_list_append(callbacks,gfc_callback_new(onCancel,callbackData));
     }
     win->data = callbacks;
     return win;
@@ -289,11 +289,11 @@ Window *window_key_value(char *question, char *defaultKey,char *defaultValue,voi
     callbacks = gfc_list_new();
     if (onOk)
     {
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onOk,callbackData));
+        gfc_list_append(callbacks,gfc_callback_new(onOk,callbackData));
     }
     if (onCancel)
     {
-        callbacks = gfc_list_append(callbacks,gfc_callback_new(onCancel,callbackData));
+        gfc_list_append(callbacks,gfc_callback_new(onCancel,callbackData));
     }
     win->data = callbacks;
     return win;

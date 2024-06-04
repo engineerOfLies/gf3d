@@ -191,7 +191,6 @@ void gf3d_material_load_mtl_file(const char *filename)
         }
         p = chomp(p);
     }
-    slog("parsed %i materials from file %s",count,filename);
 }
 
 GF3D_Material *gf3d_material_duplicate(GF3D_Material *from)
@@ -212,7 +211,6 @@ GF3D_Material *gf3d_material_parse_js(SJson *json,const char *filename)
     if (!json)return NULL;
     material = gf3d_material_new();
     if (!material)return NULL;
-    slog("materials parsing");
     material->filename = gfc_string(filename);
     material->name = sj_object_get_gfc_string(json,"name");
     material->ambient = sj_object_get_color(json,"ambient");

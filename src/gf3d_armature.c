@@ -964,7 +964,7 @@ Armature3D *gf3d_armature_new()
             armature_manager3d.armatureGFC_List[i].refCount = 1;//set ref count
             armature_manager3d.armatureGFC_List[i].bones = gfc_list_new();
             armature_manager3d.armatureGFC_List[i].poses = gfc_list_new();
-            armature_manager3d.armatureGFC_List[i].actions = gfc_list_new();
+            armature_manager3d.armatureGFC_List[i].actions = gfc_action_list_new();
 
 
             return &armature_manager3d.armatureGFC_List[i];//return address of this array element        }
@@ -979,7 +979,7 @@ Armature3D *gf3d_armature_new()
             armature_manager3d.armatureGFC_List[i].refCount = 1;//set ref count
             armature_manager3d.armatureGFC_List[i].bones = gfc_list_new();
             armature_manager3d.armatureGFC_List[i].poses = gfc_list_new();
-            armature_manager3d.armatureGFC_List[i].actions = gfc_list_new();
+            armature_manager3d.armatureGFC_List[i].actions = gfc_action_list_new();
             return &armature_manager3d.armatureGFC_List[i];//return address of this array element
         }
     }
@@ -991,7 +991,7 @@ void gf3d_armature_delete(Armature3D *armature)
 {
     int i,c;
     if (!armature)return;
-    gf2d_action_list_delete(armature->actions);
+    gfc_action_list_free(armature->actions);
     if (armature->inverseBindMatrices)
     {
         free(armature->inverseBindMatrices);

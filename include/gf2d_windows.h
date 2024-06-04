@@ -24,25 +24,25 @@ typedef enum
 
 typedef struct Window_S
 {
-    int _inuse;             /**<do not touch*/
-    int hidden;             /**<if true, no drawing or updating*/
-    GFC_TextLine    name;       /**<name of window*/
-    int no_draw_generic;    /**<if true, do not use the generic window draw style*/
-    GFC_List *elements;         /**<all the components of the window*/
-    GFC_List *focus_elements;   /**<pointers to all of the elements that can have focus*/
-    Element *focus;         /**<this element has the focus*/
-    GFC_Rect dimensions;        /**<where on the screen*/
-    GFC_Rect canvas;            /**<Where within the window we draw things*/
-    GFC_Color color;         /**<color to draw the window with*/
-    int blocks_input;       /**<if true, windows below will not be checked for input updates, but will update*/
-    struct Window_S *parent;/**<pointer to a parent window*/
-    struct Window_S *child; /**<pointer to a child window, used when only one at a time is allowed*/
-    void (*close_child)(struct Window_S *win,struct Window_S *child);
-    int (*update)(struct Window_S *win,GFC_List *updateGFC_List);//update function to be called whenever a window element is updated
-    int (*draw)(struct Window_S *win);                   //custom draw function, if it returns 1, skip the standard draw
-    void(*refresh)(struct Window_S *win);                //custom refresh function.  Called when window content is changed
-    int (*free_data)(struct Window_S *win);              //if you have custom data, you need to specify this to free it
-    void *data;             /**<custom data*/       
+    int                 _inuse;             /**<do not touch*/
+    int                 hidden;             /**<if true, no drawing or updating*/
+    GFC_TextLine        name;       /**<name of window*/
+    int                 no_draw_generic;    /**<if true, do not use the generic window draw style*/
+    GFC_List           *elements;         /**<all the components of the window*/
+    GFC_List           *focus_elements;   /**<pointers to all of the elements that can have focus*/
+    Element            *focus;         /**<this element has the focus*/
+    GFC_Rect            dimensions;        /**<where on the screen*/
+    GFC_Rect            canvas;            /**<Where within the window we draw things*/
+    GFC_Color           color;         /**<color to draw the window with*/
+    int                 blocks_input;       /**<if true, windows below will not be checked for input updates, but will update*/
+    struct Window_S    *parent;/**<pointer to a parent window*/
+    struct Window_S    *child; /**<pointer to a child window, used when only one at a time is allowed*/
+    void              (*close_child)(struct Window_S *win,struct Window_S *child);
+    int               (*update)(struct Window_S *win,GFC_List *updateList);//update function to be called whenever a window element is updated
+    int               (*draw)(struct Window_S *win);                   //custom draw function, if it returns 1, skip the standard draw
+    void              (*refresh)(struct Window_S *win);                //custom refresh function.  Called when window content is changed
+    int               (*free_data)(struct Window_S *win);              //if you have custom data, you need to specify this to free it
+    void               *data;             /**<custom data*/       
 }Window;
 
 /**

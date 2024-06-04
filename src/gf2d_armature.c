@@ -74,7 +74,7 @@ Armature2D *gf2d_armature_new()
             armature_manager.armatureGFC_List[i].refCount = 1;//set ref count
             armature_manager.armatureGFC_List[i].bones = gfc_list_new();
             armature_manager.armatureGFC_List[i].poses = gfc_list_new();
-            armature_manager.armatureGFC_List[i].actions = gfc_list_new();
+            armature_manager.armatureGFC_List[i].actions = gfc_action_list_new();
 
 
             return &armature_manager.armatureGFC_List[i];//return address of this array element        }
@@ -89,7 +89,7 @@ Armature2D *gf2d_armature_new()
             armature_manager.armatureGFC_List[i].refCount = 1;//set ref count
             armature_manager.armatureGFC_List[i].bones = gfc_list_new();
             armature_manager.armatureGFC_List[i].poses = gfc_list_new();
-            armature_manager.armatureGFC_List[i].actions = gfc_list_new();
+            armature_manager.armatureGFC_List[i].actions = gfc_action_list_new();
             return &armature_manager.armatureGFC_List[i];//return address of this array element
         }
     }
@@ -125,7 +125,7 @@ void gf2d_armature_delete(Armature2D *armature)
 {
     int i,c;
     if (!armature)return;
-    gf2d_action_list_delete(armature->actions);
+    gfc_action_list_free(armature->actions);
     if (armature->bones != NULL)
     {
         c = gfc_list_get_count(armature->bones);
@@ -153,20 +153,20 @@ void gf2d_armature_free(Armature2D *armature)
     armature->refCount--;
 }
 
-Action *gf2d_armature_set_action(Armature2D *armature, const char *name,float *frame)
+GFC_Action *gf2d_armature_get_action(Armature2D *armature, const char *name,float *frame)
 {
-    Action *action;
+    GFC_Action *action;
     if (!armature)return NULL;
-    action = gf2d_action_list_get_action_by_name(armature->actions,name);
+    action = gfc_action_list_get_action_by_name(armature->actions,name);
     if (!action)return NULL;
     if (frame)*frame = action->startFrame;
     return action;
 }
 
-Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index)
+GFC_Action *gf2d_armature_get_action_by_index(Armature2D *armature,Uint32 index)
 {
     if (!armature)return NULL;
-    return gfc_list_get_nth(armature->actions,index);
+    return gfc_action_list_get_action_by_index(armature->actions,index);
 }
 
 
@@ -247,7 +247,7 @@ void gf2d_armature_add_bone_to_parent(Bone *parent,Bone *child)
 {
     if ((!parent)||(!child))return;
     child->parent = parent;
-    parent->children = gfc_list_append(parent->children,child);
+    gfc_list_append(parent->children,child);
 }
 
 Bone *gf2d_armature_duplicate_bone(Armature2D *armature, Bone *bone)
@@ -300,7 +300,7 @@ void gf2d_armature_delete_bone(Armature2D *armature, Bone *bone)
         child->parent = bone->parent;// remove me from the lineage
         if ((bone->parent)&&(bone->parent->children))
         {
-            bone->parent->children = gfc_list_append(bone->parent->children,child);
+            gfc_list_append(bone->parent->children,child);
         }
     }
     gf2d_armature_delete_pose_bones_by_bone(armature,bone);
@@ -741,7 +741,7 @@ void gf2d_armature_save(Armature2D *armature, const char *filepath)
     gfc_line_cpy(armature->filepath,filepath);
     sj_object_insert(save,"filepath",sj_new_str(filepath));
     sj_object_insert(save,"name",sj_new_str(armature->name));
-    sj_object_insert(save,"actionGFC_List",gf2d_action_list_to_json(armature->actions));
+    sj_object_insert(save,"actionList",gfc_action_list_to_json(armature->actions));
     sj_object_insert(save,"bones",gf2d_armature_bones_to_json(armature));
     sj_object_insert(save,"poses",gf2d_armature_poses_to_json(armature));
     sj_save(save,filepath);
@@ -787,7 +787,7 @@ void gf2d_armature_bone_parse_link(Armature2D *armature,SJson *jBone,Bone *bone)
         {
             continue;
         }
-        bone->children = gfc_list_append(bone->children,child);
+        gfc_list_append(bone->children,child);
     }
 }
 
@@ -825,7 +825,7 @@ Pose *gf2d_armature_pose_parse(Armature2D *armature, SJson *jPose)
         if (!jPoseBone)continue;
         posebone = gf2d_armature_bone_pose_parse(armature,jPoseBone);
         if (!posebone)continue;
-        pose->poseBones = gfc_list_append(pose->poseBones,posebone);
+        gfc_list_append(pose->poseBones,posebone);
     }
     return pose;
 }
@@ -875,7 +875,7 @@ Armature2D *gf2d_armature_load(const char *filepath)
         gfc_line_cpy(armature->name,name);
     }
     //base bones pass
-    armature->actions =  gf2d_action_list_parse(sj_object_get_value(json,"actionGFC_List"));
+    armature->actions = gfc_action_list_parse(sj_object_get_value(json,"actionList"));
 
     jBones = sj_object_get_value(json,"bones");
     c = sj_array_get_count(jBones);
@@ -886,7 +886,7 @@ Armature2D *gf2d_armature_load(const char *filepath)
         bone = gf2d_armature_bone_parse(jBone);
         if (!bone)continue;
         bone->index = i;
-        armature->bones = gfc_list_append(armature->bones,bone);
+        gfc_list_append(armature->bones,bone);
     }
     //bone link pass
     for (i = 0;i < c; i++)
@@ -905,7 +905,7 @@ Armature2D *gf2d_armature_load(const char *filepath)
         if (!jPose)continue;
         pose = gf2d_armature_pose_parse(armature,jPose);
         if (!pose)continue;
-        armature->poses = gfc_list_append(armature->poses,pose);
+        gfc_list_append(armature->poses,pose);
     }
     sj_free(json);
     return armature;
@@ -1130,11 +1130,11 @@ Bone *gf2d_armature_add_bone(Armature2D * armature,Bone *parent)
     if (!newbone)return NULL;
     newbone->length = 10;
     newbone->index = gfc_list_get_count(armature->bones);
-    armature->bones = gfc_list_append(armature->bones,newbone);
+    gfc_list_append(armature->bones,newbone);
     if (parent)
     {
         newbone->parent = parent;
-        parent->children = gfc_list_append(parent->children,newbone);
+        gfc_list_append(parent->children,newbone);
         newbone->rootPosition = gf2d_armature_get_bone_tip(parent);
         gfc_line_sprintf(newbone->name,"%s.child",parent->name);
     }
@@ -1150,7 +1150,7 @@ Bone *gf2d_armature_add_bone(Armature2D * armature,Bone *parent)
 //        slog("adding new pose bone");
         newbonepose = gf2d_armature_bone_pose_new();
         newbonepose->bone = newbone;
-        pose->poseBones = gfc_list_append(pose->poseBones,newbonepose);
+        gfc_list_append(pose->poseBones,newbonepose);
     }
     return newbone;
 }
@@ -1203,7 +1203,7 @@ Pose *gf2d_armature_pose_create_for(Armature2D *armature)
         newposebone = gf2d_armature_bone_pose_new();
         if (!newposebone)continue;
         newposebone->bone = bone;
-        pose->poseBones = gfc_list_append(pose->poseBones,newposebone);
+        gfc_list_append(pose->poseBones,newposebone);
     }
     return pose;
 }
@@ -1214,7 +1214,7 @@ Pose *gf2d_armature_pose_add_at_index(Armature2D *armature,Uint32 index)
     if (!armature)return NULL;
     if (index > gfc_list_get_count(armature->poses))return NULL;
     pose = gf2d_armature_pose_create_for(armature);
-    armature->poses = gfc_list_insert(armature->poses,pose,index);
+    gfc_list_insert(armature->poses,pose,index);
     return pose;
 }
 
@@ -1223,7 +1223,7 @@ Pose *gf2d_armature_pose_add(Armature2D *armature)
     Pose *pose;
     if (!armature)return NULL;
     pose = gf2d_armature_pose_create_for(armature);
-    armature->poses = gfc_list_append(armature->poses,pose);
+    gfc_list_append(armature->poses,pose);
     return pose;
 }
 

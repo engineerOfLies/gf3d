@@ -63,7 +63,7 @@ typedef struct
     Texture            *normalMap;
     Armature3D         *armature;
     GFC_Box             bounds;         //copied from the mesh
-    GFC_List           *action_list;    //list of animation actions
+    GFC_ActionList     *action_list;    //list of animation actions
 }Model;
 
 typedef struct
@@ -122,6 +122,23 @@ Model * gf3d_model_load_from_config(SJson *json,const char *filename);
  * @return NULL on error or a new copy of the input model
  */
 Model *gf3d_model_copy(Model *in);
+
+/**
+ * @brief append the mesh data from modelB to modelA
+ * @note modelB is not affected in this proccess
+ * @param modelA the model to gain mesh data
+ * @param modelB the model to provide mesh data
+ * @param offset move the vertices of modelB by this much as they are added
+ */
+void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB);
+
+/**
+ * @brief move all of the vertices of the model mesh data by the offset
+ * @param in the model to move
+ * @param offset how much to move it
+ * @note this is memory heavy.  do not do often
+ */
+void gf3d_model_move(Model *in, GFC_Vector3D offset);
 
 /**
  * @brief queue up a model for rendering

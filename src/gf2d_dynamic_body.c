@@ -132,23 +132,23 @@ DynamicBody *gf2d_dynamic_body_new()
         return NULL;
     }
     memset(db,0,sizeof(DynamicBody));
-    db->collisionGFC_List = gfc_list_new();
-    db->bucketGFC_List = gfc_list_new();
+    db->collisionList = gfc_list_new();
+    db->bucketList = gfc_list_new();
     return db;
 }
 
 void gf2d_dynamic_body_clear_collisions(DynamicBody *db)
 {
     if (!db)return;
-    gf2d_collision_list_clear(db->collisionGFC_List);
+    gf2d_collision_list_clear(db->collisionList);
 }
 
 void gf2d_dynamic_body_free(DynamicBody *db)
 {
     if (!db)return;
     //cleanup collionGFC_List
-    gf2d_collision_list_free(db->collisionGFC_List);
-    gfc_list_delete(db->bucketGFC_List);
+    gf2d_collision_list_free(db->collisionList);
+    gfc_list_delete(db->bucketList);
     free(db);
 }
 
@@ -184,10 +184,10 @@ void gf2d_dynamic_body_resolve_overlap(DynamicBody *db,float backoff)
     Collision *collision;
     GFC_Vector2D adjust = {0};
     if (!db)return;
-    count = gfc_list_get_count(db->collisionGFC_List);
+    count = gfc_list_get_count(db->collisionList);
     for (i = 0; i < count; i++)
     {
-        collision = (Collision*)gfc_list_get_nth(db->collisionGFC_List,i);
+        collision = (Collision*)gfc_list_get_nth(db->collisionList,i);
         if (!collision)continue;
         if (!gfc_shape_overlap(gf2d_dynamic_body_to_shape(db),collision->shape))continue;
         r = gfc_shape_get_bounds(collision->shape);

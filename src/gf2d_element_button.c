@@ -102,7 +102,7 @@ GFC_List *gf2d_element_button_update(Element *element,GFC_Vector2D offset)
                 if (button->repeat && gf2d_mouse_button_held(0))
                 {
                     list = gfc_list_new();
-                    list = gfc_list_append(list,element);
+                    gfc_list_append(list,element);
                     if (strlen(button->sound))gf2d_windows_play_sound(button->sound);
                     return list;
                 }
@@ -110,7 +110,7 @@ GFC_List *gf2d_element_button_update(Element *element,GFC_Vector2D offset)
             else if (gf2d_mouse_button_released(0))
             {
                 list = gfc_list_new();
-                list = gfc_list_append(list,element);
+                gfc_list_append(list,element);
                 if (strlen(button->sound))gf2d_windows_play_sound(button->sound);
                 return list;
             }

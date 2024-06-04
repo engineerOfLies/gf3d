@@ -124,15 +124,54 @@ Model * gf3d_model_new()
     return NULL;
 }
 
+void gf3d_model_move(Model *in, GFC_Vector3D offset)
+{
+    int i,c;
+    Mesh *mesh;
+    if (!in);
+    c = gfc_list_get_count(in->mesh_list);
+    for (i = 0; i < c; i++)
+    {
+        mesh = gfc_list_get_nth(in->mesh_list,i);
+        if (!mesh)continue;
+        gf3d_mesh_move_vertices(mesh, offset);
+    }
+}
+
+void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB)
+{
+    int i,c;
+    Mesh *meshA,*meshB;
+    if ((!modelA)||(!modelB))return;
+    //only merge up to the minimum number of meshes between the two
+    c = MIN(gfc_list_get_count(modelA->mesh_list),gfc_list_get_count(modelB->mesh_list));
+    for (i = 0; i < c; i++)
+    {
+        meshA = gfc_list_get_nth(modelA->mesh_list,i);
+        meshB = gfc_list_get_nth(modelB->mesh_list,i);
+        if ((!meshA)||(!meshB))continue;
+        gf3d_mesh_append(meshA, meshB, offsetB);
+    }
+}
+
+
 Model *gf3d_model_copy(Model *in)
 {
     int i,c;
     Mesh *mesh;
     Mesh *meshNew;
     Model *out;
-    if (!in)return NULL;
+    if (!in)
+    {
+        slog("no input to copy");
+        return NULL;
+    }
     out = gf3d_model_new();
-    if (!out)return NULL;
+    if (!out)
+    {
+        slog("failed to get a copy model");
+        return NULL;
+    }
 
     gfc_line_sprintf(out->filename,"%s.dup",in->filename);
     
@@ -180,11 +219,11 @@ Model *gf3d_model_copy(Model *in)
         out->armature->refCount++;
     }
 
-    //TODO: revisit when I fix actions
-    //GFC_List           *action_list;    //list of animation actions
-
-    
-    
+    if (in->action_list)
+    {
+        out->action_list = in->action_list;
+        out->action_list->_refCount++;
+    }
     return out;
 }
 
@@ -304,8 +343,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     item = sj_object_get_value(json,"actionList");
     if (item)
     {
-        slog("loading action list for model %s",filename);
-        model->action_list = gf2d_action_list_parse(item);
+        model->action_list = gfc_action_list_parse(item);
     }
     
     item = sj_object_get_value(json,"material");
@@ -354,7 +392,7 @@ void gf3d_model_delete(Model *model)
         gf3d_mesh_free(mesh);
     }
     gf3d_material_free(model->material);
-    gf2d_action_list_delete(model->action_list);
+    gfc_action_list_free(model->action_list);
     gfc_list_delete(model->mesh_list);
     gf3d_texture_free(model->texture);
     gf3d_armature_free(model->armature);
@@ -385,7 +423,7 @@ Model * gf3d_model_load_full(const char * modelFile,const char *textureFile)
         return NULL;
     }
     gfc_box_cpy(model->bounds,mesh->bounds);
-    model->mesh_list = gfc_list_append(model->mesh_list,mesh);
+    gfc_list_append(model->mesh_list,mesh);
     
     model->texture = gf3d_texture_load(textureFile);
 

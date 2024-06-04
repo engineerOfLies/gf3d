@@ -12,21 +12,21 @@
 typedef struct Body_S
 {
     GFC_TextLine    name;           /**<name for debugging purposes*/
-    int         inactive;       /**<internal use only*/
-    float       gravity;        /**<the factor this body adheres to gravity*/
-    Uint8       worldclip;      /**<if this body should clip the world bounds and static shapes*/
-    Uint32      cliplayer;      /**<only bodies that share one or more layers will collide with each other*/
-    Uint32      touchlayer;     /**<only bodies that share one or more layers will have their touch functions called*/
-    Uint32      team;           /**<bodies that share a team will NOT interact*/
+    int             inactive;       /**<internal use only*/
+    float           gravity;        /**<the factor this body adheres to gravity*/
+    Uint8           worldclip;      /**<if this body should clip the world bounds and static shapes*/
+    Uint32          cliplayer;      /**<only bodies that share one or more layers will collide with each other*/
+    Uint32          touchlayer;     /**<only bodies that share one or more layers will have their touch functions called*/
+    Uint32          team;           /**<bodies that share a team will NOT interact*/
     GFC_Vector2D    position;       /**<position of the center of mass*/
     GFC_Vector2D    velocity;       /**<rate of change of position over time*/
     GFC_Vector2D    newvelocity;    /**<after a collision this is the new calculated velocity*/
-    float       mass;           /**<used for inertia*/
-    float       elasticity;     /**<how much bounce this body has*/
+    float           mass;           /**<used for inertia*/
+    float           elasticity;     /**<how much bounce this body has*/
     GFC_Shape      *shape;          /**<which shape data will be used to collide for this body*/
-    void       *data;           /**<custom data pointer*/
-    struct Body_S *ignore;      /**<if true, ignore this body   */
-    int       (*touch)(struct Body_S *self, GFC_List *collision);/**< function to call when two bodies collide*/
+    void           *data;           /**<custom data pointer*/
+    struct Body_S  *ignore;      /**<if true, ignore this body   */
+    int           (*touch)(struct Body_S *self, GFC_List *collision);/**< function to call when two bodies collide*/
 }Body;
 
 /**

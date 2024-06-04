@@ -311,6 +311,16 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
     }
 }
 
+void gf3d_obj_move(ObjData *obj,GFC_Vector3D offset)
+{
+    int i;
+    if (!obj)return;
+    for (i = 0; i < obj->face_vert_count;i++)
+    {
+        gfc_vector3d_add(obj->faceVertices[i].vertex,obj->faceVertices[i].vertex,offset);
+    }
+}
+
 ObjData *gf3d_obj_new()
 {
     ObjData *out = NULL;
@@ -457,12 +467,14 @@ ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vec
         gf3d_obj_free(ObjNew);
         return NULL;
     }
+    ObjNew->face_vert_count = ObjA->face_vert_count + ObjB->face_vert_count;
     ObjNew->outFace = gfc_allocate_array(sizeof(Face),ObjA->face_count + ObjB->face_count);
     if (!ObjNew->outFace)
     {
         gf3d_obj_free(ObjNew);
         return NULL;
     }
+    ObjNew->face_count = ObjA->face_count + ObjB->face_count;
     //copy the old data into the ObjNew
     for (i = 0; i < ObjA->face_count;i++)
     {
@@ -487,7 +499,7 @@ ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vec
         gfc_vector3d_add(
             ObjNew->faceVertices[i + ObjA->face_vert_count].vertex,
             ObjNew->faceVertices[i + ObjA->face_vert_count].vertex,
-            offsetA);
+            offsetB);
     }
     return ObjNew;
 }

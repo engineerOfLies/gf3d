@@ -17,13 +17,6 @@ typedef struct
 
 static ActorManager actor_manager = {0};
 
-const char *actionTypes[] =
-{
-    "none",
-    "loop",
-    "pass"
-};
-
 void gf2d_actor_clear_all();
 
 void gf2d_actor_close()
@@ -49,25 +42,10 @@ void gf2d_actor_init(Uint32 max)
     atexit(gf2d_actor_close);
 }
 
-void gf2d_action_list_delete(GFC_List *list)
-{
-    Action *action;
-    if (!list)return;
-    int i,c;
-    c = gfc_list_get_count(list);
-    for (i = 0; i < c;i++)
-    {
-        action = gfc_list_get_nth(list,i);
-        if (!action)continue;
-        free(action);
-    }
-    gfc_list_delete(list);
-}
-
 void gf2d_actor_delete(Actor *actor)
 {
     if (!actor)return;
-    gf2d_action_list_delete(actor->al);
+    gfc_action_list_free(actor->al);
     if (actor->sprite)gf2d_sprite_free(actor->sprite);
     memset(actor,0,sizeof(Actor));
 }
@@ -96,7 +74,7 @@ Actor *gf2d_actor_new()
         if ((actor_manager.actorList[i]._refCount == 0)&&(actor_manager.actorList[i].al == NULL))
         {
             actor_manager.actorList[i]._refCount = 1;//set ref count
-            actor_manager.actorList[i].al = gfc_list_new();
+            actor_manager.actorList[i].al = gfc_action_list_new();
             return &actor_manager.actorList[i];//return address of this array element        }
         }
     }
@@ -107,7 +85,7 @@ Actor *gf2d_actor_new()
         {
             gf2d_actor_delete(&actor_manager.actorList[i]);// clean up the old data
             actor_manager.actorList[i]._refCount = 1;//set ref count
-            actor_manager.actorList[i].al = gfc_list_new();
+            actor_manager.actorList[i].al = gfc_action_list_new();
             return &actor_manager.actorList[i];//return address of this array element
         }
     }
@@ -132,99 +110,6 @@ Actor *gf2d_actor_get_by_filename(const char * filename)
     return NULL;// not found
 }
 
-const char *gf2d_actor_type_to_text(ActionType type)
-{
-    if (type >= AT_MAX)return 0;
-    return actionTypes[type];
-}
-
-ActionType gf2d_actor_type_from_text(const char *text)
-{
-    if (!text)return AT_NONE;
-    if (strcmp(text,"pass")==0)return AT_PASS;
-    if (strcmp(text,"loop")==0)return AT_LOOP;
-    return AT_NONE;
-}
-
-
-Action *gf2d_action_new()
-{
-    return gfc_allocate_array(sizeof(Action),1);
-}
-
-Action *gf2d_action_json_parse(
-    SJson *actionSJ
-)
-{
-    Action *action;
-    int tempInt;
-    float tempFloat;
-    const char *tempStr;
-    if (!actionSJ)
-    {
-        return NULL;
-    }
-    action = gfc_allocate_array(sizeof(Action),1);
-    if (!action)return NULL;
-    tempStr = sj_get_string_value(sj_object_get_value(actionSJ,"action"));
-    if (tempStr)
-    {
-        gfc_line_cpy(action->name,tempStr);
-    }
-    tempStr = sj_get_string_value(sj_object_get_value(actionSJ,"type"));
-    if (strcmp(tempStr,"loop")==0)
-    {
-        action->type = AT_LOOP;
-    }
-    else if (strcmp(tempStr,"pass")==0)
-    {
-        action->type = AT_PASS;
-    }
-    else if (strcmp(tempStr,"none")==0)
-    {
-        action->type = AT_NONE;
-    }
-    sj_get_integer_value(sj_object_get_value(actionSJ,"startFrame"),&tempInt);
-    action->startFrame = tempInt;
-    sj_get_integer_value(sj_object_get_value(actionSJ,"endFrame"),&tempInt);
-    action->endFrame = tempInt;
-    sj_get_float_value(sj_object_get_value(actionSJ,"frameRate"),&tempFloat);
-    action->frameRate = tempFloat;
-    return action;
-}
-
-SJson *gf2d_action_to_json(Action *action)
-{
-    SJson *save;
-    if (!action)return NULL;
-    save = sj_object_new();
-    if (!save)return NULL;
-    sj_object_insert(save,"action",sj_new_str(action->name));
-    sj_object_insert(save,"type",sj_new_str(actionTypes[action->type]));
-    sj_object_insert(save,"startFrame",sj_new_int(action->startFrame));
-    sj_object_insert(save,"endFrame",sj_new_int(action->endFrame));
-    sj_object_insert(save,"frameRate",sj_new_float(action->frameRate));
-    return save;
-}
-
-SJson *gf2d_action_list_to_json(GFC_List *actions)
-{
-    int i,c;
-    SJson *actionJS;
-    Action *action;
-    if (!actions)return NULL;
-    actionJS = sj_array_new();
-    if (!actionJS)return NULL;
-    c = gfc_list_get_count(actions);
-    for (i = 0;i < c;i++)
-    {
-        action = gfc_list_get_nth(actions,i);
-        if (!action)continue;
-        sj_array_append(actionJS,gf2d_action_to_json(action));
-    }
-    return actionJS;
-}
-
 SJson *gf2d_actor_to_json(Actor *actor)
 {
     SJson *save;
@@ -239,7 +124,7 @@ SJson *gf2d_actor_to_json(Actor *actor)
     sj_object_insert(save,"center",sj_vector2d_new(actor->center));
     sj_object_insert(save,"color",sj_vector4d_new(gfc_color_to_vector4(actor->color)));
     sj_object_insert(save,"drawOffset",sj_vector2d_new(actor->drawOffset));
-    sj_object_insert(save,"actionGFC_List",gf2d_action_list_to_json(actor->al));
+    sj_object_insert(save,"actionList",gfc_action_list_to_json(actor->al));
     return save;
 }
 
@@ -254,24 +139,6 @@ void gf2d_actor_save(Actor *actor,const char *filename)
     sj_object_insert(actorjs,"actor",save);
     sj_save(actorjs,filename);
     sj_free(actorjs);
-}
-
-GFC_List *gf2d_action_list_parse(SJson *actionList)
-{
-    GFC_List *al;
-    SJson *item;
-    int i,c;
-    if (!actionList)return NULL;
-    al = gfc_list_new();
-    if (!al)return NULL;
-    c = sj_array_get_count(actionList);
-    for (i = 0; i < c; i++)
-    {
-        item = sj_array_get_nth(actionList,i);
-        if (!item)continue;
-        gfc_list_append(al,gf2d_action_json_parse(item));
-    }
-    return al;
 }
 
 Actor *gf2d_actor_load_json(SJson *json)
@@ -289,7 +156,7 @@ Actor *gf2d_actor_load_json(SJson *json)
     actorJS = sj_object_get_value(json,"actor");
     if (!actorJS)
     {
-        slog("missing actor object in actor file");
+        slog("missing actor object in sprite actor file");
         return NULL;
     }
     if (sj_get_string_value(sj_object_get_value(actorJS,"sprite")))
@@ -315,88 +182,14 @@ Actor *gf2d_actor_load_json(SJson *json)
     actor->size.x = actor->frameWidth * actor->scale.x;
     actor->size.y = actor->frameHeight * actor->scale.y;
 
-    actor->al = gf2d_action_list_parse(sj_object_get_value(actorJS,"actionList"));
+    actor->al = gfc_action_list_parse(sj_object_get_value(actorJS,"actionList"));
     return actor;
-}
-
-Action *gf2d_action_list_get_action(GFC_List *al, const char *name)
-{
-    Action *action;
-    int i,c;
-    if (!al)
-    {
-        slog("no action list provided");
-        return NULL;
-    }
-    if (!name)
-    {
-        slog("no filename provided");
-        return NULL;
-    }
-    c = gfc_list_get_count(al);
-    for (i = 0; i < c;i++)
-    {
-        action = gfc_list_get_nth(al,i);
-        if (!action)continue;
-        if (gfc_line_cmp(action->name,name) == 0)
-        {
-            return action;
-        }
-    }
-    return NULL;// not found
-}
-
-Uint32 gf2d_action_next_frame_after(Action *action,float frame)
-{
-    Uint32 ret = 0;
-    if (!action)return 0;
-    if (frame < action->startFrame)ret= action->startFrame + 1;
-    else
-    {
-        ret = ceil(frame);
-        if (ret > action->endFrame)
-        {
-            if (action->type == AT_LOOP)ret = action->startFrame;
-            ret = action->endFrame;
-        }
-    }
-    return ret;
-}
-
-ActionReturnType gf2d_action_next_frame(Action *action,float *frame)
-{
-    if ((!action)||(!frame))
-    {
-        return ART_ERROR;
-    }
-    if (*frame < action->startFrame)
-    {
-        *frame = action->startFrame;
-        return ART_START;
-    }
-    *frame = *frame + action->frameRate;
-    if (*frame >= action->endFrame)
-    {
-        switch (action->type)
-        {
-            case AT_MAX:
-            case AT_NONE:
-                break;
-            case AT_LOOP:
-                *frame = action->startFrame;
-                break;
-            case AT_PASS:
-                *frame = action->endFrame;
-                return ART_END;
-        }
-    }
-    return ART_NORMAL;
 }
 
 Actor *gf2d_actor_load_image(const char *file)
 {
     Actor *actor;
-    Action *action;
+    GFC_Action *action;
     Sprite *sprite;
     if (!file)return NULL;
     sprite = gf2d_sprite_load_image(file);
@@ -417,11 +210,10 @@ Actor *gf2d_actor_load_image(const char *file)
     actor->scale = gfc_vector2d(1,1);
     actor->center = gfc_vector2d(sprite->frameWidth*0.5,sprite->frameHeight *0.5);
     actor->color = gfc_color8(255,255,255,255);
-//    actor->drawOffset;  left zero
-    actor->al = gfc_list_new();
-    action = gf2d_action_new();
+    actor->al = gfc_action_list_new();
+    action = gfc_action_new();
     gfc_line_cpy(action->name,"default");
-    actor->al = gfc_list_append(actor->al,action);
+    gfc_action_list_append(actor->al,action);
     return actor;
 }
 
@@ -454,40 +246,9 @@ Actor *gf2d_actor_load(const char *file)
     return gf2d_actor_load_image(file);
 }
 
-void gf2d_action_list_frame_inserted(GFC_List *list,Uint32 index)
+GFC_Action *gf2d_actor_get_action(Actor *actor, const char *name,float *frame)
 {
-    Action *action;
-    int i,c;
-    if (!list)return;
-    c = gfc_list_get_count(list);
-    for (i = 0;i < c; i++)
-    {
-        action = gfc_list_get_nth(list,i);
-        if (!action)continue;
-        if (action->startFrame > index)action->startFrame++;
-        if (action->endFrame > index)action->endFrame++;
-    }
-}
-
-void gf2d_action_list_frame_deleted(GFC_List *list,Uint32 index)
-{
-    Action *action;
-    int i,c;
-    if (!list)return;
-    c = gfc_list_get_count(list);
-    for (i = 0;i < c; i++)
-    {
-        action = gfc_list_get_nth(list,i);
-        if (!action)continue;
-        if (action->startFrame > index)action->startFrame--;
-        if (action->endFrame > index)action->endFrame--;
-    }
-}
-
-
-Action *gf2d_actor_set_action(Actor *actor, const char *name,float *frame)
-{
-    Action *action;
+    GFC_Action *action;
     if (!actor)return NULL;
     action = gf2d_actor_get_action_by_name(actor,name);
     if (!action)action = gf2d_actor_get_action_by_index(actor,0);
@@ -496,87 +257,34 @@ Action *gf2d_actor_set_action(Actor *actor, const char *name,float *frame)
     return action;
 }
 
-Action *gf2d_action_list_get_action_by_frame(GFC_List *list,Uint32 frame)
-{
-    Action *action;
-    int i,c;
-    if (!list)return NULL;
-    c = gfc_list_get_count(list);
-    for (i = 0; i < c; i++)
-    {
-        action = gfc_list_get_nth(list,i);
-        if (!action)continue;
-        if ((frame >= action->startFrame)&&(frame <= action->endFrame))return action;
-    }
-    return NULL;
-}
-
-Action *gf2d_action_list_get_action_by_name(GFC_List *list,const char *name)
-{
-    Action *action;
-    int i,c;
-    if ((!list)||(!name))return NULL;
-    c = gfc_list_get_count(list);
-    for (i = 0; i < c; i++)
-    {
-        action = gfc_list_get_nth(list,i);
-        if (!action)continue;
-        if (strcmp(action->name,name)==0)return action;
-    }
-    return NULL;
-}
-
-Action *gf2d_actor_get_action_by_name(Actor *actor,const char *name)
+GFC_Action *gf2d_actor_get_action_by_name(Actor *actor,const char *name)
 {
     if (!actor)return NULL;
-    return gf2d_action_list_get_action_by_name(actor->al,name);
+    return gfc_action_list_get_action_by_name(actor->al,name);
 }
 
 Uint32 gf2d_actor_get_action_count(Actor *actor)
 {
-    if (!actor)return 0;
-    return gfc_list_get_count(actor->al);
+    if ((!actor)||(!actor->al))return 0;
+    return gfc_list_get_count(actor->al->actions);
 }
 
-Action *gf2d_actor_get_action_by_index(Actor *actor,Uint32 index)
+GFC_Action *gf2d_actor_get_action_by_index(Actor *actor,Uint32 index)
 {
     if (!actor)return NULL;
-    return gfc_list_get_nth(actor->al,index);
+    return gfc_action_list_get_action_by_index(actor->al,index);
 }
 
-Action *gf2d_actor_get_next_action(Actor *actor,Action *action)
+GFC_Action *gf2d_actor_get_next_action(Actor *actor,GFC_Action *action)
 {
-    int i;
     if (!actor)return NULL;
-    if (!action)return gfc_list_get_nth(actor->al,0);
-    i = gfc_list_get_item_index(actor->al,action);
-    if ((i == -1)||(i >= (gfc_list_get_count(actor->al) - 1)))
-    {
-        return gfc_list_get_nth(actor->al,0);
-    }
-    return gfc_list_get_nth(actor->al,i + 1);
-}
-
-Uint32 gf2d_action_get_framecount(Action *action)
-{
-    if (!action)return 0;
-    return action->endFrame - action->startFrame;
+    return gfc_action_list_get_next_action(actor->al,action);
 }
 
 Uint32 gf2d_actor_get_framecount(Actor *actor)
 {
-    Action *action;
-    int i,c;
-    Uint32 count = 0;
     if (!actor)return 0;
-    c = gfc_list_get_count(actor->al);
-    for (i = 0; i < c; i++)
-    {
-        action = gfc_list_get_nth(actor->al,i);
-        if (!action)continue;
-        if (action->endFrame > count)count = action->endFrame;
-    }
-    return count;
+    return gfc_action_list_get_framecount(actor->al);
 }
 
 void gf2d_actor_draw(
@@ -643,66 +351,5 @@ void gf2d_actor_draw(
         &drawClip,
         (int)frame);
 }
-
-int gf2d_action_get_animation_frames(Action *action)
-{
-    if (!action)
-    {
-        return -1;
-    }
-    if (action->frameRate == 0)
-    {
-        return -1;//infinite!!! we never stop!
-    }
-    return (int)((action->endFrame - action->startFrame)/action->frameRate);
-
-}
-
-float gf2d_action_get_percent_complete(Action *action,float frame)
-{
-    float total,passed;
-    if (!action)
-    {
-        return -1;
-    }
-    if (action->frameRate == 0)
-    {
-        return -1;//infinite!!! we never stop!
-    }
-    total = (action->endFrame - action->startFrame)/action->frameRate;
-    passed = (frame - action->startFrame)/action->frameRate;
-    if (!total)return 0;
-    return (passed/total);
-}
-
-int gf2d_action_get_frames_remaining(Action *action,float frame)
-{
-    float total,passed;
-    if (!action)
-    {
-        return -1;
-    }
-    if (action->frameRate == 0)
-    {
-        return -1;//infinite!!! we never stop!
-    }
-    total = (action->endFrame - action->startFrame)/action->frameRate;
-    passed = (frame - action->startFrame)/action->frameRate;
-    return (int)(total - passed);
-}
-
-int gf2d_action_get_action_frame(Action *action,float frame)
-{
-    if (!action)
-    {
-        return -1;
-    }
-    if (action->frameRate == 0)
-    {
-        return -1;//infinite!!! we never stop!
-    }
-    return (int)((frame - action->startFrame)/action->frameRate);
-}
-
 
 /*eol@eof*/

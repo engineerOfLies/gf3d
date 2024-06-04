@@ -6,13 +6,13 @@
 
 typedef struct
 {
-    Actor       *actor;
-    Action      *action;
+    Actor          *actor;
+    GFC_Action     *action;
     GFC_Vector2D    scale;
     GFC_Vector2D    flip;
-    Sprite      *image;
+    Sprite         *image;
     GFC_Vector2D    center;
-    float       frame;
+    float           frame;
 }ActorElement;
 
 ActorElement *gf2d_element_actor_new();

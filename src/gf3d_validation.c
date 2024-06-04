@@ -55,7 +55,7 @@ void gf3d_validation_query_layer_properties()
         newLayer->name = newLayer->properties->layerName;
         newLayer->enabled = 1;//enabled by default
         slog("Validation layer available: %s",gf3d_validation.availableLayers[i].layerName);
-        gf3d_validation.layers = gfc_list_append(gf3d_validation.layers,newLayer);
+        gfc_list_append(gf3d_validation.layers,newLayer);
     }
 }
 

@@ -7,26 +7,26 @@
 typedef struct
 {
     GFC_Vector2D coordinate;            /**<where in the hash this bucket is*/
-    GFC_List *dynamicBodies;            /**<list of clipping dynamic bodies*/
-    GFC_List *staticGFC_Shapes;             /**<list of clipping static shapes*/
+    GFC_List   *dynamicBodies;            /**<list of clipping dynamic bodies*/
+    GFC_List   *staticShapes;             /**<list of clipping static shapes*/
 }SpaceBucket;
 
 typedef struct
 {
-    GFC_List       *dynamicBodyGFC_List;    /**<list of bodies in the space*/
-    GFC_List       *staticGFC_Shapes;       /**<list of shapes that will collide that do not move*/
-    int         usesBuckets;        /**<if true, we will optimize with buckets*/
+    GFC_List       *dynamicBodyList;    /**<list of bodies in the space*/
+    GFC_List       *staticShapes;       /**<list of shapes that will collide that do not move*/
+    int             usesBuckets;        /**<if true, we will optimize with buckets*/
     GFC_List       *buckets;            /**<for spacial hash, a list of body lists*/
-    SpaceBucket *voidBucket;        /**<catch all bucket for if bodies exit the playable space*/
+    SpaceBucket    *voidBucket;        /**<catch all bucket for if bodies exit the playable space*/
     GFC_Vector2D    bucketSize;         /**<how large the buckets are individually*/
     GFC_Vector2D    bucketCount;        /**<how many buckets per row,column*/
-    int         precision;          /**<number of backoff attempts before giving up*/
+    int             precision;          /**<number of backoff attempts before giving up*/
     GFC_Rect        bounds;             /**<absolute bounds of the space*/
-    float       timeStep;           /**<how much each iteration of the simulation progresses time by*/
+    float           timeStep;           /**<how much each iteration of the simulation progresses time by*/
     GFC_Vector2D    gravity;            /**<global gravity pull direction*/
-    float       dampening;          /**<rate of movement degrade  ambient frictions*/
-    float       slop;               /**<how much to correct for body overlap*/
-    Uint32      idpool;
+    float           dampening;          /**<rate of movement degrade  ambient frictions*/
+    float           slop;               /**<how much to correct for body overlap*/
+    Uint32          idpool;
 }Space;
 
 /**
@@ -141,7 +141,7 @@ SpaceBucket *gf2d_space_bucket_get_by_point(Space *space,GFC_Vector2D point);
  * @param collisionGFC_List the list of collisions to append to (if NULL, a new list is created)
  * @return NULL on missing space, or a list of collisions otherwise
  */
-GFC_List *gf2d_space_static_shape_check(Space *space, GFC_Shape shape, GFC_List *collisionGFC_List);
+GFC_List *gf2d_space_static_shape_check(Space *space, GFC_Shape shape, GFC_List *collisionList);
 
 /**
  * @brief iterate through an area of the spacial hash based on which buckets clip the given bounds
