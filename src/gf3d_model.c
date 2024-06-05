@@ -116,6 +116,7 @@ Model * gf3d_model_new()
         {
             gf3d_model_delete(&gf3d_model.model_list[i]);
             gf3d_model.model_list[i].refCount = 1;
+            gfc_matrix4_identity(gf3d_model.model_list[i].matrix);
             gf3d_model.model_list[i].mesh_list = gfc_list_new();
             return &gf3d_model.model_list[i];
         }
@@ -323,7 +324,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
             mesh = gf3d_mesh_load_obj(modelFile);
             if (!mesh)
             {
-                slog("failed to parse mesh data from obj file");
+                slog("failed to parse mesh data from obj file %s",modelFile);
                 gf3d_model_free(model);
                 return NULL;
             }
@@ -339,6 +340,12 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     }
     
     if (filename)gfc_line_cpy(model->filename,filename);
+    
+    item = sj_object_get_value(json,"matrix");
+    if (item)
+    {
+        sj_value_as_matrix4_vectors(item,model->matrix);
+    }
     
     item = sj_object_get_value(json,"actionList");
     if (item)
@@ -661,6 +668,7 @@ void gf3d_model_draw_index(
     Uint32 frame)
 {
     Mesh *mesh;
+    GFC_Matrix4 matrix = {0};
     GFC_Vector4D modColor = {0};
     ModelUBO uboData = {0};
     Texture *texture;
@@ -670,7 +678,10 @@ void gf3d_model_draw_index(
     mesh = gfc_list_get_nth(model->mesh_list,index);
     if (!mesh)return;
     
-    uboData.mesh = gf3d_mesh_get_ubo(modelMat,colorMod);
+    //factor in the matrix loaded from disk
+    gfc_matrix4_multiply(matrix,model->matrix,modelMat);
+    
+    uboData.mesh = gf3d_mesh_get_ubo(matrix,colorMod);
     
     if (lighting)
     {
@@ -711,12 +722,17 @@ void gf3d_model_draw_index(
 void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
 {
     Mesh *mesh;
+    GFC_Matrix4 matrix = {0};
     Texture *texture;
     MeshUBO uboData = {0};
     
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
-    uboData = gf3d_model_get_highlight_ubo(modelMat,highlight);
+
+    //factor in the matrix loaded from disk
+    gfc_matrix4_multiply(matrix,model->matrix,modelMat);
+    uboData = gf3d_model_get_highlight_ubo(matrix,highlight);
+    
     if (!model->texture)
     {
         texture = gf3d_model.defaultTexture;
@@ -730,11 +746,13 @@ void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GF
 void gf3d_model_draw_sky(Model *model,GFC_Matrix4 modelMat,GFC_Color color)
 {
     Mesh *mesh;
+    GFC_Matrix4 matrix = {0};
     Texture *texture;
     MeshUBO uboData = {0};
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
-    uboData = gf3d_model_get_sky_ubo(modelMat,gfc_color_to_vector4f(color));
+    gfc_matrix4_multiply(matrix,model->matrix,modelMat);
+    uboData = gf3d_model_get_sky_ubo(matrix,gfc_color_to_vector4f(color));
     if (!model->texture)
     {
         texture = gf3d_model.defaultTexture;

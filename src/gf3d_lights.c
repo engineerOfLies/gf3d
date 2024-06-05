@@ -1,8 +1,17 @@
 #include "simple_logger.h"
 
+#include "gfc_config.h"
+
 #include "gf3d_draw.h"
 #include "gf3d_particle.h"
 #include "gf3d_lights.h"
+
+static const char *gf3d_light_types[] = 
+{
+    "Directional",
+    "Area",
+    "Spot"
+};
 
 typedef struct
 {
@@ -224,6 +233,71 @@ void gf3d_light_draw(GF3D_Light *light)
         gfc_edge3d_from_vectors(gfc_vector4dxyz(light->position),dir),
         gfc_vector3d(0,0,0),gfc_vector3d(0,0,0),gfc_vector3d(1,1,1),0.01 * size,gfc_color_from_vector4f(light->color));
     }
+}
+
+void gf3d_light_list_free(GFC_List *list)
+{
+    if (!list)return;
+    gfc_list_foreach(list,(gfc_work_func*)gf3d_light_free);
+    gfc_list_delete(list);
+}
+
+GFC_List *gf3d_light_list_load_from_config(SJson *config)
+{
+    GFC_List *list;
+    GF3D_Light *light;
+    int i,c;
+    SJson *item;
+    if (!config)return NULL;
+    c = sj_array_get_count(config);
+    if (!c)return NULL;
+    list = gfc_list_new();
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(config,i);
+        if (!item)continue;
+        light = gf3d_light_load_from_config(item);
+        if (!light)continue;
+        gfc_list_append(list,light);
+    }
+    return list;
+}
+
+GF3D_Light *gf3d_light_load_from_config(SJson *config)
+{
+    GFC_Color color;
+    GF3D_Light *light;
+    if (!config)return NULL;
+    light = gf3d_light_new();
+    if (!light)return NULL;
+    color = sj_object_get_color(config,"color");
+    light->color = gfc_color_to_vector4f(color);
+    
+    sj_object_get_vector4d(config,"direction",&light->direction);
+    sj_object_get_vector4d(config,"position",&light->position);
+
+    sj_object_get_value_as_float(config,"ambientCoefficient",&light->ambientCoefficient);
+    sj_object_get_value_as_float(config,"attenuation",&light->attenuation);
+    sj_object_get_value_as_float(config,"angle",&light->angle);
+    sj_object_get_value_as_float(config,"range",&light->range);
+    return light;
+}
+
+GF3D_LightTypes gf3d_light_get_type_by_name(const char *name)
+{
+    int i;
+    if (!name)return LT_MAX;
+    for (i = 0; i < LT_MAX;i++)
+    {
+        if (gfc_strlcmp(name,gf3d_light_types[i])==0)return (GF3D_LightTypes)i;
+    }
+    return LT_MAX;
+}
+
+const char *gf3d_light_get_type_name(GF3D_LightTypes lightType)
+{
+    if (lightType >= LT_MAX)return NULL;
+    return gf3d_light_types[lightType];
 }
 
 /*eol@eof*/

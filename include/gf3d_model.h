@@ -63,9 +63,14 @@ typedef struct
     Texture            *normalMap;
     Armature3D         *armature;
     GFC_Box             bounds;         //copied from the mesh
+    GFC_Matrix4         matrix;         //a delta applied right before rendering.  an adjustment loaded from file
     GFC_ActionList     *action_list;    //list of animation actions
 }Model;
 
+/**
+ * @brief this struct groups the model with common use case for it.
+ * for many game objects and entities, they will dynamically change the model's matrix to suit
+ */
 typedef struct
 {
     Model *model;

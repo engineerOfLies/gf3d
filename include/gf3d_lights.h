@@ -10,18 +10,26 @@
  */
 #define MAX_SHADER_LIGHTS 8
 
+typedef enum
+{
+    LT_Directional,     //illuminates as if from infinitely far away in one direction. The sun or moon are examples
+    LT_Area,            //illuminates from a single point in all directions like a match
+    LT_Spot,            //illuminates in one direction with a focused cone of light like a flashlight
+    LT_MAX              //limiter
+}GF3D_LightTypes;
+
 /**
  * @brief describes a standard light
  */
 typedef struct
 {
-    GFC_Vector4D    color;         //color of light
-    GFC_Vector4D    direction;     //used for directional light
-    GFC_Vector4D    position;      //where the light is from.  w determines if its a directional light or attenuated light
-    float           ambientCoefficient;
-    float           attenuation;   //how fast this light falls off
-    float           angle;         //If nonzero, it is a spot light.  
-    float           padding;
+    GFC_Vector4D    color;              //color of light
+    GFC_Vector4D    direction;          //used for directional light
+    GFC_Vector4D    position;           //where the light is from.  w determines if its a directional light or attenuated light
+    float           ambientCoefficient; //how strong the ambient
+    float           attenuation;        //how fast this light falls off
+    float           angle;              //If nonzero, it is a spot light.  
+    float           range;              //if nonzero, light will not illuminate past this distance
 }GF3D_Light;
 
 /**
@@ -159,5 +167,41 @@ void gf3d_list_reset_ubo(LightUBO *lights);
  * @param light the light to draw
  */
 void gf3d_light_draw(GF3D_Light *light);
+
+/**
+ * @brief get the light type by its name
+ * @param name the name of the lighttype
+ * @return LT_MAX if the name does not match any light types, the GF3D_LightTypes otherwise
+ */
+GF3D_LightTypes gf3d_light_get_type_by_name(const char *name);
+
+/**
+ * @brief get the type name as a character string given a lightType
+ * @param lightType the name to get
+ * @return NULL if the lightType is invalid, a read-only character buffer containing the light type name otherwise
+ */
+const char *gf3d_light_get_type_name(GF3D_LightTypes lightType);
+
+/**
+ * @brief free a list of GF3D_Lights.  
+ * @note this cannot type check so be sure the list only contains lights
+ * @param list the light list to free.  The lights and the list will be cleaned up
+ */
+void gf3d_light_list_free(GFC_List *list);
+
+/**
+ * @brief load a list of lights from config
+ * @param config the json array to load from
+ * @return NULL if the config is bad or does not contain an array. A list with all of the lights in it otherwise
+ */
+GFC_List *gf3d_light_list_load_from_config(SJson *config);
+
+/**
+ * @brief extract a light from json config
+ * @param config the json to extract from
+ * @return NULL on error, or the light information from the config
+ * @note this doesn't validate if the light data makes sense or not
+ */
+GF3D_Light *gf3d_light_load_from_config(SJson *config);
 
 #endif
