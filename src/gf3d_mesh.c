@@ -67,7 +67,7 @@ void gf3d_mesh_primitive_free(MeshPrimitive *primitive);
 /**
  * @brief move the primitive
  */
-void gf3d_mesh_primitive_move(MeshPrimitive *in,GFC_Vector3D offset);
+void gf3d_mesh_primitive_move(MeshPrimitive *in,GFC_Vector3D offset,GFC_Vector3D rotation);
 
 void gf3d_mesh_init(Uint32 mesh_max)
 {
@@ -267,7 +267,7 @@ Mesh *gf3d_mesh_copy(Mesh *in)
     return out;
 }
 
-void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset)
+void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset,GFC_Vector3D rotation)
 {
     int i,c;
     MeshPrimitive *primitive;
@@ -277,7 +277,7 @@ void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset)
     {
         primitive = gfc_list_get_nth(in->primitives,i);
         if (!primitive)continue;
-        gf3d_mesh_primitive_move(primitive,offset);
+        gf3d_mesh_primitive_move(primitive,offset,rotation);
     }
 }
 
@@ -576,12 +576,16 @@ GFC_Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,GFC_Vector3D size)
     return outScale;
 }
 
-Uint8 gf3d_mesh_primitive_append(MeshPrimitive * primitiveA,MeshPrimitive * primitiveB, GFC_Vector3D offsetB)
+Uint8 gf3d_mesh_primitive_append(
+    MeshPrimitive * primitiveA,
+    MeshPrimitive * primitiveB,
+    GFC_Vector3D offsetB,
+    GFC_Vector3D rotation)
 {
     ObjData *objNew;
     if ((!primitiveA)||(!primitiveB))return 0;//fail
     if ((!primitiveA->objData)||(!primitiveB->objData))return 0;
-    objNew = gf3d_obj_merge(primitiveA->objData,gfc_vector3d(0,0,0),primitiveB->objData,offsetB);
+    objNew = gf3d_obj_merge(primitiveA->objData,gfc_vector3d(0,0,0),primitiveB->objData,offsetB,rotation);
     if (!objNew)return 0;
     gf3d_mesh_primitive_delete_buffers(primitiveA);
     gf3d_obj_free(primitiveA->objData);
@@ -590,7 +594,7 @@ Uint8 gf3d_mesh_primitive_append(MeshPrimitive * primitiveA,MeshPrimitive * prim
     return 1;
 }
 
-void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB)
+void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB,GFC_Vector3D rotation)
 {
     int i,c;
     MeshPrimitive * primitiveA;
@@ -602,7 +606,7 @@ void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB)
         primitiveA = gfc_list_get_nth(meshA->primitives,i);
         primitiveB = gfc_list_get_nth(meshB->primitives,i);
         if ((!primitiveA)||(!primitiveB))continue;
-        gf3d_mesh_primitive_append(primitiveA,primitiveB, offsetB);
+        gf3d_mesh_primitive_append(primitiveA,primitiveB, offsetB,rotation);
     }
 }
 
@@ -639,11 +643,11 @@ MeshPrimitive *gf3d_mesh_primitive_copy(MeshPrimitive *in)
     return out;
 }
 
-void gf3d_mesh_primitive_move(MeshPrimitive *in,GFC_Vector3D offset)
+void gf3d_mesh_primitive_move(MeshPrimitive *in,GFC_Vector3D offset,GFC_Vector3D rotation)
 {
     if (!in)return;
     if (!in->objData)return;
-    gf3d_obj_move(in->objData,offset);
+    gf3d_obj_move(in->objData,offset,rotation);
     gf3d_mesh_primitive_delete_buffers(in);
     gf3d_mesh_create_vertex_buffer_from_vertices(in);
 }

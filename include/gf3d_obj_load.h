@@ -54,8 +54,9 @@ ObjData *gf3d_obj_duplicate(ObjData *in);
  * @brief update the vertex positions of all faceVerticies of an obj
  * @param obj the obj to modify
  * @param offset how much to move the faceVertices
+ * @param rotation apply this rotation to the vertices and normals
  */
-void gf3d_obj_move(ObjData *obj,GFC_Vector3D offset);
+void gf3d_obj_move(ObjData *obj,GFC_Vector3D offset,GFC_Vector3D rotation);
 
 /**
  * @brief re-organize the vertices into faceVertices for use with the rendering pipeline
@@ -68,12 +69,13 @@ void gf3d_obj_load_reorg(ObjData *obj);
  * @param ObjA the first obj to merge
  * @param offsetA an offset to apply to all the vertices in the first Obj
  * @param ObjB the second obj to merge
- * @param offsetBA an offset to apply to all the vertices in the second Obj
+ * @param offsetB an offset to apply to all the vertices in the second Obj
+ * @param rotation apply this rotation to the vertices and normals
  * @return NULL if the input objs are missing or have not been re-organized yet, a new third OBJ containing all the geometry of the first two.
  * @note this does NOT free the input OBJs.  
  * @note gf3d_obj_load_reorg must have been called on both prior to calling this one
  */
-ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vector3D offsetB);
+ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vector3D offsetB,GFC_Vector3D rotation);
 
 /**
  * @brief free obj data

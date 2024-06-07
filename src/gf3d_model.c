@@ -125,7 +125,7 @@ Model * gf3d_model_new()
     return NULL;
 }
 
-void gf3d_model_move(Model *in, GFC_Vector3D offset)
+void gf3d_model_move(Model *in, GFC_Vector3D offset,GFC_Vector3D rotation)
 {
     int i,c;
     Mesh *mesh;
@@ -135,11 +135,11 @@ void gf3d_model_move(Model *in, GFC_Vector3D offset)
     {
         mesh = gfc_list_get_nth(in->mesh_list,i);
         if (!mesh)continue;
-        gf3d_mesh_move_vertices(mesh, offset);
+        gf3d_mesh_move_vertices(mesh, offset,rotation);
     }
 }
 
-void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB)
+void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB,GFC_Vector3D rotation)
 {
     int i,c;
     Mesh *meshA,*meshB;
@@ -151,7 +151,7 @@ void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB)
         meshA = gfc_list_get_nth(modelA->mesh_list,i);
         meshB = gfc_list_get_nth(modelB->mesh_list,i);
         if ((!meshA)||(!meshB))continue;
-        gf3d_mesh_append(meshA, meshB, offsetB);
+        gf3d_mesh_append(meshA, meshB, offsetB,rotation);
     }
 }
 

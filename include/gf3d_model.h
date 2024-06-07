@@ -134,16 +134,18 @@ Model *gf3d_model_copy(Model *in);
  * @param modelA the model to gain mesh data
  * @param modelB the model to provide mesh data
  * @param offset move the vertices of modelB by this much as they are added
+ * @param rotation apply this rotation to the vertices and normals
  */
-void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB);
+void gf3d_model_append(Model *modelA,Model *modelB, GFC_Vector3D offsetB,GFC_Vector3D rotation);
 
 /**
  * @brief move all of the vertices of the model mesh data by the offset
  * @param in the model to move
  * @param offset how much to move it
+ * @param rotation apply this rotation to the vertices and normals
  * @note this is memory heavy.  do not do often
  */
-void gf3d_model_move(Model *in, GFC_Vector3D offset);
+void gf3d_model_move(Model *in, GFC_Vector3D offset,GFC_Vector3D rotation);
 
 /**
  * @brief queue up a model for rendering

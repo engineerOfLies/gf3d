@@ -94,8 +94,9 @@ Mesh *gf3d_mesh_copy(Mesh *in);
  * @brief move all of the vertices of the mesh by offset at the buffer level
  * @param in the mesh to move
  * @param offset how much to move it
+ * @param rotation apply this rotation to the vertices and normals
  */
-void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset);
+void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset,GFC_Vector3D rotation);
 
 /**
  * @brief allocate a zero initialized mesh primitive
@@ -109,8 +110,10 @@ MeshPrimitive *gf3d_mesh_primitive_new();
  * @note: this only applies for the N primitives, which is the smaller of the two lists
  * @param meshA the mesh to gain geometry
  * @param meshB the mesh to provide new geometry, this is unmodified after the process
+ * @param offsetB an offset to apply to all the vertices in the second Obj
+ * @param rotation apply this rotation to the vertices and normals
  */
-void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB);
+void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB,GFC_Vector3D rotation);
 
 /**
  * @brief get the scaling factor necessary to make the mesh fit within the bounds
