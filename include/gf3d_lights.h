@@ -8,7 +8,7 @@
 /**
  * needs to remain in sync with the shader ubo
  */
-#define MAX_SHADER_LIGHTS 8
+#define MAX_SHADER_LIGHTS 16
 
 typedef enum
 {
@@ -29,7 +29,7 @@ typedef struct
     float           ambientCoefficient; //how strong the ambient
     float           attenuation;        //how fast this light falls off
     float           angle;              //If nonzero, it is a spot light.  
-    float           range;              //if nonzero, light will not illuminate past this distance
+    float           brightness;         //how bright the light is.  1.0 is a good starting point
 }GF3D_Light;
 
 /**

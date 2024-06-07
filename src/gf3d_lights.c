@@ -173,7 +173,7 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
     {
         light = gfc_list_get_nth(lights,i);
         if (!light)continue;
-        if (i < MAX_SHADER_LIGHTS)
+        if (i < MAX_SHADER_LIGHTS)//just add the first X lights to the list
         {
             bestLights[i] = light;
             bestDistances[i] = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
@@ -279,7 +279,7 @@ GF3D_Light *gf3d_light_load_from_config(SJson *config)
     sj_object_get_value_as_float(config,"ambientCoefficient",&light->ambientCoefficient);
     sj_object_get_value_as_float(config,"attenuation",&light->attenuation);
     sj_object_get_value_as_float(config,"angle",&light->angle);
-    sj_object_get_value_as_float(config,"range",&light->range);
+    sj_object_get_value_as_float(config,"brightness",&light->brightness);
     return light;
 }
 

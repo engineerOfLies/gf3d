@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 const uint MAX_BONES = 100;
-const uint MAX_LIGHTS = 8;
+const uint MAX_LIGHTS = 16;
 
 struct MeshUBO
 {
@@ -36,7 +36,7 @@ struct Light
     float   ambientCoefficient;
     float   attenuation;   //how fast this light falls off
     float   angle;         //If nonzero, it is a spot light.  
-    float   padding;        //for alignment
+    float   range;        //if nonzero, light will not illuminate past this distance
 };
 
 struct LightUBO

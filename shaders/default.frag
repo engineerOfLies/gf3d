@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 const uint MAX_BONES = 100;
-const uint MAX_LIGHTS = 8;
+const uint MAX_LIGHTS = 16;
 
 struct MeshUBO
 {
@@ -36,7 +36,7 @@ struct Light
     float   ambientCoefficient;
     float   attenuation;   //how fast this light falls off
     float   angle;         //If nonzero, it is a spot light.  
-    float   padding;        //for alignment
+    float   brightness;    //if nonzero, light will not illuminate past this distance
 };
 
 struct LightUBO
@@ -126,7 +126,9 @@ vec3 ApplyLight(Light light, vec3 surfaceColor, vec3 normal, vec3 surfacePos, ve
         //point light
         surfaceToLight = normalize(light.position.xyz - surfacePos);
         float distanceToLight = length(light.position.xyz - surfacePos);
-        attenuation = (light.attenuation * light.attenuation) / (1.0 + (distanceToLight * distanceToLight));
+        //distance filter:
+        
+        attenuation = 1.0 / (1.0 + (light.attenuation * distanceToLight * distanceToLight));
 
         //cone restrictions (affects attenuation)
         if (light.angle > 0)
@@ -138,17 +140,17 @@ vec3 ApplyLight(Light light, vec3 surfaceColor, vec3 normal, vec3 surfacePos, ve
             }
             else
             {
-                attenuation *= (1.0 - (lightToSurfaceAngle / light.angle));
+                attenuation *= ((180 - lightToSurfaceAngle) / light.angle);
             }
         }
     }
 
     //ambient
-    vec3 ambient = light.ambientCoefficient * surfaceColor.rgb * light.color.xyz;
+    vec3 ambient = light.ambientCoefficient * surfaceColor.rgb * light.color.xyz * light.brightness;
 
     //diffuse
     float diffuseCoefficient = max(0.0, dot(normal, surfaceToLight));
-    vec3 diffuse = diffuseCoefficient * surfaceColor.rgb * light.color.xyz;
+    vec3 diffuse = diffuseCoefficient * surfaceColor.rgb * light.color.xyz * light.brightness;
     
     //specular
     float specularCoefficient = 0.0;
@@ -156,7 +158,7 @@ vec3 ApplyLight(Light light, vec3 surfaceColor, vec3 normal, vec3 surfacePos, ve
     {
         specularCoefficient = pow(max(0.0, dot(surfaceToCamera, reflect(-surfaceToLight, normal))), ubo.material.shininess);
     }
-    vec3 specular = specularCoefficient * ubo.material.specular.xyz * light.color.xyz;
+    vec3 specular = specularCoefficient * ubo.material.specular.xyz * light.color.xyz * light.brightness;
 
     //linear color (color before gamma correction)
     return ambient + attenuation*(diffuse + specular);
