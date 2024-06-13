@@ -1017,7 +1017,7 @@ void gf2d_armature_bone_calculate_from_tip(Bone *bone,GFC_Vector2D tip)
     if (!bone)return;
     gfc_vector2d_sub(delta,tip,bone->rootPosition);
     bone->length = gfc_vector2d_magnitude(delta);
-    bone->baseAngle = (gfc_vector2d_angle(delta) + 180) * GFC_DEGTORAD;
+    bone->baseAngle = gfc_vector2d_angle(delta);
 }
 
 void gf2d_armature_bone_tip_move(Bone *bone,GFC_Vector2D offset)
@@ -1361,108 +1361,5 @@ int gf2d_armature_bone_name_lr_flip(char *newname,const char *oldname)
     return 0;
 }
 
-
-/*  TODO: solve inverse kinematics
-void gf2d_armature_rotate_pose_bones_to_length(Armature2D *armature,Uint32 poseIndex, BonePose *tipbone,BonePose *rootbone,float length)
-{
-    GFC_Vector2D rootPosition,rootToTip;
-    float chainreach = 0;
-    float currentLength = 0;
-    float deltaAngle = 0;
-    Bone *bone;
-    BonePose *posebone;
-    if ((!armature)||(!tipbone)||(!rootbone))return;
-    if (rootbone == tipbone)
-    {
-        return;// nothing to be done
-    }
-    //check for special case that the length is greater than the sum of the lenths.
-    bone = tipbone->bone;
-    if (!bone)return;
-    do//armature out maximum chain reach
-    {
-        chainreach += bone->length;
-        bone = bone->parent;
-    }while(bone != rootbone->bone);
-    chainreach += bone->length;
-    if (chainreach <= length)
-    {//relax all poses to their extreme
-        for (bone = tipbone->bone;rootbone->bone != bone;bone = bone->parent)
-        {//stepping backware through
-            posebone = gf2d_armature_get_bone_pose_by_name(armature,poseIndex, bone->name);
-            if (!posebone)continue;
-            deltaAngle = bone->baseAngle + posebone->angle;
-            gf2d_armature_bonepose_rotate(
-                armature,
-                posebone,
-                poseIndex, 
-                gf2d_armature_get_pose_bone_position(posebone), -deltaAngle);
-        }
-        // still gotta do it for the root bone
-        posebone = gf2d_armature_get_bone_pose_by_name(armature,poseIndex, bone->name);
-        if (!posebone)return;
-        deltaAngle = bone->baseAngle + posebone->angle;
-        gf2d_armature_bonepose_rotate(
-            armature, 
-            posebone,
-            poseIndex, 
-            gf2d_armature_get_pose_bone_position(posebone), -deltaAngle);
-        return;
-    }
-    gfc_vector2d_sub(rootToTip,gf2d_armature_get_pose_bone_position(tipbone),gf2d_armature_get_pose_bone_position(rootbone));
-    currentLength = gfc_vector2d_magnitude(rootToTip);
-    if (currentLength > length)
-    {
-        //flexion
-    }
-    else
-    {
-        //extension
-    }
-}
-
-//target must be in armature space
-void gf2d_armature_pose_bone_ik_to(Armature2D *armature,Uint32 poseIndex, BonePose *posebone,GFC_Vector2D target,Uint32 chainlength)
-{
-    Bone *bone;
-    BonePose *rootPose;
-    int i;
-    GFC_Vector2D D,rootPosition,chainTip,CD;
-    float cd;//distance from chain root to chain tip
-    float d;//distance from chain root to target;
-    float targetAngle,chainAngle,deltaAngle;
-    // this starts an IK check
-    if ((!armature)||(!posebone))
-    {
-        return;
-    }
-    bone = posebone->bone;
-    if (!bone)return;//bad posebone
-    for (i = 0; i < chainlength;i++)
-    {
-        if (bone->parent == NULL)break;// if we are the root we gotta stop
-        bone = bone->parent;
-    }
-    //now bone is the root of the chain
-    rootPose = gf2d_armature_get_bone_pose_by_name(armature,poseIndex, bone->name);
-    if (!rootPose)return;// again, bad
-    gfc_vector2d_add(rootPosition,bone->rootPosition,rootPose->position);
-    gfc_vector2d_sub(D,target,rootPosition);// now we have the gfc_vector from the root bone to the target position
-    d = gfc_vector2d_magnitude(D);
-    chainTip = gf2d_armature_get_bonepose_tip(posebone,gfc_vector2d(1,1), 0);
-    gfc_vector2d_sub(CD,chainTip,rootPosition);//gfc_vector from root to tip
-    cd = gfc_vector2d_magnitude(CD); //length from root to tip
-    if (d != cd)//already stretched to the correct length just need to rotation skip ahead to the rotation
-    {                                            
-        gf2d_armature_rotate_pose_bones_to_length(armature,poseIndex,posebone,rootPose,d);
-        chainTip = gf2d_armature_get_bonepose_tip(posebone,gfc_vector2d(1,1), 0);//get this again in case it has moved
-        gfc_vector2d_sub(CD,chainTip,rootPosition);//gfc_vector from root to tip
-    }
-    targetAngle = gfc_vector2d_angle(D);    
-    chainAngle = gfc_vector2d_angle(CD);
-    deltaAngle = targetAngle - chainAngle;
-    gf2d_armature_bonepose_rotate(armature, rootPose,poseIndex, rootPosition, deltaAngle);
-}
-*/
 
 /*eol@eof*/
