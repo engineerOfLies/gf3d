@@ -163,35 +163,33 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
 {
     int i,j,c;
     float newDist;
-    int least = -1;
-    float bestDistances[MAX_SHADER_LIGHTS];
+    int most = -1;
+    float bestDistances[MAX_SHADER_LIGHTS];     //best is smallest
     GF3D_Light *bestLights[MAX_SHADER_LIGHTS] = {0};
     GF3D_Light *light;
     if (!ubo)return;
     c = gfc_list_get_count(lights);
-    for (i = 0;i < c;i++)
+    for (i = 0;i < MIN(c,MAX_SHADER_LIGHTS);i++)
     {
         light = gfc_list_get_nth(lights,i);
         if (!light)continue;
-        if (i < MAX_SHADER_LIGHTS)//just add the first X lights to the list
+        bestLights[i] = light;
+        bestDistances[i] = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
+        if (most == -1)most = i;
+        else if (bestDistances[i] > bestDistances[most])most = i;//figure out the worst of the first MAX_SHADER_LIGHTS
+    }
+    for (;i < c;i++)
+    {
+        light = gfc_list_get_nth(lights,i);
+        if (!light)continue;
+        newDist = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
+        if (newDist < bestDistances[most])//if this is better than the worst, swap me in
         {
-            bestLights[i] = light;
-            bestDistances[i] = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
-            if (least == -1)least = i;
-            else if (bestDistances[i] < bestDistances[least])least = i;
-        }
-        else //replace the least of the best
-        {
-            newDist = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
-            if (newDist < bestDistances[least])
+            bestLights[most] = light;
+            bestDistances[most] = newDist;
+            for (j = 0;j < MAX_SHADER_LIGHTS;j++)//find a new worst
             {
-                bestLights[least] = light;
-                bestDistances[least] = newDist;
-                least = 0;
-                for (j = 1;j < MAX_SHADER_LIGHTS;j++)
-                {
-                    if (bestDistances[j] < bestDistances[least])least = j;
-                }
+                if (bestDistances[j] > bestDistances[most])most = j;
             }
         }
     }
