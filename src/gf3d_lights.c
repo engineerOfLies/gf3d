@@ -174,7 +174,7 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
         light = gfc_list_get_nth(lights,i);
         if (!light)continue;
         bestLights[i] = light;
-        bestDistances[i] = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
+        bestDistances[i] = gfc_vector3d_magnitude_between_squared(gfc_vector4dxyz(light->position),relative);
         if (most == -1)most = i;
         else if (bestDistances[i] > bestDistances[most])most = i;//figure out the worst of the first MAX_SHADER_LIGHTS
     }
@@ -182,7 +182,7 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
     {
         light = gfc_list_get_nth(lights,i);
         if (!light)continue;
-        newDist = gfc_vector3d_magnitude_between(gfc_vector4dxyz(light->position),relative);
+        newDist = gfc_vector3d_magnitude_between_squared(gfc_vector4dxyz(light->position),relative);
         if (newDist < bestDistances[most])//if this is better than the worst, swap me in
         {
             bestLights[most] = light;
