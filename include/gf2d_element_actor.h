@@ -34,6 +34,13 @@ Actor *gf2d_element_actor_get_actor(Element *e);
 void gf2d_element_actor_set_actor(Element *e, const char *actorFile);
 
 /**
+ * @brief set an element actor's draw scale
+ * @param e the element actor
+ * @param scale to set to
+ */
+void gf2d_element_actor_set_scale(Element *e, GFC_Vector2D scale);
+
+/**
  * @brief set the frame for the current actor
  * @param e the element to set
  * @param i the index of the frame to set it to

@@ -167,6 +167,16 @@ void gf2d_element_actor_set_frame(Element *e, Uint32 i)
     ae->frame = i;
 }
 
+void gf2d_element_actor_set_scale(Element *e, GFC_Vector2D scale)
+{
+    ActorElement *ae;
+    if ((!e)||(e->type != ET_Actor))return;
+
+    ae = (ActorElement *)e->data;
+    ae->scale = scale;
+}
+
+
 void gf2d_element_actor_set_action(Element *e, const char *action)
 {
     ActorElement *ae;
