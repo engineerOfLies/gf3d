@@ -211,6 +211,11 @@ void gf3_pipeline_update_ubos(Pipeline *pipe)
     device = gf3d_vgraphics_get_default_logical_device();
     frame = gf3d_vgraphics_get_current_buffer_frame();
     buffer = gf3d_uniform_buffer_list_get_nth_buffer(pipe->uboBigBuffer, 0, frame);
+    if (!buffer)
+    {
+        slog("failed to get buffer for pipeline %s and frame %i",pipe->name,frame);
+        return;
+    }
     
     vkMapMemory(device, buffer->uniformBufferMemory, 0, buffer->bufferSize, 0, &data);
         memcpy(data, pipe->uboData, buffer->bufferSize);
