@@ -14,10 +14,23 @@
 Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultGFC_Color);
 
 /**
+ * @brief set behavior to always show the most recent message and push older messages away faster
+ * @param on if true, enables this mode, if false disables it
+ */
+void message_buffer_set_latest_mode(Uint8 on);
+
+/**
  * @brief print a new message to the message buffer
+ * @param color the color to print with
  * @param newMessage the message to print
  */
 void message_new(const char *newMessage);
+
+/**
+ * @brief print a new message to the message buffer
+ * @param newMessage the message to print
+ */
+void message_new_color(const char *newMessage,GFC_Color color);
 
 /**
  * @brief print a new message to the message buffer using printf style
@@ -25,6 +38,14 @@ void message_new(const char *newMessage);
  * @param ... additional arguments
  */
 void message_printf(const char *newMessage,...);
+
+/**
+ * @brief print a new message to the message buffer using printf style with a specific color
+ * @param newMessage the message to print
+ * @param color the color to print with
+ * @param ... additional arguments
+ */
+void message_printf_color(GFC_Color color,const char *newMessage,...);
 
 /**
  * @brief make the message buffer the top drawing window
