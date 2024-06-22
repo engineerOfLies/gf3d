@@ -12,12 +12,13 @@ typedef struct
     GFC_Vector2D    flip;
     Sprite         *image;
     GFC_Vector2D    center;
+    float           rotation;
     float           frame;
 }ActorElement;
 
 ActorElement *gf2d_element_actor_new();
 
-ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,GFC_Vector2D scale,const char *image,GFC_Vector2D center,GFC_Vector2D flip  );
+ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,GFC_Vector2D scale,const char *image,GFC_Vector2D center,GFC_Vector2D flip, float rotation  );
 
 /**
  * @brief get a pointer to the actor data in this element

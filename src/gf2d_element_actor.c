@@ -18,8 +18,8 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
             actor->image,
             position,
             actor->scale,
-            gfc_vector2d(0,0),
-            0,
+            actor->center,
+            actor->rotation,
             actor->flip,
             element->color,
             gfc_vector4d(0,0,0,0),
@@ -40,8 +40,8 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
             actor->frame,
             position,
             &actor->scale,
-            NULL,
-            NULL,
+            &actor->center,
+            &actor->rotation,
             &element->color,
             &actor->flip);
     }
@@ -83,7 +83,7 @@ ActorElement *gf2d_element_actor_new()
 }
 
 
-ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,GFC_Vector2D scale,const char *image,GFC_Vector2D center,GFC_Vector2D flip)
+ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *action,GFC_Vector2D scale,const char *image,GFC_Vector2D center,GFC_Vector2D flip,float rotation)
 {
     ActorElement *ae;
     ae = gf2d_element_actor_new();
@@ -91,6 +91,7 @@ ActorElement *gf2d_element_actor_new_full(const char *actorFile, const char *act
     {
         return NULL;
     }
+    ae->rotation = rotation;
     gfc_vector2d_copy(ae->scale,scale);
     gfc_vector2d_copy(ae->center,center);
     gfc_vector2d_copy(ae->flip,flip);
@@ -135,8 +136,16 @@ void gf2d_element_actor_auto_scale(Element *e)
     if ((!e)||(e->type != ET_Actor))return;
 
     ae = (ActorElement *)e->data;
-    if (ae->actor->size.x)ae->scale.x = e->bounds.w/ ae->actor->size.x ;
-    if (ae->actor->size.y)ae->scale.y = e->bounds.h /ae->actor->size.y;
+    if (ae->actor)
+    {
+        ae->scale.x = e->bounds.w / (float)ae->actor->size.x;
+        ae->scale.y = e->bounds.h / (float)ae->actor->size.y;
+    }
+    else if (ae->image)
+    {
+        ae->scale.x = e->bounds.w / (float)ae->image->frameWidth ;
+        ae->scale.y = e->bounds.h / (float)ae->image->frameHeight;
+    }
 }
 
 void gf2d_element_actor_set_actor(Element *e, const char *actorFile)
@@ -220,6 +229,8 @@ void gf2d_element_load_actor_from_config(Element *e,SJson *json)
 {
     GFC_Vector2D flip = {0};
     GFC_Vector2D center = {0};
+    Bool scaleToFit = 0;
+    float rotation = 0;
     SJson *value;
     const char *buffer = NULL;
     const char *action = NULL;
@@ -246,12 +257,19 @@ void gf2d_element_load_actor_from_config(Element *e,SJson *json)
         image = sj_get_string_value(value);
     }
 
+    sj_object_get_value_as_float(json,"rotation",&rotation);
+    rotation *= GFC_DEGTORAD;//always accept degrees from people, but work in radians
     sj_value_as_vector2d(sj_object_get_value(json,"flip"),&flip);
     sj_value_as_vector2d(sj_object_get_value(json,"center"),&center);
     
 
     scale.x = scale.y = 1;
     sj_value_as_vector2d(sj_object_get_value(json,"scale"),&scale);
-    gf2d_element_make_actor(e,gf2d_element_actor_new_full((char *)buffer,(char *)action,scale,image,center,flip));
+    sj_object_get_value_as_bool(json,"scaleToFit",&scaleToFit);
+    gf2d_element_make_actor(e,gf2d_element_actor_new_full((char *)buffer,(char *)action,scale,image,center,flip,rotation));
+    if (scaleToFit)
+    {
+        gf2d_element_actor_auto_scale(e);
+    }
 }
 /*eol@eof*/

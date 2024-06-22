@@ -347,7 +347,7 @@ Element *gf2d_button_new_simple(
         0,
         gfc_color(.5,.5,.5,1),0,win);
     
-    actor = gf2d_element_actor_new_full(actorFile, "idle" ,scale,NULL,gfc_vector2d(0,0),gfc_vector2d(0,0));
+    actor = gf2d_element_actor_new_full(actorFile, "idle" ,scale,NULL,gfc_vector2d(0,0),gfc_vector2d(0,0),0);
     ae = gf2d_element_new_full(
         be,
         0,
