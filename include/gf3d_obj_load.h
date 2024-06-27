@@ -83,4 +83,14 @@ ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vec
  */
 void gf3d_obj_free(ObjData *obj);
 
+/**
+ * @brief perform a collision test between the edge and an obj.  Searches through each triangle for collision, returning the FIRST triangle with collision (so convex hulls might return the wrong side)
+ * @param obj the object to test
+ * @param offset if the model has moved, rotated, scaled etc.  this is applied before the test 
+ * @param e the edge to test with
+ * @param contact [optional output] provides the point of impact
+ */
+int gf3d_obj_edge_test(ObjData *obj,GFC_Matrix4 offset, GFC_Edge3D e,GFC_Vector3D *contact);
+
+
 #endif

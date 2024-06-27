@@ -6,6 +6,29 @@
 
 #include "gf3d_obj_load.h"
 
+int gf3d_obj_edge_test(ObjData *obj,GFC_Matrix4 offset, GFC_Edge3D e,GFC_Vector3D *contact)
+{
+    int i;
+    GFC_Vector4D out;
+    GFC_Triangle3D t;
+    if ((!obj)||(!obj->outFace))return 0;
+    for (i = 0;i < obj->face_count;i++)
+    {
+        t.a = obj->faceVertices[obj->outFace[i].verts[0]].vertex;
+        t.b = obj->faceVertices[obj->outFace[i].verts[1]].vertex;
+        t.c = obj->faceVertices[obj->outFace[i].verts[2]].vertex;
+        //apply offset
+        gfc_matrix4_multiply_v(&out,offset,gfc_vector3dw(t.a,0));
+        t.a = gfc_vector4dxyz(out);
+        gfc_matrix4_multiply_v(&out,offset,gfc_vector3dw(t.b,0));
+        t.b = gfc_vector4dxyz(out);
+        gfc_matrix4_multiply_v(&out,offset,gfc_vector3dw(t.c,0));
+        t.c = gfc_vector4dxyz(out);
+        if (gfc_trigfc_angle_edge_test(e,t,contact))return 1;
+    }
+    return 0;
+}
+
 void gf3d_obj_get_counts_from_file(ObjData *obj, const char *mem,size_t fileSize);
 void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileSize);
 
