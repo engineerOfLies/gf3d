@@ -683,7 +683,7 @@ void gf3d_pipeline_create_basic_descriptor_pool_from_config(Pipeline *pipe,SJson
     {
         item = sj_array_get_nth(list,i);
         if (!item)continue;
-        str = sj_get_string_value(item);
+        str = sj_object_get_value_as_string(item,"descriptorType");
         if (!str)continue;
         poolSize[pools].type = gf3d_config_descriptor_type_from_str(str);
         poolSize[pools].descriptorCount = pipe->descriptorSetCount;
@@ -705,10 +705,6 @@ void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolS
         slog("no pipeline provided");
         return;
     }
-    poolSize[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSize[0].descriptorCount = pipe->descriptorSetCount;
-    poolSize[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSize[1].descriptorCount = pipe->descriptorSetCount;
     
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = poolSizeCount;
@@ -723,6 +719,10 @@ void gf3d_pipeline_create_basic_descriptor_pool(Pipeline *pipe,VkDescriptorPoolS
             slog("failed to create descriptor pool!");
             return;
         }
+    }
+    if (__DEBUG)
+    {
+        slog("created %i descriptor pools, with %i descriptors with %i sets",i,poolSizeCount,pipe->descriptorSetCount);
     }
     pipe->descriptorPoolCount = gf3d_pipeline.chainLength;
 }
@@ -803,7 +803,6 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
         allocInfo.descriptorPool = pipe->descriptorPool[i];
         if ((r = vkAllocateDescriptorSets(pipe->device, &allocInfo, pipe->descriptorSets[i])) != VK_SUCCESS)
         {
-            slog("failed to allocate descriptor sets!");
             if (r == VK_ERROR_OUT_OF_POOL_MEMORY)slog("out of pool memory");
             else if (r == VK_ERROR_FRAGMENTED_POOL)slog("fragmented pool");
             else if (r == VK_ERROR_OUT_OF_DEVICE_MEMORY)slog("out of device memory");
@@ -811,6 +810,7 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
             free(layouts);
             return;
         }
+        slog("allocated descriptor set %i for pipeline %s!",i,pipe->name);
     }
 }
 
