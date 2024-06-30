@@ -219,8 +219,7 @@ VkCommandBuffer gf3d_command_begin_single_time(Command* com)
     if (!com)
     {
         slog("com is NULL");
-    }
-    
+    }    
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandPool = com->commandPool;

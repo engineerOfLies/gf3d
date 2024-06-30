@@ -810,7 +810,7 @@ void gf3d_pipeline_create_descriptor_sets(Pipeline *pipe)
             free(layouts);
             return;
         }
-        slog("allocated descriptor set %i for pipeline %s!",i,pipe->name);
+        if (__DEBUG)slog("allocated descriptor set %i for pipeline %s!",i,pipe->name);
     }
 }
 
