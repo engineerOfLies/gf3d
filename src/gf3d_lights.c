@@ -159,7 +159,7 @@ void gf3d_light_build_ubo_from_array(LightUBO *ubo, GF3D_Light *lights[],Uint32 
     }
 }
 
-void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative)
+void gf3d_light_build_ubo_from_closest_list_limit(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative,int limit)
 {
     int i,j,c;
     float newDist;
@@ -168,15 +168,16 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
     GF3D_Light *bestLights[MAX_SHADER_LIGHTS] = {0};
     GF3D_Light *light;
     if (!ubo)return;
+    if ((limit > MAX_SHADER_LIGHTS)||(limit < 0))limit = MAX_SHADER_LIGHTS;
     c = gfc_list_get_count(lights);
-    for (i = 0;i < MIN(c,MAX_SHADER_LIGHTS);i++)
+    for (i = 0;i < MIN(c,limit);i++)
     {
         light = gfc_list_get_nth(lights,i);
         if (!light)continue;
         bestLights[i] = light;
         bestDistances[i] = gfc_vector3d_magnitude_between_squared(gfc_vector4dxyz(light->position),relative);
         if (most == -1)most = i;
-        else if (bestDistances[i] > bestDistances[most])most = i;//figure out the worst of the first MAX_SHADER_LIGHTS
+        else if (bestDistances[i] > bestDistances[most])most = i;//figure out the worst of the first limit
     }
     for (;i < c;i++)
     {
@@ -187,13 +188,18 @@ void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_
         {
             bestLights[most] = light;
             bestDistances[most] = newDist;
-            for (j = 0;j < MAX_SHADER_LIGHTS;j++)//find a new worst
+            for (j = 0;j < limit;j++)//find a new worst
             {
                 if (bestDistances[j] > bestDistances[most])most = j;
             }
         }
     }
-    gf3d_light_build_ubo_from_array(ubo, bestLights,MIN(c,MAX_SHADER_LIGHTS));
+    gf3d_light_build_ubo_from_array(ubo, bestLights,MIN(c,limit));
+}
+
+void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative)
+{
+    gf3d_light_build_ubo_from_closest_list_limit(ubo,lights,relative,-1);
 }
 
 void gf3d_light_build_ubo_from_closest(LightUBO *ubo,GFC_Vector3D relative)

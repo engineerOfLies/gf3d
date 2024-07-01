@@ -144,6 +144,16 @@ void gf3d_light_build_ubo_from_closest(LightUBO *ubo,GFC_Vector3D relative);
 void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative);
 
 /**
+ * @brief build a lighting ubo based on the closest X lights in the provided list, where X is the limit
+ * @param ubo [output] this will be populated with up to MAX_SHADER_LIGHTS
+ * @param lights the list of lights to check against
+ * @param relative this will be the reference point for chosing which lights will be added.
+ * @param limit if -1 limit will be MAX_SHADER_LIGHTS, if its greater than MAX_SHADER_LIGHTS then it will be MAX_SHADER_LIGHTS.  Otherwise up to limit be populated
+ * @note ubo->flags.y will be set to the number of lights set.
+ */
+void gf3d_light_build_ubo_from_closest_list_limit(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative,int limit);
+
+/**
  * @brief build a basic lightUbo from just the ambient light info.
  * @note this is a good starting point for making a light ubo
  * @return a light Ubo with just the ambient light set based on the global setting
