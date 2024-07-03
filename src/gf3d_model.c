@@ -267,6 +267,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     const char *textureFile;
     const char *armatureFile;
     const char *animFile;
+    const char *materialFile;
     if (!gf3d_model.initiliazed)return NULL;
     if (!json)return NULL;
 
@@ -362,10 +363,18 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
         }
     }
     
-    item = sj_object_get_value(json,"material");
-    if (item)
+    materialFile = sj_object_get_value_as_string(json,"materialFile");
+    if (materialFile)
     {
-        model->material = gf3d_material_parse_js(item,filename);
+        model->material = gf3d_material_load(materialFile);
+    }
+    else
+    {
+        item = sj_object_get_value(json,"material");
+        if (item)
+        {
+            model->material = gf3d_material_parse_js(item,filename);
+        }
     }
 
     textureFile = sj_get_string_value(sj_object_get_value(json,"normalMap"));

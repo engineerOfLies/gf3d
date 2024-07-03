@@ -214,4 +214,20 @@ GFC_List *gf3d_light_list_load_from_config(SJson *config);
  */
 GF3D_Light *gf3d_light_load_from_config(SJson *config);
 
+/**
+ * @brief save a list of lights to json that can be saved
+ * @param lights the list containing gf3d_lights
+ * @return NULL on error or if the list was empty, the json otherwise
+ * @note the json must be freed
+ */
+SJson *gf3d_light_list_save_to_config(GFC_List *lights);
+
+/**
+ * @brief save a gf3d_light to json that can be saved
+ * @param light gf3d_light to save
+ * @return NULL on error, the json otherwise
+ * @note the json must be freed
+ */
+SJson *gf3d_light_save_to_config(GF3D_Light *light);
+
 #endif

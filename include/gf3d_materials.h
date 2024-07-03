@@ -98,6 +98,16 @@ MaterialUBO gf3d_material_make_basic_ubo(GFC_Color diffuse);
 GF3D_Material *gf3d_material_duplicate(GF3D_Material *from);
 
 /**
+ * @brief load a material from json file
+ * @note the object key must be named "material"
+ * @note if already loaded, gives back a reference to the exiting one
+ * @param filename the json file containing the material definition
+ * @return NULL on error or not found, the material otherwise
+ * @note free with gf3d_material_free()
+ */
+GF3D_Material *gf3d_material_load(const char *filename);
+
+/**
  * @brief search the loaded materials for the material by its name.  
  * @note there may be duplicate names.  You may need to use gf3d_material_get_by_file_name to specify which file it came from
  * @param name the name of the material to find
@@ -106,12 +116,11 @@ GF3D_Material *gf3d_material_duplicate(GF3D_Material *from);
 GF3D_Material *gf3d_material_get_by_name(const char *name);
 
 /**
- * @brief search the loaded materials for the material by its name and file loaded from
+ * @brief search the loaded materials for the material by its filename
  * @param filename the file that provided this material
- * @param name the name of the material
  * @return NULL if not found, or a pointer to the material otherwise
  */
-GF3D_Material *gf3d_material_get_by_file_name(const char *filename,const char *name);
+GF3D_Material *gf3d_material_get_by_file_name(const char *filename);
 
 /**
  * @brief load the material information from an obj mtl file.

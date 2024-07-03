@@ -238,7 +238,7 @@ GF3D_Material *gf3d_material_get_by_name(const char *name)
     return NULL;
 }
 
-GF3D_Material *gf3d_material_get_by_file_name(const char *filename,const char *name)
+GF3D_Material *gf3d_material_get_by_file_name(const char *filename)
 {
     int i,c;
     GF3D_Material *material;
@@ -248,10 +248,27 @@ GF3D_Material *gf3d_material_get_by_file_name(const char *filename,const char *n
         material = gfc_list_get_nth(material_manager.materials,i);
         if (!material)continue;
         if (gfc_string_l_strcmp(material->filename,filename)!= 0)continue;
-        if (gfc_string_l_strcmp(material->name,name)!= 0)continue;
         return material;
     }
     return NULL;
+}
+
+GF3D_Material *gf3d_material_load(const char *filename)
+{
+    SJson *json;
+    GF3D_Material *material;
+    if (!filename)return NULL;
+    material = gf3d_material_get_by_file_name(filename);
+    if (material)
+    {
+        material->_refCount++;
+        return material;
+    }
+    json = sj_load(filename);
+    if (!json)return NULL;
+    material = gf3d_material_parse_js(sj_object_get_value(json,"material"),filename);
+    sj_free(json);
+    return material;
 }
 
 void gf3d_material_free(GF3D_Material *material)

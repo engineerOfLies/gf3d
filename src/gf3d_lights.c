@@ -267,6 +267,42 @@ GFC_List *gf3d_light_list_load_from_config(SJson *config)
     return list;
 }
 
+SJson *gf3d_light_list_save_to_config(GFC_List *lights)
+{
+    int i,c;
+    GF3D_Light *light;
+    SJson *json;
+    if (!lights)return NULL;
+    c = gfc_list_count(lights);
+    if (!c)return NULL;
+    json = sj_array_new();
+    if (!json)return NULL;
+    for (i = 0;i < c;i++)
+    {
+        light = gfc_list_nth(lights,i);
+        if (!light)continue;
+        sj_array_append(json,gf3d_light_save_to_config(light));
+    }
+    return json;
+}
+
+SJson *gf3d_light_save_to_config(GF3D_Light *light)
+{
+    SJson *json;
+    if (!light)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    
+    sj_object_insert(json,"color",sj_vector4d_new(light->color));    
+    sj_object_insert(json,"direction",sj_vector4d_new(light->direction));    
+    sj_object_insert(json,"position",sj_vector4d_new(light->position));    
+    sj_object_insert(json,"ambientCoefficient",sj_new_float(light->ambientCoefficient));
+    sj_object_insert(json,"attenuation",sj_new_float(light->attenuation));
+    sj_object_insert(json,"angle",sj_new_float(light->angle));
+    sj_object_insert(json,"brightness",sj_new_float(light->brightness));
+    return json;
+}
+
 GF3D_Light *gf3d_light_load_from_config(SJson *config)
 {
     GFC_Color color;
