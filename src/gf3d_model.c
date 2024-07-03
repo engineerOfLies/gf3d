@@ -266,6 +266,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     const char *modelFile;
     const char *textureFile;
     const char *armatureFile;
+    const char *animFile;
     if (!gf3d_model.initiliazed)return NULL;
     if (!json)return NULL;
 
@@ -347,10 +348,18 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
         sj_value_as_matrix4_vectors(item,model->matrix);
     }
     
-    item = sj_object_get_value(json,"actionList");
-    if (item)
+    animFile = sj_object_get_value_as_string(json,"actionListFile");
+    if (animFile)
     {
-        model->action_list = gfc_action_list_parse(item);
+        model->action_list = gfc_action_list_load(animFile);
+    }
+    else
+    {
+        item = sj_object_get_value(json,"actionList");
+        if (item)
+        {
+            model->action_list = gfc_action_list_parse(item);
+        }
     }
     
     item = sj_object_get_value(json,"material");
