@@ -43,29 +43,29 @@ typedef enum
 
 struct Element_S
 {
-    int      index;             /**<order of highlight in the menu, -1 for does not receive highlight*/
-    GFC_TextLine name;              /**<name of the element should be unique per window*/
+    int                 index;              /**<order of highlight in the menu, -1 for does not receive highlight*/
+    GFC_TextLine        name;               /**<name of the element should be unique per window*/
     
-    Uint8   canHasFocus;        /**<if true, this element can be the focus for keyboard input*/
-    Uint8   hasFocus;           /**<if true, this element does have focus*/
-    GFC_Rect bounds;                /**<drawing bounds for the element*/
-    GFC_Vector2D lastDrawPosition;  /**<location of the element on the screen of its last draw position*/
-    GFC_Color color;                /**<color for the element*/
+    Uint8               canHasFocus;        /**<if true, this element can be the focus for keyboard input*/
+    Uint8               hasFocus;           /**<if true, this element does have focus*/
+    GFC_Rect            bounds;             /**<drawing bounds for the element*/
+    GFC_Vector2D        lastDrawPosition;   /**<location of the element on the screen of its last draw position*/
+    GFC_Color           color;              /**<color for the element*/
     
-    GFC_Color backgroundGFC_Color;      /**<color for background of element*/
-    int   backgroundDraw;       /**<if true, draw the background*/
+    GFC_Color           backgroundColor;    /**<color for background of element*/
+    int                 backgroundDraw;     /**<if true, draw the background*/
     
-    int hidden;                 /**<if true, do not draw or update*/
-    int state;                  /**<if true, drawn with highlight*/
-    int type;                   /**<which type of element this is*/
-    void (*draw)        (struct Element_S *element,GFC_Vector2D offset); /**<draw function, offset comes from draw position of window*/
+    int                 hidden;             /**<if true, do not draw or update*/
+    int                 state;              /**<if true, drawn with highlight*/
+    int                 type;               /**<which type of element this is*/
+    void (*draw)(struct Element_S *element,GFC_Vector2D offset); /**<draw function, offset comes from draw position of window*/
     struct Element_S *(*get_next)(struct Element_S *element,struct Element_S *from); /**<search for the next element from (if NULL, it returns itself*/
-    GFC_List *(*update)     (struct Element_S *element,GFC_Vector2D offset); /**<function called for updates  returns alist of all elements updated with input*/
-    void (*free_data)   (struct Element_S *element);    /**<free function for the element to clean up any loaded custom data*/
+    GFC_List *(*update)(struct Element_S *element,GFC_Vector2D offset); /**<function called for updates  returns alist of all elements updated with input*/
+    void (*free_data)(struct Element_S *element);    /**<free function for the element to clean up any loaded custom data*/
     struct Element_S *(*get_by_name)(struct Element_S *element,const char *name);/**<get element by name, searches sub elements as well*/
-    Window *win;                /**<my parent window*/
-    struct Element_S *parent;   /**<my parent element*/
-    void *data;                 /**<custom element data*/
+    Window             *win;                /**<my parent window*/
+    struct Element_S   *parent;             /**<my parent element*/
+    void               *data;               /**<custom element data*/
 };
 
 /**
@@ -79,10 +79,9 @@ Element *gf2d_element_new();
  * @param index the index of the element
  * @param name the name of the element
  * @param bounds the drawing bounds of the element
- * @param color the dra    return NULL;
-w color of the element
+ * @param color the draw color of the element
  * @param state the initial state of the element
- * @param backgroundGFC_Color the color to draw for the background
+ * @param backgroundColor the color to draw for the background
  * @param backgroundDraw if true, draw a background for the element
  * @param win the window this element ultimately belongs to
  * @return NULL on error or a new element otherwise;
@@ -94,7 +93,7 @@ Element *gf2d_element_new_full(
     GFC_Rect bounds,
     GFC_Color color,
     int state,
-    GFC_Color backgroundGFC_Color,
+    GFC_Color backgroundColor,
     int backgroundDraw,
     Window *win
 );

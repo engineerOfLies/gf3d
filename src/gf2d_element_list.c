@@ -28,6 +28,15 @@ int gf2d_element_list_get_row_count(Element *element)
     return (int)element->bounds.h / list->itemSize.y;
 }
 
+GFC_Vector2D gf2d_element_list_get_item_size(Element *element)
+{
+    GFC_ListElement *list;
+    if (!element)return gfc_vector2d(-1,-1);
+    list = (GFC_ListElement*)element->data;
+    return list->itemSize;
+}
+
+
 int gf2d_element_list_get_items_per_column(Element *element)
 {
     GFC_ListElement *list;

@@ -1,11 +1,7 @@
 #include "simple_logger.h"
 
 #include "gfc_callbacks.h"
-#include "gfc_input.h"
-#include "gfc_vector.h"
 
-#include "gf3d_vgraphics.h"
-#include "gf2d_mouse.h"
 #include "gf2d_elements.h"
 #include "gf2d_element_list.h"
 #include "gf2d_element_label.h"
@@ -15,33 +11,38 @@
 
 typedef struct
 {
-    GFC_Callback callback;
-    int *result;
-}ItemGFC_ListMenuData;
+    GFC_Callback        callback;
+    int                *result;
+    int                 itemCount;
+    GFC_Color           fontBase;
+    GFC_Color           backgroundBase;
+    GFC_Color           Selected;
+    ButtonCustomAction  highStyle;
+    int                 selectedOption;
+}ItemListMenuData;
 
 int item_list_menu_free(Window *win)
 {
-    ItemGFC_ListMenuData* data;
+    ItemListMenuData* data;
     if ((!win)||(!win->data))return 0;
-    data = (ItemGFC_ListMenuData*)win->data;
-    gf2d_window_close_child(win->parent,win);
+    data = (ItemListMenuData*)win->data;
     free(data);
     return 0;
 }
 
-int item_list_menu_update(Window *win,GFC_List *updateGFC_List)
+int item_list_menu_update(Window *win,GFC_List *updateList)
 {
     int i,count;
     Element *e;
-    ItemGFC_ListMenuData* data;
+    ItemListMenuData* data;
     if ((!win)||(!win->data))return 0;
-    if (!updateGFC_List)return 0;
-    data = (ItemGFC_ListMenuData*)win->data;
+    if (!updateList)return 0;
+    data = (ItemListMenuData*)win->data;
         
-    count = gfc_list_get_count(updateGFC_List);
+    count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateGFC_List,i);
+        e = gfc_list_get_nth(updateList,i);
         if (e->index >= 1000)
         {
             if (data->result)
@@ -52,70 +53,68 @@ int item_list_menu_update(Window *win,GFC_List *updateGFC_List)
             gf2d_window_free(win);
             return 1;
         }
-    }
-    if (gfc_input_command_released("cancel"))
-    {
-            if (data->result)
-            {
-                *data->result = -1;
-            }
-            gfc_callback_call(&data->callback);
-            gf2d_window_free(win);
-            return 1;
-    }
-    if ((gf2d_mouse_button_state(0))||(gf2d_mouse_button_state(1)))
-    {
-        if (!gf2d_window_mouse_in(win))
+        else if (strcmp(e->name,"item_down")==0)
         {
-            //clicked outside of the menu
-            if (data->result)
-            {
-                *data->result = -1;
-            }
-            gfc_callback_call(&data->callback);
-            gf2d_window_free(win);
+            data->selectedOption++;
+            if (data->selectedOption > data->itemCount)data->selectedOption = 0;
+            gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1000 + data->selectedOption));
+            return 1;
+        }
+        else if (strcmp(e->name,"item_up")==0)
+        {
+            data->selectedOption--;
+            if (data->selectedOption < 0 )data->selectedOption = data->itemCount - 1;
+            gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1000 + data->selectedOption));
             return 1;
         }
     }
-    return gf2d_window_mouse_in(win);
+    return 0;
 }
 
 void item_list_menu_add_option(Window *win, const char *option,int index)
 {
     Element *list;
     Element *be,*le;
+    GFC_Vector2D size;
     
+    ButtonElement *button;
     LabelElement *label;
-
+    
+    ItemListMenuData* data;
     if ((!win)||(!option))return;
+    data = win->data;
     list = gf2d_window_get_element_by_name(win,"options");
     if (!list)
     {
         slog("window missing options element");
         return;
     }
-    
-    label = gf2d_element_label_new_full(option,gfc_color8(200,255,255,255),FT_Small,LJ_Left,LA_Middle,0);
+    size = gf2d_element_list_get_item_size(list);
+    label = gf2d_element_label_new_full(option,data->fontBase,FT_Small,LJ_Left,LA_Middle,0);
 
     be = gf2d_element_new_full(
         list,
         1000+index,
         (char *)option,
-        gfc_rect(0,0,336,24),
-        GFC_COLOR_LIGHTCYAN,
+        gfc_rect(0,0,size.x,size.y),
+        data->fontBase,
         0,
-        gfc_color(.5,.5,.5,1),0,win);
+        data->backgroundBase,0,win);
     le = gf2d_element_new_full(
         be,
         2000+index,
         (char *)option,
-        gfc_rect(0,0,336,24),
-        GFC_COLOR_LIGHTCYAN,
+        gfc_rect(0,0,size.x,size.y),
+        data->fontBase,
         0,
-        gfc_color(1,1,1,1),0,win);
+        data->backgroundBase,0,win);
     
     gf2d_element_make_label(le,label);
-    gf2d_element_make_button(be,gf2d_element_button_new_full(le,NULL,gfc_color(1,1,1,1),gfc_color(0.9,0.9,0.9,1),0));
+    
+    button = gf2d_element_button_new_full(le,NULL,data->Selected,GFC_COLOR_DARKGREY,0);
+    button->customActions = data->highStyle;
+    gf2d_element_make_button(be,button);
+    be->canHasFocus = 1;
     gf2d_element_list_add_item(list,be);
 }
 
@@ -123,44 +122,47 @@ void item_list_menu_add_all_options(Window *win,GFC_List *options)
 {
     const char *item;
     int i,c;
-    GFC_Vector2D screen;
     if ((!win)||(!options))return;
     c = gfc_list_get_count(options);
-    gf2d_window_set_dimensions(
-        win,
-        gfc_rect(win->dimensions.x,win->dimensions.y,win->dimensions.w,win->dimensions.h + c * 24));
+    if (win->dimensions.h < ((c + 1) * 24))//only expand the list
+    {
+        gf2d_window_set_dimensions(
+            win,
+            gfc_rect(win->dimensions.x,win->dimensions.y,win->dimensions.w,(c + 1) * 24));
+    }
     for (i = 0;i < c;i++)
     {
         item = gfc_list_get_nth(options,i);
         if (!item)continue;
         item_list_menu_add_option(win, item,i);
     }
-    screen = gf3d_vgraphics_get_resolution();
-    if ((win->dimensions.y + win->dimensions.h) > screen.y)
-    {
-        win->dimensions.y = screen.y - win->dimensions.h;
-    }
-    if (win->dimensions.y < 0)
-    {
-        win->dimensions.y = 0;
-    }
 }
 
 
-Window *item_list_menu(Window *parent,GFC_Vector2D position,float width,char *question,GFC_List *options,void(*onSelect)(void *),void *callbackData,int *result)
+Window *item_list_menu(
+    Window *parent,
+    GFC_Vector2D position,
+    char *question,
+    GFC_List *options,
+    GFC_Color fontBase,
+    GFC_Color backgroundBase,
+    GFC_Color Selected,
+    ButtonCustomAction highStyle,
+    void(*onSelect)(void *),
+    void *callbackData,
+    int *result)
 {
-    Element *e;
     Window *win;
-    ItemGFC_ListMenuData* data;
-    win = gf2d_window_load("menus/item_list_menu.json");
+    ItemListMenuData* data;
+    win = gf2d_window_load("menus/item_list.menu");
     if (!win)
     {
-        slog("failed to load editor menu");
+        slog("failed to load item_list.menu");
         return NULL;
     }
     win->update = item_list_menu_update;
     win->free_data = item_list_menu_free;
-    data = gfc_allocate_array(sizeof(ItemGFC_ListMenuData),1);
+    data = gfc_allocate_array(sizeof(ItemListMenuData),1);
     if (!data)
     {
         gf2d_window_free(win);
@@ -168,18 +170,19 @@ Window *item_list_menu(Window *parent,GFC_Vector2D position,float width,char *qu
     }
     win->data = data;
     win->parent = parent;
-    win->dimensions.w = width;
     data->result = result;
     data->callback.data = callbackData;
     data->callback.callback = onSelect;
-    e = gf2d_window_get_element_by_name(win,"title");
-    if (e)
-    {
-        e->bounds.w = width;
-        gf2d_element_label_set_text(e,question);
-    }
+    data->itemCount = gfc_list_count(options);
+    data->fontBase = fontBase;
+    data->backgroundBase = backgroundBase;
+    data->Selected = Selected;
+    data->highStyle = highStyle;
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),question);
     gf2d_window_set_position(win,position);
     item_list_menu_add_all_options(win,options);
+    data->selectedOption = 0;
+    gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1000 + data->selectedOption));
     return win;
 }
 

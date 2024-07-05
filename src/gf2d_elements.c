@@ -35,7 +35,7 @@ Element *gf2d_element_new_full(
     GFC_Rect bounds,
     GFC_Color color,
     int state,
-    GFC_Color backgroundGFC_Color,
+    GFC_Color backgroundColor,
     int backgroundDraw,
     Window *win
 )
@@ -51,7 +51,7 @@ Element *gf2d_element_new_full(
     e->color = color;
     e->state = state;
     e->bounds = bounds;
-    e->backgroundGFC_Color = backgroundGFC_Color;
+    e->backgroundColor = backgroundColor;
     e->backgroundDraw = backgroundDraw;
     e->win = win;
     return e;
@@ -91,7 +91,7 @@ void gf2d_element_draw(Element *e, GFC_Vector2D offset)
     e->lastDrawPosition.y = rect.y;
     if (e->backgroundDraw)
     {
-        gf2d_draw_rect_filled(rect,e->backgroundGFC_Color);
+        gf2d_draw_rect_filled(rect,e->backgroundColor);
     }
     if (e->draw)e->draw(e,offset);
     if (__DEBUG)
@@ -189,7 +189,7 @@ Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
     sj_get_integer_value(value,&e->index);
 
     e->color = sj_value_as_color(sj_object_get_value(json,"color"));
-    e->backgroundGFC_Color = sj_value_as_color(sj_object_get_value(json,"backgroundGFC_Color"));
+    e->backgroundColor = sj_value_as_color(sj_object_get_value(json,"backgroundColor"));
 
     value = sj_object_get_value(json,"backgroundDraw");
     if (value)
@@ -254,7 +254,7 @@ void gf2d_element_set_color(Element *element,GFC_Color color)
 void gf2d_element_set_background_color(Element *element,GFC_Color color)
 {
     if (!element)return;
-    element->backgroundGFC_Color = color;
+    element->backgroundColor = color;
 }
 
 int gf2d_element_set_focus(Element *element,int focus)

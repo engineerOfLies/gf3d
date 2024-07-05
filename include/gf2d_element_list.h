@@ -115,6 +115,13 @@ int gf2d_element_list_get_items_per_line(Element *e);
 int gf2d_element_list_get_items_per_column(Element *e);
 
 /**
+ * @brief get the configured size of each item for a list element
+ * @param e the list element 
+ * @return (-1,-1) on error or the size othereise
+ */
+GFC_Vector2D gf2d_element_list_get_item_size(Element *e);
+
+/**
  * @brief make a new list element, and specify all of its parameters
  */
 Element *gf2d_element_list_new_complete(

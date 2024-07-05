@@ -26,7 +26,7 @@ void gf2d_element_scrollbar_draw(Element *element,GFC_Vector2D offset)
         offset.y + element->bounds.y + 20,
         element->bounds.w -25,
         element->bounds.h -40);
-    gf2d_draw_rect_filled(rect,element->backgroundGFC_Color);
+    gf2d_draw_rect_filled(rect,element->backgroundColor);
     
     gf2d_element_draw(data->scrollUp,position);
     gf2d_element_draw(data->scrollSlider,position);

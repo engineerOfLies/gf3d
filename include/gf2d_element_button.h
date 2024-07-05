@@ -16,21 +16,22 @@ typedef enum
 {
     BCA_Default = 0,
     BCA_Nothing,        // do nothing at all
-    BCA_BackgroundHighlight //use the highGFC_Colors for the background
+    BCA_BackgroundHighlight, //use the highGFC_Colors for the background
+    BCA_MAX
 }ButtonCustomAction;
 
 typedef struct
 {
-    Element *label;
-    Element *actor;
-    BE_Style style;
-    GFC_TextLine hotkey; /**<input used to hotkey the button*/
-    Bool     repeat; /**<if true, enable continuous updates while held*/
-    Bool     customActions;
+    Element            *label;
+    Element            *actor;
+    BE_Style            style;
+    GFC_TextLine        hotkey; /**<input used to hotkey the button*/
+    Bool                repeat; /**<if true, enable continuous updates while held*/
+    ButtonCustomAction  customActions;
     // base color comes from element
-    GFC_Color highGFC_Color;    /**<color used when button is in highlight*/
-    GFC_Color pressGFC_Color;   /**<color used while pressed*/
-    GFC_TextLine sound;//sound file to play when pressed
+    GFC_Color           highColor;    /**<color used when button is in highlight*/
+    GFC_Color           pressColor;   /**<color used while pressed*/
+    GFC_TextLine        sound;//sound file to play when pressed
 }ButtonElement;
 
 /**
@@ -50,7 +51,7 @@ void gf2d_element_make_button(Element *e,ButtonElement *button);
  * @param customActions if true, this will not look for actions idle, high and press for the button
  * @return NULL on error or a newly create button element
  */
-ButtonElement *gf2d_element_button_new_full(Element *label,Element *actor,GFC_Color highGFC_Color,GFC_Color pressGFC_Color,int customActions);
+ButtonElement *gf2d_element_button_new_full(Element *label,Element *actor,GFC_Color highColor,GFC_Color pressColor,int customActions);
 
 /**
  * @brief load button configuration for a button element from config
