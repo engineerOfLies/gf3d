@@ -209,6 +209,16 @@ const char *gf2d_element_label_get_text(Element *e)
     return label->text;
 }
 
+void gf2d_element_label_set_font(Element *e,FontTypes font)
+{
+    LabelElement *label;
+    if (!e)return;
+    if (e->type != ET_Label)return;
+    label = (LabelElement *)e->data;
+    if (!label)return;
+    label->style = font;
+}
+
 void gf2d_element_label_set_text(Element *e,const char *text)
 {
     LabelElement *label;

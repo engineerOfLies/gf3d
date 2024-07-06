@@ -14,6 +14,9 @@ typedef struct
     GFC_Callback        callback;
     int                *result;
     int                 itemCount;
+    Uint8               allowClose;
+    Uint8               persist;
+    FontTypes           font;
     GFC_Color           fontBase;
     GFC_Color           backgroundBase;
     GFC_Color           Selected;
@@ -50,7 +53,7 @@ int item_list_menu_update(Window *win,GFC_List *updateList)
                 *data->result = e->index - 1000;
             }
             gfc_callback_call(&data->callback);
-            gf2d_window_free(win);
+            if (!data->persist)gf2d_window_free(win);
             return 1;
         }
         else if (strcmp(e->name,"item_down")==0)
@@ -65,6 +68,11 @@ int item_list_menu_update(Window *win,GFC_List *updateList)
             data->selectedOption--;
             if (data->selectedOption < 0 )data->selectedOption = data->itemCount - 1;
             gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1000 + data->selectedOption));
+            return 1;
+        }
+        else if ((data->allowClose)&&(strcmp(e->name,"close")==0))
+        {
+            gf2d_window_free(win);
             return 1;
         }
     }
@@ -90,7 +98,7 @@ void item_list_menu_add_option(Window *win, const char *option,int index)
         return;
     }
     size = gf2d_element_list_get_item_size(list);
-    label = gf2d_element_label_new_full(option,data->fontBase,FT_Small,LJ_Left,LA_Middle,0);
+    label = gf2d_element_label_new_full(option,data->fontBase,data->font,LJ_Left,LA_Middle,0);
 
     be = gf2d_element_new_full(
         list,
@@ -142,8 +150,13 @@ void item_list_menu_add_all_options(Window *win,GFC_List *options)
 Window *item_list_menu(
     Window *parent,
     GFC_Vector2D position,
-    char *question,
+    Uint8     persist,
+    Uint8     allowClose,
+    char     *question,
+    FontTypes questionFont,
+    GFC_Color questionColor,
     GFC_List *options,
+    FontTypes font,
     GFC_Color fontBase,
     GFC_Color backgroundBase,
     GFC_Color Selected,
@@ -153,6 +166,7 @@ Window *item_list_menu(
     int *result)
 {
     Window *win;
+    Element *title;
     ItemListMenuData* data;
     win = gf2d_window_load("menus/item_list.menu");
     if (!win)
@@ -174,11 +188,18 @@ Window *item_list_menu(
     data->callback.data = callbackData;
     data->callback.callback = onSelect;
     data->itemCount = gfc_list_count(options);
+    data->font = font;
     data->fontBase = fontBase;
     data->backgroundBase = backgroundBase;
     data->Selected = Selected;
     data->highStyle = highStyle;
-    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),question);
+    data->persist = persist;
+    data->allowClose = allowClose;
+    //set title
+    title = gf2d_window_get_element_by_name(win,"title");
+    gf2d_element_label_set_text(title,question);
+    gf2d_element_label_set_font(title,questionFont);
+    title->color = questionColor;
     gf2d_window_set_position(win,position);
     item_list_menu_add_all_options(win,options);
     data->selectedOption = 0;

@@ -163,6 +163,10 @@ FontTypes gf2d_font_type_from_text(const char *buf)
     {
         return FT_Normal;
     }
+    else if (strcmp(buf,"large")==0)
+    {
+        return FT_Large;
+    }
     else if (strcmp(buf,"small")==0)
     {
         return FT_Small;

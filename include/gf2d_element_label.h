@@ -1,6 +1,7 @@
 #ifndef __GF2D_LABEL_ELEMENT_H__
 #define __GF2D_LABEL_ELEMENT_H__
 
+#include "gf2d_font.h"
 #include "gf2d_elements.h"
 
 typedef enum
@@ -82,6 +83,13 @@ void gf2d_element_load_label_from_config(Element *e,SJson *json);
  * @param text the text
  */
 void gf2d_element_label_set_text(Element *e,const char *text);
+
+/**
+ * @brief set the label font
+ * @param e the element to set the font for
+ * @param font the font to use
+ */
+void gf2d_element_label_set_font(Element *e,FontTypes font);
 
 /**
  * @brief enable/disable text wrapping for the label element
