@@ -56,7 +56,7 @@ int item_list_menu_update(Window *win,GFC_List *updateList)
         else if (strcmp(e->name,"item_down")==0)
         {
             data->selectedOption++;
-            if (data->selectedOption > data->itemCount)data->selectedOption = 0;
+            if (data->selectedOption >= data->itemCount)data->selectedOption = 0;
             gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1000 + data->selectedOption));
             return 1;
         }

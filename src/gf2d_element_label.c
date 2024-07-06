@@ -146,6 +146,28 @@ Element *gf2d_label_new_simple_size(Window *win,int index,const char *text,int s
     return le;
 }
 
+void gf2d_element_label_set_wrap(Element *e,Uint8 wraps)
+{
+    LabelElement *label;
+    if (!e)return;
+    if (e->type != ET_Label)return;
+    label = (LabelElement *)e->data;
+    if (!label)return;
+    label->wraps = wraps;
+}
+
+void gf2d_element_label_set_alignment(Element *e,Uint8 justify,Uint8 align)
+{
+    LabelElement *label;
+    if (!e)return;
+    if (e->type != ET_Label)return;
+    label = (LabelElement *)e->data;
+    if (!label)return;
+    label->justify = justify;
+    label->alignment = align;
+}
+
+
 Element *gf2d_label_new_simple(Window *win,int index,const char *text,int style,GFC_Color color)
 {
     Element *le;
@@ -189,9 +211,9 @@ const char *gf2d_element_label_get_text(Element *e)
 
 void gf2d_element_label_set_text(Element *e,const char *text)
 {
+    LabelElement *label;
     if (!e)return;
     if (e->type != ET_Label)return;
-    LabelElement *label;
     label = (LabelElement *)e->data;
     if (!label)return;
     if ((!text)||(!strlen(text)))

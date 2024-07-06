@@ -84,6 +84,21 @@ void gf2d_element_load_label_from_config(Element *e,SJson *json);
 void gf2d_element_label_set_text(Element *e,const char *text);
 
 /**
+ * @brief enable/disable text wrapping for the label element
+ * @param e the element to set
+ * @param wraps 1 to enable, 0 to disable
+ */
+void gf2d_element_label_set_wrap(Element *e,Uint8 wraps);
+
+/**
+ * @brief Set the justification and alignment of the text element
+ * @param e the element to set
+ * @param justify the justification  LJ_Left, LJ_Center, or LJ_Right
+ * @param align the alightment LA_Top, LA_Middle, or LA_Bottom
+ */
+void gf2d_element_label_set_alignment(Element *e,Uint8 justify,Uint8 align);
+
+/**
  * @brief get the label text
  * @param e the element to get the text from
  * @return a pointer to the label text

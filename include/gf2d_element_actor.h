@@ -29,10 +29,19 @@ Actor *gf2d_element_actor_get_actor(Element *e);
 
 /**
  * @brief set the actor for a given actor element
+ * @note free's any image or actor previously loaded
  * @param e the element to set the actor for
  * @param actorFile the file to set it to
  */
 void gf2d_element_actor_set_actor(Element *e, const char *actorFile);
+
+/**
+ * @brief set the image for the given actor element
+ * @note free's any image or actor previously loaded
+ * @param e the element to set the actor for
+ * @param imageFile the file to set it to
+ */
+void gf2d_element_actor_set_image(Element *e, const char *imageFile);
 
 /**
  * @brief set an element actor's draw scale

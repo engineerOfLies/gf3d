@@ -4,6 +4,19 @@
 #include "gf2d_elements.h"
 #include "gf2d_element_list.h"
 
+/**
+ * @example
+    {
+        "type":"scrollbar",
+        "name": "scrollbarName",    //OPTIONAL for referencing
+        "id" : 0,                   //OPTIONAL for referencing
+        "bounds": [0,4,1,1],        //remember things within 0.0-1.0 are percentages of parent
+        "color" : [255,255,255,255],
+        "list_target":"list element name", //this scrollbar will scroll for the provided element named list
+        "style": "vertical",        //horizontal is also an option
+    }
+ */
+
 typedef struct
 {
     int position;           //our current scroll position

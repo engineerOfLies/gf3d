@@ -3,6 +3,26 @@
 
 #include "gfc_list.h"
 #include "gf2d_elements.h"
+/**
+ * @example
+ * 
+ * {
+        "type": "list",
+        "name": "listName",         //OPTIONAL for referencing
+        "id" : 0,                   //OPTIONAL for referencing
+        "bounds": [0,4,1,1],        //remember things within 0.0-1.0 are percentages of parent
+        "color" : [255,255,255,255],
+        "style": "vertical",        //horizontal is also an option
+        "item_size" : [1,24],       //default size of items
+        "packed":true,              //OPTIONAL if false, item size is used for spacing
+        "cropped":true,             //OPTIONAL if true, cut off any list items that exceed bounds
+        "scrolls":true,             //OPTIONAL, only matters if crapped.  Allows items to scroll within bounds
+        "scroolbar":{},             //if scrolling, use this scrollbar element
+        "elements":                 // list of other elements
+        []
+ * 
+ */
+
 
 typedef enum
 {

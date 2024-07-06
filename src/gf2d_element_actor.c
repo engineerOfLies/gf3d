@@ -159,6 +159,11 @@ void gf2d_element_actor_set_actor(Element *e, const char *actorFile)
         gf2d_actor_free(ae->actor);
         ae->actor = NULL;
     }
+    if (ae->image)
+    {
+        gf2d_sprite_free(ae->image);
+        ae->image = NULL;
+    }
     if (actorFile)
     {
         ae->actor = gf2d_actor_load(actorFile);
@@ -166,6 +171,31 @@ void gf2d_element_actor_set_actor(Element *e, const char *actorFile)
     ae->action = NULL;
     ae->frame = 0;
 }
+
+void gf2d_element_actor_set_image(Element *e, const char *imageFile)
+{
+    ActorElement *ae;
+    if ((!e)||(e->type != ET_Actor))return;
+
+    ae = (ActorElement *)e->data;
+    if (ae->actor)
+    {
+        gf2d_actor_free(ae->actor);
+        ae->actor = NULL;
+    }
+    if (ae->image)
+    {
+        gf2d_sprite_free(ae->image);
+        ae->image = NULL;
+    }
+    if (imageFile)
+    {
+        ae->image = gf2d_sprite_load_image(imageFile);
+    }
+    ae->action = NULL;
+    ae->frame = 0;
+}
+
 
 void gf2d_element_actor_set_frame(Element *e, Uint32 i)
 {
