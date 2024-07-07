@@ -2,6 +2,7 @@
 #define __MESSAGE_BUFFER_H__
 
 #include "gfc_color.h"
+#include "gf2d_font.h"
 #include "gf2d_windows.h"
 
 /**
@@ -9,9 +10,10 @@
  * @note this is a singleton and won't make a new one if one already exists
  * @param count how many messages will be displayed at once
  * @param timeout how long messages stay in the buffer before timing out
- * @param defaultGFC_Color the color the messages are drawn with
+ * @param defaultColor the color the messages are drawn with
+ * @param font the font to use for the messages
  */
-Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultGFC_Color);
+Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultColor, FontTypes font);
 
 /**
  * @brief set behavior to always show the most recent message and push older messages away faster

@@ -114,7 +114,7 @@ int message_buffer_update(Window *win,GFC_List *updateGFC_List)
     return 0;
 }
 
-Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultColor)
+Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultColor,FontTypes font)
 {
     int i;
     LabelElement *label;
@@ -154,7 +154,7 @@ Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultColor)
         label = gf2d_element_label_new_full(
             NULL,
             gfc_color8(255,255,255,255),
-            FT_H6,
+            font,
             LJ_Left,
             LA_Middle,
             0);
