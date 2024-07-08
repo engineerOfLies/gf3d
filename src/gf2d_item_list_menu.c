@@ -152,7 +152,7 @@ Window *item_list_menu(
     GFC_Vector2D position,
     Uint8     persist,
     Uint8     allowClose,
-    char     *question,
+    const char     *question,
     FontTypes questionFont,
     GFC_Color questionColor,
     GFC_List *options,

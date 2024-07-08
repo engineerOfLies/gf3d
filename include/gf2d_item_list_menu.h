@@ -2,6 +2,8 @@
 #define __ITEM_LIST_MENU_H__
 
 #include "gfc_list.h"
+#include "gf2d_font.h"
+#include "gf2d_element_button.h"
 #include "gf2d_windows.h"
 
 /**
@@ -26,17 +28,17 @@
  */
 Window *item_list_menu(
     Window *parent,
-    GFC_Vector2D position,
-    Uint8     persist,
-    Uint8     allowClose,
-    char *question,
-    FontTypes questionFont,
-    GFC_Color questionColor,
-    GFC_List *options,
-    FontTypes font,
-    GFC_Color fontBase,
-    GFC_Color backgroundBase,
-    GFC_Color Selected,
+    GFC_Vector2D    position,
+    Uint8           persist,
+    Uint8           allowClose,
+    const char     *question,
+    FontTypes       questionFont,
+    GFC_Color       questionColor,
+    GFC_List       *options,
+    FontTypes       font,
+    GFC_Color       fontBase,
+    GFC_Color       backgroundBase,
+    GFC_Color       Selected,
     ButtonCustomAction highStyle,
     void(*onSelect)(void *),
     void *callbackData,
