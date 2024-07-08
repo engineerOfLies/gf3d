@@ -288,12 +288,13 @@ SJson *gf3d_light_list_save_to_config(GFC_List *lights)
 
 SJson *gf3d_light_save_to_config(GF3D_Light *light)
 {
+    GFC_Vector4D color;
     SJson *json;
     if (!light)return NULL;
     json = sj_object_new();
     if (!json)return NULL;
-    
-    sj_object_insert(json,"color",sj_vector4d_new(light->color));    
+    gfc_vector4d_scale(color,light->color,255);//always save in range 0-255
+    sj_object_insert(json,"color",sj_vector4d_new(color));    
     sj_object_insert(json,"direction",sj_vector4d_new(light->direction));    
     sj_object_insert(json,"position",sj_vector4d_new(light->position));    
     sj_object_insert(json,"ambientCoefficient",sj_new_float(light->ambientCoefficient));
