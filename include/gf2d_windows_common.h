@@ -27,12 +27,13 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
 
 /**
  * @brief open a yes / no dialog box
+ * @param parent [optional ]the window that spawned this window
  * @param text question to prompt the user
  * @param onYes the function to call if the user selects yes
  * @param onNo the function to call if the user selects no
  * @param data data to be provided to the callback functions
  */
-Window *window_yes_no(char *text, void(*onYes)(void *),void(*onNo)(void *),void *data);
+Window *window_yes_no(Window *parent,char *text, void(*onYes)(void *),void(*onNo)(void *),void *data);
 
 /**
  * @brief open a dialog box to take a text entry

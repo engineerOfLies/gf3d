@@ -97,7 +97,7 @@ int yes_no_update(Window *win,GFC_List *updateGFC_List)
     return 1;
 }
 
-Window *window_yes_no(char *text, void(*onYes)(void *),void(*onNo)(void *),void *data)
+Window *window_yes_no(Window *parent,char *text, void(*onYes)(void *),void(*onNo)(void *),void *data)
 {
     Window *win;
     GFC_List *callbacks;
@@ -107,6 +107,7 @@ Window *window_yes_no(char *text, void(*onYes)(void *),void(*onNo)(void *),void 
         slog("failed to load yes/no window");
         return NULL;
     }
+    win->parent = parent;
     gf2d_element_label_set_text(gf2d_window_get_element_by_id(win,1),text);
     if (gf2d_mouse_hidden())gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,51));
     win->update = yes_no_update;
