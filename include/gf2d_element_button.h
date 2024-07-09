@@ -4,6 +4,38 @@
 #include "gf2d_elements.h"
 #include "gf2d_font.h"
 
+/**
+ * @example json
+{
+    "type": "button",                       //must be set to be a button
+    "name":"newgame",                       //standard
+    "id" : 1,                               //standard
+    "canHasFocus":true,                     //if you are making a game with keyboard/controller menu nav, this is a must
+    "sound":"confirm",                      //play this default sound when pressed
+    "bounds": [0,0,160,42],                 //standard bounds of the element
+    "hotkey":"newgame",                     //this hotkey should match a named input
+    "highColor":[255,255,255,255],          //[optional] if set, the text will be in this color when highlighting
+    "pressColor":[0,0,0,255],               //[optional] if set, the text will be in this color when pressed
+    "repeat":true,                          //[optional] if set key repeat will be enabled for the button
+    "customActions":0,                      //[optional] values must match ButtonCustomAction enum
+    "actor" :                               //[optional] if you want an animated button button graphic.
+    {
+        "type": "actor",
+        "actor" : "actors/button.actor"     // the actor needs to have defined these actions: idle, high, press
+    },
+    "label" :                               //[optional] if you want text to show up on your button
+    {
+        "type": "label",
+        "bounds": [0,0,160,48],
+        "text":"New Game",
+        "justify" : "center",
+        "align" : "middle",
+        "style":"H4"
+    }
+}
+ */
+
+
 typedef enum
 {
     BE_Hidden = 0,

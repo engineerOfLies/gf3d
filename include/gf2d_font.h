@@ -68,6 +68,14 @@ void gf2d_font_init(const char *configFile);
 void gf2d_font_update();
 
 /**
+ * @brief select a font type from text buffer
+ * @param buf the string with a font name in it, must be supported
+ * @return FT_MAX if not valid, the FontType otherwise
+ */
+FontTypes gf2d_font_type_from_text(const char *buf);
+
+
+/**
  * @brief draw text to the screen overlay layer
  */
 void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position);

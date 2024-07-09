@@ -253,38 +253,7 @@ void gf2d_element_load_label_from_config(Element *e,SJson *json)
     buffer = sj_get_string_value(value);
     if (buffer)
     {
-        if (strcmp(buffer,"normal") == 0)
-        {
-            style = FT_Normal;
-        }
-        else if (strcmp(buffer,"small") == 0)
-        {
-            style = FT_Small;
-        }
-        else if (strcmp(buffer,"H1") == 0)
-        {
-            style = FT_H1;
-        }
-        else if (strcmp(buffer,"H2") == 0)
-        {
-            style = FT_H2;
-        }
-        else if (strcmp(buffer,"H3") == 0)
-        {
-            style = FT_H3;
-        }
-        else if (strcmp(buffer,"H4") == 0)
-        {
-            style = FT_H4;
-        }
-        else if (strcmp(buffer,"H5") == 0)
-        {
-            style = FT_H5;
-        }
-        else if (strcmp(buffer,"H6") == 0)
-        {
-        style = FT_H6;
-        }
+        style = gf2d_font_type_from_text(buffer);
     }
 
     value = sj_object_get_value(json,"wraps");

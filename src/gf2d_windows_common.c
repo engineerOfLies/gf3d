@@ -101,7 +101,7 @@ Window *window_yes_no(Window *parent,char *text, void(*onYes)(void *),void(*onNo
 {
     Window *win;
     GFC_List *callbacks;
-    win = gf2d_window_load("menus/yes_no_window.json");
+    win = gf2d_window_load("menus/yes_no_window.menu");
     if (!win)
     {
         slog("failed to load yes/no window");
@@ -200,7 +200,7 @@ Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData)
 {
     Window *win;
     GFC_List *callbacks;
-    win = gf2d_window_load("menus/alert_menu.json");
+    win = gf2d_window_load("menus/alert_menu.menu");
     if (!win)
     {
         slog("failed to load alert window");
@@ -223,7 +223,7 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
 {
     Window *win;
     GFC_List *callbacks;
-    win = gf2d_window_load("menus/dialog.json");
+    win = gf2d_window_load("menus/dialog.menu");
     if (!win)
     {
         slog("failed to load alert window");
@@ -247,7 +247,7 @@ Window *window_text_entry(char *question, char *defaultText,void *callbackData, 
 {
     Window *win;
     GFC_List *callbacks;
-    win = gf2d_window_load("menus/text_entry_window.json");
+    win = gf2d_window_load("menus/text_entry_window.menu");
     if (!win)
     {
         slog("failed to load text entry window");
@@ -275,7 +275,7 @@ Window *window_key_value(char *question, char *defaultKey,char *defaultValue,voi
 {
     Window *win;
     GFC_List *callbacks;
-    win = gf2d_window_load("menus/key_value.json");
+    win = gf2d_window_load("menus/key_value.menu");
     if (!win)
     {
         slog("failed to load key_value window");

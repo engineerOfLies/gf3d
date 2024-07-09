@@ -122,7 +122,7 @@ Window *window_message_buffer(int count, Uint32 timeout, GFC_Color defaultColor,
     Window *win;
     MessageBufferData *data;
     
-    win = gf2d_window_load("menus/message_buffer.json");
+    win = gf2d_window_load("menus/message_buffer.menu");
     if (!win)
     {
         slog("failed to load message buffer");
