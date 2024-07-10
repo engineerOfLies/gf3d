@@ -14,7 +14,7 @@
  * @param onOK the function to call if the user selects OK
  * @param data data to be provided to the callback functions
  */
-Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData);
+Window *window_alert(const char *title, const  char *text, void(*onOK)(void *),void *okData);
 
 /**
  * @brief open a text dialog box
@@ -23,7 +23,7 @@ Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData);
  * @param onOK the function to call if the user selects OK
  * @param data data to be provided to the callback functions
  */
-Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData);
+Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),void *okData);
 
 /**
  * @brief open a yes / no dialog box
@@ -33,7 +33,7 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
  * @param onNo the function to call if the user selects no
  * @param data data to be provided to the callback functions
  */
-Window *window_yes_no(Window *parent,char *text, void(*onYes)(void *),void(*onNo)(void *),void *data);
+Window *window_yes_no(Window *parent,const char *text, void(*onYes)(void *),void(*onNo)(void *),void *data);
 
 /**
  * @brief open a dialog box to take a text entry
@@ -44,7 +44,7 @@ Window *window_yes_no(Window *parent,char *text, void(*onYes)(void *),void(*onNo
  * @param onOK the function to call if the user selects okay
  * @param onCancel the function to call if the user selects cancel
  */
-Window *window_text_entry(char *question, char *defaultText, void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *));
+Window *window_text_entry(const char *question, char *defaultText, void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *));
 
 /**
  * @brief open a dialog box to take a key/value pair
@@ -57,7 +57,7 @@ Window *window_text_entry(char *question, char *defaultText, void *callbackData,
  * @param onOK the function to call if the user selects okay
  * @param onCancel the function to call if the user selects cancel
  */
-Window *window_key_value(char *question, char *defaultKey,char *defaultValue,void *callbackData, size_t keyLength,size_t valueLength, void(*onOk)(void *),void(*onCancel)(void *));
+Window *window_key_value(const char *question, char *defaultKey,char *defaultValue,void *callbackData, size_t keyLength,size_t valueLength, void(*onOk)(void *),void(*onCancel)(void *));
 
 
 /**
@@ -68,7 +68,7 @@ Window *window_key_value(char *question, char *defaultKey,char *defaultValue,voi
  * @param onCancel callback function to be invoked if the users selects cancel
  * @param data data to be sent with the callback function
  */
-Window *window_color_select(char *title, GFC_Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *data);
+Window *window_color_select(const char *title, GFC_Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *data);
 
 
 #endif

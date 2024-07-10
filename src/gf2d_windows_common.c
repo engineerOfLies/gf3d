@@ -97,7 +97,7 @@ int yes_no_update(Window *win,GFC_List *updateGFC_List)
     return 1;
 }
 
-Window *window_yes_no(Window *parent,char *text, void(*onYes)(void *),void(*onNo)(void *),void *data)
+Window *window_yes_no(Window *parent,const char *text, void(*onYes)(void *),void(*onNo)(void *),void *data)
 {
     Window *win;
     GFC_List *callbacks;
@@ -182,7 +182,7 @@ int alert_update(Window *win,GFC_List *updateGFC_List)
     {
         e = gfc_list_get_nth(updateGFC_List,i);
         if (!e)continue;
-        if (strcmp(e->name,"ok")==0)
+        if ((strcmp(e->name,"ok")==0)||(strcmp(e->name,"cancel")==0))
         {
             callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
             if (callback)
@@ -196,7 +196,7 @@ int alert_update(Window *win,GFC_List *updateGFC_List)
     return 0;
 }
 
-Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData)
+Window *window_alert(const char *title, const char *text, void(*onOK)(void *),void *okData)
 {
     Window *win;
     GFC_List *callbacks;
@@ -219,7 +219,7 @@ Window *window_alert(char *title, char *text, void(*onOK)(void *),void *okData)
     return win;
 }
 
-Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
+Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),void *okData)
 {
     Window *win;
     GFC_List *callbacks;
@@ -229,8 +229,8 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
         slog("failed to load alert window");
         return NULL;
     }
-    gf2d_element_label_set_text(gf2d_window_get_element_by_id(win,1),title);
-    gf2d_element_label_set_text(gf2d_window_get_element_by_id(win,2),text);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),title);
+    gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"text"),text);
     win->update = alert_update;
     win->free_data = yes_no_free;
     if (onOK)
@@ -243,7 +243,7 @@ Window *window_dialog(char *title, char *text, void(*onOK)(void *),void *okData)
 }
 
 
-Window *window_text_entry(char *question, char *defaultText,void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *))
+Window *window_text_entry(const char *question, char *defaultText,void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *))
 {
     Window *win;
     GFC_List *callbacks;
@@ -271,7 +271,7 @@ Window *window_text_entry(char *question, char *defaultText,void *callbackData, 
     return win;
 }
 
-Window *window_key_value(char *question, char *defaultKey,char *defaultValue,void *callbackData, size_t keyLength,size_t valueLength, void(*onOk)(void *),void(*onCancel)(void *))
+Window *window_key_value(const char *question, char *defaultKey,char *defaultValue,void *callbackData, size_t keyLength,size_t valueLength, void(*onOk)(void *),void(*onCancel)(void *))
 {
     Window *win;
     GFC_List *callbacks;
@@ -423,7 +423,7 @@ void window_color_refresh(Window *win)
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"blue"),buffer);
 }
 
-Window *window_color_select(char *title, GFC_Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *okData)
+Window *window_color_select(const char *title, GFC_Color *color, void(*onOK)(void *),void(*onCancel)(void *),void *okData)
 {
     Window *win;
     GF2DWindowGFC_ColorPickData *data;
