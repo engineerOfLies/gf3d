@@ -23,7 +23,7 @@
  * @param backgroundSelected color for text options background when selected
  * @param onSelect a callback function to invoke when a selections is made
  * @param callbackData data to be provided to the callback function
- * @param result integer to be populated when a decision is made
+ * @param result integer to be populated when a decision is made.  If this is closed without makine a choice, this will be set to -1, the index in the provided otherwise
  * @return a pointer to the newly created window, or NULL otherwise
  */
 Window *item_list_menu(

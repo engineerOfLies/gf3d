@@ -51,6 +51,7 @@ Element *gf2d_element_new_full(
     e->color = color;
     e->state = state;
     e->bounds = bounds;
+    
     e->backgroundColor = backgroundColor;
     e->backgroundDraw = backgroundDraw;
     e->win = win;
@@ -86,7 +87,7 @@ void gf2d_element_draw(Element *e, GFC_Vector2D offset)
     {
         return;
     }
-    gfc_rect_set(rect,offset.x + e->bounds.x,offset.y + e->bounds.y,e->bounds.w,e->bounds.h);
+    gfc_rect_set(rect,offset.x + e->drawBounds.x,offset.y + e->drawBounds.y,e->drawBounds.w,e->drawBounds.h);
     e->lastDrawPosition.x = rect.x;
     e->lastDrawPosition.y = rect.y;
     if (e->backgroundDraw)
@@ -106,18 +107,18 @@ GFC_List * gf2d_element_update(Element *e, GFC_Vector2D offset)
     {
         return NULL;
     }
-    if (e->draw)return e->update(e,offset);
+    if (e->update)return e->update(e,offset);
     return NULL;
 }
 
 void gf2d_element_calibrate(Element *e,Element *parent, Window *win)
 {
-    GFC_Rect res;
+    GFC_Rect res = {0};
     int negx = 0,negy = 0;
     if (!e)return;
     if (parent != NULL)
     {
-        gfc_rect_copy(res,parent->bounds);
+        gfc_rect_copy(res,parent->drawBounds);
     }
     else if (win != NULL)
     {
@@ -128,41 +129,49 @@ void gf2d_element_calibrate(Element *e,Element *parent, Window *win)
         slog("error: need a parent element or a window");
         return;
     }
+    gfc_rect_copy(e->drawBounds,e->bounds);
     if (e->bounds.x < 0)
     {
         negx = 1;
-        e->bounds.x *= -1;
+        e->drawBounds.x *= -1;
     }
     if (e->bounds.y < 0)
     {
         negy = 1;
-        e->bounds.y *= -1;
+        e->drawBounds.y *= -1;
     }
-    if ((e->bounds.x > 0)&&(e->bounds.x < 1.0))
+    if ((e->drawBounds.x > 0)&&(e->drawBounds.x < 1.0))
     {
-        e->bounds.x *= res.w;
+        e->drawBounds.x *= res.w;
     }
-    if ((e->bounds.y > 0)&&(e->bounds.y < 1.0))
+    if ((e->drawBounds.y > 0)&&(e->drawBounds.y < 1.0))
     {
-        e->bounds.y *= res.h;
+        e->drawBounds.y *= res.h;
     }
     if ((e->bounds.w > 0)&&(e->bounds.w <= 1.0))
     {
-        e->bounds.w *= res.w;
+        e->drawBounds.w *= res.w;
     }
     if ((e->bounds.h > 0)&&(e->bounds.h <= 1.0))
     {
-        e->bounds.h *= res.h;
+        e->drawBounds.h *= res.h;
     }
     
     if (negx)
     {
-        e->bounds.x = res.w - e->bounds.x;
+        e->drawBounds.x = res.w - e->drawBounds.x;
     }
     if (negy)
     {
-        e->bounds.y = res.h - e->bounds.y;
+        e->drawBounds.y = res.h - e->drawBounds.y;
     }
+}
+
+void gf2d_element_recalibrate(Element *e)
+{
+    if (!e)return;
+    gf2d_element_calibrate(e,e->parent, e->win);
+    if (e->recalibrate)e->recalibrate(e);
 }
 
 Element *gf2d_element_load_from_config(SJson *json,Element *parent,Window *win)
@@ -268,10 +277,10 @@ GFC_Rect gf2d_element_get_absolute_bounds(Element *element,GFC_Vector2D offset)
 {
     GFC_Rect r = {0};
     if (!element)return r;
-    r.x = element->bounds.x + offset.x;
-    r.y = element->bounds.y + offset.y;
-    r.w = element->bounds.w;
-    r.h = element->bounds.h;
+    r.x = element->drawBounds.x + offset.x;
+    r.y = element->drawBounds.y + offset.y;
+    r.w = element->drawBounds.w;
+    r.h = element->drawBounds.h;
     return r;
 }
 

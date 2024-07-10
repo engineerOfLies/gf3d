@@ -5,62 +5,62 @@
 
 int gf2d_element_list_get_items_per_line(Element *element)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return 0;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     return list->itemsPerLine;
 }
 
 void gf2d_element_list_set_scroll_offset(Element *element,int offset)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     list->scrollOffset = offset;
 }
 
 int gf2d_element_list_get_row_count(Element *element)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return 0;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list->itemSize.y)return 0;
-    return (int)element->bounds.h / list->itemSize.y;
+    return (int)element->drawBounds.h / list->itemSize.y;
 }
 
 GFC_Vector2D gf2d_element_list_get_item_size(Element *element)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return gfc_vector2d(-1,-1);
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     return list->itemSize;
 }
 
 
 int gf2d_element_list_get_items_per_column(Element *element)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return 0;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     return list->itemsPerColumn;
 }
 
 GFC_Vector2D gf2d_element_get_item_position(Element *element,int i,GFC_Vector2D lastPosition)
 {
-    GFC_ListElement* list;
+    GF2D_ListElement* list;
     Element *item;
     GFC_Vector2D itemSize;
     GFC_Vector2D position = {0};
     if (i == 0)return lastPosition;
     if (!element)return lastPosition;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list)return lastPosition;
     item = (Element *)gfc_list_get_nth(list->list,i - 1);
     if (!item)return position;
     if (list->packed)
     {
-        itemSize.x = item->bounds.w;
-        itemSize.y = item->bounds.h;
+        itemSize.x = item->drawBounds.w;
+        itemSize.y = item->drawBounds.h;
     }
     else
     {
@@ -68,11 +68,11 @@ GFC_Vector2D gf2d_element_get_item_position(Element *element,int i,GFC_Vector2D 
     }
     if ((list->listStyle == LS_Horizontal) && (list->wraps))
     {
-        list->itemsPerLine = element->bounds.w / itemSize.x;
+        list->itemsPerLine = element->drawBounds.w / itemSize.x;
         if (((i % list->itemsPerLine) == 0)&&(i != 0))
         {
             // this is a new line
-            position.x = element->bounds.x;
+            position.x = element->drawBounds.x;
             position.y = lastPosition.y + itemSize.y;
         }
         else
@@ -84,11 +84,11 @@ GFC_Vector2D gf2d_element_get_item_position(Element *element,int i,GFC_Vector2D 
     }
     if ((list->listStyle == LS_Vertical) && (list->wraps))
     {
-        list->itemsPerColumn = element->bounds.h / itemSize.y;
+        list->itemsPerColumn = element->drawBounds.h / itemSize.y;
         if (((i % list->itemsPerColumn) == 0)&&(i != 0))
         {
             position.x = lastPosition.x + itemSize.x;
-            position.y = element->bounds.y;
+            position.y = element->drawBounds.y;
         }
         else
         {
@@ -115,16 +115,16 @@ GFC_Vector2D gf2d_element_get_item_position(Element *element,int i,GFC_Vector2D 
 void gf2d_element_list_draw(Element *element,GFC_Vector2D offset)
 {
     int skip;
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     GFC_Vector2D position = {0};
     GFC_Vector2D drawPosition = {0};
     int count,i;
     Element *e;
     if (!element)return;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list)return;
-    position.x = element->bounds.x;
-    position.y = element->bounds.y;
+    position.x = element->drawBounds.x;
+    position.y = element->drawBounds.y;
     if (list->scrolls)
     {
         if ((list->listStyle == LS_Horizontal) && (list->wraps))
@@ -153,11 +153,11 @@ void gf2d_element_list_draw(Element *element,GFC_Vector2D offset)
         position = gf2d_element_get_item_position(element,i,position);
         if (list->cropped)
         {
-            if ((position.x < element->bounds.x)||(position.y < element->bounds.y))
+            if ((position.x < element->drawBounds.x)||(position.y < element->drawBounds.y))
             {
                 skip = 1;
             }
-            if ((position.x + e->bounds.w > element->bounds.x + element->bounds.w)||(position.y + e->bounds.h > element->bounds.y + element->bounds.h))
+            if ((position.x + e->drawBounds.w > element->drawBounds.x + element->drawBounds.w)||(position.y + e->drawBounds.h > element->drawBounds.y + element->drawBounds.h))
             {
                 skip = 1;//skip outside of range
             }
@@ -171,20 +171,20 @@ void gf2d_element_list_draw(Element *element,GFC_Vector2D offset)
 
 int gf2d_element_list_get_item_count(Element *element)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return 0;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list)return 0;
     return gfc_list_get_count(list->list);
 }
 
 Element *gf2d_list_get_next(Element *element,Element *from)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     int i,c;
     Element *e,*sub;
     if (!element)return NULL;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list)return NULL;
     c = gfc_list_get_count(list->list);
     if (element == from)
@@ -216,13 +216,31 @@ Element *gf2d_list_get_next(Element *element,Element *from)
     return NULL;
 }
 
+void gf2d_element_list_recalibrate(Element *e)
+{
+    int c,i;
+    Element *item;
+    GF2D_ListElement *list;
+    if (!e)return;
+    list = (GF2D_ListElement*)e->data;
+    if (!list)return;
+    c = gfc_list_count(list->list);
+    for (i = 0; i < c; i++)
+    {
+        item = gfc_list_nth(list->list,i);
+        if (!item)continue;
+        gf2d_element_recalibrate(item);
+    }
+}
+
+
 Element *list_get_by_name(Element *element,const char *name)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     int count,i;
     Element *e,*r;
     if (!element)return NULL;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list)return NULL;
     count = gfc_list_get_count(list->list);
     for (i = 0; i < count; i++)
@@ -237,14 +255,14 @@ Element *list_get_by_name(Element *element,const char *name)
 
 GFC_List *gf2d_element_list_update(Element *element,GFC_Vector2D offset)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     GFC_Vector2D position,drawPosition;
     int count,i;
     Element *e;
     GFC_List *ret = NULL;
     GFC_List *updated;
     if (!element)return NULL;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (!list)return NULL;
     count = gfc_list_get_count(list->list);
     position.x = 0;
@@ -273,9 +291,9 @@ void gf2d_element_list_free_items(Element *element)
 {
     int count,i;
     Element *e;
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if ((list != NULL)&&(list->list != NULL))
     {
         /*for each item, free it*/
@@ -295,9 +313,9 @@ void gf2d_element_list_free(Element *element)
 {
     int count,i;
     Element *e;
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if (!element)return;
-    list = (GFC_ListElement*)element->data;
+    list = (GF2D_ListElement*)element->data;
     if (list != NULL)
     {
         /*for each item, free it*/
@@ -313,24 +331,24 @@ void gf2d_element_list_free(Element *element)
     }
 }
 
-GFC_ListElement *gf2d_element_list_new()
+GF2D_ListElement *gf2d_element_list_new()
 {
-    GFC_ListElement *list;
-    list = (GFC_ListElement *)malloc(sizeof(GFC_ListElement));
+    GF2D_ListElement *list;
+    list = (GF2D_ListElement *)malloc(sizeof(GF2D_ListElement));
     if (!list)
     {
         slog("failed to allocate memory for list");
         return NULL;
     }
-    memset(list,0,sizeof(GFC_ListElement));
+    memset(list,0,sizeof(GF2D_ListElement));
     list->list = gfc_list_new();
     return list;
 }
 
 
-GFC_ListElement *gf2d_element_list_new_full(GFC_Rect bounds,GFC_Vector2D itemSize,GFC_ListStyle ls,int wraps,int scrolls,int packed,int cropped)
+GF2D_ListElement *gf2d_element_list_new_full(GFC_Rect bounds,GFC_Vector2D itemSize,GFC_ListStyle ls,int wraps,int scrolls,int packed,int cropped)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     list = gf2d_element_list_new();
     if (!list)
     {
@@ -347,7 +365,7 @@ GFC_ListElement *gf2d_element_list_new_full(GFC_Rect bounds,GFC_Vector2D itemSiz
     return list;
 }
 
-void gf2d_element_make_list(Element *e,GFC_ListElement *list)
+void gf2d_element_make_list(Element *e,GF2D_ListElement *list)
 {
     if ((!e)||(!list))return;// no op
     e->data = list;
@@ -357,35 +375,37 @@ void gf2d_element_make_list(Element *e,GFC_ListElement *list)
     e->free_data = gf2d_element_list_free;
     e->get_by_name = list_get_by_name;
     e->get_next = gf2d_list_get_next;
+    e->recalibrate = gf2d_element_list_recalibrate;
 }
 
 void gf2d_element_list_remove_item(Element *e,Element *item)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if ((!e)||(!item))return;// no op
-    list = (GFC_ListElement *)e->data;
+    list = (GF2D_ListElement *)e->data;
     gfc_list_delete_data(list->list,(void*)item);
 }
 
 void gf2d_element_list_add_item(Element *e,Element *item)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     if ((!e)||(!item))return;// no op
-    list = (GFC_ListElement *)e->data;
+    list = (GF2D_ListElement *)e->data;
     item->parent = e;
     if (item->bounds.w == 1)item->bounds.w = list->itemSize.x;
     if (item->bounds.h == 1)item->bounds.h = list->itemSize.y;
+    gf2d_element_recalibrate(item);
     gfc_list_append(list->list,(void*)item);
 }
 
 Element *gf2d_element_list_get_item_by_id(Element *e,int id)
 {
-    GFC_ListElement *list;
+    GF2D_ListElement *list;
     Element *item, *q;
     int count,i;
     if (!e)return NULL;
     if (e->type != ET_GFC_List)return NULL;
-    list = (GFC_ListElement *)e->data;
+    list = (GF2D_ListElement *)e->data;
     if (!list)return NULL;
     count = gfc_list_get_count(list->list);
     for (i = 0; i < count; i++)
@@ -415,7 +435,7 @@ Element *gf2d_element_list_new_complete(
     int cropped)
 {
     Element *list;
-    GFC_ListElement *le;
+    GF2D_ListElement *le;
     le = gf2d_element_list_new_full(
         gfc_rect(0,0,1,1),
         itemSize,
@@ -436,7 +456,7 @@ void gf2d_element_load_list_from_config(Element *e,SJson *json,Window *win)
 {
     SJson *value = NULL;
     SJson *item = NULL;
-    GFC_ListElement *list = NULL;
+    GF2D_ListElement *list = NULL;
     GFC_Vector2D gfc_vector = {0};
     GFC_ListStyle ls = 0;
     int i,count;

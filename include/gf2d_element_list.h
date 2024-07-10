@@ -43,7 +43,7 @@ typedef struct
     int   itemsPerLine;     /**<how many items will fit per line*/
     int   itemsPerColumn;   /**<how many items will fit per columns*/
     Element *scrollbar;     /**<sub_element*/
-}GFC_ListElement;
+}GF2D_ListElement;
 
 
 /**
@@ -57,7 +57,7 @@ typedef struct
  * @param packed if true, items will be skipped if they are out of bounds of the list
  * @return NULL on error or a formatted listElement otherwise
  */
-GFC_ListElement *gf2d_element_list_new_full(
+GF2D_ListElement *gf2d_element_list_new_full(
     GFC_Rect bounds,
     GFC_Vector2D itemSize,
     GFC_ListStyle ls,
@@ -84,7 +84,7 @@ void gf2d_element_list_add_item(Element *e,Element *item);
  * @param e the element to set
  * @param list the list to set it too
  */
-void gf2d_element_make_list(Element *e,GFC_ListElement *list);
+void gf2d_element_make_list(Element *e,GF2D_ListElement *list);
 
 /**
  * @brief load list configuration for a list element from config

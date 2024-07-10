@@ -48,7 +48,8 @@ struct Element_S
     
     Uint8               canHasFocus;        /**<if true, this element can be the focus for keyboard input*/
     Uint8               hasFocus;           /**<if true, this element does have focus*/
-    GFC_Rect            bounds;             /**<drawing bounds for the element*/
+    GFC_Rect            bounds;             /**<drawing bounds for the element specified by config*/
+    GFC_Rect            drawBounds;         /**<drawing bounds for the element calculated*/
     GFC_Vector2D        lastDrawPosition;   /**<location of the element on the screen of its last draw position*/
     GFC_Color           color;              /**<color for the element*/
     
@@ -63,6 +64,7 @@ struct Element_S
     GFC_List *(*update)(struct Element_S *element,GFC_Vector2D offset); /**<function called for updates  returns alist of all elements updated with input*/
     void (*free_data)(struct Element_S *element);    /**<free function for the element to clean up any loaded custom data*/
     struct Element_S *(*get_by_name)(struct Element_S *element,const char *name);/**<get element by name, searches sub elements as well*/
+    void (*recalibrate)(struct Element_S *element);/**<to be called whenever the parent window or parent element is moved or changed*/
     Window             *win;                /**<my parent window*/
     struct Element_S   *parent;             /**<my parent element*/
     void               *data;               /**<custom element data*/
@@ -182,5 +184,11 @@ Element *gf2d_element_get_by_id(Element *e,int id);
  * @returns NULL if not found, or a pointer to the element found
  */
 Element *gf2d_get_element_by_name(Element *e,const char *name);
+
+/**
+ * @brief if the element's parent window or element has moved or changes, this needs to be called
+ */
+void gf2d_element_recalibrate(Element *e);
+
 
 #endif

@@ -17,8 +17,8 @@ void gf2d_element_button_draw(Element *element,GFC_Vector2D offset)
     if (!element)return;
     button = (ButtonElement*)element->data;
     if (!button)return;
-    gfc_vector2d_add(position,offset,element->bounds);
-    gfc_rect_set(rect,offset.x + element->bounds.x,offset.y + element->bounds.y,element->bounds.w,element->bounds.h);
+    gfc_vector2d_add(position,offset,element->drawBounds);
+    gfc_rect_set(rect,offset.x + element->drawBounds.x,offset.y + element->drawBounds.y,element->drawBounds.w,element->drawBounds.h);
     if (button->customActions == BCA_Default)
     {
         switch(element->state)
@@ -183,6 +183,16 @@ Element *gf2d_button_get_next(Element *element, Element *from)
 }
 
 
+void gf2d_element_button_recalibrate(Element *e)
+{
+    ButtonElement *button;
+    if (!e)return;
+    button = (ButtonElement*)e->data;
+    if (!button)return;
+    gf2d_element_recalibrate(button->label);
+    gf2d_element_recalibrate(button->actor);
+}
+
 void gf2d_element_button_free(Element *element)
 {
     ButtonElement *button;
@@ -218,6 +228,7 @@ void gf2d_element_make_button(Element *e,ButtonElement *button)
     e->draw = gf2d_element_button_draw;
     e->update = gf2d_element_button_update;
     e->free_data = gf2d_element_button_free;
+    e->recalibrate = gf2d_element_button_recalibrate;
     e->get_by_name = button_get_by_name;
     e->get_next = gf2d_button_get_next;
 }

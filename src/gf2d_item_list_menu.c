@@ -72,6 +72,11 @@ int item_list_menu_update(Window *win,GFC_List *updateList)
         }
         else if ((data->allowClose)&&(strcmp(e->name,"close")==0))
         {
+            if (data->result)
+            {
+                *data->result = -1;
+            }
+            gfc_callback_call(&data->callback);
             gf2d_window_free(win);
             return 1;
         }

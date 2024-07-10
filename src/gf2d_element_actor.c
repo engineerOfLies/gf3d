@@ -11,7 +11,7 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
     if (!element)return;
     actor = (ActorElement*)element->data;
     if (!actor)return;
-    gfc_vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->drawBounds);
     if (actor->image)
     {
         gf2d_sprite_draw_full(
@@ -29,11 +29,11 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
     {
         if (actor->center.x)
         {
-            position.x += element->bounds.w / 2;
+            position.x += element->drawBounds.w / 2;
         }
         if (actor->center.y)
         {
-            position.y += element->bounds.h / 2;
+            position.y += element->drawBounds.h / 2;
         }
         gf2d_actor_draw(
             actor->actor,
@@ -138,13 +138,13 @@ void gf2d_element_actor_auto_scale(Element *e)
     ae = (ActorElement *)e->data;
     if (ae->actor)
     {
-        ae->scale.x = e->bounds.w / (float)ae->actor->size.x;
-        ae->scale.y = e->bounds.h / (float)ae->actor->size.y;
+        ae->scale.x = e->drawBounds.w / (float)ae->actor->size.x;
+        ae->scale.y = e->drawBounds.h / (float)ae->actor->size.y;
     }
     else if (ae->image)
     {
-        ae->scale.x = e->bounds.w / (float)ae->image->frameWidth ;
-        ae->scale.y = e->bounds.h / (float)ae->image->frameHeight;
+        ae->scale.x = e->drawBounds.w / (float)ae->image->frameWidth ;
+        ae->scale.y = e->drawBounds.h / (float)ae->image->frameHeight;
     }
 }
 

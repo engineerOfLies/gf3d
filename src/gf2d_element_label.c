@@ -20,8 +20,8 @@ void gf2d_element_label_draw(Element *element,GFC_Vector2D offset)
         r = gf2d_font_get_text_wrap_bounds_tag(
             label->text,
             label->style,
-            element->bounds.w,
-            element->bounds.h);
+            element->drawBounds.w,
+            element->drawBounds.h);
         size.x = r.w;
         size.y = r.h;
     }
@@ -34,16 +34,16 @@ void gf2d_element_label_draw(Element *element,GFC_Vector2D offset)
         return;
     }
     // adjust position to top left
-    gfc_vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->drawBounds);
     switch(label->justify)
     {
         case LJ_Left:
             break;
         case LJ_Center:
-            position.x += (element->bounds.w - size.x)/2 ;
+            position.x += (element->drawBounds.w - size.x)/2 ;
             break;
         case LJ_Right:
-            position.x += (element->bounds.w - size.x);
+            position.x += (element->drawBounds.w - size.x);
             break;
     }
     switch(label->alignment)
@@ -51,15 +51,15 @@ void gf2d_element_label_draw(Element *element,GFC_Vector2D offset)
         case LA_Top:
             break;
         case LA_Middle:
-            position.y += (element->bounds.h - size.y)/2 ;
+            position.y += (element->drawBounds.h - size.y)/2 ;
             break;
         case LA_Bottom:
-            position.y += (element->bounds.h - size.y);
+            position.y += (element->drawBounds.h - size.y);
             break;
     }
     if (label->wraps)
     {
-        gf2d_font_draw_text_wrap_tag(label->text,label->style,element->color, gfc_rect(position.x, position.y, element->bounds.w, element->bounds.h));
+        gf2d_font_draw_text_wrap_tag(label->text,label->style,element->color, gfc_rect(position.x, position.y, element->drawBounds.w, element->drawBounds.h));
     }
     else 
     {

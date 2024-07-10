@@ -19,13 +19,13 @@ void gf2d_element_scrollbar_draw(Element *element,GFC_Vector2D offset)
     if (!element)return;
     data = (ScrollbarElement*)element->data;
 
-    gfc_vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->drawBounds);
     //draw background of the sliders
     gfc_rect_set(rect,
-        offset.x + element->bounds.x + 20,
-        offset.y + element->bounds.y + 20,
-        element->bounds.w -25,
-        element->bounds.h -40);
+        offset.x + element->drawBounds.x + 20,
+        offset.y + element->drawBounds.y + 20,
+        element->drawBounds.w -25,
+        element->drawBounds.h -40);
     gf2d_draw_rect_filled(rect,element->backgroundColor);
     
     gf2d_element_draw(data->scrollUp,position);
@@ -207,13 +207,22 @@ Element *gf2d_element_scrollbar_get_by_name(Element *e,const char *name)
 {
     ScrollbarElement *bar;
     Element *r;
-    if (!e)return NULL;
+    if ((!e)||(!e->data))return NULL;
     bar = (ScrollbarElement*)e->data;
     r = gf2d_get_element_by_name(bar->scrollUp,name);
     if (r)return r;
     r = gf2d_get_element_by_name(bar->scrollDown,name);
     if (r)return r;
     return gf2d_get_element_by_name(bar->scrollSlider,name);
+}
+
+void gf2d_element_scrollbar_recalibrate(Element *e)
+{
+    ScrollbarElement *bar;
+    if ((!e)||(!e->data))return;
+    bar = (ScrollbarElement*)e->data;
+    gf2d_element_recalibrate(bar->scrollUp);
+    gf2d_element_recalibrate(bar->scrollDown);
 }
 
 void gf2d_element_make_scrollbar(Element *e,ScrollbarElement *scrollbar)
@@ -226,6 +235,7 @@ void gf2d_element_make_scrollbar(Element *e,ScrollbarElement *scrollbar)
     e->free_data = gf2d_element_scrollbar_free;
     e->get_by_name = gf2d_element_scrollbar_get_by_name;
     e->get_next = gf2d_element_scrollbar_get_next;
+    e->recalibrate = gf2d_element_scrollbar_recalibrate;
 }
 
 void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
@@ -259,7 +269,7 @@ void gf2d_element_scrollbar_load_from_config(Element *e,SJson *json,Window *win)
         e->bounds.w = 32; 
         e->bounds.h = bar->list->bounds.h; 
     }
-
+    gf2d_element_recalibrate(e);
     str = sj_object_get_value_as_string(json,"style");
     if (str)
     {

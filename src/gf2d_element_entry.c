@@ -13,26 +13,26 @@ void gf2d_element_entry_draw(Element *element,GFC_Vector2D offset)
     if (!element)return;
     entry = (EntryElement*)element->data;
     if (!entry)return;
-    gfc_vector2d_add(position,offset,element->bounds);
+    gfc_vector2d_add(position,offset,element->drawBounds);
     gf2d_element_draw(entry->label,position);
     if (!element->hasFocus)
     {
         gf2d_draw_rect(
             gfc_rect(
-                element->bounds.x + position.x,
-                element->bounds.y + position.y,
-                element->bounds.w,
-                element->bounds.h),
+                element->drawBounds.x + position.x,
+                element->drawBounds.y + position.y,
+                element->drawBounds.w,
+                element->drawBounds.h),
             gfc_color8(150,150,150,255));
     }
     else
     {
         gf2d_draw_rect(
             gfc_rect(
-                element->bounds.x + position.x,
-                element->bounds.y + position.y,
-                element->bounds.w,
-                element->bounds.h),
+                element->drawBounds.x + position.x,
+                element->drawBounds.y + position.y,
+                element->drawBounds.w,
+                element->drawBounds.h),
             gfc_color8(200,200,200,255));
     }
 }

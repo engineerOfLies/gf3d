@@ -38,6 +38,8 @@ static WindowManager window_manager = {0};
 
 Window *gf2d_window_load_from_json(SJson *json);
 Element *gf2d_window_get_next_element(Window *win,Element *from);
+void gf2d_window_calibrate(Window *win);
+
 
 void gf2d_draw_window_border_generic(GFC_Rect rect,GFC_Color color)
 {
@@ -483,8 +485,18 @@ void gf2d_window_refresh_by_name(const char *name)
 
 void gf2d_window_set_dimensions(Window *win,GFC_Rect dimensions)
 {
+    int i,c;
+    Element *e;
     if (!win)return;
     gfc_rect_copy(win->dimensions,dimensions);
+    gf2d_window_calibrate(win);
+    c = gfc_list_count(win->elements);
+    for (i = 0; i< c; i++)
+    {
+        e = gfc_list_nth(win->elements,i);
+        if (!e)continue;
+        gf2d_element_recalibrate(e);
+    }
 }
 
 void gf2d_window_set_position(Window *win,GFC_Vector2D position)
@@ -592,6 +604,7 @@ Element *gf2d_window_get_next_element(Window *win,Element *from)
         if (!e)continue;
         if (e == from)
         {
+            if (!e->get_next)continue;
             sub = e->get_next(e,from);
             if (sub == NULL)
             {
@@ -609,6 +622,7 @@ Element *gf2d_window_get_next_element(Window *win,Element *from)
             }
             return sub;
         }
+        if (!e->get_next)continue;
         sub = e->get_next(e,from);
         if (sub == from)
         {
