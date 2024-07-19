@@ -171,6 +171,7 @@ void gf3d_sprite_submit_pipe_commands()
 Sprite *gf2d_sprite_get_by_filename(const char *filename)
 {
     int i;
+    if (!filename)return NULL;
     for (i = 0; i < gf2d_sprite.max_sprites; i++)
     {
         if (!gf2d_sprite.sprite_list[i]._inuse)continue;
