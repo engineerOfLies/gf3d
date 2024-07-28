@@ -25,7 +25,8 @@ typedef enum
 typedef struct Window_S
 {
     int                 _inuse;             /**<do not touch*/
-    int                 hidden;             /**<if true, no drawing or updating*/
+    int                 hidden;             /**<if true, no drawing*/
+    int                 disabled;           /**<if true, no drawing or updating*/
     GFC_TextLine        name;       /**<name of window*/
     int                 no_draw_generic;    /**<if true, do not use the generic window draw style*/
     GFC_List           *elements;         /**<all the components of the window*/
@@ -146,6 +147,12 @@ void gf2d_window_hide(Window *win);
  * @param win the window
  */
 void gf2d_window_unhide(Window *win);
+
+/**
+ * @brief toggle a window's hidden state
+ * @param win the window
+ */
+void gf3d_window_hide_toggle(Window *win);
 
 /**
  * @brief draw a window to the screen.  

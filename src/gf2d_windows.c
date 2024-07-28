@@ -517,6 +517,12 @@ void gf2d_window_unhide(Window *win)
     win->hidden = 0;
 }
 
+void gf3d_window_hide_toggle(Window *win)
+{
+    if (!win)return;
+    win->hidden = !win->hidden;
+}
+
 
 void gf2d_window_draw(Window *win)
 {
@@ -524,6 +530,7 @@ void gf2d_window_draw(Window *win)
     GFC_Vector2D offset;
     if (!win)return;
     if (win->hidden)return;
+    if (win->disabled)return;
     if (!win->no_draw_generic)
     {
         gf2d_draw_window_border_generic(win->dimensions,win->color);
@@ -546,7 +553,7 @@ int gf2d_window_update(Window *win)
     GFC_List *updated = NULL;
     Element *e;
     if (!win)return 0;
-    if (win->hidden)return 0;
+    if (win->disabled)return 0;
     offset.x = win->dimensions.x + win->canvas.x;
     offset.y = win->dimensions.y + win->canvas.y;
     count = gfc_list_get_count(win->elements);
