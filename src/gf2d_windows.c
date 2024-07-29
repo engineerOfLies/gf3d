@@ -27,8 +27,7 @@ typedef struct
     Sprite *generic_border;     /**<sprite to use to draw the border*/
     Sprite *generic_background; /**<sprite to use to draw the background*/
     WindowDrawStyle style;      /**<tiled or stretched*/
-    Window *window_list;        /**<list of all active windows*/
-    int window_max;             /**<how many windows can exist at once*/
+    GFC_List *windowList;        /**<list of all active windows*/
     GFC_List *window_deque;         /**<draw order is back to front, update order is front to back*/
     int drawbounds;             /**<if true draw rects around window bounds*/
     GFC_HashMap *sounds;            /**<sound pack for windows and elements*/
@@ -36,6 +35,7 @@ typedef struct
 
 static WindowManager window_manager = {0};
 
+void gf2d_window_delete(Window *win);
 Window *gf2d_window_load_from_json(SJson *json);
 Element *gf2d_window_get_next_element(Window *win,Element *from);
 void gf2d_window_calibrate(Window *win);
@@ -350,16 +350,13 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
 
 void gf2d_windows_close()
 {
-    int i;
-    for (i = 0;i < window_manager.window_max;i++)
+    if (window_manager.windowList)
     {
-        if (window_manager.window_list[i]._inuse)
-        {
-            gf2d_window_free(&window_manager.window_list[i]);
-        }
+        gfc_list_foreach(window_manager.windowList,(gfc_work_func*)gf2d_window_delete);
+        gfc_list_delete(window_manager.windowList);
     }
     gfc_list_delete(window_manager.window_deque);
-    
+   
     gf2d_sprite_free(window_manager.generic_border);
     gf2d_sprite_free(window_manager.generic_background);
     gfc_sound_pack_free(window_manager.sounds);
@@ -378,14 +375,12 @@ void gf2d_windows_init(int max_windows,const char *config)
         slog("cannot initilize window system for 0 windows");
         return;
     }
-    window_manager.window_list = (Window*)malloc(sizeof(Window)*max_windows);
-    if(window_manager.window_list == NULL)
+    window_manager.windowList = gfc_list_new_size(max_windows);
+    if(window_manager.windowList == NULL)
     {
         slog("failed to allocate memory for window system");
         return;
     }
-    memset(window_manager.window_list,0,sizeof(Window)*max_windows);
-    window_manager.window_max = max_windows;
     window_manager.window_deque = gfc_list_new();
     //defaults
     gfc_line_cpy(background,"images/ui/window_background.png");
@@ -462,10 +457,18 @@ void gf2d_window_free(Window *win)
     {
         gf2d_element_free((Element*)gfc_list_get_nth(win->elements,i));
     }
-    gfc_list_delete(win->elements);
-    gfc_list_delete(win->focus_elements);// only delete the list, the data is handled by the other list
+    if (win->elements)gfc_list_delete(win->elements);
+    if (win->focus_elements)gfc_list_delete(win->focus_elements);// only delete the list, the data is handled by the other list
     memset(win,0,sizeof(Window));
 }
+
+void gf2d_window_delete(Window *win)
+{
+    if (!win)return;
+    if (win->_inuse)gf2d_window_free(win);
+    free(win);
+}
+
 
 void gf2d_window_refresh(Window *win)
 {
@@ -719,31 +722,29 @@ void gf2d_window_next_focus(Window *win)
 
 Window *gf2d_window_new()
 {
-    
-    int i;
-    for (i = 0;i < window_manager.window_max;i++)
-    {
-        
-        if (!window_manager.window_list[i]._inuse)
-        {
-           window_manager.window_list[i]._inuse = 1;
-           gfc_list_append(window_manager.window_deque,&window_manager.window_list[i]);
-           window_manager.window_list[i].elements = gfc_list_new();
-           window_manager.window_list[i].focus_elements = gfc_list_new();
-           return &window_manager.window_list[i];
-        }
-    }
-    return NULL;
+    Window *win;
+    win = gfc_allocate_array(sizeof(Window),1);
+    if (!win)return NULL;
+    win->_inuse = 1;
+    gfc_list_append(window_manager.windowList,win);
+    gfc_list_append(window_manager.window_deque,win);
+    win->elements = gfc_list_new();
+    win->focus_elements = gfc_list_new();
+    return win;
 }
 
 Window *gf2d_window_get_by_name(const char *name)
 {
-    int i;
+    Window *win;
+    int i,c;
     if (!name)return NULL;
-    for (i = 0;i < window_manager.window_max;i++)
+    c = gfc_list_count(window_manager.windowList);
+    for (i = 0;i < c;i++)
     {
-        if (!window_manager.window_list[i]._inuse)continue;
-        if (strcmp(window_manager.window_list[i].name,name) == 0)return &window_manager.window_list[i];
+        win = gfc_list_nth(window_manager.windowList,i);
+        if (!win)continue;
+        if (!win->_inuse)continue;
+        if (strcmp(win->name,name) == 0)return win;
     }
     return NULL;
 }
@@ -777,13 +778,23 @@ void gf2d_windows_draw_all()
 
 int gf2d_windows_update_all()
 {
+    Window *win;
     int i,count;
     int retval = 0;
-    count = gfc_list_get_count(window_manager.window_deque);
+    count = gfc_list_count(window_manager.window_deque);
     for (i = count - 1; i >= 0; i--)
     {
-        retval = gf2d_window_update((Window*)gfc_list_get_nth(window_manager.window_deque,i));
+        retval = gf2d_window_update((Window*)gfc_list_nth(window_manager.window_deque,i));
         if (retval)break;
+    }
+    count = gfc_list_count(window_manager.windowList);
+    for (i = count -1 ; i >= 0; i--)
+    {
+        win = gfc_list_nth(window_manager.windowList,i);
+        if (!win)continue;
+        if (win->_inuse)continue;
+        gfc_list_delete_nth(window_manager.windowList,i);
+        gf2d_window_delete(win);
     }
     return retval;
 }
@@ -864,6 +875,7 @@ Window *gf2d_window_load(char *filename)
     Window *win = NULL;
     SJson *json;
     json = gfc_pak_load_json(filename);
+    if (!json)return NULL;
     win = gf2d_window_load_from_json(json);
     sj_free(json);
     if (win)

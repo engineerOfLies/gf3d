@@ -39,7 +39,7 @@ int yes_no_free(Window *win)
     return 0;
 }
 
-int yes_no_update(Window *win,GFC_List *updateGFC_List)
+int yes_no_update(Window *win,GFC_List *updateList)
 {
     int i,count;
     Element *e;
@@ -47,7 +47,7 @@ int yes_no_update(Window *win,GFC_List *updateGFC_List)
     GFC_List *callbacks;
     GFC_Callback *callback;
     if (!win)return 0;
-    if (!updateGFC_List)return 0;
+    if (!updateList)return 0;
     
     if ((gf2d_mouse_hidden())&&(gfc_input_command_pressed("nextelement")))
     {
@@ -56,10 +56,10 @@ int yes_no_update(Window *win,GFC_List *updateGFC_List)
     }
 
     callbacks = (GFC_List*)win->data;
-    count = gfc_list_get_count(updateGFC_List);
+    count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateGFC_List,i);
+        e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
         if ((strcmp(e->name,"item_right")==0)||(strcmp(e->name,"item_left")==0))
         {
@@ -126,19 +126,19 @@ Window *window_yes_no(Window *parent,const char *text, void(*onYes)(void *),void
 }
 
 
-int ok_update(Window *win,GFC_List *updateGFC_List)
+int ok_update(Window *win,GFC_List *updateList)
 {
     int i,count;
     Element *e;
     GFC_List *callbacks;
     GFC_Callback *callback;
     if (!win)return 0;
-    if (!updateGFC_List)return 0;
+    if (!updateList)return 0;
     callbacks = (GFC_List*)win->data;
-    count = gfc_list_get_count(updateGFC_List);
+    count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateGFC_List,i);
+        e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
         switch(e->index)
         {
@@ -155,7 +155,7 @@ int ok_update(Window *win,GFC_List *updateGFC_List)
     return 0;
 }
 
-int alert_update(Window *win,GFC_List *updateGFC_List)
+int alert_update(Window *win,GFC_List *updateList)
 {
     int i,count;
     Element *e;
@@ -176,11 +176,11 @@ int alert_update(Window *win,GFC_List *updateGFC_List)
         gf2d_window_free(win);
         return 1;
     }
-    if (!updateGFC_List)return 0;
-    count = gfc_list_get_count(updateGFC_List);
+    if (!updateList)return 1;
+    count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateGFC_List,i);
+        e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
         if ((strcmp(e->name,"ok")==0)||(strcmp(e->name,"cancel")==0))
         {
@@ -193,7 +193,7 @@ int alert_update(Window *win,GFC_List *updateGFC_List)
             return 1;
         }
     }
-    return 0;
+    return 1;
 }
 
 Window *window_alert(const char *title, const char *text, void(*onOK)(void *),void *okData)
@@ -226,7 +226,7 @@ Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),v
     win = gf2d_window_load("menus/dialog.menu");
     if (!win)
     {
-        slog("failed to load alert window");
+        slog("failed to load dialog window");
         return NULL;
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),title);
@@ -239,6 +239,7 @@ Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),v
         gfc_list_append(callbacks,gfc_callback_new(onOK,okData));
         win->data = callbacks;
     }
+    gf2d_window_bring_to_front(win);
     return win;
 }
 
@@ -318,18 +319,18 @@ int window_color_select_free(Window *win)
     return 0;
 }
 
-int window_color_select_update(Window *win,GFC_List *updateGFC_List)
+int window_color_select_update(Window *win,GFC_List *updateList)
 {
     int i,count;
     Element *e;
     GF2DWindowGFC_ColorPickData *data;
     if ((!win)||(!win->data))return 0;
-    if (!updateGFC_List)return 0;
+    if (!updateList)return 0;
     data = win->data;
-    count = gfc_list_get_count(updateGFC_List);
+    count = gfc_list_get_count(updateList);
     for (i = 0; i < count; i++)
     {
-        e = gfc_list_get_nth(updateGFC_List,i);
+        e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
         if (strcmp(e->name,"red_up")==0)
         {
