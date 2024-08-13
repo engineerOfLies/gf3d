@@ -222,7 +222,11 @@ void gf2d_draw_rect_filled(GFC_Rect rect,GFC_Color color)
     SDL_Rect rects;
     GFC_Shape shape;
     DrawImage *image = NULL;
-    
+    if ((!rect.w)||(!rect.h))
+    {
+        return;
+    }
+
     shape = gfc_shape_from_rect(gfc_rect(0,0,rect.w,rect.h));
     image = gf2d_draw_image_get(shape,1);
     if (image)
@@ -240,10 +244,6 @@ void gf2d_draw_rect_filled(GFC_Rect rect,GFC_Color color)
             0);
 
         return;
-    }
-    if ((!rect.w)||(!rect.h))
-    {
-        slog("cannot render a zero dimension rectangle");
     }
     surface = gf3d_vgraphics_create_surface((Uint32)rect.w + 1,(Uint32)rect.h + 1);
     if (!surface)
