@@ -4,10 +4,12 @@
 #include "simple_json.h"
 
 #include "gfc_vector.h"
+#include "gfc_actions.h"
 #include "gfc_color.h"
 #include "gfc_callbacks.h"
 #include "gfc_primitives.h"
 
+#include "gf2d_actor.h"
 #include "gf3d_draw.h"
 #include "gf3d_particle.h"
 #include "gf3d_model.h"
@@ -17,7 +19,6 @@ typedef enum
     GF3D_ET_Particle = 0,
     GF3D_ET_Line,
     GF3D_ET_Model,
-    GF3D_ET_Sprite,
     GF3D_ET_MAX,
 }GF3DEffectType;
 
@@ -27,19 +28,22 @@ typedef struct
     Uint8           _inuse;
     Sint32          ttd;                // when this time is passed, delete this effect
     ModelMat        mat;                // for keeping track of model data`
-    GFC_Edge3D          edge;               // for drawing lines
+    GFC_Edge3D      edge;               // for drawing lines
     Particle        particle;           // particle data, partical data
-    float           radius;             // how wide a line is
+    Actor          *actor;              // for animated particles
+    GFC_Action     *action;             // current action
+    float           frame;              // for animations
+    float           size;               // how wide a line is, how large a particle is
+    float           sizeVector;         // for particles, this changes the size of the particle to draw over time
     GF3DEffectType  eType;              // which type of effect this one is
-    Uint16          fadein;             // if true, start fading in from zero alpha to full by the time this has ended
-    Uint16          fadeout;            // if true, start fading out when there is this much time left to live
-    float           sizeDelta;          // for particles, this changes the size of the particle to draw over time
-    GFC_Vector3D        velocity;           // movement of the effect
-    GFC_Vector3D        acceleration;       // acceleration of the effect
-    GFC_Color           color;              // color mod for the effect
-    GFC_Color           colorVector;        // color delta to be applied over time
-    GFC_Color           colorAcceleration;  // color delta delta to be applied over time
-    GFC_Callback        callback;           // if a callback has been set for when a particle dies
+    Uint8           fadein;             // if true, start fading in from zero alpha to full by the time this has ended
+    Uint8           fadeout;            // if true, start fading out when there is this much time left to live
+    GFC_Vector3D    velocity;           // movement of the effect
+    GFC_Vector3D    acceleration;       // acceleration of the effect
+    GFC_Color       color;              // color mod for the effect
+    GFC_Color       colorVector;        // color delta to be applied over time
+    GFC_Color       colorAcceleration;  // color delta delta to be applied over time
+    GFC_Callback    callback;           // if a callback has been set for when a particle dies
 }GF3DEffect;
 
 /**
@@ -155,8 +159,20 @@ void gf3d_effect_set_callback(GF3DEffect *effect,void (*callback)(void *data),vo
 
 /**
  * @brief make a new particle based on a json config
+ * @param config the json to configure the particle by
+ * @param position where the particle should be
+ * @param position2 if the particle is a line, this is the second endpoint
+ * @param velocity where the particle is moving
+ * @param acceleration and how its velocity changes over time
+ * @param callback [optional] to be called when the particle expires
  */
-GF3DEffect *gf3d_effect_from_config(SJson *config);
+GF3DEffect *gf3d_effect_from_config(
+    SJson *config,
+    GFC_Vector3D position,
+    GFC_Vector3D position2,
+    GFC_Vector3D velocity,
+    GFC_Vector3D acceleration,
+    GFC_Callback *callback);
 
 /**
  * @brief while most effects will timeout on their own

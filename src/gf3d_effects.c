@@ -1,4 +1,7 @@
 #include "simple_logger.h"
+
+#include "gfc_config.h"
+
 #include "gf3d_effects.h"
 #include "gf3d_effects.h"
 
@@ -52,7 +55,7 @@ void gf3d_effect_update(GF3DEffect *effect)
     gfc_color_add(&effect->color,effect->color,effect->colorVector);
     gfc_color_add(&effect->colorVector,effect->colorVector,effect->colorAcceleration);
     //do fade in/ fade out
-    
+    gfc_action_next_frame(effect->action,&effect->frame);
     //do physcial updates
     switch (effect->eType)
     {
@@ -60,13 +63,13 @@ void gf3d_effect_update(GF3DEffect *effect)
             gfc_vector3d_add(effect->particle.position,effect->particle.position,effect->velocity);
             gfc_vector3d_add(effect->velocity,effect->velocity,effect->acceleration);
             gfc_color_copy(effect->particle.color,effect->color);
-            effect->particle.size *= effect->sizeDelta;
+            effect->particle.size += effect->sizeVector;
             break;
         case GF3D_ET_Line:
             gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
             gf3d_model_mat_rotate(&effect->mat,effect->mat.rotationDelta);
             gf3d_model_mat_scale(&effect->mat,effect->mat.scaleDelta);
-            effect->radius *= effect->sizeDelta;
+            effect->size += effect->sizeVector;
             break;
         case GF3D_ET_Model:
             gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
@@ -90,13 +93,17 @@ void gf3d_effect_draw(GF3DEffect *effect)
     switch (effect->eType)
     {
         case GF3D_ET_Particle:
-            gf3d_particle_draw(effect->particle);
+            if (effect->actor)
+            {
+                gf3d_particle_draw_sprite(effect->particle,effect->actor->sprite,effect->frame);
+            }
+            else gf3d_particle_draw(effect->particle);
             break;
         case GF3D_ET_Line:
-            gf3d_draw_edge_3d(effect->edge,effect->mat.position,effect->mat.rotation,effect->mat.scale,effect->radius,effect->color);
+            gf3d_draw_edge_3d(effect->edge,effect->mat.position,effect->mat.rotation,effect->mat.scale,effect->size,effect->color);
             break;
         case GF3D_ET_Model:
-            gf3d_model_draw(effect->mat.model,effect->mat.mat,effect->color,NULL,0);
+            gf3d_model_draw(effect->mat.model,effect->mat.mat,effect->color,NULL,effect->frame);
             break;
         default:
             break;
@@ -121,10 +128,10 @@ GF3DEffect *gf3d_effect_new()
     for (i = 0; i < gf3d_effect_manager.effect_max;i++)
     {
         if (gf3d_effect_manager.effect_list[i]._inuse)continue;
+        memset(&gf3d_effect_manager.effect_list[i],0,sizeof(GF3DEffect));
         gf3d_effect_manager.effect_list[i]._inuse = 1;
         gf3d_effect_manager.effect_list[i].color = gfc_color8(255,255,255,255);
         gf3d_model_mat_reset(&gf3d_effect_manager.effect_list[i].mat);
-        gf3d_effect_manager.effect_list[i].sizeDelta = 1;
         return &gf3d_effect_manager.effect_list[i];
     }
     return NULL;
@@ -133,6 +140,7 @@ GF3DEffect *gf3d_effect_new()
 void gf3d_effect_free(GF3DEffect *effect)
 {
     if (!effect)return;
+    if (effect->actor)gf2d_actor_free(effect->actor);
     if (effect->mat.model)gf3d_model_free(effect->mat.model);
     memset(effect,0,sizeof(GF3DEffect));
 }
@@ -155,12 +163,12 @@ GF3DEffect *gf3d_effect_new_line(
     effect->eType = GF3D_ET_Line;
     if (ttl < 0)effect->ttd = -1;
     else effect->ttd = gf3d_effect_manager.now + ttl;
-    effect->radius = size;
+    effect->size = size;
     effect->edge = edge;
     effect->velocity = velocity;
     effect->acceleration = acceleration;
     effect->particle.size = size;
-    effect->sizeDelta = sizeDelta;
+    effect->sizeVector = sizeDelta;
     gfc_color_copy(effect->color,color);
     gfc_color_copy(effect->colorVector,colorVector);
     gfc_color_copy(effect->colorAcceleration,colorAcceleration);
@@ -188,7 +196,7 @@ GF3DEffect *gf3d_effect_new_particle(
     effect->velocity = velocity;
     effect->acceleration = acceleration;
     effect->particle.size = size;
-    effect->sizeDelta = sizeDelta;
+    effect->sizeVector = sizeDelta;
     gfc_color_copy(effect->particle.color,color);
     gfc_color_copy(effect->color,color);
     gfc_color_copy(effect->colorVector,colorVector);
@@ -266,7 +274,7 @@ GF3DEffect *gf3d_effect_new_particle_target(
     effect->eType = GF3D_ET_Particle;
     effect->particle.position = position;
     effect->particle.size = size;
-    effect->sizeDelta = sizeDelta;
+    effect->sizeVector = sizeDelta;
     gfc_color_copy(effect->particle.color,color);
     gfc_color_copy(effect->color,color);
     gfc_color_copy(effect->colorVector,colorVector);
@@ -279,13 +287,86 @@ GF3DEffect *gf3d_effect_new_particle_target(
 }
 
 
-GF3DEffect *gf3d_effect_from_config(SJson *config)
+GF3DEffect *gf3d_effect_from_config(
+    SJson *config,
+    GFC_Vector3D position,
+    GFC_Vector3D position2,
+    GFC_Vector3D velocity,
+    GFC_Vector3D acceleration,
+    GFC_Callback *callback)
 {
+    const char *effectType;
+    const char *filename;
+    float variance = 0;
     GF3DEffect *effect;
     if (!config)return NULL;
     effect = gf3d_effect_new();
     if (!effect)return NULL;
     
+    effect->velocity = velocity;
+    effect->acceleration = acceleration;
+    
+    if (callback)
+    {
+        effect->callback.callback = callback->callback;
+        effect->callback.data = callback->data;
+    }
+    
+    sj_object_get_int(config,"ttd",(int*)&effect->ttd);
+    if (sj_object_get_float(config,"ttdVariance",&variance))effect->ttd += (int)(gfc_crandom() * variance);
+    effect->ttd += gf3d_effect_manager.now;
+    
+    sj_object_get_float(config,"size",&effect->size);
+    sj_object_get_float(config,"sizeVector",&effect->sizeVector);
+    if (sj_object_get_float(config,"sizeVariance",&variance))effect->size += (gfc_crandom() * variance);
+
+    sj_object_get_uint8(config,"fadein",&effect->fadein);
+    sj_object_get_uint8(config,"fadeout",&effect->fadeout);
+
+    sj_object_get_color_value(config,"color",&effect->color);
+    sj_object_get_color_value(config,"colorVector",&effect->colorVector);
+    sj_object_get_color_value(config,"colorAcceleration",&effect->colorAcceleration);
+    
+    effectType = sj_object_get_string(config,"type");
+    if (effectType)
+    {
+        if (gfc_strlcmp(effectType,"particle") == 0)
+        {
+            effect->eType = GF3D_ET_Particle;
+            effect->particle.size = effect->size;
+            sj_object_get_color_value(config,"color",&effect->particle.color);
+            sj_object_get_color_value(config,"color2",&effect->particle.color2);
+            effect->particle.position = position;
+            filename = sj_object_get_string(config,"actor");
+            if (filename)
+            {
+                effect->actor = gf2d_actor_load(filename);
+                filename = sj_object_get_string(config,"action");
+                effect->action = gf2d_actor_get_action_by_name(effect->actor,filename);
+            }
+        }
+        else if (gfc_strlcmp(effectType,"line") == 0)
+        {
+            effect->eType = GF3D_ET_Line;
+            effect->edge.a = position;
+            effect->edge.b = position2;
+        }
+        else if (gfc_strlcmp(effectType,"model") == 0)
+        {
+            effect->eType = GF3D_ET_Line;
+            filename = sj_object_get_string(config,"model");
+            effect->mat.model = gf3d_model_load(filename);
+            effect->mat.position = position;
+            if (effect->mat.model)
+            {
+                filename = sj_object_get_string(config,"action");
+                if (filename)
+                {
+                    effect->action = gfc_action_list_get_action(effect->mat.model->action_list,filename);
+                }
+            }
+        }
+    }
     return effect;
 }
 
