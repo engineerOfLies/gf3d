@@ -374,10 +374,12 @@ GF3DEffect *gf3d_effect_from_config(
 void gf3d_effect_square_emitter(GFC_Vector3D centerPosition, GFC_Vector3D direction,float area,Uint8 count,SJson *effect)
 {
     int i;
+    float gravity = 0;
     GFC_Vector3D angles,right,up;
     GFC_Vector3D position,velocity,rightV,upV;
     float speed = 0,speedVariance = 0;
     if (!effect)return;
+    sj_object_get_float(effect,"gravity",&gravity);
     sj_object_get_float(effect,"speed",&speed);
     sj_object_get_float(effect,"speedVariance",&speedVariance);
     
@@ -404,7 +406,7 @@ void gf3d_effect_square_emitter(GFC_Vector3D centerPosition, GFC_Vector3D direct
             position,
             gfc_vector3d(0,0,0),
             velocity,
-            gfc_vector3d(0,0,0),
+            gfc_vector3d(0,0,gravity),
             NULL);
     }
 }
