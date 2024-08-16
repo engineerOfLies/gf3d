@@ -175,6 +175,35 @@ GF3DEffect *gf3d_effect_from_config(
     GFC_Callback *callback);
 
 /**
+ * @brief emit multiple particles baased on the name of the effect provided.  
+ * @param position where to emit from
+ * @param direction direciton of emission
+ * @param count how many to emit
+ * @param effectName the name of the effect in the config_def effects list to use
+ * @note you must have used gfc_config_def_load() on a json file that contains a list of "effects"
+ * @example
+    {
+        "name":"flame",
+        "ttd":300,
+        "ttdVariance":5,
+        "type":"particle",
+        "color":[255,50,0,128],
+        "color2":[255,255,50,128],
+        "actor":"actors/flame.actor",
+        "action":"default",
+        "emitter":"point",       
+        "speed":0.0005,
+        "speedVariance":0.00025,
+        "fadein":0,
+        "fadeout":0,
+        "size":0.5
+    }
+    @note emmitter currently supports "square" and point
+ */
+void gf3d_effect_emit(GFC_Vector3D position, GFC_Vector3D direction,Uint8 count,const char *effectName);
+
+
+/**
  * @brief while most effects will timeout on their own
  */
 void gf3d_effect_free(GF3DEffect *effect);

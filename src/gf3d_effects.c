@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 
 #include "gfc_config.h"
+#include "gfc_config_def.h"
 
 #include "gf3d_effects.h"
 #include "gf3d_effects.h"
@@ -368,6 +369,66 @@ GF3DEffect *gf3d_effect_from_config(
         }
     }
     return effect;
+}
+
+void gf3d_effect_square_emitter(GFC_Vector3D centerPosition, GFC_Vector3D direction,float area,Uint8 count,SJson *effect)
+{
+    int i;
+    GFC_Vector3D angles,right,up;
+    GFC_Vector3D position,velocity,rightV,upV;
+    float speed = 0,speedVariance = 0;
+    if (!effect)return;
+    sj_object_get_float(effect,"speed",&speed);
+    sj_object_get_float(effect,"speedVariance",&speedVariance);
+    
+    gfc_vector3d_normalize(&direction);
+    gfc_vector3d_angles (direction, &angles);
+    gfc_vector3d_angle_vectors(angles, NULL, &right, &up);
+    gfc_vector3d_scale(direction,direction,speed);
+
+    gfc_vector3d_scale(right,right,area);
+    gfc_vector3d_scale(up,up,area);
+    for (i = 0; i < count; i++)
+    {
+        gfc_vector3d_copy(position,centerPosition);
+        gfc_vector3d_randomize(&rightV,right);
+        gfc_vector3d_randomize(&upV,up);
+        gfc_vector3d_add(position,position,rightV);
+        gfc_vector3d_add(position,position,upV);
+        
+        velocity.x = direction.x + gfc_crandom() * speedVariance;
+        velocity.y = direction.y + gfc_crandom() * speedVariance;
+        velocity.z = direction.z + gfc_crandom() * speedVariance;
+        gf3d_effect_from_config(
+            effect,
+            position,
+            gfc_vector3d(0,0,0),
+            velocity,
+            gfc_vector3d(0,0,0),
+            NULL);
+    }
+}
+
+void gf3d_effect_emit(GFC_Vector3D position, GFC_Vector3D direction,Uint8 count,const char *effectName)
+{
+    float area = 0;
+    const char *emitter;
+    SJson *config;
+    if (!effectName)return;
+    config = gfc_config_def_get_by_name("effects",effectName);
+    if (!config)return;
+    emitter = sj_object_get_string(config,"emitter");
+    if (!emitter)return;
+    if (gfc_strlcmp(emitter,"square") == 0)
+    {
+        sj_object_get_float(config,"radius",&area);
+        gf3d_effect_square_emitter(position, direction,area,count,config);
+    }
+    else if (gfc_strlcmp(emitter,"point") == 0)
+    {
+        
+        gf3d_effect_square_emitter(position, direction,0,count,config);
+    }
 }
 
 /*eol@eof*/
