@@ -215,7 +215,8 @@ GF3D_Material *gf3d_material_parse_js(SJson *json,const char *filename)
     material->name = sj_object_get_gfc_string(json,"name");
     material->ambient = sj_object_get_color(json,"ambient");
     material->diffuse = sj_object_get_color(json,"diffuse");
-    material->specular = sj_object_get_color(json,"specular");
+    sj_object_get_color_value(json,"specular",&material->specular);
+    sj_object_get_color_value(json,"emit",&material->emissive);
     sj_object_get_value_as_float(json,"transparency",&material->transparency);
     sj_object_get_value_as_float(json,"shininess",&material->shininess);
     return material;
@@ -297,6 +298,7 @@ MaterialUBO gf3d_material_get_ubo(GF3D_Material *material)
     ubo.ambient = gfc_color_to_vector4f(material->ambient);
     ubo.diffuse = gfc_color_to_vector4f(material->diffuse);
     ubo.specular = gfc_color_to_vector4f(material->specular);
+    ubo.emission = gfc_color_to_vector4f(material->emissive);
     ubo.shininess = material->shininess;
     ubo.transparency = material->transparency;
     
@@ -309,6 +311,7 @@ MaterialUBO gf3d_material_make_basic_ubo(GFC_Color diffuse)
     material.ambient = gfc_vector4d(1,1,1,1);
     material.specular = gfc_vector4d(1,1,1,1);
     material.diffuse = gfc_color_to_vector4f(diffuse);
+    material.emission = gfc_vector4d(0,0,0,0);
     material.shininess = 128;
     material.transparency = 1.0;
     return material;

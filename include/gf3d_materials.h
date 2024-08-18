@@ -18,6 +18,7 @@ typedef struct
     GFC_Vector4D    ambient;        //how much ambient light affects this material
     GFC_Vector4D    diffuse;        //how much diffuse light affects this material - primary influcen for material color
     GFC_Vector4D    specular;       //color of the shine on the materials
+    GFC_Vector4D    emission;       //color that shows regardless of light
     float           transparency;   //how translucent the material should be overall
     float           shininess;      //how shiny the materials is.  // how pronounced the specular is
     GFC_Vector2D    padding;        //for alignment
