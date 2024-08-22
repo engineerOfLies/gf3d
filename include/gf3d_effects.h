@@ -31,10 +31,12 @@ typedef struct
     GFC_Edge3D      edge;               // for drawing lines
     Particle        particle;           // particle data, partical data
     Actor          *actor;              // for animated particles
+    Sprite         *image;              // for non animated particles
     GFC_Action     *action;             // current action
     float           frame;              // for animations
     float           size;               // how wide a line is, how large a particle is
     float           sizeVector;         // for particles, this changes the size of the particle to draw over time
+    float           sizeAcceleration;   // for particles, this changes the change of size of the particle to draw over time
     GF3DEffectType  eType;              // which type of effect this one is
     Uint8           fadein;             // if true, start fading in from zero alpha to full by the time this has ended
     Uint8           fadeout;            // if true, start fading out when there is this much time left to live

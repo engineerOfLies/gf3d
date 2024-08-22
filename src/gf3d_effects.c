@@ -65,12 +65,14 @@ void gf3d_effect_update(GF3DEffect *effect)
             gfc_vector3d_add(effect->velocity,effect->velocity,effect->acceleration);
             gfc_color_copy(effect->particle.color,effect->color);
             effect->particle.size += effect->sizeVector;
+            effect->sizeVector += effect->sizeAcceleration;
             break;
         case GF3D_ET_Line:
             gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
             gf3d_model_mat_rotate(&effect->mat,effect->mat.rotationDelta);
             gf3d_model_mat_scale(&effect->mat,effect->mat.scaleDelta);
             effect->size += effect->sizeVector;
+            effect->sizeVector += effect->sizeAcceleration;
             break;
         case GF3D_ET_Model:
             gf3d_model_mat_move(&effect->mat,effect->mat.positionDelta);
@@ -97,6 +99,10 @@ void gf3d_effect_draw(GF3DEffect *effect)
             if (effect->actor)
             {
                 gf3d_particle_draw_sprite(effect->particle,effect->actor->sprite,effect->frame);
+            }
+            else if (effect->image)
+            {
+                gf3d_particle_draw_sprite(effect->particle,effect->image,0);
             }
             else gf3d_particle_draw(effect->particle);
             break;
@@ -319,6 +325,7 @@ GF3DEffect *gf3d_effect_from_config(
     
     sj_object_get_float(config,"size",&effect->size);
     sj_object_get_float(config,"sizeVector",&effect->sizeVector);
+    sj_object_get_float(config,"sizeAcceleration",&effect->sizeAcceleration);
     if (sj_object_get_float(config,"sizeVariance",&variance))effect->size += (gfc_crandom() * variance);
 
     sj_object_get_uint8(config,"fadein",&effect->fadein);
@@ -345,6 +352,12 @@ GF3DEffect *gf3d_effect_from_config(
                 filename = sj_object_get_string(config,"action");
                 effect->action = gf2d_actor_get_action_by_name(effect->actor,filename);
             }
+            filename = sj_object_get_string(config,"image");
+            if (filename)
+            {
+                effect->image = gf2d_sprite_load_image(filename);
+            }
+
         }
         else if (gfc_strlcmp(effectType,"line") == 0)
         {
