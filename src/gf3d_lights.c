@@ -159,6 +159,36 @@ void gf3d_light_build_ubo_from_array(LightUBO *ubo, GF3D_Light *lights[],Uint32 
     }
 }
 
+GFC_List *gf3d_list_list_filter_from_pov(GFC_List *lights,GFC_Vector3D point, GFC_Vector3D view)
+{
+    GFC_List *list;//output
+    GF3D_Light *light;
+    GFC_Vector3D dir;
+    int i,c;
+    if (!lights)return NULL;
+    c = gfc_list_count(lights);
+    if (!c)return NULL;
+    list = gfc_list_new();
+    if (!list)return NULL;
+    for (i = 0; i < c; i++)
+    {
+        light = gfc_list_nth(lights,i);
+        if (!light)continue;
+        if (!light->position.w)
+        {
+            //light is global, add it
+            gfc_list_append(list,light);
+            continue;
+        }
+        gfc_vector3d_sub(dir,light->position,point);
+        if (gfc_vector3d_dot_product(dir,view) > 0)
+        {
+            gfc_list_append(list,light);//its in front of the point of view, add it
+        }
+    }
+    return list;
+}
+
 void gf3d_light_build_ubo_from_closest_list_limit(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative,int limit)
 {
     int i,j,c;

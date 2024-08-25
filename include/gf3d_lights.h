@@ -144,6 +144,16 @@ void gf3d_light_build_ubo_from_closest(LightUBO *ubo,GFC_Vector3D relative);
 void gf3d_light_build_ubo_from_closest_list(LightUBO *ubo,GFC_List *lights, GFC_Vector3D relative);
 
 /**
+ * @brief filter a list of lights for lights that are in the direction of the reference point
+ * @param lights the list of GF3D_Lights to filter
+ * @param point the reference point to check
+ * @param view the direction the point is looking in
+ * @return NULL if no lights, or a new list containing the lights that passed the filter otherwise
+ * @note the returned list needs to be cleaned up.  NOT THE LIGHTS IN IT
+ */
+GFC_List *gf3d_list_list_filter_from_pov(GFC_List *lights,GFC_Vector3D point, GFC_Vector3D view);
+
+/**
  * @brief build a lighting ubo based on the closest X lights in the provided list, where X is the limit
  * @param ubo [output] this will be populated with up to MAX_SHADER_LIGHTS
  * @param lights the list of lights to check against
