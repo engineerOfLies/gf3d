@@ -8,8 +8,9 @@
 typedef struct
 {
     Uint8                   _inuse;                 /**<if this buffer is currently being used*/
-    VkBuffer                uniformBuffer;      /**<buffer handle passed to render calls*/
-    VkDeviceMemory          uniformBufferMemory;/**<buffer memory for updating the data*/
+    VkBuffer                uniformBuffer;          /**<buffer handle passed to render calls*/
+    VkDeviceMemory          uniformBufferMemory;    /**<buffer memory for updating the data*/
+    size_t                  bufferSize;
 }UniformBuffer;
 
 typedef struct
@@ -46,10 +47,24 @@ void gf3d_uniform_buffer_list_free(UniformBufferList *list);
 UniformBuffer *gf3d_uniform_buffer_list_get_buffer(UniformBufferList *list, Uint32 bufferFrame);
 
 /**
+ * @brief get the nth buffer.  This does not check for inuse or set it.
+ * @param list the buffer list to get from
+ * @param nth which one to get
+ * @param bufferFrame from which frame
+ * @return NULL if not found, the UniformBuffer otherwise
+ */
+UniformBuffer *gf3d_uniform_buffer_list_get_nth_buffer(UniformBufferList *list, Uint32 nth, Uint32 bufferFrame);
+
+/**
  * @brief clear all of the uniform buffers that have been used for the buffer frame
  */
 void gf3d_uniform_buffer_list_clear(UniformBufferList *list, Uint32 bufferFrame);
 
-
+/**
+ * @brief setup a single Uniform buffer
+ * @param buffer the buffer to setup (allocate it first)
+ * @param bufferSize how large to make it
+ */
+void gf3d_uniform_buffer_setup(UniformBuffer *buffer,VkDeviceSize bufferSize);
 
 #endif

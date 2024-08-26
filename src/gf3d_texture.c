@@ -1,5 +1,8 @@
 #include <SDL_image.h>
+
 #include "simple_logger.h"
+
+#include "gfc_pak.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_buffers.h"
@@ -13,6 +16,7 @@ typedef struct
     VkDevice        device;
 }TextureManager;
 
+extern int __DEBUG;
 static TextureManager gf3d_texture = {0};
 
 void gf3d_texture_close();
@@ -21,7 +25,6 @@ void gf3d_texture_delete_all();
 
 void gf3d_texture_init(Uint32 max_textures)
 {
-    slog("initializing texture system");
     if (!max_textures)
     {
         slog("cannot initialize texture system for 0 textures");
@@ -36,12 +39,12 @@ void gf3d_texture_init(Uint32 max_textures)
     gf3d_texture.max_textures = max_textures;
     gf3d_texture.device = gf3d_vgraphics_get_default_logical_device();
     atexit(gf3d_texture_close);
-    slog("texture system initialized");
+    if (__DEBUG)slog("texture system initialized");
 }
 
 void gf3d_texture_close()
 {
-    slog("cleaning up textures");
+    if (__DEBUG)slog("cleaning up textures");
     gf3d_texture_delete_all();
     if (gf3d_texture.texture_list != NULL)
     {
@@ -77,23 +80,27 @@ Texture *gf3d_texture_new()
 
 void gf3d_texture_delete(Texture *tex)
 {
-    if ((!tex)||(!tex->_inuse))return;
+    if (!tex)return;
     
-    if (tex->textureSampler != VK_NULL_HANDLE)
+    if ((tex->textureSampler)&&(tex->textureSampler != VK_NULL_HANDLE))
     {
         vkDestroySampler(gf3d_texture.device, tex->textureSampler, NULL);
     }
-    if (tex->textureImageView != VK_NULL_HANDLE)
+    if ((tex->textureImageView)&&(tex->textureImageView != VK_NULL_HANDLE))
     {
         vkDestroyImageView(gf3d_texture.device, tex->textureImageView, NULL);
     }
-    if (tex->textureImage != VK_NULL_HANDLE)
+    if ((tex->textureImage)&&(tex->textureImage != VK_NULL_HANDLE))
     {
         vkDestroyImage(gf3d_texture.device, tex->textureImage, NULL);
     }
-    if (tex->textureImageMemory != VK_NULL_HANDLE)
+    if ((tex->textureImage)&&(tex->textureImageMemory != VK_NULL_HANDLE))
     {
         vkFreeMemory(gf3d_texture.device, tex->textureImageMemory, NULL);
+    }
+    if (tex->surface)
+    {
+        SDL_FreeSurface(tex->surface);
     }
     memset(tex,0,sizeof(Texture));
 }
@@ -213,30 +220,30 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
         slog("no surface provided for texture conversion");
         return NULL;
     }
-    
-    surface = gf3d_vgraphics_screen_convert(&surface);
 
     tex = gf3d_texture_new();
     if (!tex)
     {
+        SDL_FreeSurface(surface);
         return NULL;
     }
-    tex->width = surface->w;
-    tex->height = surface->h;
-    imageSize = surface->w * surface->h * 4;
+    tex->surface = gf3d_vgraphics_screen_convert(&surface);
+    tex->width = tex->surface->w;
+    tex->height = tex->surface->h;
+    imageSize = tex->surface->w * tex->surface->h * 4;
     
     gf3d_buffer_create(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     
-    SDL_LockSurface(surface);
+    SDL_LockSurface(tex->surface);
         vkMapMemory(gf3d_texture.device, stagingBufferMemory, 0, imageSize, 0, &data);
-            memcpy(data, surface->pixels, imageSize);
+            memcpy(data, tex->surface->pixels, imageSize);
         vkUnmapMemory(gf3d_texture.device, stagingBufferMemory);
-    SDL_UnlockSurface(surface);    
+    SDL_UnlockSurface(tex->surface);    
     
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = surface->w;
-    imageInfo.extent.height = surface->h;
+    imageInfo.extent.width = tex->surface->w;
+    imageInfo.extent.height = tex->surface->h;
     imageInfo.extent.depth = 1;
     imageInfo.mipLevels = 1;
     imageInfo.arrayLayers = 1;    
@@ -252,7 +259,7 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
     {
         slog("failed to create image!");
         gf3d_texture_delete(tex);
-        SDL_FreeSurface(surface);
+        SDL_FreeSurface(tex->surface);
         return NULL;
     }
     vkGetImageMemoryRequirements(gf3d_texture.device, tex->textureImage, &memRequirements);
@@ -265,7 +272,6 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
     {
         slog("failed to allocate image memory!");
         gf3d_texture_delete(tex);
-        SDL_FreeSurface(surface);
         return NULL;
     }
 
@@ -273,7 +279,7 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
     
     gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-    gf3d_texture_copy_buffer_to_image(stagingBuffer, tex->textureImage, surface->w, surface->h);
+    gf3d_texture_copy_buffer_to_image(stagingBuffer, tex->textureImage, tex->surface->w, tex->surface->h);
     
     gf3d_swapchain_transition_image_layout(tex->textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -289,6 +295,9 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
 
 Texture *gf3d_texture_load(const char *filename)
 {
+    void *mem;
+    SDL_RWops *src;
+    size_t fileSize = 0;
     SDL_Surface * surface;
     Texture *tex;
 
@@ -298,7 +307,20 @@ Texture *gf3d_texture_load(const char *filename)
         tex->_refcount++;
         return tex;
     }
-    surface = IMG_Load(filename);
+    mem = gfc_pak_file_extract(filename,&fileSize);
+    if (!mem)
+    {
+        slog("failed to load image %s",filename);
+        return NULL;
+    }
+    src = SDL_RWFromMem(mem, fileSize);
+    if (!src)
+    {
+        slog("failed to read image %s",filename);
+        return NULL;
+    }
+    surface = IMG_Load_RW(src,1);
+    free(mem);
     if (!surface)
     {
         slog("failed to load texture file %s",filename);
@@ -308,11 +330,9 @@ Texture *gf3d_texture_load(const char *filename)
     
     if (!tex)
     {
-        SDL_FreeSurface(surface);
         return NULL;
     }
     gfc_line_cpy(tex->filename,filename);
-    tex->surface = surface;
     return tex;
 }
 

@@ -1,0 +1,36 @@
+{
+    "actor":
+    {
+        "sprite": "images/ui/com_button.png",
+        "frameWidth": 256,
+        "frameHeight": 64,
+        "framesPerLine": 1,
+        "scale": [0.62,0.65],
+        "drawOffset":[2,2],
+        "color": [64,200,255,200],
+        "actionList":
+        [
+            {
+                "action": "idle",
+                "startFrame": 0,
+                "endFrame": 0,
+                "frameRate": 0,
+                "type": "loop"
+            },
+            {
+                "action": "high",
+                "startFrame": 1,
+                "endFrame": 1,
+                "frameRate": 0,
+                "type": "loop"
+            },
+            {
+                "action": "press",
+                "startFrame": 2,
+                "endFrame": 2,
+                "frameRate": 0,
+                "type": "loop"
+            }
+        ]
+    }
+}

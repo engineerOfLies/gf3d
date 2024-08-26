@@ -1,0 +1,55 @@
+{
+"window":{
+    "dimensions" : [0,0,1,1],
+    "no_draw_generic":true,
+    "elements":
+    [
+      {
+        "type": "label",
+        "bounds": [0,0,1,1],
+        "text":" ",
+        "justify" : "center",
+        "backgroundDraw":1,
+        "backgroundColor" : [0,0,0, 150],
+        "align" : "middle",
+        "style":"H5"
+      },
+      {
+        "type": "list",
+        "name": "list",
+        "bounds": [0,0.4,1,100],
+        "style": "vertical",
+        "item_size" : [100,50],
+        "elements":
+        [
+            {
+                "type": "label",
+                "name": "title",
+                "bounds": [0,0,1,50],
+                "text":" ",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H5"
+            },
+            {
+                "type": "label",
+                "name": "text",
+                "bounds": [0.1,0,0.8,50],
+                "text":" ",
+                "wraps":true,
+                "justify" : "center",
+                "align" : "top",
+                "style":"H5"
+            }
+        ]
+      },
+      {
+        "type": "button",
+        "canHasFocus":true,
+        "sound":"confirm",
+        "name": "ok",
+        "hotkey":"ok"
+      }
+    ]
+    }
+}

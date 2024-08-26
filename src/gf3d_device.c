@@ -3,6 +3,7 @@
 
 #include "gfc_types.h"
 #include "gfc_list.h"
+#include "gfc_pak.h"
 
 #include "gf3d_vqueues.h"
 #include "gf3d_validation.h"
@@ -15,7 +16,7 @@ typedef struct
 {
     SJson *config;                  /**<loaded config*/
     VkInstance instance;            /**<active vulkan instance*/
-    List *device_list;              /**<list of GF3D_Device's*/
+    GFC_List *device_list;              /**<list of GF3D_Device's*/
     VkPhysicalDevice *devices;      /**<array of physical device handles*/
     VkDevice          device;       /**<logical device handle*/
     int bestDevice;                 /**<index of the chosen physical device*/
@@ -67,7 +68,7 @@ void gf3d_device_manager_init(const char *config, VkInstance instance, VkSurface
         slog("no config file provided");
         return;
     }
-    gf3d_device_manager.config = sj_load(config);
+    gf3d_device_manager.config = gfc_pak_load_json(config);
     if (!gf3d_device_manager.config)
     {
         slog("failed to load device config file: %s",config);
@@ -174,7 +175,7 @@ int gf3d_devices_enumerate()
     {
         device = gf3d_device_get_info(gf3d_device_manager.devices[i]);
         if (!device)continue;
-        gf3d_device_manager.device_list = gfc_list_append(gf3d_device_manager.device_list,device);
+        gfc_list_append(gf3d_device_manager.device_list,device);
     }
     
     return 1;

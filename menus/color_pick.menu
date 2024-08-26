@@ -1,0 +1,306 @@
+{
+    "window":
+    {
+        "dimensions" : [0,80,320,220],
+        "name":"color_pick_menu",
+        "justify" : "center",
+        "elements":
+        [
+            {
+                "type": "label",
+                "bounds": [0,0,1,40],
+                "text":"Color Selection",
+                "name":"title",
+                "justify" : "center",
+                "align" : "middle",
+                "style":"H4"
+            },
+            {
+                "type":"label",
+                "name":"border",
+                "bounds":[30,50,100,100],
+                "backgroundColor":[0,0,0,250],
+                "backgroundDraw":1
+            },
+            {
+                "type":"label",
+                "name":"color",
+                "bounds":[32,52,96,96],
+                "backgroundColor":[0,0,0,250],
+                "backgroundDraw":1
+            },
+            {
+                "type": "button",
+                "name":"cancel",
+                "bounds": [0,170,160,42],
+                "hotkey":"cancel",
+                "sound":"cancel",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"cancel",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "button",
+                "name":"ok",
+                "bounds": [160,170,160,42],
+                "hotkey":"okay",
+                "sound":"confirm",
+                "label" :
+                {
+                    "type": "label",
+                    "text":"Okay",
+                    "bounds": [0,0,160,48],
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                },
+                "actor" :
+                {
+                    "type": "actor",
+                    "bounds": [0,0,160,48],
+                    "actor" : "actors/button.actor"
+                }
+            },
+            {
+                "type": "list",
+                "bounds": [140,50,1,1],
+                "style": "vertical",
+                "item_size" : [1,40],
+                "packed":true,
+                "elements":
+                [
+                    {
+                        "type": "list",
+                        "bounds": [0,0,1,30],
+                        "style": "horizontal",
+                        "packed":true,
+                        "item_size" : [80,1],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "bounds": [0,0,50,30],
+                                "text":"Red:",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,40,30],
+                                "name":"red",
+                                "text":"0",
+                                "justify" : "right",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "button",
+                                "name":"red_down",
+                                "bounds": [0,0,40,21],
+                                "sound":"confirm",
+                                "repeat":true,
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"-",
+                                    "bounds": [0,0,40,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H5"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,40,24],
+                                    "scale":[0.25,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            },
+                            {
+                                "type": "button",
+                                "name":"red_up",
+                                "bounds": [0,0,40,21],
+                                "sound":"confirm",
+                                "repeat":true,
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"+",
+                                    "bounds": [0,0,40,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H5"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,40,24],
+                                    "scale":[0.25,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "list",
+                        "bounds": [0,0,1,30],
+                        "style": "horizontal",
+                        "packed":true,
+                        "item_size" : [80,1],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "bounds": [0,0,50,30],
+                                "text":"Green:",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,40,30],
+                                "name":"green",
+                                "text":"0",
+                                "justify" : "right",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "button",
+                                "name":"green_down",
+                                "bounds": [0,0,40,21],
+                                "repeat":true,
+                                "sound":"confirm",
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"-",
+                                    "bounds": [0,0,40,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H5"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,40,24],
+                                    "scale":[0.25,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            },
+                            {
+                                "type": "button",
+                                "name":"green_up",
+                                "bounds": [0,0,40,21],
+                                "repeat":true,
+                                "sound":"confirm",
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"+",
+                                    "bounds": [0,0,40,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H5"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,40,24],
+                                    "scale":[0.25,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            }
+                        ]
+                    }                    {
+                        "type": "list",
+                        "bounds": [0,0,1,30],
+                        "style": "horizontal",
+                        "packed":true,
+                        "item_size" : [80,1],
+                        "elements":
+                        [
+                            {
+                                "type": "label",
+                                "bounds": [0,0,50,30],
+                                "text":"Blue:",
+                                "justify" : "left",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "label",
+                                "bounds": [0,0,40,30],
+                                "name":"blue",
+                                "text":"0",
+                                "justify" : "right",
+                                "align" : "middle",
+                                "style":"H6"
+                            },
+                            {
+                                "type": "button",
+                                "name":"blue_down",
+                                "repeat":true,
+                                "bounds": [0,0,40,21],
+                                "sound":"confirm",
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"-",
+                                    "bounds": [0,0,40,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H5"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,40,24],
+                                    "scale":[0.25,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            },
+                            {
+                                "type": "button",
+                                "name":"blue_up",
+                                "repeat":true,
+                                "bounds": [0,0,40,21],
+                                "sound":"confirm",
+                                "label" :
+                                {
+                                    "type": "label",
+                                    "text":"+",
+                                    "bounds": [0,0,40,24],
+                                    "justify" : "center",
+                                    "align" : "middle",
+                                    "style":"H5"
+                                },
+                                "actor" :
+                                {
+                                    "type": "actor",
+                                    "bounds": [0,0,40,24],
+                                    "scale":[0.25,0.5],
+                                    "actor" : "actors/button.actor"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

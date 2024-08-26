@@ -51,3 +51,7 @@ dkms.conf
 makefile.dep
 gf3d
 *.log
+
+# backup files
+*.blend1
+

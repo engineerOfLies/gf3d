@@ -15,6 +15,7 @@
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_pak.h"
 #include "gfc_config.h"
 
 #include "gf3d_device.h"
@@ -56,7 +57,7 @@ typedef struct
     VkSurfaceKHR                surface;
 
     // color space
-    Color                       bgcolor;
+    GFC_Color                       bgcolor;
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
     
@@ -64,7 +65,7 @@ typedef struct
     VkSemaphore                 renderFinishedSemaphore;
 
     Command                 *   graphicsCommandPool; 
-    UniformBufferObject         ubo;
+    ModelViewProjection         ubo;
     
     //render frame and command buffer for the current render pass
     Uint32                      bufferFrame;
@@ -75,6 +76,8 @@ typedef struct
     Uint32                      gmask;
     Uint32                      bmask;
     Uint32                      amask;
+    Bool                        enable_3d;
+    Bool                        enable_2d;
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -104,14 +107,16 @@ void gf3d_vgraphics_setup(
 
 void gf3d_vgraphics_init(const char *config)
 {
+    Bool enable;
+    Pipeline *renderPipe= NULL;
     SJson *json,*setup;
     const char *windowName = NULL;
-    Vector2D resolution = {1024,768};
+    GFC_Vector2D resolution = {1024,768};
     short int fullscreen = 0;
     short int enableValidation = 0;
     short int enableDebug = 0;
     
-    json = sj_load(config);
+    json = gfc_pak_load_json(config);
     if (!json)
     {
         slog("graphics config file load failed, exiting");
@@ -143,16 +148,16 @@ void gf3d_vgraphics_init(const char *config)
         return;
     }
 
-    gfc_matrix_identity(gf3d_vgraphics.ubo.model);
-    gfc_matrix_identity(gf3d_vgraphics.ubo.view);
-    gfc_matrix_identity(gf3d_vgraphics.ubo.proj);
+    gfc_matrix4_identity(gf3d_vgraphics.ubo.model);
+    gfc_matrix4_identity(gf3d_vgraphics.ubo.view);
+    gfc_matrix4_identity(gf3d_vgraphics.ubo.proj);
     
-    gfc_matrix_perspective(
+    gfc_matrix4_perspective(
         gf3d_vgraphics.ubo.proj,
         45 * GFC_DEGTORAD,
         resolution.x/resolution.y,
         0.1f,
-        10000
+        100000
     );
     
     gf3d_vgraphics.ubo.proj[1][1] *= -1;
@@ -173,7 +178,6 @@ void gf3d_vgraphics_init(const char *config)
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
     gf3d_pipeline_init(16);// how many different rendering pipelines we need
-    gf3d_mesh_init(1024);//TODO: pull this from a parameter
     
     // 2D stuff
     SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_RGBA32,
@@ -198,12 +202,23 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_command_system_init(16 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
-    gf3d_model_manager_init(1024);
-    gf2d_sprite_manager_init(1024);
-    gf3d_particle_manager_init(4096);
+    if (sj_object_get_value_as_bool(json,"enable_3d",&enable)&&(enable))
+    {
+        gf3d_vgraphics.enable_3d = 1;
+        gf3d_mesh_init(1024);//TODO: pull this from a parameter
+        gf3d_model_manager_init(1024);
+        gf3d_particle_manager_init(16384);
+        renderPipe = gf3d_mesh_get_pipeline();
+    }
+    if (sj_object_get_value_as_bool(json,"enable_2d",&enable)&&(enable))
+    {
+        gf3d_vgraphics.enable_2d = 1;
+        gf2d_sprite_manager_init(1024);
+        if (!renderPipe)renderPipe = gf2d_sprite_get_pipeline();
+    }
 
     gf3d_swapchain_create_depth_image();
-    gf3d_swapchain_setup_frame_buffers(gf3d_mesh_get_pipeline());
+    gf3d_swapchain_setup_frame_buffers(renderPipe);
     gf3d_vgraphics_semaphores_create();
 }
 
@@ -269,7 +284,7 @@ void gf3d_vgraphics_setup(
         SDL_Vulkan_GetInstanceExtensions(gf3d_vgraphics.main_window, &(gf3d_vgraphics.sdl_extension_count), gf3d_vgraphics.sdl_extension_names);
         for (i = 0; i < gf3d_vgraphics.sdl_extension_count;i++)
         {
-            slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
+            if (__DEBUG)slog("SDL Vulkan extensions support: %s",gf3d_vgraphics.sdl_extension_names[i]);
             gf3d_extensions_enable(ET_Instance, gf3d_vgraphics.sdl_extension_names[i]);
         }
     }
@@ -362,13 +377,10 @@ void gf3d_vgraphics_setup(
 
 void gf3d_vgraphics_close()
 {
-    slog("cleaning up vulkan graphics");
-    
     if (gf3d_vgraphics.sdl_extension_names)
     {
         free(gf3d_vgraphics.sdl_extension_names);
     }
-
     gf3d_debug_close();
         
     if(gf3d_vgraphics.surface && gf3d_vgraphics.vk_instance)
@@ -401,11 +413,16 @@ VkExtent2D gf3d_vgraphics_get_view_extent()
     return gf3d_swapchain_get_extent();
 }
 
-Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
+GFC_Vector2D gf3d_vgraphics_get_resolution()
+{
+    return gf3d_vgraphics_get_view_extent_as_vector2d();
+}
+
+GFC_Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
 {
     VkExtent2D extent;
     extent = gf3d_swapchain_get_extent();
-    return vector2d(extent.width,extent.height);
+    return gfc_vector2d(extent.width,extent.height);
 }
 
 SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h)
@@ -480,11 +497,7 @@ Uint32 gf3d_vgraphics_render_begin()
 void gf3d_vgraphics_render_start()
 {
     gf3d_vgraphics.bufferFrame = gf3d_vgraphics_render_begin();
-    
-    
-    gf3d_mesh_reset_pipes();
-    gf3d_particle_reset_pipes();
-    gf3d_sprite_reset_pipes();
+    gf3d_pipeline_reset_all_pipes();
 }
 
 Uint32  gf3d_vgraphics_get_current_buffer_frame()
@@ -501,9 +514,7 @@ void gf3d_vgraphics_render_end()
     VkSemaphore signalSemaphores[] = {gf3d_vgraphics.renderFinishedSemaphore};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     
-    gf3d_mesh_submit_pipe_commands();
-    gf3d_particle_submit_pipe_commands();
-    gf3d_sprite_submit_pipe_commands();
+    gf3d_pipeline_submit_all_pipe_commands();
     
     swapChains[0] = gf3d_swapchain_get();
 
@@ -543,7 +554,6 @@ void gf3d_vgraphics_semaphores_close()
 {
     vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.renderFinishedSemaphore, NULL);
     vkDestroySemaphore(gf3d_vgraphics.device, gf3d_vgraphics.imageAvailableSemaphore, NULL);
-    
 }
 
 void gf3d_vgraphics_semaphores_create()
@@ -557,7 +567,6 @@ void gf3d_vgraphics_semaphores_create()
     {
         slog("failed to create semaphores!");
     }
-	else slog("created semaphores");
     atexit(gf3d_vgraphics_semaphores_close);
 }
 
@@ -579,18 +588,31 @@ uint32_t gf3d_vgraphics_find_memory_type(uint32_t typeFilter, VkMemoryPropertyFl
     return 0;
 }
 
-Matrix4 *gf3d_vgraphics_get_view_matrix()
+void gf3d_vgraphics_get_projection_matrix(GFC_Matrix4 *proj)
+{
+    if (!proj)return;
+    memcpy(proj,gf3d_vgraphics.ubo.proj,sizeof(GFC_Matrix4));
+}
+
+void gf3d_vgraphics_get_view(GFC_Matrix4 *view)
+{
+    if (!view)return;
+    memcpy(view,gf3d_vgraphics.ubo.view,sizeof(GFC_Matrix4));
+}
+
+
+GFC_Matrix4 *gf3d_vgraphics_get_view_matrix()
 {
     return &gf3d_vgraphics.ubo.view;
 }
 
 void gf3d_vgraphics_rotate_camera(float degrees)
 {
-    gfc_matrix_rotate(
+    gfc_matrix4_rotate(
         gf3d_vgraphics.ubo.view,
         gf3d_vgraphics.ubo.view,
         degrees,
-        vector3d(0,0,1));
+        gfc_vector3d(0,0,1));
 
 }
 
@@ -599,7 +621,7 @@ Command *gf3d_vgraphics_get_graphics_command_pool()
     return gf3d_vgraphics.graphicsCommandPool;
 }
 
-UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object()
+ModelViewProjection gf3d_vgraphics_get_mvp()
 {
     return gf3d_vgraphics.ubo;
 }
@@ -627,6 +649,68 @@ VkImageView gf3d_vgraphics_create_image_view(VkImage image, VkFormat format)
 
     return imageView;
 }
+
+GFC_Vector2D vgraphics_3d_position_to_screen(GFC_Vector3D position)
+{
+    GFC_Vector2D res,out;
+    GFC_Matrix4 mvp,model;
+    GFC_Vector4D transformed = {0};
+    ModelViewProjection graphics_mvp;
+    
+    res = gf3d_vgraphics_get_resolution();
+    
+    gfc_matrix4_make_translation(
+        model,
+        position);
+    graphics_mvp = gf3d_vgraphics_get_mvp();
+    gfc_matrix4_multiply(
+        mvp,
+        graphics_mvp.view,
+        graphics_mvp.proj
+    );
+    
+    gfc_matrix4_v_multiply(
+        &transformed,
+        gfc_vector4d(position.x,position.y,position.z,1.0),
+        mvp);
+    
+    out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
+    out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;
+        
+    return out;
+}
+
+GFC_Vector3D vgraphics_3d_position_to_screen_depth(GFC_Vector3D position)
+{
+    GFC_Vector2D res;
+    GFC_Vector3D out;
+    GFC_Matrix4 mvp,model;
+    GFC_Vector4D transformed = {0};
+    ModelViewProjection graphics_mvp;
+    
+    res = gf3d_vgraphics_get_resolution();
+    
+    gfc_matrix4_make_translation(
+        model,
+        position);
+    graphics_mvp = gf3d_vgraphics_get_mvp();
+    gfc_matrix4_multiply(
+        mvp,
+        graphics_mvp.view,
+        graphics_mvp.proj
+    );
+    
+    gfc_matrix4_v_multiply(
+        &transformed,
+        gfc_vector4d(position.x,position.y,position.z,1.0),
+        mvp);
+    
+    out.x = (0.5 *(transformed.x / transformed.w) + 0.5)*res.x;
+    out.y = (0.5 *(transformed.y / transformed.w) + 0.5)*res.y;
+    out.z = transformed.z;
+    return out;
+}
+
 
 /*eol@eof*/
 

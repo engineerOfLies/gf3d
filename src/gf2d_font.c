@@ -4,6 +4,7 @@
 #include "gfc_list.h"
 #include "gfc_color.h"
 #include "gfc_shape.h"
+#include "gfc_pak.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_texture.h"
@@ -13,8 +14,8 @@
 typedef struct
 {
     Sprite     *image;
-    TextBlock   text;
-    Color       color;
+    GFC_TextBlock   text;
+    GFC_Color       color;
     Font       *font;
     Uint32      last_used;
 }FontImage;
@@ -24,7 +25,8 @@ typedef struct
     Font *font_list;
     Font *font_tags[FT_MAX];
     Uint32 font_max;
-    List *font_images;
+    int row_padding;
+    GFC_List *font_images;
     Uint32 ttl;         //time to live for font re-use
 }FontManager;
 
@@ -42,6 +44,7 @@ void gf2d_font_close()
         if (font_manager.font_list[i].font != NULL)
         {
             TTF_CloseFont(font_manager.font_list[i].font);
+            free(font_manager.font_list[i].mem);
         }
     }
     c = gfc_list_get_count(font_manager.font_images);
@@ -54,7 +57,6 @@ void gf2d_font_close()
     }
     gfc_list_delete(font_manager.font_images);
     TTF_Quit();
-    slog("text system closed");
 }
 
 void gf2d_font_image_free(FontImage *image)
@@ -66,8 +68,8 @@ void gf2d_font_image_free(FontImage *image)
 
 void gf2d_font_image_new(
     Sprite     *sprite,
-    TextBlock   text,
-    Color       color,
+    GFC_TextBlock   text,
+    GFC_Color       color,
     Font       *font
 )
 {
@@ -80,12 +82,12 @@ void gf2d_font_image_new(
     image->color = color;
     image->font = font;
     image->last_used = SDL_GetTicks();
-    font_manager.font_images = gfc_list_append(font_manager.font_images,image);
+    gfc_list_append(font_manager.font_images,image);
 }
 
 FontImage *gf2d_font_image_get(
-    TextBlock   text,
-    Color       color,
+    GFC_TextBlock   text,
+    GFC_Color       color,
     Font       *font)
 {
     FontImage *image;
@@ -96,8 +98,14 @@ FontImage *gf2d_font_image_get(
         image = gfc_list_get_nth(font_manager.font_images,i);
         if (!image)continue;
         if (image->font != font)continue;
-        if (!gfc_color_cmp(image->color, color))continue;
-        if (gfc_block_cmp(image->text,text)!= 0)continue;
+        if (!gfc_color_cmp(image->color, color))
+        {
+            continue;
+        }
+        if (gfc_block_cmp(image->text,text)!= 0)
+        {
+            continue;
+        }
         return image;
     }
     return NULL;
@@ -110,11 +118,19 @@ void gf2d_font_init(const char *configFile)
         slog("TTF_Init: %s\n", TTF_GetError());
         return;
     }
+    font_manager.ttl = 100;
     gf2d_fonts_load_json(configFile);
     font_manager.font_images = gfc_list_new();
     font_manager.ttl = 1000;// 1000 milliseconds
     slog("text system initialized");
     atexit(gf2d_font_close);
+}
+
+void gf2d_font_image_free(FontImage *image)
+{
+    if (!image)return;
+    gf2d_sprite_free(image->image);
+    free(image);
 }
 
 void gf2d_font_update()
@@ -155,6 +171,10 @@ FontTypes gf2d_font_type_from_text(const char *buf)
     if (strcmp(buf,"normal")==0)
     {
         return FT_Normal;
+    }
+    else if (strcmp(buf,"large")==0)
+    {
+        return FT_Large;
     }
     else if (strcmp(buf,"small")==0)
     {
@@ -229,12 +249,17 @@ void gf2d_fonts_load_json(const char *filename)
 {
     int i;
     int count = 0;
+    SDL_RWops *src;
+    void *mem;
+    size_t fileSize = 0;
     const char *str;
     int size = 10;
     FontTypes fontType;
     SJson *file,*fonts,*item;
-    file = sj_load(filename);
+    file = gfc_pak_load_json(filename);
     if (!file)return;
+    sj_object_get_value_as_uint32(file,"ttl",&font_manager.ttl);
+    sj_object_get_value_as_int(file,"row_padding",&font_manager.row_padding);
     fonts = sj_object_get_value(file,"fonts");
     if (!fonts)
     {
@@ -268,54 +293,25 @@ void gf2d_fonts_load_json(const char *filename)
         }
         sj_get_integer_value(sj_object_get_value(item,"size"),&size);
         font_manager.font_list[i].pointSize = size;
-        font_manager.font_list[i].font = TTF_OpenFont(font_manager.font_list[i].filename, font_manager.font_list[i].pointSize);
+        mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
+        if (!mem)
+        {
+            slog("failed to load font %s",font_manager.font_list[i].filename);
+            continue;
+        }
+        src = SDL_RWFromMem(mem, fileSize);
+        if (!src)
+        {
+            slog("failed to read font %s",font_manager.font_list[i].filename);
+            free(mem);
+            continue;
+        }
+        font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
+        font_manager.font_list[i].mem = mem;
     }
     sj_free(file);
 }
 
-void gf2d_fonts_load(const char *filename)
-{
-    FILE *file;
-    int count;
-    int i;
-    file = fopen(filename,"r");
-    if (!file)
-    {
-        slog("failed to open font config file %s",filename);
-        return;
-    }
-    count = gf2d_fonts_get_count(file);
-    if (!count)
-    {
-        slog("font config file %s contained no font information",filename);
-        fclose(file);
-        return;
-    }
-    font_manager.font_list = (Font*)gfc_allocate_array(sizeof(Font),count);
-    if (!font_manager.font_list)
-    {
-        slog("failed to allocate memory for %i fonts",count);
-        fclose(file);
-        return;
-    }
-    memset(font_manager.font_list,0,sizeof(Font)*count);
-    for (i = 0 ; i < FT_MAX; i++)
-    {
-        font_manager.font_tags[i] = font_manager.font_list;
-    }
-    gf2d_fonts_parse(file);
-    for (i = 0; i < count; i++)
-    {
-        font_manager.font_list[i].font = TTF_OpenFont(font_manager.font_list[i].filename, font_manager.font_list[i].pointSize);
-        if (!font_manager.font_list[i].font)
-        {
-            slog("failed to load font: %s\n", TTF_GetError());
-        }
-    }
-    font_manager.font_max = count;
-    slog("font library loaded with %i fonts",count);
-    fclose(file);
-}
 
 Font *gf2d_font_get_by_filename(char *filename)
 {
@@ -341,17 +337,17 @@ Font *gf2d_font_get_by_tag(FontTypes tag)
     return font_manager.font_tags[tag];
 }
 
-void gf2d_font_draw_line_named(char *text,char *filename,Color color, Vector2D position)
+void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position)
 {
     gf2d_font_draw_line(text,gf2d_font_get_by_filename(filename),color, position);
 }
 
-void gf2d_font_draw_line_tag(char *text,FontTypes tag,Color color, Vector2D position)
+void gf2d_font_draw_line_tag(char *text,FontTypes tag,GFC_Color color, GFC_Vector2D position)
 {
     gf2d_font_draw_line(text,gf2d_font_get_by_tag(tag),color, position);
 }
 
-void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position)
+void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D position)
 {
     SDL_Surface *surface;
     Sprite *sprite;
@@ -372,7 +368,16 @@ void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position)
     if (image != NULL)
     {
         image->last_used = SDL_GetTicks();
-        gf2d_sprite_draw(image->image,position,vector2d(1,1),vector3d(0,0,0),gfc_color(1,1,1,1),0);
+        gf2d_sprite_draw_full(
+            image->image,
+            position,
+            gfc_vector2d(1,1),
+            gfc_vector2d(0,0),
+            0,
+            gfc_vector2d(0,0),
+            gfc_color(1,1,1,1),
+            gfc_vector4d(0,0,0,0),
+            0);
         return;
     }
 
@@ -389,31 +394,41 @@ void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position)
         SDL_FreeSurface(surface);
         return;
     }
-    gf2d_sprite_draw(sprite,position,vector2d(1,1),vector3d(0,0,0),gfc_color(1,1,1,1),0);
+    gf2d_sprite_draw_full(
+        sprite,
+        position,
+        gfc_vector2d(1,1),
+        gfc_vector2d(0,0),
+        0,
+        gfc_vector2d(0,0),
+        gfc_color(1,1,1,1),
+        gfc_vector4d(0,0,0,0),
+        0);
+
     gf2d_font_image_new(sprite,text,color,font);
 }
 
-Vector2D gf2d_font_get_bounds_tag(char *text,FontTypes tag)
+GFC_Vector2D gf2d_font_get_bounds_tag(char *text,FontTypes tag)
 {
     return gf2d_font_get_bounds(text,gf2d_font_get_by_tag(tag));
 }
 
-Vector2D gf2d_font_get_bounds(char *text,Font *font)
+GFC_Vector2D gf2d_font_get_bounds(char *text,Font *font)
 {
     int x = -1,y = -1;
     if (!text)
     {
         slog("cannot size text, none provided");
-        return vector2d(-1,-1);
+        return gfc_vector2d(-1,-1);
     }
     if (!font)
     {
         slog("cannot size text, no font provided");
-        return vector2d(-1,-1);
+        return gfc_vector2d(-1,-1);
     }
     
     TTF_SizeUTF8(font->font, text, &x,&y);
-    return vector2d(x,y);
+    return gfc_vector2d(x,y);
 }
 
 void gf2d_font_chomp(char *text,int length,int strl)
@@ -434,7 +449,7 @@ void gf2d_font_chomp(char *text,int length,int strl)
     }
 }
 
-Rect gf2d_font_get_text_wrap_bounds_tag(
+GFC_Rect gf2d_font_get_text_wrap_bounds_tag(
     char       *thetext,
     FontTypes   tag,
     Uint32      w,
@@ -444,19 +459,19 @@ Rect gf2d_font_get_text_wrap_bounds_tag(
     return gf2d_font_get_text_wrap_bounds(thetext,gf2d_font_get_by_tag(tag),w,h);
 }
 
-Rect gf2d_font_get_text_wrap_bounds(
+GFC_Rect gf2d_font_get_text_wrap_bounds(
     char    *thetext,
     Font    *font,
     Uint32   w,
     Uint32   h
 )
 {
-    Rect r = {0,0,0,0};
-    TextBlock textline;
-    TextBlock temptextline;
-    TextBlock tempBuffer;
-    TextBlock text;
-    TextLine word;
+    GFC_Rect r = {0,0,0,0};
+    GFC_TextBlock textline;
+    GFC_TextBlock temptextline;
+    GFC_TextBlock tempBuffer;
+    GFC_TextBlock text;
+    GFC_TextLine word;
     Bool whitespace;
     int tw = 0, th = 0;
     int drawheight = 0;
@@ -510,6 +525,7 @@ Rect gf2d_font_get_text_wrap_bounds(
         gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
         gfc_block_cpy(temptextline,tempBuffer);
         TTF_SizeText(font->font, temptextline, &tw, &th); /*see how big it is now*/
+        th += font_manager.row_padding;
         lindex += strlen(word);
         if(tw > w)         /*see if we have gone over*/
         {
@@ -534,7 +550,7 @@ Rect gf2d_font_get_text_wrap_bounds(
 
 
 
-void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,Color color, Rect block)
+void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,GFC_Color color, GFC_Rect block)
 {
     gf2d_font_draw_text_wrap(text,block,color, gf2d_font_get_by_tag(tag));
 }
@@ -542,16 +558,16 @@ void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,Color color, Rect blo
 
 void gf2d_font_draw_text_wrap(
     char    *thetext,
-    Rect     block,
-    Color    color,
+    GFC_Rect     block,
+    GFC_Color    color,
     Font    *font
 )
 {
-    TextBlock textline;
-    TextBlock temptextline;
-    TextBlock tempBuffer;
-    TextBlock text;
-    TextLine word;
+    GFC_TextBlock textline;
+    GFC_TextBlock temptextline;
+    GFC_TextBlock tempBuffer;
+    GFC_TextBlock text;
+    GFC_TextLine word;
     Bool whitespace;
     int drawheight = block.y;
     int w,h = 0;
@@ -600,7 +616,7 @@ void gf2d_font_draw_text_wrap(
         if (sscanf(text,"%s",word) == EOF)
         {
             block.y=drawheight + (h*row);
-            gf2d_font_draw_line(temptextline,font,color, vector2d(block.x,block.y));
+            gf2d_font_draw_line(temptextline,font,color, gfc_vector2d(block.x,block.y));
             return;
         }
         
@@ -614,11 +630,12 @@ void gf2d_font_draw_text_wrap(
         gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
         gfc_block_cpy(temptextline,tempBuffer);
         TTF_SizeText(font->font, temptextline, &w, &h); /*see how big it is now*/
+        h += font_manager.row_padding;
         lindex += strlen(word);
         if(w > block.w)         /*see if we have gone over*/
         {
             block.y=drawheight + (h*row);
-            gf2d_font_draw_line(textline,font,color, vector2d(block.x,block.y));
+            gf2d_font_draw_line(textline,font,color, gfc_vector2d(block.x,block.y));
             row++;
             /*draw the line and get ready for the next line*/
             if (block.h != 0)

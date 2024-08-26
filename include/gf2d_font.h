@@ -35,6 +35,7 @@
 
 typedef enum
 {
+    FT_Large,
     FT_Normal,
     FT_Small,
     FT_H1,
@@ -49,8 +50,9 @@ typedef enum
 
 typedef struct
 {
-    TextLine filename;
+    GFC_TextLine filename;
     TTF_Font *font;
+    void     *mem;
     Uint32  pointSize;
 }Font;
 
@@ -66,11 +68,19 @@ void gf2d_font_init(const char *configFile);
 void gf2d_font_update();
 
 /**
+ * @brief select a font type from text buffer
+ * @param buf the string with a font name in it, must be supported
+ * @return FT_MAX if not valid, the FontType otherwise
+ */
+FontTypes gf2d_font_type_from_text(const char *buf);
+
+
+/**
  * @brief draw text to the screen overlay layer
  */
-void gf2d_font_draw_line_named(char *text,char *filename,Color color, Vector2D position);
-void gf2d_font_draw_line_tag(char *text,FontTypes tag,Color color, Vector2D position);
-void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position);
+void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position);
+void gf2d_font_draw_line_tag(char *text,FontTypes tag,GFC_Color color, GFC_Vector2D position);
+void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D position);
 
 /**
  * @brief draw a word wrapped block of text to the sceen
@@ -81,8 +91,8 @@ void gf2d_font_draw_line(char *text,Font *font,Color color, Vector2D position);
  */
 void gf2d_font_draw_text_wrap(
     char    *thetext,
-    Rect     block,
-    Color    color,
+    GFC_Rect     block,
+    GFC_Color    color,
     Font    *font
 );
 
@@ -93,7 +103,7 @@ void gf2d_font_draw_text_wrap(
  * @param color the color to draw with
  * @param block the dimensions to keep to
  */
-void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,Color color, Rect block);
+void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,GFC_Color color, GFC_Rect block);
 
 /**
  * @brief get the bounds that will describe the text provided, with word wrap on
@@ -102,7 +112,7 @@ void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,Color color, Rect blo
  * @param w the width of the desired bounds - will be used for word wrapping
  * @param h the height of the desired bounds
  */
-Rect gf2d_font_get_text_wrap_bounds(
+GFC_Rect gf2d_font_get_text_wrap_bounds(
     char    *thetext,
     Font    *font,
     Uint32   w,
@@ -112,7 +122,7 @@ Rect gf2d_font_get_text_wrap_bounds(
 /**
  * @brief the above but by tag
  */
-Rect gf2d_font_get_text_wrap_bounds_tag(
+GFC_Rect gf2d_font_get_text_wrap_bounds_tag(
     char       *thetext,
     FontTypes   tag,
     Uint32      w,
@@ -120,7 +130,7 @@ Rect gf2d_font_get_text_wrap_bounds_tag(
 );
 
 
-Vector2D gf2d_font_get_bounds_tag(char *text,FontTypes tag);
-Vector2D gf2d_font_get_bounds(char *text,Font *font);
+GFC_Vector2D gf2d_font_get_bounds_tag(char *text,FontTypes tag);
+GFC_Vector2D gf2d_font_get_bounds(char *text,Font *font);
 
 #endif

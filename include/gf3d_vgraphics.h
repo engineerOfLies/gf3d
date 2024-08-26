@@ -10,6 +10,14 @@
 
 #define GF3D_VGRAPHICS_DISCRETE 1
 //Choosing whether to use discrete [1] or integrated graphics [0]
+//NOTE: make this configurable
+
+typedef struct
+{
+    GFC_Matrix4 model;
+    GFC_Matrix4 view;
+    GFC_Matrix4 proj;
+}ModelViewProjection;
 
 /**
  * @brief init Vulkan / SDL, setup device and initialize infrastructure for 3d graphics
@@ -39,10 +47,47 @@ Uint32  gf3d_vgraphics_get_current_buffer_frame();
  */
 VkDevice gf3d_vgraphics_get_default_logical_device();
 
+/**
+ * @brief get the physical device handle for the graphics system
+ */
 VkPhysicalDevice gf3d_vgraphics_get_default_physical_device();
 
+/**
+ * @brief get the screen resolution as a Vulkan Extent
+ */
 VkExtent2D gf3d_vgraphics_get_view_extent();
-Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
+
+/**
+ * @brief get the screen extent as a 2d gfc_vector
+ */
+GFC_Vector2D gf3d_vgraphics_get_view_extent_as_vector2d();
+
+/**
+ * @brief get the screen extent as a 2d gfc_vector
+ */
+GFC_Vector2D gf3d_vgraphics_get_resolution();
+
+/**
+ * @brief translate a 3D position to the corresponding screen position
+ * @note this does the same operations that are better handled in shaders, so it sparingly
+ * @param position the position in 3D space input
+ * @return the same position as it maps to the screen.
+ */
+GFC_Vector2D vgraphics_3d_position_to_screen(GFC_Vector3D position);
+
+/**
+ * @brief translate a 3D position to the corresponding screen position
+ * @note this does the same operations that are better handled in shaders, so it sparingly
+ * @param position the position in 3D space input
+ * @return the same position as it maps to the screen with the z component being the screen depth
+ */
+GFC_Vector3D vgraphics_3d_position_to_screen_depth(GFC_Vector3D position);
+
+/**
+ * @brief copy into view the current view matrix
+ * @param view [output]
+ */
+void gf3d_vgraphics_get_view(GFC_Matrix4 *view);
 
 
 void gf3d_vgraphics_clear();
@@ -61,15 +106,24 @@ void gf3d_vgraphics_rotate_camera(float degrees);
  * @brief get the matrix used for rendering the view
  * @return the view matrix sent to every rendering call
  */
-Matrix4 *gf3d_vgraphics_get_view_matrix();
+GFC_Matrix4 *gf3d_vgraphics_get_view_matrix();
+
+/**
+ * @brief get the projection matrix
+ * @param proj where to put the projection matrix
+ */
+void gf3d_vgraphics_get_projection_matrix(GFC_Matrix4 *proj);
 
 
+/**
+ * @brief get the vulkan handle for a uniform buffer by its index
+ */
 VkBuffer gf3d_vgraphics_get_uniform_buffer_by_index(Uint32 index);
 
 /**
  * @brief get the current MVP matrix for the render calls.
  */
-UniformBufferObject gf3d_vgraphics_get_uniform_buffer_object();
+ModelViewProjection gf3d_vgraphics_get_mvp();
 
 /**
  * @brief get the pipeline that is used to render 2d images to the overlay

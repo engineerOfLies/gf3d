@@ -6,6 +6,7 @@
 #include "simple_json.h"
 
 #include "gfc_vector.h"
+#include "gfc_pak.h"
 
 #include "gf3d_extensions.h"
 
@@ -53,7 +54,7 @@ void gf3d_extensions_device_init(VkPhysicalDevice device, const char *config)
     }
     gf3d_extensions_config(config,ET_Device);
     atexit(gf3d_extensions_device_close);
-    slog("device extensions initialized");
+    if (__DEBUG)slog("device extensions initialized");
 }
 
 void gf3d_extensions_device_close()
@@ -67,7 +68,7 @@ void gf3d_extensions_device_close()
         free(gf3d_device_extensions.enabled_extension_names);
     }
     memset(&gf3d_device_extensions,0,sizeof(vExtensions));
-    slog("device extensions closed");
+    if (__DEBUG)slog("device extensions closed");
 }
 
 void gf3d_extensions_instance_init(const char *config)
@@ -95,7 +96,7 @@ void gf3d_extensions_instance_init(const char *config)
     }
     gf3d_extensions_config(config,ET_Instance);
     atexit(gf3d_extensions_instance_close);
-    slog("intance extensions initialized");
+    if (__DEBUG)slog("intance extensions initialized");
 }
 
 void gf3d_extensions_instance_close()
@@ -109,7 +110,7 @@ void gf3d_extensions_instance_close()
         free(gf3d_instance_extensions.enabled_extension_names);
     }
     memset(&gf3d_instance_extensions,0,sizeof(vExtensions));
-    slog("instance extentions closed");
+    if (__DEBUG)slog("instance extentions closed");
 }
 
 Bool gf3d_extensions_check_available(vExtensions *extensions,const char *extensionName, int *index)
@@ -117,6 +118,7 @@ Bool gf3d_extensions_check_available(vExtensions *extensions,const char *extensi
     int i;
     
     if (!extensions)return false;
+    if ((!extensionName)||(!strlen(extensionName)))return false;
     
     for (i = 0; i < extensions->available_extension_count;i++)
     {
@@ -136,7 +138,7 @@ void gf3d_extensions_config(const char *config,ExtensionType extType)
     SJson *extensions,*json, *extension;
     const char *extensionName;
     if (!config)return;
-    json = sj_load(config);
+    json = gfc_pak_load_json(config);
     if (!json)return;
     if (extType == ET_Instance)
     {

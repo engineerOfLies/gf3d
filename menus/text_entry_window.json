@@ -1,0 +1,104 @@
+{
+"window":{
+    "dimensions" : [0,0,600,130],
+    "justify" : "center",
+    "align" : "middle",
+    "elements":
+    [
+      {
+        "type": "list",
+        "bounds": [0.01,0.01,0.99,0.99],
+        "style": "vertical",
+        "item_size" : [0.5,42],
+        "elements":
+        [
+            {
+            "type": "label",
+            "name": "question",
+            "id" : 1,
+            "bounds": [0,0,1,40],
+            "text":"?",
+            "justify" : "center",
+            "align" : "middle",
+            "style":"normal"
+            },
+            {
+            "type": "entry",
+            "name": "entry",
+            "id" : 2,
+            "canHasFocus":true,
+            "bounds": [0,0,0.99,40],
+            "label" :
+                {
+                "type": "label",
+                "name": "entry_l",
+                "id" : 21,
+                "bounds": [0.01,0,0.98,1],
+                "text":"?",
+                "justify" : "left",
+                "align" : "middle",
+                "style":"small"
+                }
+            },
+            {
+            "type": "list",
+            "bounds": [260,0,0.45,42],
+            "style": "horizontal",
+            "item_size" : [168,42],
+            "elements":
+            [
+                {
+                "type": "button",
+                "name": "OK",
+                "id" : 51,
+                "bounds": [0,0,168,44],
+                "hotkey":"ok",
+                "sound":"confirm",
+                "canHasFocus":true,
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,168,44],
+                    "text":"OK",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "bounds": [0,0,168,44],
+                    "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                "type": "button",
+                "name": "cancel",
+                "id" : 52,
+                "canHasFocus":true,
+                "sound":"cancel",
+                "bounds": [0,0,164,68],
+                "hotkey":"cancel",
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,168,44],
+                    "text":"Cancel",
+                    "align" : "middle",
+                    "justify" : "center",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "bounds": [0,0,168,44],
+                    "actor" : "actors/button.actor"
+                    }
+                }
+            ]
+            }
+        ]
+      }
+    ]
+    }
+}

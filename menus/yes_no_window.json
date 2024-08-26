@@ -1,0 +1,97 @@
+{
+"window":{
+    "dimensions" : [0,0,350,120],
+    "justify" : "center",
+    "align" : "middle",
+    "elements":
+    [
+    {
+        "type": "button",
+        "name" : "item_left",
+        "hotkey":"item_left"
+    },
+    {
+        "type": "button",
+        "name" : "item_right",
+        "hotkey":"item_right"
+    },
+    {
+        "type": "list",
+        "bounds": [10,10,1,1],
+        "style": "vertical",
+        "item_size" : [100,36],
+        "elements":
+        [
+            {
+            "type": "label",
+            "name": "question",
+            "id" : 1,
+            "bounds": [0,0,1,40],
+            "text":"?",
+            "justify" : "center",
+            "align" : "middle",
+            "style":"H3"
+            },
+            {
+            "type": "list",
+            "name": "yesno",
+            "id" : 50,
+            "bounds": [0,0,200,1],
+            "style": "horizontal",
+            "item_size" : [168,64],
+            "elements":
+            [
+                {
+                "type": "button",
+                "name": "yes",
+                "id" : 51,
+                "canHasFocus":true,
+                "bounds": [0,0,168,42],
+                "hotkey":"yes",
+                "sound":"confirm",
+                "label" :
+                    {
+                    "type": "label",
+                    "name": "yes_l",
+                    "bounds": [0,0,168,48],
+                    "text":"Yes",
+                    "justify" : "center",
+                    "align" : "middle",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "actor" : "actors/button.actor"
+                    }
+                },
+                {
+                "type": "button",
+                "name": "no",
+                "id" : 52,
+                "canHasFocus":true,
+                "bounds": [0,0,164,42],
+                "hotkey":"no",
+                "sound":"cancel",
+                "label" :
+                    {
+                    "type": "label",
+                    "bounds": [0,0,168,48],
+                    "text":"No",
+                    "align" : "middle",
+                    "justify" : "center",
+                    "style":"H5"
+                    },
+                "actor" :
+                    {
+                    "type": "actor",
+                    "actor" : "actors/button.actor"
+                    }
+                }
+            ]
+            }
+        ]
+    }
+    ]
+    }
+}

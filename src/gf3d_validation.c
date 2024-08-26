@@ -8,6 +8,7 @@
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_list.h"
+#include "gfc_pak.h"
 
 #include "gf3d_validation.h"
 
@@ -25,7 +26,7 @@ typedef struct
     VkLayerProperties *availableLayers;
     const char **enabledLayers;
     Uint32 enabledCount;
-    List *layers;
+    GFC_List *layers;
 }GF3D_Validation_Manager;
 
 static GF3D_Validation_Manager gf3d_validation = {0};
@@ -54,7 +55,7 @@ void gf3d_validation_query_layer_properties()
         newLayer->name = newLayer->properties->layerName;
         newLayer->enabled = 1;//enabled by default
         slog("Validation layer available: %s",gf3d_validation.availableLayers[i].layerName);
-        gf3d_validation.layers = gfc_list_append(gf3d_validation.layers,newLayer);
+        gfc_list_append(gf3d_validation.layers,newLayer);
     }
 }
 
@@ -83,7 +84,7 @@ void gf3d_validation_config_layers(const char *config)
     const char *name;
     int i,c;
     if (!config)return;
-    json = sj_load(config);
+    json = gfc_pak_load_json(config);
     if (!json)
     {
         return;
