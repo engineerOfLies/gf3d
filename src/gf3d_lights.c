@@ -3,7 +3,6 @@
 #include "gfc_config.h"
 
 #include "gf3d_draw.h"
-#include "gf3d_particle.h"
 #include "gf3d_lights.h"
 
 static const char *gf3d_light_types[] = 
@@ -252,11 +251,7 @@ void gf3d_light_draw(GF3D_Light *light)
     size = 0.1 * light->attenuation;
     if (light->position.w)
     {
-        gf3d_particle_draw(
-            gf3d_particle(
-                gfc_vector4dxyz(light->position),
-                gfc_color_from_vector4f(light->color),
-                size));
+        gf3d_draw_sphere_solid(gfc_sphere(light->position.x,light->position.y,light->position.z,0.01),gfc_vector3d(0,0,0),gfc_vector3d(0,0,0),gfc_vector3d(1,1,1),gfc_color_from_vector4(light->color),GFC_COLOR_WHITE);
     }
     if (light->direction.w)
     {

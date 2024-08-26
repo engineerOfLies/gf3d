@@ -20,9 +20,7 @@ typedef struct
 {
     Mesh *mesh_list;
     Pipeline *pipe;
-    Pipeline *highlight_pipe;
     Pipeline *sky_pipe;
-    Pipeline *alpha_pipe;
     Uint32 mesh_max;
     VkVertexInputAttributeDescription attributeDescriptions[ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription bindingDescription;
@@ -138,48 +136,12 @@ void gf3d_mesh_init(Uint32 mesh_max)
         VK_INDEX_TYPE_UINT16
     );
 
-    //pretty much identical to model pipe
-    //TODO: make these separate sub passes
-    gf3d_mesh.alpha_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/model_alpha_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        sizeof(ModelUBO),
-        VK_INDEX_TYPE_UINT16
-    );
-
-    gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
-        gf3d_vgraphics_get_default_logical_device(),
-        "config/highlight_pipeline.cfg",
-        gf3d_vgraphics_get_view_extent(),
-        mesh_max,
-        gf3d_mesh_get_bind_description(),
-        gf3d_mesh_get_attribute_descriptions(NULL),
-        count,
-        sizeof(MeshUBO),
-        VK_INDEX_TYPE_UINT16
-    );
-
     if (__DEBUG)slog("mesh system initialized");
 }
 
 Pipeline *gf3d_mesh_get_pipeline()
 {
     return gf3d_mesh.pipe;
-}
-
-Pipeline *gf3d_mesh_get_alpha_pipeline()
-{
-    return gf3d_mesh.alpha_pipe;
-}
-
-Pipeline *gf3d_mesh_get_highlight_pipeline()
-{
-    return gf3d_mesh.highlight_pipe;
 }
 
 Pipeline *gf3d_mesh_get_sky_pipeline()
@@ -193,34 +155,18 @@ void gf3d_mesh_reset_pipes()
     
     gf3d_pipeline_reset_frame(gf3d_mesh.pipe,bufferFrame);
     gf3d_pipeline_reset_frame(gf3d_mesh.sky_pipe,bufferFrame);
-    gf3d_pipeline_reset_frame(gf3d_mesh.alpha_pipe,bufferFrame);
-    gf3d_pipeline_reset_frame(gf3d_mesh.highlight_pipe,bufferFrame);
-}
+}    
 
 void gf3d_mesh_submit_pipe_commands()
 {
     gf3d_pipeline_submit_commands(gf3d_mesh.sky_pipe);
     gf3d_pipeline_submit_commands(gf3d_mesh.pipe);
-    gf3d_pipeline_submit_commands(gf3d_mesh.alpha_pipe);
-    gf3d_pipeline_submit_commands(gf3d_mesh.highlight_pipe);
 }
 
 VkCommandBuffer gf3d_mesh_get_model_command_buffer()
 {
     if (!gf3d_mesh.pipe)return VK_NULL_HANDLE;
     return gf3d_mesh.pipe->commandBuffer;
-}
-
-VkCommandBuffer gf3d_mesh_get_alph_model_command_buffer()
-{
-    if (!gf3d_mesh.alpha_pipe)return VK_NULL_HANDLE;
-    return gf3d_mesh.alpha_pipe->commandBuffer;
-}
-
-VkCommandBuffer gf3d_mesh_get_highlight_command_buffer()
-{
-    if (!gf3d_mesh.highlight_pipe)return VK_NULL_HANDLE;
-    return gf3d_mesh.highlight_pipe->commandBuffer;
 }
 
 VkCommandBuffer gf3d_mesh_get_sky_command_buffer()
@@ -466,16 +412,6 @@ void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe, VkDescriptorSet * descr
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
 {
     gf3d_mesh_render_generic(mesh,gf3d_mesh.pipe, descriptorSet);
-}
-
-void gf3d_mesh_alpha_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
-{
-    gf3d_mesh_render_generic(mesh,gf3d_mesh.alpha_pipe, descriptorSet);
-}
-
-void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)
-{
-    gf3d_mesh_render_generic(mesh,gf3d_mesh.highlight_pipe, descriptorSet);
 }
 
 void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet)

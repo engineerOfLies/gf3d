@@ -32,7 +32,6 @@
 
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
-#include "gf3d_armature.h"
 #include "gf3d_lights.h"
 #include "gf3d_materials.h"
 
@@ -41,7 +40,6 @@
 typedef struct
 {
     MeshUBO         mesh;
-    ArmatureUBO     armature;
     MaterialUBO     material;   //this may become an array
     LightUBO        lights;
     GFC_Vector4D    flags;      //.x is for bones, .y is for transparency/opaque pass 
@@ -61,10 +59,8 @@ typedef struct
     GF3D_Material      *material;       //if set, use this material when sending draw calls
     Texture            *texture;
     Texture            *normalMap;
-    Armature3D         *armature;
     GFC_Box             bounds;         //copied from the mesh
     GFC_Matrix4         matrix;         //a delta applied right before rendering.  an adjustment loaded from file
-    GFC_ActionList     *action_list;    //list of animation actions
 }Model;
 
 /**
@@ -78,9 +74,6 @@ typedef struct
     GFC_Vector3D position;
     GFC_Vector3D rotation;
     GFC_Vector3D scale;
-    GFC_Vector3D positionDelta;
-    GFC_Vector3D rotationDelta;
-    GFC_Vector3D scaleDelta;
 }ModelMat;
 
 /**
@@ -194,14 +187,6 @@ void gf3d_model_draw_all_meshes(
     GFC_Color   colorMod,
     LightUBO *lighting,
     Uint32 frame);
-
-/**
- * @brief queue up a model for rendering as highlight wireframe
- * @param model the model to render
- * @param modelMat the model matrix (MVP)
- * @param highlightGFC_Color the color of the outline
- */
-void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight);
 
 /**
  * @brief queue up a model for rendering as a sky

@@ -126,13 +126,6 @@ void gf2d_font_init(const char *configFile)
     atexit(gf2d_font_close);
 }
 
-void gf2d_font_image_free(FontImage *image)
-{
-    if (!image)return;
-    gf2d_sprite_free(image->image);
-    free(image);
-}
-
 void gf2d_font_update()
 {
     FontImage *image;

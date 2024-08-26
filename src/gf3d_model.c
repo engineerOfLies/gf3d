@@ -206,25 +206,9 @@ Model *gf3d_model_copy(Model *in)
         out->normalMap = in->normalMap;       //if set, use this material when sending draw calls
         out->normalMap->_refcount++;
     }
-    if (in->armature)
-    {
-        out->armature = in->armature;       //if set, use this material when sending draw calls
-        out->armature->refCount++;
-    }
     
     memcpy(&out->bounds,&in->bounds,sizeof(GFC_Box));
 
-    if (in->armature)
-    {
-        out->armature = in->armature;       //if set, use this material when sending draw calls
-        out->armature->refCount++;
-    }
-
-    if (in->action_list)
-    {
-        out->action_list = in->action_list;
-        out->action_list->_refCount++;
-    }
     return out;
 }
 
@@ -265,8 +249,6 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     Model *model;
     const char *modelFile;
     const char *textureFile;
-    const char *armatureFile;
-    const char *animFile;
     const char *materialFile;
     if (!gf3d_model.initiliazed)return NULL;
     if (!json)return NULL;
@@ -276,11 +258,6 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     {
         model = gf3d_gltf_parse_model(modelFile);
         if (!model)return NULL;
-        armatureFile = sj_get_string_value(sj_object_get_value(json,"armature"));
-        if (armatureFile)
-        {
-            model->armature = gf3d_armature_load(armatureFile);
-        }
     }    
     else
     {
@@ -348,21 +325,7 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     {
         sj_value_as_matrix4_vectors(item,model->matrix);
     }
-    
-    animFile = sj_object_get_value_as_string(json,"actionListFile");
-    if (animFile)
-    {
-        model->action_list = gfc_action_list_load(animFile);
-    }
-    else
-    {
-        item = sj_object_get_value(json,"actionList");
-        if (item)
-        {
-            model->action_list = gfc_action_list_parse(item);
-        }
-    }
-    
+        
     materialFile = sj_object_get_value_as_string(json,"materialFile");
     if (materialFile)
     {
@@ -417,10 +380,8 @@ void gf3d_model_delete(Model *model)
         gf3d_mesh_free(mesh);
     }
     gf3d_material_free(model->material);
-    gfc_action_list_free(model->action_list);
     gfc_list_delete(model->mesh_list);
     gf3d_texture_free(model->texture);
-    gf3d_armature_free(model->armature);
     memset(model,0,sizeof(Model));
 }
 
@@ -502,7 +463,6 @@ void gf3d_model_mat_reset(ModelMat *mat)
     memset(mat,0,sizeof(ModelMat));
     gfc_matrix4_identity(mat->mat);
     mat->scale = gfc_vector3d(1,1,1);
-    mat->scaleDelta = gfc_vector3d(1,1,1);
 }
 
 void gf3d_model_mat_extract_vectors(ModelMat *mat)
@@ -546,9 +506,6 @@ SJson *gf3d_model_mat_save(ModelMat *mat,Bool updateFirst)
     sj_object_insert(json,"position",sj_vector3d_new(mat->position));
     sj_object_insert(json,"rotation",sj_vector3d_new(mat->rotation));
     sj_object_insert(json,"scale",sj_vector3d_new(mat->scale));
-    sj_object_insert(json,"positionDelta",sj_vector3d_new(mat->positionDelta));
-    sj_object_insert(json,"rotationDelta",sj_vector3d_new(mat->rotationDelta));
-    sj_object_insert(json,"scaleDelta",sj_vector3d_new(mat->scaleDelta));
     return json;
 }
 
@@ -575,11 +532,7 @@ void gf3d_model_mat_parse(ModelMat *mat,SJson *config)
     if (str)mat->model= gf3d_model_load(str);
     sj_value_as_vector3d(sj_object_get_value(config,"position"),&mat->position);
     sj_value_as_vector3d(sj_object_get_value(config,"rotation"),&mat->rotation);
-    sj_value_as_vector3d(sj_object_get_value(config,"positionDelta"),&mat->positionDelta);
-    sj_value_as_vector3d(sj_object_get_value(config,"rotationDelta"),&mat->rotationDelta);
-    sj_value_as_vector3d(sj_object_get_value(config,"scaleDelta"),&mat->scaleDelta);
     gfc_vector3d_scale(mat->rotation,mat->rotation,GFC_DEGTORAD);//config file is in degrees
-    gfc_vector3d_scale(mat->rotationDelta,mat->rotationDelta,GFC_DEGTORAD);//config file is in degrees
     sj_value_as_vector3d(sj_object_get_value(config,"scale"),&mat->scale);
 }
 
@@ -590,7 +543,6 @@ ModelMat *gf3d_model_mat_new()
     if (!modelMat)return NULL;
     gfc_matrix4_identity(modelMat->mat);
     gfc_vector3d_set(modelMat->scale,1,1,1);
-    gfc_vector3d_set(modelMat->scaleDelta,1,1,1);
     return modelMat;
 }
 
@@ -690,7 +642,6 @@ void gf3d_model_draw_index(
     GFC_Vector4D modColor = {0};
     ModelUBO uboData = {0};
     Texture *texture;
-    GFC_List *list;
     if (!gf3d_model.initiliazed)return;
     if (!model)return;
     mesh = gfc_list_get_nth(model->mesh_list,index);
@@ -714,51 +665,13 @@ void gf3d_model_draw_index(
         gfc_vector4d_scale_by(uboData.material.diffuse,uboData.material.diffuse,modColor);
     }
     else uboData.material = gf3d_material_make_basic_ubo(colorMod);
-    if (model->armature)
-    {
-        uboData.armature = gf3d_armature_get_ubo(model->armature,frame);
-        uboData.flags.x = 1;
-    }
-    if (!model->texture)
-    {
-        texture = gf3d_model.defaultTexture;
-    }
-    else texture = model->texture;
-        // queue up a render for batch rendering
-    if ((uboData.material.diffuse.w * uboData.material.transparency) >= 1.0)
-    {
-        //if the global transparency values are set, then no need to draw opaque
-        gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
-    }
-    //queue up the translucent pass, we can't skip this one because there MIGHT be transparency in the skins
-    uboData.flags.y = 1.0;//setup the pipeline to know
-    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
-    list = gfc_list_new();
-    gfc_list_delete(list);
-}
-
-void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
-{
-    Mesh *mesh;
-    GFC_Matrix4 matrix = {0};
-    Texture *texture;
-    MeshUBO uboData = {0};
-    
-    if (!gf3d_model.initiliazed)return;
-    if (!model)return;
-
-    //factor in the matrix loaded from disk
-    gfc_matrix4_multiply(matrix,model->matrix,modelMat);
-    uboData = gf3d_model_get_highlight_ubo(matrix,highlight);
-    
     if (!model->texture)
     {
         texture = gf3d_model.defaultTexture;
     }
     else texture = model->texture;
     // queue up a render for batch rendering
-    mesh = gfc_list_get_nth(model->mesh_list,index);
-    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,texture);
+    gf3d_mesh_queue_render(mesh,gf3d_model.pipe,&uboData,texture);
 }
 
 void gf3d_model_draw_sky(Model *model,GFC_Matrix4 modelMat,GFC_Color color)

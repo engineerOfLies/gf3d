@@ -52,13 +52,6 @@ void gf2d_draw_image_free(DrawImage *image)
     free(image);
 }
 
-void gf2d_draw_image_free(DrawImage *image)
-{
-    if (!image)return;
-    gf2d_sprite_free(image->image);
-    free(image);
-}
-
 void gf2d_draw_manager_update()
 {
     DrawImage *image;

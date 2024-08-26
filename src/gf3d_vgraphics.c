@@ -29,7 +29,6 @@
 #include "gf3d_commands.h"
 #include "gf3d_texture.h"
 #include "gf2d_sprite.h"
-#include "gf3d_particle.h"
 
 #include "gf3d_vgraphics.h"
 
@@ -207,7 +206,6 @@ void gf3d_vgraphics_init(const char *config)
         gf3d_vgraphics.enable_3d = 1;
         gf3d_mesh_init(1024);//TODO: pull this from a parameter
         gf3d_model_manager_init(1024);
-        gf3d_particle_manager_init(16384);
         renderPipe = gf3d_mesh_get_pipeline();
     }
     if (sj_object_get_value_as_bool(json,"enable_2d",&enable)&&(enable))

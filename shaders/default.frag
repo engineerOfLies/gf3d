@@ -23,6 +23,7 @@ struct MaterialUBO
     vec4    ambient;        //how much ambient light affects this material
     vec4    diffuse;        //how much diffuse light affects this material - primary influcen for material color
     vec4    specular;       //color of the shine on the materials
+    vec4    emission;       //color that shows regardless of light
     float   transparency;   //how translucent the material should be overall
     float   shininess;      //how shiny the materials is.  // how pronounced the specular is
     vec2    padding;        //for alignment
@@ -108,6 +109,7 @@ void main()
     {
         linearColor = surfaceColor.xyz;
     }
+    linearColor.xyz += ubo.material.emission.xyz;
     outColor = vec4(linearColor,surfaceColor.w);
 }
 
@@ -146,7 +148,7 @@ vec3 ApplyLight(Light light, vec3 surfaceColor, vec3 normal, vec3 surfacePos, ve
     }
 
     //ambient
-    vec3 ambient = light.ambientCoefficient * surfaceColor.rgb * light.color.xyz * light.brightness;
+    vec3 ambient = light.ambientCoefficient * surfaceColor.rgb * light.color.xyz * ubo.material.ambient.xyz;
 
     //diffuse
     float diffuseCoefficient = max(0.0, dot(normal, surfaceToLight));

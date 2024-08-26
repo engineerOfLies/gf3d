@@ -24,7 +24,7 @@ INC_PARAMS =$(foreach d, $(INC_PATHS), -I$d)
 
 SDL_CFLAGS = `sdl2-config --cflags` $(INC_PARAMS)
 SDL_LDFLAGS = `sdl2-config --libs` -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lpng -ljpeg -lz -lvulkan -lm
-LFLAGS = -g  -shared -Wl,-soname -o $(LIB_PATH)/lib$(PROJECT).so.1 
+LFLAGS = -g  -o ../$(PROJECT) 
 CFLAGS = -g  -fPIC -Wall -pedantic -std=gnu99 -fgnu89-inline -Wno-unknown-pragmas -Wno-variadic-macros -Wformat-truncation=0
 # -ffast-math for relase version
 
@@ -55,9 +55,6 @@ depend:
 
 clean:
 	rm *.o
-
-static:
-	ar rcs $(LIB_PATH)/lib$(PROJECT).a $(OBJECTS)
 
 count:
 	wc -l *.c $(foreach d, $(INC_PATHS), $d/*.h) makefile

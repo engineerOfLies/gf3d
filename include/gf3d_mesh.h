@@ -177,9 +177,6 @@ void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *tex
  * @param com the command pool to use to handle the request we are rendering with
  */
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
-void gf3d_mesh_alpha_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
-
-void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 
 /**
@@ -199,8 +196,6 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *primitive);
  * @return NULL on error or the pipeline in question
  */
 Pipeline *gf3d_mesh_get_pipeline();
-Pipeline *gf3d_mesh_get_alpha_pipeline();
-Pipeline *gf3d_mesh_get_highlight_pipeline();
 Pipeline *gf3d_mesh_get_sky_pipeline();
 
 /**
