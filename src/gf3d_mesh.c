@@ -110,7 +110,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     gf3d_mesh.mesh_list = gfc_allocate_array(sizeof(Mesh),mesh_max);
     
     gf3d_mesh_get_attribute_descriptions(&count);
-    
+
     //the order of the pipeline creation is the order they are submitted in.
     gf3d_mesh.sky_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
@@ -593,7 +593,7 @@ Mesh *gf3d_mesh_load_obj(const char *filename)
     Mesh *mesh;
     MeshPrimitive *primitive;
 
-    ObjData *obj;
+    ObjData* obj = NULL;
     mesh = gf3d_mesh_get_by_filename(filename);
     if (mesh)return mesh;
     

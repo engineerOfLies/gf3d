@@ -7,7 +7,6 @@
 #include "gfc_config_def.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
-#include "gfc_pak.h"
 #include "gfc_audio.h"
 #include "gfc_string.h"
 #include "gfc_actions.h"
@@ -64,23 +63,23 @@ int main(int argc,char *argv[])
     init_logger("gf3d.log",0);
     slog("gf3d begin");
     //gfc init
-    gfc_pak_manager_init();
     gfc_input_init("config/input.cfg");
-    gfc_config_def_init();
     gfc_action_init(1024);
+    //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
     gf3d_materials_init();
     gf2d_font_init("config/font.cfg");
+    gf2d_actor_init(1000);
     gf3d_draw_init();//3D
     gf2d_draw_manager_init(1000);//2D
     
     //game init
     srand(SDL_GetTicks());
     slog_sync();
-        
-    //load game definitions
 
     //game setup
+    gf2d_mouse_load("actors/mouse.actor");
+    gf2d_mouse_show();
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix4_identity(skyMat);
     dino = gf3d_model_load("models/dino.model");
@@ -99,6 +98,7 @@ int main(int argc,char *argv[])
     while(!_done)
     {
         gfc_input_update();
+        gf2d_mouse_update();
         gf2d_font_update();
         //camera updaes
         gf3d_camera_controls_update();
@@ -108,6 +108,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
+        
                 gf3d_model_draw_sky(sky,skyMat,GFC_COLOR_WHITE);
                 gf3d_model_draw(
                     dino,
@@ -116,6 +117,7 @@ int main(int argc,char *argv[])
                     0);
                 draw_origin();
             //2D draws
+                gf2d_mouse_draw();
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
         gf3d_vgraphics_render_end();
         if (gfc_input_command_down("exit"))_done = 1; // exit condition

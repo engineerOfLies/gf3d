@@ -52,7 +52,6 @@ typedef struct
 {
     GFC_TextLine filename;
     TTF_Font *font;
-    void     *mem;
     Uint32  pointSize;
 }Font;
 

@@ -2,7 +2,6 @@
 
 #include "gfc_list.h"
 #include "gfc_text.h"
-#include "gfc_pak.h"
 #include "gfc_config.h"
 
 #include "gf2d_actor.h"
@@ -72,23 +71,39 @@ const char *chomp(const char *p)
 
 void gf3d_material_load_mtl_file(const char *filename)
 {
+    FILE* file;
     const char *p;
     void *mem = NULL;
     GFC_TextLine buf;
     GFC_TextLine text;
     GF3D_Material *material = NULL;
+    size_t size = 0;
     float x,y,z;
     int count = 0;
     size_t fileSize = 0;
-
-    if (!filename)return;
-    mem = gfc_pak_file_extract(filename,&fileSize);
     
-    if (!mem)
+    if (!filename)return;
+    file = fopen(filename,"r");
+    if (!file)
     {
-        slog("failed to load material file %s",filename);
+        slog("failed to open material file %s",filename);
         return;
     }
+    size = get_file_Size(file);
+    if (!size)
+    {
+        slog("material file %s has size zero",filename);
+        fclose(file);
+        return;
+    }
+    mem = gfc_allocate_array(sizeof(char),size);
+    if (!mem)
+    {
+        slog("failed to load material file %s data",filename);
+        return;
+    }
+    fread(mem, size, 1, file);
+    fclose(file);
 
     p = mem;
     while(sscanf(p, "%s", buf) != EOF)
@@ -191,6 +206,7 @@ void gf3d_material_load_mtl_file(const char *filename)
         }
         p = chomp(p);
     }
+    free(mem);
 }
 
 GF3D_Material *gf3d_material_duplicate(GF3D_Material *from)

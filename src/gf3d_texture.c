@@ -2,8 +2,6 @@
 
 #include "simple_logger.h"
 
-#include "gfc_pak.h"
-
 #include "gf3d_vgraphics.h"
 #include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
@@ -295,9 +293,6 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
 
 Texture *gf3d_texture_load(const char *filename)
 {
-    void *mem;
-    SDL_RWops *src;
-    size_t fileSize = 0;
     SDL_Surface * surface;
     Texture *tex;
 
@@ -307,20 +302,7 @@ Texture *gf3d_texture_load(const char *filename)
         tex->_refcount++;
         return tex;
     }
-    mem = gfc_pak_file_extract(filename,&fileSize);
-    if (!mem)
-    {
-        slog("failed to load image %s",filename);
-        return NULL;
-    }
-    src = SDL_RWFromMem(mem, fileSize);
-    if (!src)
-    {
-        slog("failed to read image %s",filename);
-        return NULL;
-    }
-    surface = IMG_Load_RW(src,1);
-    free(mem);
+    surface = IMG_Load(filename);
     if (!surface)
     {
         slog("failed to load texture file %s",filename);

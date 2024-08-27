@@ -4,7 +4,6 @@
 #include "gfc_types.h"
 #include "gfc_list.h"
 #include "gfc_config.h"
-#include "gfc_pak.h"
 
 #include "gf3d_mesh.h"
 #include "gf3d_model.h"
@@ -51,7 +50,7 @@ GLTF *gf3d_gltf_load(const char *filename)
     int i,c;
     GLTF *gltf;
     if (!filename)return NULL;
-    json = gfc_pak_load_json(filename);
+    json = sj_load(filename);
     if (!json)return NULL;
     gltf = gf3d_gltf_new();
     if (!gltf)

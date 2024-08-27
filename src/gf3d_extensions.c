@@ -6,7 +6,6 @@
 #include "simple_json.h"
 
 #include "gfc_vector.h"
-#include "gfc_pak.h"
 
 #include "gf3d_extensions.h"
 
@@ -138,7 +137,7 @@ void gf3d_extensions_config(const char *config,ExtensionType extType)
     SJson *extensions,*json, *extension;
     const char *extensionName;
     if (!config)return;
-    json = gfc_pak_load_json(config);
+    json = sj_load(config);
     if (!json)return;
     if (extType == ET_Instance)
     {

@@ -4,7 +4,6 @@
 #include "gfc_list.h"
 #include "gfc_color.h"
 #include "gfc_shape.h"
-#include "gfc_pak.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_texture.h"
@@ -32,7 +31,6 @@ typedef struct
 
 static FontManager font_manager = {0};
 
-void gf2d_fonts_load(const char *filename);
 void gf2d_fonts_load_json(const char *filename);
 
 void gf2d_font_close()
@@ -44,7 +42,6 @@ void gf2d_font_close()
         if (font_manager.font_list[i].font != NULL)
         {
             TTF_CloseFont(font_manager.font_list[i].font);
-            free(font_manager.font_list[i].mem);
         }
     }
     c = gfc_list_get_count(font_manager.font_images);
@@ -122,7 +119,6 @@ void gf2d_font_init(const char *configFile)
     gf2d_fonts_load_json(configFile);
     font_manager.font_images = gfc_list_new();
     font_manager.ttl = 1000;// 1000 milliseconds
-    slog("text system initialized");
     atexit(gf2d_font_close);
 }
 
@@ -242,14 +238,11 @@ void gf2d_fonts_load_json(const char *filename)
 {
     int i;
     int count = 0;
-    SDL_RWops *src;
-    void *mem;
-    size_t fileSize = 0;
     const char *str;
     int size = 10;
     FontTypes fontType;
     SJson *file,*fonts,*item;
-    file = gfc_pak_load_json(filename);
+    file = sj_load(filename);
     if (!file)return;
     sj_object_get_value_as_uint32(file,"ttl",&font_manager.ttl);
     sj_object_get_value_as_int(file,"row_padding",&font_manager.row_padding);
@@ -286,21 +279,7 @@ void gf2d_fonts_load_json(const char *filename)
         }
         sj_get_integer_value(sj_object_get_value(item,"size"),&size);
         font_manager.font_list[i].pointSize = size;
-        mem = gfc_pak_file_extract(font_manager.font_list[i].filename,&fileSize);
-        if (!mem)
-        {
-            slog("failed to load font %s",font_manager.font_list[i].filename);
-            continue;
-        }
-        src = SDL_RWFromMem(mem, fileSize);
-        if (!src)
-        {
-            slog("failed to read font %s",font_manager.font_list[i].filename);
-            free(mem);
-            continue;
-        }
-        font_manager.font_list[i].font = TTF_OpenFontRW(src, 1, font_manager.font_list[i].pointSize);
-        font_manager.font_list[i].mem = mem;
+        font_manager.font_list[i].font = TTF_OpenFont(filename, font_manager.font_list[i].pointSize);
     }
     sj_free(file);
 }

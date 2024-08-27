@@ -2,8 +2,6 @@
 
 #include "simple_logger.h"
 
-#include "gfc_pak.h"
-
 #include "gf3d_obj_load.h"
 
 int gf3d_obj_edge_test(ObjData *obj,GFC_Matrix4 offset, GFC_Edge3D e,GFC_Vector3D *contact)
@@ -29,8 +27,8 @@ int gf3d_obj_edge_test(ObjData *obj,GFC_Matrix4 offset, GFC_Edge3D e,GFC_Vector3
     return 0;
 }
 
-void gf3d_obj_get_counts_from_file(ObjData *obj, const char *mem,size_t fileSize);
-void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileSize);
+void gf3d_obj_get_counts_from_file(ObjData *obj, FILE *file);
+void gf3d_obj_load_get_data_from_file(ObjData *obj, FILE *file);
 
 void gf3d_obj_free(ObjData *obj)
 {
@@ -155,17 +153,23 @@ void gf3d_obj_get_bounds(ObjData *obj)
 ObjData *gf3d_obj_load_from_file(const char *filename)
 {
     ObjData *obj;
-    void *mem = NULL;
-    size_t fileSize;
+    FILE* file;
     
-    mem = gfc_pak_file_extract(filename,&fileSize);
-    
-    if (!mem)return NULL;
-        
+    if (!filename)return;
+    file = fopen(filename, "r");
+    if (!file)
+    {
+        slog("failed to open material file %s", filename);
+        return;
+    }        
     obj = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
-    if (!obj)return NULL;
+    if (!obj)
+    {
+        fclose(file);
+        return NULL;
+    }
     
-    gf3d_obj_get_counts_from_file(obj, mem,fileSize);
+    gf3d_obj_get_counts_from_file(obj, file);
     
     obj->vertices = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),obj->vertex_count);
     obj->normals = (GFC_Vector3D *)gfc_allocate_array(sizeof(GFC_Vector3D),obj->normal_count);
@@ -175,33 +179,30 @@ ObjData *gf3d_obj_load_from_file(const char *filename)
     obj->faceNormals = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     obj->faceTexels = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
     
-    gf3d_obj_load_get_data_from_file(obj, mem,fileSize);
+    gf3d_obj_load_get_data_from_file(obj, file);
     
     
     gf3d_obj_get_bounds(obj);
     gf3d_obj_load_reorg(obj);
+    fclose(file);
     return obj;
 }
 
-void gf3d_obj_get_counts_from_file(ObjData *obj, const char *mem,size_t fileSize)
+void gf3d_obj_get_counts_from_file(ObjData *obj, FILE *file)
 {
     char buf[256];
-    const char *p;
-    const char *c;
     int  numvertices = 0;
     int  numtexels = 0;
     int  numnormals = 0;
     int  numfaces = 0;
 
-    if ((!obj)||(!mem))
+    if ((!obj)||(!file))
     {
         return;
     }
-    p = mem;
-    while(sscanf(p, "%s", buf) != EOF)
+    rewind(file);
+    while(fscanf(file, "%s", buf) != EOF)
     {
-        c = strchr(p,'\n');//go to the end of line
-        p = c + 1;//and then the next line
         switch(buf[0])
         {
             case 'v':
@@ -233,10 +234,8 @@ void gf3d_obj_get_counts_from_file(ObjData *obj, const char *mem,size_t fileSize
     obj->face_count = numfaces;
 }
 
-void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileSize)
+void gf3d_obj_load_get_data_from_file(ObjData *obj, FILE *file)
 {
-    const char *p;
-    const char *c;
     int  numvertices = 0;
     int  numnormals = 0;
     int  numtexcoords = 0;
@@ -245,20 +244,19 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
     float x,y,z;
     int f[3][3];
 
-    if ((!obj)||(!mem))return;
+    if ((!obj)||(!file))return;
 
-    p = mem;
-    while(sscanf(p, "%s", buf) != EOF)
+    rewind(file);
+    while(fscanf(file, "%s", buf) != EOF)
     {
-        p += strlen(buf);//skip what was checked so far
         switch(buf[0])
         {
             case 'v':
               switch(buf[1])
               {
                 case '\0':
-                  sscanf(
-                      p,
+                  fscanf(
+                      file,
                       "%f %f %f",
                       &x,
                       &y,
@@ -270,8 +268,8 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
                   numvertices++;
                   break;
                 case 'n':
-                  sscanf(
-                      p,
+                  fscanf(
+                      file,
                       "%f %f %f",
                       &x,
                       &y,
@@ -283,8 +281,8 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
                   numnormals++;
                   break;
                 case 't':
-                  sscanf(
-                      p,
+                  fscanf(
+                      file,
                       "%f %f",
                       &x,
                       &y
@@ -298,8 +296,8 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
               }
               break;
             case 'f':
-              sscanf(
-                  p,
+              fscanf(
+                  file,
                   "%d/%d/%d %d/%d/%d %d/%d/%d",
                   &f[0][0],
                   &f[0][1],
@@ -329,8 +327,6 @@ void gf3d_obj_load_get_data_from_file(ObjData *obj, const char *mem,size_t fileS
             default:
               break;
         }
-        c = strchr(p,'\n');//go to the end of line
-        p = c + 1;//and then the next line
     }
 }
 

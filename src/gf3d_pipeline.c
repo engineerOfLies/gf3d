@@ -4,8 +4,6 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
-#include "gfc_pak.h"
-
 #include "gf3d_config.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
@@ -407,7 +405,7 @@ Pipeline *gf3d_pipeline_create_from_config(
         return NULL;
     }
     if (!configFile)return NULL;
-    file = gfc_pak_load_json(configFile);
+    file = sj_load(configFile);
     if (!file)
     {
         slog("failed to load config file for pipeline %s",configFile);
@@ -420,7 +418,7 @@ Pipeline *gf3d_pipeline_create_from_config(
         sj_free(file);
         return NULL;
     }
-    
+
     pipe = gf3d_pipeline_new();
     if (!pipe)
     {
@@ -517,11 +515,11 @@ Pipeline *gf3d_pipeline_create_from_config(
     colorBlending.blendConstants[1] = 0.0f; // Optional
     colorBlending.blendConstants[2] = 0.0f; // Optional
     colorBlending.blendConstants[3] = 0.0f; // Optional
-    
+
     gf3d_pipeline_create_basic_descriptor_pool_from_config(pipe,config);
     gf3d_pipeline_create_basic_descriptor_set_layout_from_config(pipe,config);
     gf3d_pipeline_create_descriptor_sets(pipe);
-    
+
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1; // Optional
     pipelineLayoutInfo.pSetLayouts = &pipe->descriptorSetLayout; // Optional 
@@ -569,8 +567,8 @@ Pipeline *gf3d_pipeline_create_from_config(
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex = -1; // Optional
     pipelineInfo.pDepthStencilState = &depthStencil;
-    
     sj_free(file);
+
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipe->pipeline) != VK_SUCCESS)
     {   
         slog("failed to create pipeline!");
@@ -578,6 +576,7 @@ Pipeline *gf3d_pipeline_create_from_config(
         gf3d_pipeline_free(pipe);
         return NULL;
     }
+
     pipe->drawCallList = gfc_allocate_array(sizeof(PipelineDrawCall),descriptorCount);
     if (pipe->drawCallList)
     {

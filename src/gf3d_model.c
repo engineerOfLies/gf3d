@@ -3,7 +3,6 @@
 #include "simple_logger.h"
 
 #include "gfc_config.h"
-#include "gfc_pak.h"
 
 #include "gf2d_actor.h"
 
@@ -220,7 +219,7 @@ Model *gf3d_model_load(const char * filename)
         model->refCount++;
         return model;
     }
-    json = gfc_pak_load_json(filename);
+    json = sj_load(filename);
     if (!json)return NULL;
     
     config = sj_object_get_value(json,"model");

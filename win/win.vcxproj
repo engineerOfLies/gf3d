@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8e8bb929-84a8-4eff-99b4-c803d08535cf}</ProjectGuid>
+    <RootNamespace>win</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..</OutDir>
+    <IncludePath>D:\git\libs\SDL2_image-2.8.2\include;D:\git\libs\SDL2_mixer-2.8.0\include;D:\git\libs\SDL2_ttf-2.22.0\include;D:\git\libs\SDL2-2.30.6\include;D:\git\libs\VulkanSDK\Include;D:\git\gf3d\gfc\simple_logger\include;D:\git\gf3d\gfc\simple_json\include;D:\git\gf3d\gfc\include;D:\git\gf3d\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\git\libs\SDL2_image-2.8.2\lib\x64;D:\git\libs\SDL2_mixer-2.8.0\lib\x64;D:\git\libs\SDL2_ttf-2.22.0\lib\x64;D:\git\libs\SDL2-2.30.6\lib\x64;D:\git\libs\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <TargetName>gf3d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..</OutDir>
+    <IncludePath>D:\git\libs\SDL2_image-2.8.2\include;D:\git\libs\SDL2_mixer-2.8.0\include;D:\git\libs\SDL2_ttf-2.22.0\include;D:\git\libs\SDL2-2.30.6\include;D:\git\libs\VulkanSDK\Include;D:\git\gf3d\gfc\simple_logger\include;D:\git\gf3d\gfc\simple_json\include;D:\git\gf3d\gfc\include;D:\git\gf3d\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\git\libs\SDL2_image-2.8.2\lib\x64;D:\git\libs\SDL2_mixer-2.8.0\lib\x64;D:\git\libs\SDL2_ttf-2.22.0\lib\x64;D:\git\libs\SDL2-2.30.6\lib\x64;D:\git\libs\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <TargetName>gf3d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_array.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_error.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_list.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_object.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_parse.c" />
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_string.c" />
+    <ClCompile Include="..\gfc\simple_logger\src\simple_logger.c" />
+    <ClCompile Include="..\gfc\src\gfc_actions.c" />
+    <ClCompile Include="..\gfc\src\gfc_audio.c" />
+    <ClCompile Include="..\gfc\src\gfc_callbacks.c" />
+    <ClCompile Include="..\gfc\src\gfc_color.c" />
+    <ClCompile Include="..\gfc\src\gfc_config.c" />
+    <ClCompile Include="..\gfc\src\gfc_config_def.c" />
+    <ClCompile Include="..\gfc\src\gfc_hashmap.c" />
+    <ClCompile Include="..\gfc\src\gfc_input.c" />
+    <ClCompile Include="..\gfc\src\gfc_list.c" />
+    <ClCompile Include="..\gfc\src\gfc_matrix.c" />
+    <ClCompile Include="..\gfc\src\gfc_noise.c" />
+    <ClCompile Include="..\gfc\src\gfc_pak.c" />
+    <ClCompile Include="..\gfc\src\gfc_primitives.c" />
+    <ClCompile Include="..\gfc\src\gfc_shape.c" />
+    <ClCompile Include="..\gfc\src\gfc_string.c" />
+    <ClCompile Include="..\gfc\src\gfc_text.c" />
+    <ClCompile Include="..\gfc\src\gfc_types.c" />
+    <ClCompile Include="..\gfc\src\gfc_vector.c" />
+    <ClCompile Include="..\gfc\src\miniz.c" />
+    <ClCompile Include="..\src\game.c" />
+    <ClCompile Include="..\src\gf2d_actor.c" />
+    <ClCompile Include="..\src\gf2d_draw.c" />
+    <ClCompile Include="..\src\gf2d_font.c" />
+    <ClCompile Include="..\src\gf2d_mouse.c" />
+    <ClCompile Include="..\src\gf2d_sprite.c" />
+    <ClCompile Include="..\src\gf3d_buffers.c" />
+    <ClCompile Include="..\src\gf3d_camera.c" />
+    <ClCompile Include="..\src\gf3d_commands.c" />
+    <ClCompile Include="..\src\gf3d_config.c" />
+    <ClCompile Include="..\src\gf3d_debug.c" />
+    <ClCompile Include="..\src\gf3d_device.c" />
+    <ClCompile Include="..\src\gf3d_draw.c" />
+    <ClCompile Include="..\src\gf3d_extensions.c" />
+    <ClCompile Include="..\src\gf3d_gltf_parse.c" />
+    <ClCompile Include="..\src\gf3d_materials.c" />
+    <ClCompile Include="..\src\gf3d_mesh.c" />
+    <ClCompile Include="..\src\gf3d_model.c" />
+    <ClCompile Include="..\src\gf3d_obj_load.c" />
+    <ClCompile Include="..\src\gf3d_pipeline.c" />
+    <ClCompile Include="..\src\gf3d_shaders.c" />
+    <ClCompile Include="..\src\gf3d_swapchain.c" />
+    <ClCompile Include="..\src\gf3d_texture.c" />
+    <ClCompile Include="..\src\gf3d_uniform_buffers.c" />
+    <ClCompile Include="..\src\gf3d_validation.c" />
+    <ClCompile Include="..\src\gf3d_vgraphics.c" />
+    <ClCompile Include="..\src\gf3d_vqueues.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\gfc\include\gfc_actions.h" />
+    <ClInclude Include="..\gfc\include\gfc_audio.h" />
+    <ClInclude Include="..\gfc\include\gfc_callbacks.h" />
+    <ClInclude Include="..\gfc\include\gfc_color.h" />
+    <ClInclude Include="..\gfc\include\gfc_config.h" />
+    <ClInclude Include="..\gfc\include\gfc_config_def.h" />
+    <ClInclude Include="..\gfc\include\gfc_hashmap.h" />
+    <ClInclude Include="..\gfc\include\gfc_input.h" />
+    <ClInclude Include="..\gfc\include\gfc_list.h" />
+    <ClInclude Include="..\gfc\include\gfc_matrix.h" />
+    <ClInclude Include="..\gfc\include\gfc_noise.h" />
+    <ClInclude Include="..\gfc\include\gfc_pak.h" />
+    <ClInclude Include="..\gfc\include\gfc_primitives.h" />
+    <ClInclude Include="..\gfc\include\gfc_shape.h" />
+    <ClInclude Include="..\gfc\include\gfc_string.h" />
+    <ClInclude Include="..\gfc\include\gfc_text.h" />
+    <ClInclude Include="..\gfc\include\gfc_types.h" />
+    <ClInclude Include="..\gfc\include\gfc_vector.h" />
+    <ClInclude Include="..\gfc\include\miniz.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_list.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_object.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_parse.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_types.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
+    <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
+    <ClInclude Include="..\include\gf2d_actor.h" />
+    <ClInclude Include="..\include\gf2d_draw.h" />
+    <ClInclude Include="..\include\gf2d_font.h" />
+    <ClInclude Include="..\include\gf2d_mouse.h" />
+    <ClInclude Include="..\include\gf2d_sprite.h" />
+    <ClInclude Include="..\include\gf3d_buffers.h" />
+    <ClInclude Include="..\include\gf3d_camera.h" />
+    <ClInclude Include="..\include\gf3d_commands.h" />
+    <ClInclude Include="..\include\gf3d_config.h" />
+    <ClInclude Include="..\include\gf3d_debug.h" />
+    <ClInclude Include="..\include\gf3d_device.h" />
+    <ClInclude Include="..\include\gf3d_draw.h" />
+    <ClInclude Include="..\include\gf3d_extensions.h" />
+    <ClInclude Include="..\include\gf3d_gltf_parse.h" />
+    <ClInclude Include="..\include\gf3d_materials.h" />
+    <ClInclude Include="..\include\gf3d_mesh.h" />
+    <ClInclude Include="..\include\gf3d_model.h" />
+    <ClInclude Include="..\include\gf3d_obj_load.h" />
+    <ClInclude Include="..\include\gf3d_pipeline.h" />
+    <ClInclude Include="..\include\gf3d_shaders.h" />
+    <ClInclude Include="..\include\gf3d_swapchain.h" />
+    <ClInclude Include="..\include\gf3d_texture.h" />
+    <ClInclude Include="..\include\gf3d_uniform_buffers.h" />
+    <ClInclude Include="..\include\gf3d_validation.h" />
+    <ClInclude Include="..\include\gf3d_vgraphics.h" />
+    <ClInclude Include="..\include\gf3d_vqueues.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

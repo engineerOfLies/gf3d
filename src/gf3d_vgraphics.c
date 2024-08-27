@@ -15,7 +15,6 @@
 #include "gfc_types.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
-#include "gfc_pak.h"
 #include "gfc_config.h"
 
 #include "gf3d_device.h"
@@ -115,7 +114,7 @@ void gf3d_vgraphics_init(const char *config)
     short int enableValidation = 0;
     short int enableDebug = 0;
     
-    json = gfc_pak_load_json(config);
+    json = sj_load(config);
     if (!json)
     {
         slog("graphics config file load failed, exiting");
@@ -170,14 +169,14 @@ void gf3d_vgraphics_init(const char *config)
         enableDebug,
         config
         );
-    
+
     gf3d_vgraphics.device = gf3d_vgraphics_get_default_logical_device();
 
     gf3d_vqueues_setup_device_queues(gf3d_vgraphics.device);
     // swap chain!!!
     gf3d_swapchain_init(gf3d_vgraphics.gpu,gf3d_vgraphics.device,gf3d_vgraphics.surface,resolution.x,resolution.y);
     gf3d_pipeline_init(16);// how many different rendering pipelines we need
-    
+
     // 2D stuff
     SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_RGBA32,
                                 &gf3d_vgraphics.bitdepth,
