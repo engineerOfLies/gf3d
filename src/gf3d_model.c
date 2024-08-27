@@ -13,7 +13,6 @@
 #include "gf3d_vgraphics.h"
 #include "gf3d_obj_load.h"
 #include "gf3d_uniform_buffers.h"
-#include "gf3d_lights.h"
 #include "gf3d_materials.h"
 #include "gf3d_camera.h"
 
@@ -49,11 +48,6 @@ void gf3d_model_update_uniform_buffer(
     GFC_Vector4D colorMod,
     GFC_Vector4D ambientLight
 );
-
-MeshUBO gf3d_model_get_highlight_ubo(
-    GFC_Matrix4 modelMat,
-    GFC_Color highlightGFC_Color);
-
 
 VkDescriptorSetLayout * gf3d_model_get_descriptor_set_layout();
 
@@ -568,28 +562,10 @@ MeshUBO gf3d_model_get_sky_ubo(
     return modelUBO;
 }
 
-MeshUBO gf3d_model_get_highlight_ubo(
-    GFC_Matrix4 modelMat,
-    GFC_Color highlightColor)
-{
-    ModelViewProjection mvp;
-    MeshUBO modelUBO = {0};
-    GFC_Vector4D color = gfc_color_to_vector4f(highlightColor);
-    mvp = gf3d_vgraphics_get_mvp();
-    
-    gfc_matrix4_copy(modelUBO.model,modelMat);
-    gfc_matrix4_copy(modelUBO.view,mvp.view);
-    gfc_matrix4_copy(modelUBO.proj,mvp.proj);
-    
-    gfc_vector4d_copy(modelUBO.color,color);
-    return modelUBO;
-}
-
 void gf3d_model_draw_all_meshes(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color colorMod,
-    LightUBO *lighting,
     Uint32 frame)
 {
     int i,c;
@@ -597,7 +573,7 @@ void gf3d_model_draw_all_meshes(
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw_index(model,i,modelMat,colorMod,lighting,frame);
+        gf3d_model_draw_index(model,i,modelMat,colorMod,frame);
     }
 }
 
@@ -605,7 +581,6 @@ void gf3d_model_draw(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
     Uint32 frame)
 {
     if (!model)return;
@@ -616,7 +591,6 @@ void gf3d_model_draw(
             frame,
             modelMat,
             colorMod,
-            lighting,
             0);
         return;
     }
@@ -624,7 +598,6 @@ void gf3d_model_draw(
         model,
         modelMat,
         colorMod,
-        lighting,
         frame);
 }
 
@@ -634,7 +607,6 @@ void gf3d_model_draw_index(
     Uint32 index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
     Uint32 frame)
 {
     Mesh *mesh;
@@ -651,11 +623,6 @@ void gf3d_model_draw_index(
     gfc_matrix4_multiply(matrix,model->matrix,modelMat);
     
     uboData.mesh = gf3d_mesh_get_ubo(matrix,colorMod);
-    
-    if (lighting)
-    {
-        memcpy(&uboData.lights,lighting,sizeof(LightUBO));
-    }
     
     if (model->material)
     {

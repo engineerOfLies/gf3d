@@ -32,7 +32,6 @@
 
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
-#include "gf3d_lights.h"
 #include "gf3d_materials.h"
 
 
@@ -41,8 +40,6 @@ typedef struct
 {
     MeshUBO         mesh;
     MaterialUBO     material;   //this may become an array
-    LightUBO        lights;
-    GFC_Vector4D    flags;      //.x is for bones, .y is for transparency/opaque pass 
 }ModelUBO;
 
 /**
@@ -145,14 +142,12 @@ void gf3d_model_move(Model *in, GFC_Vector3D offset,GFC_Vector3D rotation);
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
- * @param lighting the lighting that should be applied
  * @param frame the animation frame to use for armature based animations
  */
 void gf3d_model_draw(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,//TODO pass a material instead
-    LightUBO *lighting,
     Uint32 frame);
 
 /**
@@ -161,7 +156,6 @@ void gf3d_model_draw(
  * @param index the mesh to render from the mesh_list, could be animation frames of a sequence of objs, or sub-meshes
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
- * @param lighting the lighting that should be applied
  * @param frame the animation frame to use for armature based animations
  */
 void gf3d_model_draw_index(
@@ -169,7 +163,6 @@ void gf3d_model_draw_index(
     Uint32 index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
     Uint32 frame);
 
 /**
@@ -177,7 +170,6 @@ void gf3d_model_draw_index(
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation
- * @param lighting the lighting that should be applied
  * @param frame used to access a frame of armature based animation
  * @note this is called by gf3d_model_draw when not using a sequence of meshes
  */
@@ -185,7 +177,6 @@ void gf3d_model_draw_all_meshes(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
     Uint32 frame);
 
 /**

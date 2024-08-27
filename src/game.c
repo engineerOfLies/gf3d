@@ -25,7 +25,6 @@
 #include "gf3d_camera.h"
 #include "gf3d_texture.h"
 #include "gf3d_draw.h"
-#include "gf3d_lights.h"
 
 extern int __DEBUG;
 
@@ -88,7 +87,7 @@ int main(int argc,char *argv[])
     gfc_matrix4_identity(dinoMat);
         //camera
     gf3d_camera_set_scale(gfc_vector3d(1,1,1));
-    gf3d_camera_set_position(gfc_vector3d(5,5,0.6));
+    gf3d_camera_set_position(gfc_vector3d(15,-15,10));
     gf3d_camera_look_at(gfc_vector3d(0,0,0),NULL);
     gf3d_camera_set_move_step(0.2);
     gf3d_camera_set_rotate_step(0.05);
@@ -114,7 +113,6 @@ int main(int argc,char *argv[])
                     dino,
                     dinoMat,
                     GFC_COLOR_WHITE,
-                    NULL,
                     0);
                 draw_origin();
             //2D draws
