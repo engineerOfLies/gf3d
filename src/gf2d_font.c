@@ -279,7 +279,8 @@ void gf2d_fonts_load_json(const char *filename)
         }
         sj_get_integer_value(sj_object_get_value(item,"size"),&size);
         font_manager.font_list[i].pointSize = size;
-        font_manager.font_list[i].font = TTF_OpenFont(filename, font_manager.font_list[i].pointSize);
+        font_manager.font_list[i].font = TTF_OpenFont(font_manager.font_list[i].filename, font_manager.font_list[i].pointSize);
+        if (!font_manager.font_list[i].font)slog("failed to load font %s");
     }
     sj_free(file);
 }
@@ -334,6 +335,11 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
         slog("cannot draw text, no font provided");
         return;
     }
+    if (!font->font)
+    {
+        slog("cannot draw text, bad font provided");
+        return;
+    }
     
     image = gf2d_font_image_get(text,color,font);
     
@@ -356,6 +362,7 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
     surface = TTF_RenderUTF8_Blended(font->font, text, gfc_color_to_sdl(color));
     if (!surface)
     {
+        slog("failed to render font for text %s, RE: %s",text,SDL_GetError());
         return;
     }
     

@@ -64,6 +64,7 @@ int main(int argc,char *argv[])
     slog("gf3d begin");
     //gfc init
     gfc_input_init("config/input.cfg");
+    gfc_config_def_init();
     gfc_action_init(1024);
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
@@ -79,7 +80,6 @@ int main(int argc,char *argv[])
 
     //game setup
     gf2d_mouse_load("actors/mouse.actor");
-    gf2d_mouse_show();
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix4_identity(skyMat);
     dino = gf3d_model_load("models/dino.model");

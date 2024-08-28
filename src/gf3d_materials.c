@@ -80,7 +80,6 @@ void gf3d_material_load_mtl_file(const char *filename)
     size_t size = 0;
     float x,y,z;
     int count = 0;
-    size_t fileSize = 0;
     
     if (!filename)return;
     file = fopen(filename,"r");

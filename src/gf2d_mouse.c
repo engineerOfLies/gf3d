@@ -1,5 +1,7 @@
 #include <SDL.h>
 
+#include "simple_logger.h"
+
 #include "gf3d_vgraphics.h"
 #include "gf3d_camera.h"
 
@@ -46,8 +48,9 @@ void gf2d_mouse_set_action(const char *action)
 
 void gf2d_mouse_load(const char *actorFile)
 {
-    gf2d_actor_free(_mouse.actor);
+    if (_mouse.actor)gf2d_actor_free(_mouse.actor);
     _mouse.actor = gf2d_actor_load(actorFile);
+    if (!_mouse.actor)slog("failed to load mouse actor");
     gf2d_mouse_set_action("default");
 }
 
@@ -62,7 +65,7 @@ void gf2d_mouse_update()
 
 void gf2d_mouse_draw()
 {
-    if (_mouse.hidden)return;
+    if (_mouse.hidden > 0)return;
     gf2d_actor_draw(
         _mouse.actor,
         _mouse.frame,

@@ -10,7 +10,7 @@ typedef struct
     Uint8               _inuse;
     Uint32              _refcount;
     Uint32              width,height;
-    GFC_TextLine            filename;
+    GFC_TextLine        filename;
     VkImage             textureImage;
     VkDeviceMemory      textureImageMemory;
     VkImageView         textureImageView;

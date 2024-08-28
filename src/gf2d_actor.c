@@ -234,8 +234,7 @@ Actor *gf2d_actor_load(const char *file)
     json = sj_load(file);
     if (json)
     {
-        actor = gf2d_actor_load_json(
-            json);
+        actor = gf2d_actor_load_json(json);
         sj_free(json);
         if (!actor)return NULL;
         gfc_line_cpy(actor->filename,file);

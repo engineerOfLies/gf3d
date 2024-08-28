@@ -18,7 +18,7 @@ extern int __DEBUG;
 
 typedef struct
 {
-    GFC_Matrix4 rotation;
+    GFC_Matrix4  rotation;
     GFC_Vector4D colorMod;
     GFC_Vector4D clip;
     GFC_Vector2D size;
@@ -28,7 +28,7 @@ typedef struct
     GFC_Vector2D frame_offset;
     GFC_Vector2D center;
     float        drawOrder;
-    float        padding;
+    GFC_Vector3D padding;
 }SpriteUBO;
 
 typedef struct

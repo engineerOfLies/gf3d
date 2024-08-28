@@ -155,12 +155,12 @@ ObjData *gf3d_obj_load_from_file(const char *filename)
     ObjData *obj;
     FILE* file;
     
-    if (!filename)return;
+    if (!filename)return NULL;
     file = fopen(filename, "r");
     if (!file)
     {
         slog("failed to open material file %s", filename);
-        return;
+        return NULL;
     }        
     obj = (ObjData*)gfc_allocate_array(sizeof(ObjData),1);
     if (!obj)
