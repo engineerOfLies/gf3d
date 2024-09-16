@@ -1,8 +1,7 @@
 {
   "ExpandedNodes": [
     "",
-    "\\shaders"
+    "\\gfc\\src"
   ],
-  "SelectedNode": "\\shaders\\default.frag",
   "PreviewInSolutionExplorer": false
 }

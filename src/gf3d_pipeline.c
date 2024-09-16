@@ -43,6 +43,7 @@ void gf3d_pipeline_init(Uint32 max_pipelines)
     }
     gf3d_pipeline.maxPipelines = max_pipelines;
     gf3d_pipeline.chainLength = gf3d_swapchain_get_swap_image_count();
+    // Clean up
     atexit(gf3d_pipeline_close);
     if (__DEBUG)slog("pipeline system initialized");
 }
@@ -569,6 +570,7 @@ Pipeline *gf3d_pipeline_create_from_config(
     pipelineInfo.pDepthStencilState = &depthStencil;
     sj_free(file);
 
+    /* Info: https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/vkCreateGraphicsPipelines.html */
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipe->pipeline) != VK_SUCCESS)
     {   
         slog("failed to create pipeline!");
