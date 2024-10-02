@@ -25,6 +25,9 @@
 #include "gf3d_texture.h"
 #include "gf3d_draw.h"
 
+#include "entity.h"
+#include "dino.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
@@ -56,15 +59,14 @@ void draw_origin()
 int main(int argc,char *argv[])
 {
     //local variables
-    Model *sky,*dino;
-    GFC_Matrix4 skyMat,dinoMat;
+    Model *sky;
+    GFC_Matrix4 skyMat;
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
     slog("gf3d begin");
     //gfc init
     gfc_input_init("config/input.cfg");
-    gfc_config_def_init();
     gfc_action_init(1024);
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
@@ -74,6 +76,8 @@ int main(int argc,char *argv[])
     gf3d_draw_init();//3D
     gf2d_draw_manager_init(1000);//2D
     
+    entity_system_init(1000);
+    
     //game init
     srand(SDL_GetTicks());
     slog_sync();
@@ -82,8 +86,7 @@ int main(int argc,char *argv[])
     gf2d_mouse_load("actors/mouse.actor");
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix4_identity(skyMat);
-    dino = gf3d_model_load("models/dino.model");
-    gfc_matrix4_identity(dinoMat);
+    
         //camera
     gf3d_camera_set_scale(gfc_vector3d(1,1,1));
     gf3d_camera_set_position(gfc_vector3d(15,-15,10));
@@ -91,16 +94,20 @@ int main(int argc,char *argv[])
     gf3d_camera_set_move_step(0.2);
     gf3d_camera_set_rotate_step(0.05);
     
-    gf3d_camera_enable_free_look(1);
+    dino_spawn(gfc_vector3d(0,0,0));
     //windows
 
+    
+    
     // main game loop    
     while(!_done)
     {
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
-        //camera updaes
+        entity_think_all();
+        entity_update_all();
+        //camera updates
         gf3d_camera_controls_update();
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
@@ -108,13 +115,8 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
 
             //3D draws
-        
                 gf3d_model_draw_sky(sky,skyMat,GFC_COLOR_WHITE);
-                gf3d_model_draw(
-                    dino,
-                    dinoMat,
-                    GFC_COLOR_WHITE,
-                    0);
+                entity_draw_all();
                 draw_origin();
             //2D draws
                 gf2d_mouse_draw();

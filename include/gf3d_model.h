@@ -33,13 +33,14 @@
 #include "gf3d_texture.h"
 #include "gf3d_mesh.h"
 #include "gf3d_materials.h"
-
+#include "lights.h"
 
 //all inclusive of features
 typedef struct
 {
     MeshUBO         mesh;
     MaterialUBO     material;   //this may become an array
+    Light           light[LIGHT_UBO_MAX];
 }ModelUBO;
 
 /**
@@ -142,12 +143,14 @@ void gf3d_model_move(Model *in, GFC_Vector3D offset,GFC_Vector3D rotation);
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
  * @param colorMod color modulation (values from 0 to 1);
+ * @param light if provided, use this light to render
  * @param frame the animation frame to use for armature based animations
  */
 void gf3d_model_draw(
-    Model *model,
-    GFC_Matrix4 modelMat,
-    GFC_Color   colorMod,//TODO pass a material instead
+    Model       *model,
+    GFC_Matrix4  modelMat,
+    GFC_Color    colorMod,//TODO pass a material instead
+    GFC_List    *light,
     Uint32 frame);
 
 /**
@@ -163,6 +166,7 @@ void gf3d_model_draw_index(
     Uint32 index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
+    GFC_List       *light,
     Uint32 frame);
 
 /**
@@ -177,6 +181,7 @@ void gf3d_model_draw_all_meshes(
     Model *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
+    GFC_List       *light,
     Uint32 frame);
 
 /**
