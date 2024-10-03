@@ -25,6 +25,8 @@
 #include "gf3d_texture.h"
 #include "gf3d_draw.h"
 
+#include "entity.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
