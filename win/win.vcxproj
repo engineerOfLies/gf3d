@@ -72,14 +72,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..</OutDir>
-    <IncludePath>D:\git\libs\SDL2_image-2.8.2\include;D:\git\libs\SDL2_mixer-2.8.0\include;D:\git\libs\SDL2_ttf-2.22.0\include;D:\git\libs\SDL2-2.30.6\include;D:\git\libs\VulkanSDK\Include;D:\git\gf3d\gfc\simple_logger\include;D:\git\gf3d\gfc\simple_json\include;D:\git\gf3d\gfc\include;D:\git\gf3d\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\git\libs\SDL2_image-2.8.2\lib\x64;D:\git\libs\SDL2_mixer-2.8.0\lib\x64;D:\git\libs\SDL2_ttf-2.22.0\lib\x64;D:\git\libs\SDL2-2.30.6\lib\x64;D:\git\libs\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Lib\SDL2_image-2.8.2\include;C:\Lib\SDL2_mixer-2.8.0\include;C:\Lib\SDL2_ttf-2.22.0\include;C:\Lib\SDL2-2.30.7\include;C:\Lib\VulkanSDK\1.3.290.0\Include;C:\Users\migue\.ssh\gf3d\gfc\simple_logger\include;C:\Users\migue\.ssh\gf3d\gfc\simple_json\include;C:\Users\migue\.ssh\gf3d\include;C:\Users\migue\.ssh\gf3d\gfc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Lib\SDL2_image-2.8.2\lib\x64;C:\Lib\SDL2_mixer-2.8.0\lib\x64;C:\Lib\SDL2_ttf-2.22.0\lib\x64;C:\Lib\SDL2-2.30.7\lib\x64;C:\Lib\VulkanSDK\1.3.290.0\Lib;$(LibraryPath)</LibraryPath>
     <TargetName>gf3d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..</OutDir>
-    <IncludePath>D:\git\libs\SDL2_image-2.8.2\include;D:\git\libs\SDL2_mixer-2.8.0\include;D:\git\libs\SDL2_ttf-2.22.0\include;D:\git\libs\SDL2-2.30.6\include;D:\git\libs\VulkanSDK\Include;D:\git\gf3d\gfc\simple_logger\include;D:\git\gf3d\gfc\simple_json\include;D:\git\gf3d\gfc\include;D:\git\gf3d\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\git\libs\SDL2_image-2.8.2\lib\x64;D:\git\libs\SDL2_mixer-2.8.0\lib\x64;D:\git\libs\SDL2_ttf-2.22.0\lib\x64;D:\git\libs\SDL2-2.30.6\lib\x64;D:\git\libs\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Lib\SDL2_image-2.8.2\include;C:\Lib\SDL2_mixer-2.8.0\include;C:\Lib\SDL2_ttf-2.22.0\include;C:\Lib\SDL2-2.30.7\include;C:\Lib\VulkanSDK\1.3.290.0\Include;C:\Users\migue\.ssh\gf3d\gfc\simple_logger\include;C:\Users\migue\.ssh\gf3d\gfc\simple_json\include;C:\Users\migue\.ssh\gf3d\include;C:\Users\migue\.ssh\gf3d\gfc\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Lib\SDL2_image-2.8.2\lib\x64;C:\Lib\SDL2_mixer-2.8.0\lib\x64;C:\Lib\SDL2_ttf-2.22.0\lib\x64;C:\Lib\SDL2-2.30.7\lib\x64;C:\Lib\VulkanSDK\1.3.290.0\Lib;$(LibraryPath)</LibraryPath>
     <TargetName>gf3d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -114,8 +114,10 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +133,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

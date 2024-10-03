@@ -25,6 +25,8 @@
 #include "gf3d_texture.h"
 #include "gf3d_draw.h"
 
+#include "entity.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
@@ -58,6 +60,7 @@ int main(int argc,char *argv[])
     //local variables
     Model *sky,*dino;
     GFC_Matrix4 skyMat,dinoMat;
+    Mix_Music *music;
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
@@ -66,6 +69,7 @@ int main(int argc,char *argv[])
     gfc_input_init("config/input.cfg");
     gfc_config_def_init();
     gfc_action_init(1024);
+    gfc_audio_init(16,8,0,1,1,0);
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
     gf3d_materials_init();
@@ -73,7 +77,7 @@ int main(int argc,char *argv[])
     gf2d_actor_init(1000);
     gf3d_draw_init();//3D
     gf2d_draw_manager_init(1000);//2D
-    
+
     //game init
     srand(SDL_GetTicks());
     slog_sync();
@@ -84,6 +88,7 @@ int main(int argc,char *argv[])
     gfc_matrix4_identity(skyMat);
     dino = gf3d_model_load("models/dino.model");
     gfc_matrix4_identity(dinoMat);
+    music = gfc_sound_load_music("music/Persona 3 Reload - It's Going Down Now (Extended Version).mp3");
         //camera
     gf3d_camera_set_scale(gfc_vector3d(1,1,1));
     gf3d_camera_set_position(gfc_vector3d(15,-15,10));
@@ -93,6 +98,9 @@ int main(int argc,char *argv[])
     
     gf3d_camera_enable_free_look(1);
     //windows
+
+    // Play music
+    gfc_music_play(music, -1);
 
     // main game loop    
     while(!_done)
@@ -120,6 +128,7 @@ int main(int argc,char *argv[])
                 gf2d_mouse_draw();
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
         gf3d_vgraphics_render_end();
+
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();
     }    
