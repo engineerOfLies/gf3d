@@ -22,7 +22,7 @@ void entity_system_close()
 
 void entity_system_init(Uint32 max_ents)
 {
-	if (!_entity_manager.entity_list)
+	if (_entity_manager.entity_list)
 	{
 		slog("cannot have two instances of an entity manager, one is already active");
 		return;
@@ -54,7 +54,7 @@ void entity_clear_all(Entity* ignore)
 Entity* entity_new()
 {
 	int i;
-	for (i = 0; i < _entity_manager.entity_list; i++)
+	for (i = 0; i < _entity_manager.entity_max; i++)
 	{
 		if (_entity_manager.entity_list[i]._inuse)continue;		//Skip any active entites
 		memset(&_entity_manager.entity_list[i], 0, sizeof(Entity));
@@ -85,7 +85,7 @@ void entity_think(Entity* self)
 void entity_system_think()
 {
 	int i;
-	for (i = 0; i < _entity_manager.entity_list; i++)
+	for (i = 0; i < _entity_manager.entity_max; i++)
 	{
 		if (!_entity_manager.entity_list[i]._inuse)continue;		//Skip any inactive entites
 		entity_think(&_entity_manager.entity_list[i]);
@@ -102,7 +102,7 @@ void entity_update(Entity* self)
 void entity_system_update()
 {
 	int i;
-	for (i = 0; i < _entity_manager.entity_list; i++)
+	for (i = 0; i < _entity_manager.entity_max; i++)
 	{
 		if (!_entity_manager.entity_list[i]._inuse)continue;		//Skip any inactive entites
 		entity_update(&_entity_manager.entity_list[i]);
@@ -112,8 +112,13 @@ void entity_system_update()
 void entity_draw(Entity* self)
 {
 	GFC_Matrix4 matrix;
-	if (!self)return;
+	if (!self) 
+	{ 
 
+		slog("Error: Entity does not exist.");
+		return; 
+	}
+	
 	if (self->draw)
 	{
 		if (self->draw(self) == -1)return;
@@ -137,7 +142,7 @@ void entity_draw(Entity* self)
 void entity_system_draw()
 {
 	int i;
-	for (i = 0; i < _entity_manager.entity_list; i++)
+	for (i = 0; i < _entity_manager.entity_max; i++)
 	{
 		if (!_entity_manager.entity_list[i]._inuse)continue;		//Skip any inactive entites
 		entity_draw(&_entity_manager.entity_list[i]);

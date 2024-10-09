@@ -26,6 +26,7 @@
 #include "gf3d_draw.h"
 
 #include "entity.h"
+#include "player.h"
 
 extern int __DEBUG;
 
@@ -70,6 +71,7 @@ int main(int argc,char *argv[])
     gfc_config_def_init();
     gfc_action_init(1024);
     gfc_audio_init(16,8,0,1,1,0);
+    entity_system_init(32);                 // Entity limit 32
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
     gf3d_materials_init();
@@ -89,18 +91,24 @@ int main(int argc,char *argv[])
     dino = gf3d_model_load("models/dino.model");
     gfc_matrix4_identity(dinoMat);
     music = gfc_sound_load_music("music/Persona 3 Reload - It's Going Down Now (Extended Version).mp3");
-        //camera
+
+    // Player
+    GFC_Vector3D spawn = gfc_vector3d(0, 0, 0);
+    Entity* player = player_new("player", dino, spawn);
+    
+    //camera
     gf3d_camera_set_scale(gfc_vector3d(1,1,1));
-    gf3d_camera_set_position(gfc_vector3d(15,-15,10));
-    gf3d_camera_look_at(gfc_vector3d(0,0,0),NULL);
+    gf3d_camera_set_position(gfc_vector3d(spawn.x - 6,spawn.y + 45,spawn.z + 20));
+    //gf3d_camera_set_rotation(gfc_vector3d(player->rotation.x + 3.4,player->rotation.y + 3,player->rotation.z + 3.15));
+    gf3d_camera_look_at(gfc_vector3d(player->position.x - 6, player->position.y, player->position.z + 10), NULL);
     gf3d_camera_set_move_step(0.2);
     gf3d_camera_set_rotate_step(0.05);
     
     gf3d_camera_enable_free_look(1);
     //windows
 
-    // Play music
-    gfc_music_play(music, -1);
+    // Music
+    gfc_music_play(music, -1);      // Play Music
 
     // main game loop    
     while(!_done)
@@ -108,7 +116,7 @@ int main(int argc,char *argv[])
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
-        //camera updaes
+        //camera updates
         gf3d_camera_controls_update();
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
@@ -118,20 +126,29 @@ int main(int argc,char *argv[])
             //3D draws
         
                 gf3d_model_draw_sky(sky,skyMat,GFC_COLOR_WHITE);
-                gf3d_model_draw(
+                
+                entity_system_draw();
+
+                /*gf3d_model_draw(
                     dino,
                     dinoMat,
                     GFC_COLOR_WHITE,
-                    0);
+                    0);*/
                 draw_origin();
             //2D draws
                 gf2d_mouse_draw();
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
         gf3d_vgraphics_render_end();
 
+        entity_system_think();
+        entity_system_update();
+
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();
     }    
+    
+    entity_system_close();
+    gfc_music_free(music);
     vkDeviceWaitIdle(gf3d_vgraphics_get_default_logical_device());    
     //cleanup
     slog("gf3d program end");
