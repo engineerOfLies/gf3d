@@ -95,16 +95,28 @@ int main(int argc,char *argv[])
     // Player
     GFC_Vector3D spawn = gfc_vector3d(0, 0, 0);
     Entity* player = player_new("player", dino, spawn);
+
+    float offset = 45.0f;
+    entity_set_radius(player, &offset);
     
     //camera
     gf3d_camera_set_scale(gfc_vector3d(1,1,1));
-    gf3d_camera_set_position(gfc_vector3d(spawn.x - 6,spawn.y + 45,spawn.z + 20));
-    //gf3d_camera_set_rotation(gfc_vector3d(player->rotation.x + 3.4,player->rotation.y + 3,player->rotation.z + 3.15));
-    gf3d_camera_look_at(gfc_vector3d(player->position.x - 6, player->position.y, player->position.z + 10), NULL);
-    gf3d_camera_set_move_step(0.2);
-    gf3d_camera_set_rotate_step(0.05);
+    SDL_CaptureMouse(SDL_TRUE);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     
-    gf3d_camera_enable_free_look(1);
+    GFC_Vector3D offsetPos = gfc_vector3d(0.0f, offset, 20.0f);
+    GFC_Vector3D offsetLook = gfc_vector3d(0.0f, 0.0f, 10.0f);
+    gf3d_camera_set_offset_position(player->position, offsetPos);
+    gf3d_camera_set_offset_rotation(player->position, offsetLook);
+    
+    //gf3d_camera_look_at(gfc_vector3d(player->position.x, player->position.y, player->position.z + 10), NULL);
+    //gf3d_camera_set_move_step(1.0);
+    //gf3d_camera_set_rotate_step(0.1);
+    
+    //gf3d_camera_enable_free_look(1);
+    gf3d_camera_enable_player_look(1);
+    //gf3d_camera_set_auto_pan(1);
+    entity_set_camera(player, gf3d_camera_get_mode());
     //windows
 
     // Music
@@ -116,8 +128,14 @@ int main(int argc,char *argv[])
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
+
         //camera updates
-        gf3d_camera_controls_update();
+        GFC_Vector2D mousePos = gf2d_mouse_get_movement();
+
+        entity_system_think();
+        entity_system_update();
+
+        gf3d_camera_move_mouse(mousePos, player->position, offset);
         gf3d_camera_update_view();
         gf3d_camera_get_view_mat4(gf3d_vgraphics_get_view_matrix());
 
@@ -136,12 +154,13 @@ int main(int argc,char *argv[])
                     0);*/
                 draw_origin();
             //2D draws
-                gf2d_mouse_draw();
+                //gf2d_mouse_draw();
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
         gf3d_vgraphics_render_end();
 
-        entity_system_think();
-        entity_system_update();
+        entity_set_camera(player,gf3d_camera_get_mode());
+        //gf3d_camera_third_person(mousePos, player->position);
+        //gf3d_camera_update_view();
 
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();

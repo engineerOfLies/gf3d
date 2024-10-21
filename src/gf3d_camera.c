@@ -6,6 +6,8 @@
 
 #include "gf3d_camera.h"
 
+#include "SDL_mouse.h"
+
 static Camera gf3d_camera = {0};
 
 void gf3d_camera_set_move_step(float step)
@@ -103,6 +105,71 @@ void gf3d_camera_set_position(GFC_Vector3D position)
     gf3d_camera.position.y = -position.y;
     gf3d_camera.position.z = -position.z;
 }
+
+void gf3d_camera_follow_player(GFC_Vector3D dir)
+{
+    gfc_vector3d_sub(gf3d_camera.position, gf3d_camera.position, dir);
+}
+
+void gf3d_camera_set_offset_position(GFC_Vector3D target, GFC_Vector3D offset) 
+{
+    gfc_vector3d_sub(gf3d_camera.position, target, offset);
+}
+
+void gf3d_camera_set_offset_rotation(GFC_Vector3D target, GFC_Vector3D offset) 
+{
+    GFC_Vector3D angles, cameraPos, targetPos;
+    GFC_Vector3D delta;
+    gfc_vector3d_negate(cameraPos, gf3d_camera.position);
+    gfc_vector3d_add(targetPos, target, offset);
+
+    gfc_vector3d_sub(delta, targetPos, cameraPos);
+    gfc_vector3d_angles(delta, &angles);
+    angles.z -= GFC_HALF_PI;
+    angles.x -= GFC_PI;
+    gfc_angle_clamp_radians(&angles.x);
+    gf3d_camera.rotation.x = -angles.x;
+    gf3d_camera.rotation.y = -angles.y;
+    gf3d_camera.rotation.z = -angles.z;;
+}
+
+void gf3d_camera_move_mouse(GFC_Vector2D mousePos, GFC_Vector3D target, float radius) 
+{
+    // 1. Find angle
+    // 
+    // angle = sensitivity * mousePos.x; 
+    // cameraRotaion += (angle * mousePos.x);
+    // position.x += target.x + (radius * cosine(angle.xy);
+    // position.y += target.y + (radius * sin(angle.xy);
+
+    //float angleX = GFC_HALF_PI * 0.005 * mousePos.x;
+    //float angleY = GFC_HALF_PI * 0.005 * mousePos.y;
+    //gf3d_camera.rotation.z += angleX;
+    //gf3d_camera.rotation.x += angleY;
+
+    gf3d_camera.angle -= 0.005 * mousePos.x;
+    gf3d_camera.height += 0.005 * mousePos.y;
+    
+    gf3d_camera.position.x = -target.x + radius * cos(gf3d_camera.angle);
+    gf3d_camera.position.y = -target.y + radius * sin(gf3d_camera.angle);
+
+    gfc_angle_clamp_radians(&gf3d_camera.position.z);
+    gf3d_camera.position.z = -target.z + radius * cos(gf3d_camera.height);
+    slog("Z: %f", cos(gf3d_camera.height));
+
+    GFC_Vector3D angles, pos;
+    GFC_Vector3D delta;
+    
+    pos = gf3d_camera_get_position();
+    
+    gfc_vector3d_sub(delta, gfc_vector3d(target.x, target.y, target.z + 10.0f), pos);
+    gfc_vector3d_angles(delta, &angles);
+    angles.z -= GFC_HALF_PI;
+    angles.x -= GFC_PI;
+    gf3d_camera_set_rotation(angles);
+    
+}
+
 
 void gf3d_camera_move(GFC_Vector3D translation)
 {
@@ -254,13 +321,13 @@ void gf3d_camera_set_scale(GFC_Vector3D scale)
     if (!scale.y)gf3d_camera.scale.y = 0;
     else gf3d_camera.scale.y = 1/scale.y;
     if (!scale.z)gf3d_camera.scale.z = 0;
-    else gf3d_camera.scale.z = 1/scale.z;
+    else gf3d_camera.scale.z = 1 / scale.z;
 }
 
 void gf3d_camera_set_look_target(GFC_Vector3D target)
 {
-    gfc_vector3d_copy(gf3d_camera.lookTargetPosition,target);
-    gf3d_camera_look_at(target,NULL);
+    gfc_vector3d_copy(gf3d_camera.lookTargetPosition, target);
+    gf3d_camera_look_at(target, NULL);
 }
 
 GFC_Vector3D gf3d_camera_get_look_target()
@@ -278,45 +345,61 @@ void gf3d_camera_enable_free_look(Uint8 enable)
     gf3d_camera.freeLook = enable;
 }
 
+void gf3d_camera_toggle_player_look()
+{
+    gf3d_camera_enable_player_look(!gf3d_camera.playerLook);
+}
+
+void gf3d_camera_enable_player_look(Uint8 enable)
+{
+    gf3d_camera.playerLook = enable;
+}
 
 void gf3d_camera_set_auto_pan(Bool enable)
 {
     gf3d_camera.autoPan = enable;
 }
 
-
 Bool gf3d_camera_free_look_enabled()
 {
     return gf3d_camera.freeLook;
 }
 
-void gf3d_player_camera_controls_update()
+int gf3d_camera_get_mode() 
 {
-    float moveSpeed = gf3d_camera.moveStep;
-    const Uint8* mouse;
-
-    //mouse = 
+    if (gf3d_camera.playerLook == 1) return 0;
+    else if (gf3d_camera.freeLook == 1) return 1;
+    else if (gf3d_camera.autoPan == 1) return 2;
+    else if (gf3d_camera.cameraTargetLock == 1) return 3;
 }
 
-void gf3d_camera_controls_update()
-{
-    float moveSpeed = gf3d_camera.moveStep;
-    GFC_Vector3D position,rotation;
-    const Uint8 * keys;
+void gf3d_camera_third_person(GFC_Vector2D mousePos, GFC_Vector3D playerPos) {
     
+
+    return;
+}
+
+void gf3d_camera_controls_update(GFC_Vector2D mousePos, GFC_Vector3D playerPos)
+{
+    //GFC_Vector3D dir = { 0,0,0 };
+    float moveSpeed = gf3d_camera.moveStep;
+    GFC_Vector3D position, rotation;
+    const Uint8* keys;
+
     keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 
+    // Camera Mode
     if (gf3d_camera.freeLook)
     {
         if (keys[SDL_SCANCODE_R])
         {
             rotation = gf3d_camera_get_angles();
-            slog("rotation: %f,%f,%f",rotation.x,rotation.y,rotation.z);
+            slog("rotation: %f,%f,%f", rotation.x, rotation.y, rotation.z);
         }
         if (keys[SDL_SCANCODE_P])
         {
             position = gf3d_camera_get_position();
-            slog("position: %f,%f,%f",position.x,position.y,position.z);
+            slog("position: %f,%f,%f", position.x, position.y, position.z);
         }
         // Press W
         if (keys[SDL_SCANCODE_W])
@@ -334,27 +417,58 @@ void gf3d_camera_controls_update()
             gf3d_camera_walk_right(moveSpeed);
         }
         // Press A
-        if (keys[SDL_SCANCODE_A])    
+        if (keys[SDL_SCANCODE_A])
         {
             gf3d_camera_walk_right(-moveSpeed);
         }
         if (keys[SDL_SCANCODE_SPACE])gf3d_camera_move_up(moveSpeed);            // Press Space
         if (keys[SDL_SCANCODE_Z])gf3d_camera_move_up(-moveSpeed);               // Press Z
-        
+
         if (keys[SDL_SCANCODE_UP])gf3d_camera_pitch(-gf3d_camera.rotateStep);   // Press Arrow Up
         if (keys[SDL_SCANCODE_DOWN])gf3d_camera_pitch(gf3d_camera.rotateStep);  // Press Arrow Down
         if (keys[SDL_SCANCODE_RIGHT])gf3d_camera_yaw(-gf3d_camera.rotateStep);  // Press Arrow Right
         if (keys[SDL_SCANCODE_LEFT])gf3d_camera_yaw(gf3d_camera.rotateStep);    // Press Arrow Left
-        
+
         return;
     }
+    // Cinema Mode
     if (gf3d_camera.autoPan)
     {
-        gf3d_camera_walk_right(moveSpeed/5);
+        gf3d_camera_set_look_target(gfc_vector3d(playerPos.x, playerPos.y, playerPos.z + 10));
+        gf3d_camera_look_at(gf3d_camera.lookTargetPosition, NULL);
+
+        gf3d_camera_walk_right(moveSpeed / 5);
     }
+    // Lock On Mode
     if (gf3d_camera.cameraTargetLock)
     {
-        gf3d_camera_look_at(gf3d_camera.lookTargetPosition,NULL);
+        gf3d_camera_look_at(gf3d_camera.lookTargetPosition, NULL);
+    }
+    // Player Mode
+    if (gf3d_camera.playerLook) {
+
+        gf3d_camera_set_look_target(gfc_vector3d(playerPos.x, playerPos.y, playerPos.z + 10));
+
+        // Right and Left
+        if (mousePos.x > 0) gf3d_camera_walk_right(-moveSpeed * 2);
+        else if (mousePos.x < 0) gf3d_camera_walk_right(moveSpeed * 2);
+
+        // Down and Up
+        //if (mousePos.y > 0) gf3d_camera_fly_up(moveSpeed * 2);
+        //else if (mousePos.y < 0) gf3d_camera_fly_up(-moveSpeed * 2);
+
+        if (keys[SDL_SCANCODE_R])
+        {
+            rotation = gf3d_camera_get_right();
+            slog("rotation: %f,%f,%f", rotation.x, rotation.y, rotation.z);
+        }
+        if (keys[SDL_SCANCODE_P])
+        {
+            position = gf3d_camera_get_position();
+            slog("position: %f,%f,%f", position.x, position.y, position.z);
+        }
+        
+        return;
     }
 }
 

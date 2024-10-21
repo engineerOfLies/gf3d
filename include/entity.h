@@ -18,8 +18,11 @@ typedef struct Entity_S
 	GFC_Vector3D		rotation;	/**How I should rotate*/
 	GFC_Vector3D		scale;		/**Stretching*/
 	GFC_Vector3D		velocity;	/**How much I should move in space*/
-	Model* model;		/**My graphics*/
-	//GFC_Matrix4 matrix;	/**My matrix*/
+	GFC_Vector3D		direction;	/**Where am I faceing in x and y*/
+	Model* model;					/**My graphics*/
+	int*				cameraMode;	/**What mode is the camera in?*/
+	float*				radius;		/**Offset for my camera*/
+	//GFC_Matrix4 matrix;			/**My matrix*/
 	// behavior
 	void (*think)(struct Entity_S* self);		/**Function to call to make decisions*/
 	void (*update)(struct Entity_S* self);		/**Function to call to execute think's decisions*/
@@ -78,9 +81,21 @@ void entity_system_draw();
 void entity_draw(Entity *self);
 
 /*
-* @brief Draw all entities in the entity manager
-* @return All entities drawn
+* @brief Use to set camera's current mode
+* @param camera's current mode
 */
-//void entity_draw_all();
+void entity_set_camera(Entity* self, int camera);
+
+/*
+* @brief Use to get camera mode
+* @return Camera's current mode
+*/
+void entity_get_camera(Entity* self);
+
+/*
+* @brief Use to set the radius around the entity (Used for camera offset)
+* @param radius
+*/
+void entity_set_radius(Entity* self, float *radius);
 
 #endif

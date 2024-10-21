@@ -148,3 +148,21 @@ void entity_system_draw()
 		entity_draw(&_entity_manager.entity_list[i]);
 	}
 }
+
+void entity_set_camera(Entity* self, int camera)
+{
+	if (!self) return;
+	if (self->cameraMode)self->cameraMode = camera;
+}
+
+void entity_get_camera(Entity* self)
+{
+	if (!self) return;
+	if (self->cameraMode)return self->cameraMode;
+}
+
+void entity_set_radius(Entity* self, float *radius) 
+{
+	if (!self) return;
+	if (self->radius) self->radius = radius;
+}
