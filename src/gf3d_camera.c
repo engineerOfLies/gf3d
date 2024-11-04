@@ -155,7 +155,7 @@ void gf3d_camera_move_mouse(GFC_Vector2D mousePos, GFC_Vector3D target, float ra
 
     gfc_angle_clamp_radians(&gf3d_camera.position.z);
     gf3d_camera.position.z = -target.z + radius * cos(gf3d_camera.height);
-    slog("Z: %f", cos(gf3d_camera.height));
+    //slog("Z: %f", cos(gf3d_camera.height));
 
     GFC_Vector3D angles, pos;
     GFC_Vector3D delta;

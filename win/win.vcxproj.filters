@@ -183,6 +183,9 @@
     <ClCompile Include="..\src\player.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ent_obj.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gf2d_actor.h">
@@ -354,6 +357,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ent_obj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

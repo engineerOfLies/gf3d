@@ -173,6 +173,7 @@
     <ClCompile Include="..\gfc\src\gfc_vector.c" />
     <ClCompile Include="..\gfc\src\miniz.c" />
     <ClCompile Include="..\src\entity.c" />
+    <ClCompile Include="..\src\ent_obj.c" />
     <ClCompile Include="..\src\game.c" />
     <ClCompile Include="..\src\gf2d_actor.c" />
     <ClCompile Include="..\src\gf2d_draw.c" />
@@ -233,6 +234,7 @@
     <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
     <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
     <ClInclude Include="..\include\entity.h" />
+    <ClInclude Include="..\include\ent_obj.h" />
     <ClInclude Include="..\include\gf2d_actor.h" />
     <ClInclude Include="..\include\gf2d_draw.h" />
     <ClInclude Include="..\include\gf2d_font.h" />

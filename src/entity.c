@@ -166,3 +166,60 @@ void entity_set_radius(Entity* self, float *radius)
 	if (!self) return;
 	if (self->radius) self->radius = radius;
 }
+
+void entity_system_collision() {
+	int i;
+	int j;
+	GFC_Vector3D collision = { 0,0,0 };
+	for (i = 0; i < _entity_manager.entity_max; i++)
+	{
+		if (!_entity_manager.entity_list[i]._inuse)continue;
+		for (j = 0; j < _entity_manager.entity_max; j++)
+		{
+			if (!_entity_manager.entity_list[i]._inuse)continue;
+			if (&_entity_manager.entity_list[i] == &_entity_manager.entity_list[j]) continue;
+
+			// If both entities are colliding in the game, have both entities run their ent_colliders
+			if (gfc_double_box_collision(_entity_manager.entity_list[i].collisionX.s.b, _entity_manager.entity_list[j].collisionX.s.b,collision)){
+				ent_collider(&_entity_manager.entity_list[i], &_entity_manager.entity_list[j], collision);
+				ent_collider(&_entity_manager.entity_list[j], &_entity_manager.entity_list[i], collision);
+			}
+
+		}
+	}
+}
+
+void ent_collider(Entity* self, Entity* other, GFC_Vector3D collision) {
+	if (!self) return;
+	if (self->touch) self->touch(self, other, collision);
+}
+
+void entity_system_collision_visible(int toggle) {
+	if (toggle == 1) {
+		int i;
+		for (i = 0; i < _entity_manager.entity_max; i++)
+		{
+			if (!_entity_manager.entity_list[i]._inuse)continue;		//Skip any inactive entites
+			gfc_render_box(_entity_manager.entity_list[i].collisionX.s.b);
+		}
+	}
+}
+/*
+GFC_List* get_Object_Entities(Entity* self) {
+	int i;
+	GFC_List* entityList;
+	if (!self) return;
+
+	entityList = gfc_list_new();
+
+	for (i = 0; i < _entity_manager.entity_max; i++)
+	{
+		if (!_entity_manager.entity_list[i]._inuse)continue;
+		if (&_entity_manager.entity_list[i] == self) continue;
+		if (strcmp(_entity_manager.entity_list[i].tag,"Object") == 0)
+		{
+			gfc_list_append(entityList, &_entity_manager.entity_list[i]);
+		}
+	}
+	return entityList;
+}*/

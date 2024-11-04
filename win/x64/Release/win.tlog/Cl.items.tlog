@@ -26,6 +26,7 @@ C:\Users\migue\.ssh\gf3d\gfc\src\gfc_types.c;C:\Users\migue\.ssh\gf3d\win\x64\Re
 C:\Users\migue\.ssh\gf3d\gfc\src\gfc_vector.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\gfc_vector.obj
 C:\Users\migue\.ssh\gf3d\gfc\src\miniz.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\miniz.obj
 C:\Users\migue\.ssh\gf3d\src\entity.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\entity.obj
+C:\Users\migue\.ssh\gf3d\src\ent_obj.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\ent_obj.obj
 C:\Users\migue\.ssh\gf3d\src\game.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\game.obj
 C:\Users\migue\.ssh\gf3d\src\gf2d_actor.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\gf2d_actor.obj
 C:\Users\migue\.ssh\gf3d\src\gf2d_draw.c;C:\Users\migue\.ssh\gf3d\win\x64\Release\gf2d_draw.obj

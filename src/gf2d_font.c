@@ -9,6 +9,7 @@
 #include "gf3d_texture.h"
 #include "gf2d_sprite.h"
 #include "gf2d_font.h"
+#include "gf2d_draw.h"
 
 typedef struct
 {
@@ -630,5 +631,29 @@ void gf2d_font_draw_text_wrap(
     
 }
 
+void gf2d_draw_menu() {
+    //Background
+    gf2d_draw_rect_filled(gfc_rect(0,0, 1600, 800), gfc_color8(90, 90, 90, 200));
+
+    //Menu Box
+    gf2d_draw_rect_filled(gfc_rect(350, 40, 600, 650), gfc_color8(45, 45, 45, 255));
+    gf2d_draw_rect(gfc_rect(350, 40, 600, 650), GFC_COLOR_RED);
+
+    //Menu Title
+    gf2d_draw_rect_filled(gfc_rect(352, 75, 200, 50), gfc_color8(200, 0, 0, 255));
+    gf2d_font_draw_text_wrap_tag("Menu", FT_Large, GFC_COLOR_WHITE,gfc_rect(350,75,200,200));
+
+    //Resume Box
+    gf2d_draw_rect_filled(gfc_rect(352, 175, 200, 50), gfc_color8(200, 0, 0, 255));
+    gf2d_font_draw_text_wrap_tag("Resume", FT_Large, GFC_COLOR_WHITE, gfc_rect(350, 175, 200, 200));
+
+    //Beastiary
+    gf2d_draw_rect_filled(gfc_rect(352, 275, 200, 50), gfc_color8(200, 0, 0, 255));
+    gf2d_font_draw_text_wrap_tag("Beastiary", FT_Large, GFC_COLOR_WHITE, gfc_rect(350, 275, 200, 200));
+
+    //Exit game
+    gf2d_draw_rect_filled(gfc_rect(352, 375, 200, 50), gfc_color8(200, 0, 0, 255));
+    gf2d_font_draw_text_wrap_tag("Exit", FT_Large, GFC_COLOR_WHITE, gfc_rect(350, 375, 200, 200));
+}
 
 /*eol@eof*/

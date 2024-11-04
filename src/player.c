@@ -8,10 +8,30 @@ void player_think(Entity *self);
 void player_update(Entity *self);
 int player_draw(Entity* self);
 void player_free(Entity *self);
-//void update_Camera_Mode(Entity *self, int camera);
-//int get_Camera_Mode(Entity *self);
+void player_collider(Entity* self, Entity* other, GFC_Vector3D collision);
 
-Entity* player_new(GFC_TextLine* name, Model* model, GFC_Vector3D spawnPosition)
+// Flag for collision
+Bool collide = false;
+/*
+* @brief Type of collision being detected
+* @param [0]-Objects
+* @param [1]-Enemy Collision
+* @param [2]-Enemy Hurtbox
+* @param [3]-Enviormental
+* @param [4]-Floor
+*/
+int typeCollision[] = { 0,0,0,0,0 };
+/*
+* @brief Entities that are touching this entity
+* @param [0]-Objects
+* @param [1]-Enemy Collision
+* @param [2]-Enemy Hurtbox
+* @param [3]-Enviormental
+* @param [4]-Floor
+*/
+Entity entCollision[] = { 0,0,0,0,0 };
+
+Entity* player_new(GFC_TextLine name, Model* model, GFC_Vector3D spawnPosition)
 {
 	Entity *self;
 
@@ -22,7 +42,8 @@ Entity* player_new(GFC_TextLine* name, Model* model, GFC_Vector3D spawnPosition)
 		return NULL;
 	}
 
-	self->name = name;
+	gfc_line_sprintf(self->tag, "Player");
+	gfc_line_sprintf(self->name, name);
 	self->position = spawnPosition;
 	self->rotation = gfc_vector3d(0, 0, 0);
 	self->scale = gfc_vector3d(1, 1, 1);
@@ -31,11 +52,19 @@ Entity* player_new(GFC_TextLine* name, Model* model, GFC_Vector3D spawnPosition)
 	self->direction = gfc_vector3d(0, 0, 0);
 	self->cameraMode = 0;
 	self->radius = 0;
+	//self->collision = gfc_box(self->position.x, self->position.y, self->position.z, 4, 4, 4);
+
+	float xScale = 6.0f;
+	float yScale = 6.0f;
+	float zScale = 11.0f;
+
+	self->collisionX = gfc_new_primitive(3, self->position.x-(xScale/2.0f), self->position.y-(yScale/2.0f), self->position.z-(zScale/2)-1, xScale, yScale, zScale, 0.0f, gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 0));
 
 	self->think = player_think;
 	self->update = player_update;
 	self->draw = player_draw;
 	self->free = player_free;
+	self->touch = player_collider;
 
 	slog("Player succefully spawned.");
 	return self;
@@ -49,6 +78,22 @@ void update_Camera_Mode(Entity *self, int camera)
 int get_Camera_Mode(Entity *self) 
 {
 	return self->cameraMode;
+}
+
+void player_collider(Entity* self, Entity* other, GFC_Vector3D collision) {
+	if (!self)return;
+
+	GFC_Vector3D dir = self->direction;
+	if (strcmp(other->tag, "Object") == 0) {
+		slog("Touching object");
+		collide = true;
+		typeCollision[0] = 1;
+		entCollision[0] = *other;
+	}	
+}
+
+void player_to_object(Entity* self, Entity* object) {
+	//slog("Touching Object");
 }
 
 void player_think(Entity *self)
@@ -85,9 +130,21 @@ void player_think(Entity *self)
 		
 	}
 	
-	
+	if (keys[SDL_SCANCODE_SPACE]) dir.z += 1;
+
+	// Add collision phycics here
+	if (collide) {
+		// Objects
+		if (typeCollision[0] == 1) {
+			
+			typeCollision[0] = 0;
+			
+		}
+		collide = false;
+	}
+
 	gfc_vector3d_normalize(&dir);
-	gfc_vector3d_scale(self->velocity,dir,3);
+	gfc_vector3d_scale(self->velocity,dir,0.1);
 }
 
 void player_update(Entity *self)
@@ -95,7 +152,16 @@ void player_update(Entity *self)
 	if (!self)return;
 
 	gfc_vector3d_add(self->position, self->position, self->velocity);
+	gfc_vector3d_add(self->collisionX.s.b, self->collisionX.s.b, self->velocity);
 
+	//gfc_primitive_offset(self->collisionX, self->velocity);
+	
+
+	//int collided = ent_collid_action(self);
+
+	//if (collided != 0) {
+	//	slog("Colliding with object.");
+	//}
 
 	/*
 	float direction;
