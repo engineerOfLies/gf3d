@@ -10,10 +10,14 @@ typedef struct
     GFC_Vector3D    scale;              //for building camera matrix
     GFC_Vector3D    position;           //for building camera matrix
     GFC_Vector3D    rotation;           //pitch, roll, yaw for building camera matrix
+    GFC_Vector3D    velocity;           //for following player
+    float           angle;              //Where the camera is looking at
+    float           height;             //How high the camera is
     float           moveStep;           //when using gf3d_camera_controls_update, this is how much the camera will move per frame
     float           rotateStep;         //when using gf3d_camera_controls_update, this is how much the camera will move per frame
     int             autoPan;            //if true, the amount gf3d_camera_controls_update will pan the camera around
     int             freeLook;           //if true, the amount gf3d_camera_controls_update will check user input for movement
+    int             playerLook;         //if true, the amount gf3d_camera_controls_update will check user mouse input for rotation
     Uint8           cameraTargetLock;   //if true, the gf3d_camera_controls_update keeps the camera pointed towards the target
     GFC_Vector3D    lookTargetPosition; //the generic camera target to look at
     GFC_Vector3D    forward;            //unit vector pointing in the forward direction relative to the camera
@@ -203,6 +207,33 @@ GFC_Vector3D gf3d_camera_get_up();
 void gf3d_camera_set_position(GFC_Vector3D position);
 
 /**
+ * @brief sets the camera to follow a target.
+ * @param dir Direction of the player during movement.
+ */
+void gf3d_camera_follow_player(GFC_Vector3D dir);
+
+/**
+ * @brief sets the camera's position with offset.
+ * @param target Target's position
+ * @param offset Amount of offset
+ */
+void gf3d_camera_set_offset_position(GFC_Vector3D target, GFC_Vector3D offset);
+
+/**
+ * @brief sets the camera's rotation with offset.
+ * @param target Target's position
+ * @param offset Amount of offset
+ */
+void gf3d_camera_set_offset_rotation(GFC_Vector3D target, GFC_Vector3D offset);
+
+/**
+ * @brief move the camera around the target depending on mouse movement
+ * @param target Target's position
+ * @param mousePos The position of the mouse
+ */
+void gf3d_camera_move_mouse(GFC_Vector2D mousePos, GFC_Vector3D target, float radius);
+
+/**
  * @brief explicitely set the camera scale (to be applied to the entire scene)
  * @param scale the new scale for the camera
  */
@@ -231,7 +262,7 @@ void gf3d_camera_get_view_vectors(GFC_Vector3D *forward, GFC_Vector3D *right, GF
 /**
  * @brief update the camera based on keyboard controls, autopan, and look target
  */
-void gf3d_camera_controls_update();
+void gf3d_camera_controls_update(GFC_Vector2D mousePos, GFC_Vector3D playerPos);
 
 /**
  * @brief set a look target for the camera to point at
@@ -258,6 +289,17 @@ void gf3d_camera_toggle_free_look();
 void gf3d_camera_enable_free_look(Uint8 enable);
 
 /**
+ * @brief turn on or off player camera controls
+ * @param enable if true then turn on, else turn off
+ */
+void gf3d_camera_enable_player_look(Uint8 enable);
+
+/**
+ * @brief toggle the current player camera control status
+ */
+void gf3d_camera_toggle_player_look();
+
+/**
  * @brief turn on or off auto pan
  * @param enable if true then turn on, else turn off
  */
@@ -274,4 +316,11 @@ Bool gf3d_camera_free_look_enabled();
  */
 void gf3d_camera_set_look_target(GFC_Vector3D target);
 
+/**
+ * @brief get the camera's current mode
+ * @return playerLook = 0; freeLook = 1; autoPan = 2; cameraTargetLock = 3;
+ */
+int gf3d_camera_get_mode();
+
+void gf3d_camera_third_person(GFC_Vector2D mousePos, GFC_Vector3D playerPos);
 #endif

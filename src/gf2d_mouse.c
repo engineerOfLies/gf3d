@@ -12,7 +12,7 @@
 typedef struct
 {
     Uint32 buttons;         /**<buttons mask*/
-    GFC_Vector2D position;  /**<position of mouse*/
+    GFC_Vector2D position;  /**<position of mouse on the screen*/
 }MouseState;
 
 typedef struct

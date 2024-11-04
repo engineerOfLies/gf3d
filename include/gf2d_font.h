@@ -128,6 +128,7 @@ GFC_Rect gf2d_font_get_text_wrap_bounds_tag(
     Uint32      h
 );
 
+void gf2d_draw_menu();
 
 GFC_Vector2D gf2d_font_get_bounds_tag(char *text,FontTypes tag);
 GFC_Vector2D gf2d_font_get_bounds(char *text,Font *font);
