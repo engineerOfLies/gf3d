@@ -15,25 +15,17 @@ layout(location = 0) out vec4 outColor;
 
 void main()
 {
-/*
-    vec2 coord = (gl_FragCoord.xy - center) / size;
-    float l = length(coord);
-    if (l > 1.0) discard;
-    outColor = inColor;
-    outColor.w = 1 - l;
-*/
     float l = 0;
     vec4 baseColor;
     vec2 texel = ((gl_FragCoord.xy - center) / (size * 2)) + vec2(0.5,0.5);
-    
     
     if (textured != 0)
     {
         texel = (texel *texture_size)+texture_offset;// now its in the range of a frame
         baseColor = texture(texSampler, texel);
-        l = 1 - length(baseColor.xyz);
+        l = 1.0 - length(baseColor.xyz/255.0);
         outColor = (inColor * l) + (inColor2 * (1-l));
-        outColor.w  = baseColor.w;
+        outColor.w  = baseColor.w * ((inColor.w * l) + (inColor2.w * (1-l)));
     }
     else
     {

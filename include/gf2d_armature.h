@@ -11,13 +11,13 @@
 
 typedef struct Bone_S
 {
-    GFC_TextLine        name;           /**<name of bone*/
+    GFC_TextLine    name;           /**<name of bone*/
     Uint32          index;          /**<place in the list*/
     struct Bone_S  *parent;         /**<pointer to the parent of the bone*/
-    GFC_List           *children;       /**<list of indicies to any children, no data is allocated for this*/
+    GFC_List       *children;       /**<list of indicies to any children, no data is allocated for this*/
     float           baseAngle;      /**<rest angle for the bone*/
     float           length;         /**<length of the bone*/
-    GFC_Vector2D        rootPosition;   /**<root position of the bone*/
+    GFC_Vector2D    rootPosition;   /**<root position of the bone*/
 }Bone;
 
 typedef struct

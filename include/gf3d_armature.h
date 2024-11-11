@@ -69,7 +69,7 @@ typedef struct
     GFC_TextLine    filepath;       /**<the file that this has been loaded from / to*/
     GFC_TextLine    name;           /**<printing name*/
     Uint32          refCount;       /**<resurce management*/
-    Uint32          bindCount;      /**<how many bones in the inverseBindGFC_Matrix*/
+    Uint32          bindCount;      /**<how many bones in the inverseBindMatrix*/
     GFC_Matrix4    *inverseBindMatrices;    /**<to make the math math*/
     GFC_List       *bones;          /**<list of Bones in the base armature*/
     GFC_ActionList *actions;        /**<action list for managing animation of poses*/

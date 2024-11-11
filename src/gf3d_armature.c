@@ -670,7 +670,7 @@ void gf3d_armature_parse_build_poses(Armature3D *armature)
         return;
     }
     armature->maxFrames = maxFrames;
-    timeStep = maxTimestamp / (maxFrames -1);
+    timeStep = maxTimestamp / (maxFrames - 1);
 //    slog("for the whole armature, there are %i frames taking %f seconds, with a step of %f",maxFrames,maxTimestamp,timeStep);
     for (i = 0; i < c; i++)
     {
