@@ -504,20 +504,20 @@ ObjData *gf3d_obj_merge(ObjData *ObjA,GFC_Vector3D offsetA,ObjData *ObjB,GFC_Vec
     ObjNew = gf3d_obj_new();
     if (!ObjNew)return NULL;
     //allocate space for new verices
-    ObjNew->faceVertices = gfc_allocate_array(sizeof(Vertex),ObjA->face_vert_count + ObjB->face_vert_count);
+    ObjNew->face_vert_count = ObjA->face_vert_count + ObjB->face_vert_count;
+    ObjNew->faceVertices = gfc_allocate_array(sizeof(Vertex),ObjNew->face_vert_count);
     if (!ObjNew->faceVertices)
     {
         gf3d_obj_free(ObjNew);
         return NULL;
     }
-    ObjNew->face_vert_count = ObjA->face_vert_count + ObjB->face_vert_count;
-    ObjNew->outFace = gfc_allocate_array(sizeof(Face),ObjA->face_count + ObjB->face_count);
+    ObjNew->face_count = ObjA->face_count + ObjB->face_count;
+    ObjNew->outFace = gfc_allocate_array(sizeof(Face),ObjNew->face_count);
     if (!ObjNew->outFace)
     {
         gf3d_obj_free(ObjNew);
         return NULL;
     }
-    ObjNew->face_count = ObjA->face_count + ObjB->face_count;
     //copy the old data into the ObjNew
     for (i = 0; i < ObjA->face_count;i++)
     {
