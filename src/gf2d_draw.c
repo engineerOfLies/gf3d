@@ -514,7 +514,10 @@ void gf2d_draw_shape(GFC_Shape shape,GFC_Color color,GFC_Vector2D offset)
             break;
     }
 }
-
+void gf2d_draw_line(GFC_Vector2D p1, GFC_Vector2D p2, GFC_Color color)
+{
+//dummy for now
+}
 #if 0
 
 void gf2d_draw_shape(GFC_Shape shape,GFC_Color color,GFC_Vector2D offset)
