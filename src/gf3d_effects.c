@@ -320,13 +320,13 @@ GF3DEffect *gf3d_effect_from_config(
     }
     
     sj_object_get_int(config,"ttd",(int*)&effect->ttd);
-    if (sj_object_get_float(config,"ttdVariance",&variance))effect->ttd += (int)(gfc_crandom() * variance);
+    if (sj_object_get_float(config,"ttdVariance",&variance))effect->ttd += (int)(gfc_random() * variance);
     effect->ttd += gf3d_effect_manager.now;
     
     sj_object_get_float(config,"size",&effect->size);
     sj_object_get_float(config,"sizeVector",&effect->sizeVector);
     sj_object_get_float(config,"sizeAcceleration",&effect->sizeAcceleration);
-    if (sj_object_get_float(config,"sizeVariance",&variance))effect->size += (gfc_crandom() * variance);
+    if (sj_object_get_float(config,"sizeVariance",&variance))effect->size += (gfc_random() * variance);
 
     sj_object_get_uint8(config,"fadein",&effect->fadein);
     sj_object_get_uint8(config,"fadeout",&effect->fadeout);
@@ -387,33 +387,52 @@ GF3DEffect *gf3d_effect_from_config(
 void gf3d_effect_square_emitter(GFC_Vector3D centerPosition, GFC_Vector3D direction,float area,Uint8 count,SJson *effect)
 {
     int i;
+    float vspeed = 0;
     float gravity = 0;
-    GFC_Vector3D angles,right,up;
-    GFC_Vector3D position,velocity,rightV,upV;
+    float hSpread = 0;
+    float vSpread = 0;
+    float fSpread = 0;
+    GFC_Vector3D up;
+    GFC_Vector3D right,dir,ep,rSpread,uSpread,dSpread;
+    GFC_Vector3D position,velocity,rightV,upV,forwardV;
+    GFC_Vector3D offset;
     float speed = 0,speedVariance = 0;
     if (!effect)return;
     sj_object_get_float(effect,"gravity",&gravity);
     sj_object_get_float(effect,"speed",&speed);
     sj_object_get_float(effect,"speedVariance",&speedVariance);
-    
+    sj_object_get_float(effect,"hSpread",&hSpread);
+    sj_object_get_float(effect,"vSpread",&vSpread);
+    sj_object_get_float(effect,"fSpread",&fSpread);
+    up = gfc_vector3d(0,0,1);
     gfc_vector3d_normalize(&direction);
-    gfc_vector3d_angles (direction, &angles);
-    gfc_vector3d_angle_vectors(angles, NULL, &right, &up);
-    gfc_vector3d_scale(direction,direction,speed);
+    gfc_vector3d_copy(right,direction);
+    gfc_vector3d_rotate_about_z(&right,GFC_HALF_PI);
 
-    gfc_vector3d_scale(right,right,area);
-    gfc_vector3d_scale(up,up,area);
+    gfc_vector3d_scale(rSpread,right,hSpread);
+    gfc_vector3d_scale(uSpread,up,vSpread);
+    gfc_vector3d_scale(dSpread,up,vSpread);
+
     for (i = 0; i < count; i++)
     {
-        gfc_vector3d_copy(position,centerPosition);
-        gfc_vector3d_randomize(&rightV,right);
-        gfc_vector3d_randomize(&upV,up);
-        gfc_vector3d_add(position,position,rightV);
-        gfc_vector3d_add(position,position,upV);
+        vspeed = speed + (gfc_random() * speedVariance);
+        //randomize starting position
+        offset = gfc_vector3d(gfc_crandom()*area,gfc_crandom()*area,gfc_crandom()*area);        
+        gfc_vector3d_add(position,centerPosition,offset);
         
-        velocity.x = direction.x + gfc_crandom() * speedVariance;
-        velocity.y = direction.y + gfc_crandom() * speedVariance;
-        velocity.z = direction.z + gfc_crandom() * speedVariance;
+        //randomize end position
+        gfc_vector3d_scale(dir,direction,vspeed);//set end point
+        gfc_vector3d_add(ep,dir,position);   //get projected end point
+        gfc_vector3d_scale(forwardV,dSpread,gfc_crandom());//vary horizontal error
+        gfc_vector3d_scale(rightV,rSpread,gfc_crandom());//vary horizontal error
+        gfc_vector3d_scale(upV,uSpread,gfc_crandom());   //vary vertical error
+
+        gfc_vector3d_add(ep,ep,forwardV);
+        gfc_vector3d_add(ep,ep,upV);
+        gfc_vector3d_add(ep,ep,rightV);         //shift the end point
+
+        gfc_vector3d_sub(velocity,ep,position);      //get new direction
+        
         gf3d_effect_from_config(
             effect,
             position,
