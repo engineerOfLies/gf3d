@@ -805,7 +805,7 @@ Armature3D *gf3d_armature_parse(GLTF *gltf)
 {
     int i,c;
     SJson *array,*item;
-    Armature3D *armature;
+    Armature3D *armature = NULL;
     if (!gltf)return NULL;
     array = sj_object_get_value(gltf->json,"skins");
     if (!array)

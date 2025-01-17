@@ -27,7 +27,8 @@ typedef struct
     GFC_Vector2D scale;
     GFC_Vector2D frame_offset;
     GFC_Vector2D center;
-    alignas(64) float drawOrder;
+    float drawOrder;
+    GFC_Vector3D padding;
 }SpriteUBO;
 
 typedef struct
