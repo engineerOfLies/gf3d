@@ -8,7 +8,7 @@
 /**
  * needs to remain in sync with the shader ubo
  */
-#define MAX_SHADER_LIGHTS 16
+#define MAX_SHADER_LIGHTS 32
 
 typedef enum
 {
@@ -126,7 +126,7 @@ void gf3d_light_add_global_ambient_to_ubo(LightUBO *ubo);
  */
 void gf3d_light_build_ubo_from_list(LightUBO *ubo,GFC_List *lights);
 
-/**
+/**t
  * @brief build a lighting ubo based on the closest lights in the global list
  * @param ubo [output] this will be populated with up to MAX_SHADER_LIGHTS
  * @param relative this will be the reference point for chosing which lights will be added.
