@@ -155,6 +155,47 @@ int ok_update(Window *win,GFC_List *updateList)
     return 0;
 }
 
+int dialog_update(Window *win,GFC_List *updateList)
+{
+    int i,count;
+    Element *e;
+    GFC_List *callbacks;
+    GFC_Callback *callback;
+    if (!win)return 0;
+    callbacks = (GFC_List*)win->data;
+    if (gf2d_mouse_button_pressed(0))
+    {
+        if (callbacks)
+        {
+            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
+            if (callback)
+            {
+                gfc_callback_call(callback);
+            }
+        }
+        gf2d_window_free(win);
+        return 1;
+    }
+    if (!updateList)return 1;
+    count = gfc_list_get_count(updateList);
+    for (i = 0; i < count; i++)
+    {
+        e = gfc_list_get_nth(updateList,i);
+        if (!e)continue;
+        if (strcmp(e->name,"ok")==0)
+        {
+            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
+            if (callback)
+            {
+                gfc_callback_call(callback);
+            }
+            gf2d_window_free(win);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int alert_update(Window *win,GFC_List *updateList)
 {
     int i,count;
@@ -231,7 +272,7 @@ Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),v
     }
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),title);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"text"),text);
-    win->update = alert_update;
+    win->update = dialog_update;
     win->free_data = yes_no_free;
     if (onOK)
     {
