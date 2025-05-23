@@ -666,7 +666,7 @@ Element *gf2d_window_get_element_by_focus(Window *win)
 void gf2d_windows_play_sound(const char *name)
 {
     if ((!name)||(!strlen(name)))return;
-    gfc_sound_pack_play(window_manager.sounds, name,0,1,-1,0);
+    gfc_sound_pack_play_to_group(window_manager.sounds, name,0,1,"ui");
 }
 
 void gf2d_window_set_focus_to(Window *win,Element *e)
@@ -684,7 +684,7 @@ void gf2d_window_set_focus_to(Window *win,Element *e)
     if (f)
     {
         f->hasFocus = 0;
-        gfc_sound_pack_play(window_manager.sounds, "select",0,1,-1,0);
+        gfc_sound_pack_play_to_group(window_manager.sounds, "select",0,1,"ui");
         //only play select sound when selection CHANGES, not when initially set
     }
     e->hasFocus = 1;
