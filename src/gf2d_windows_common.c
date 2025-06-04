@@ -11,6 +11,14 @@
 
 #include "gf2d_windows_common.h"
 
+typedef struct
+{
+    GFC_List *callbacks;
+    Uint8 blocks;
+    Uint8 allowCancel;
+}GF2D_DialogWindowData;
+
+
 int yes_no_free(Window *win)
 {
     GFC_List *list;
@@ -155,19 +163,49 @@ int ok_update(Window *win,GFC_List *updateList)
     return 0;
 }
 
+int dialog_free(Window *win)
+{
+    GF2D_DialogWindowData *data;
+    int count,i;
+    GFC_Callback *callback;
+
+    if (!win)return 0;
+    if (!win->data)return 0;
+
+    data = win->data;
+    if (data->callbacks)
+    {
+    count = gfc_list_get_count(data->callbacks);
+
+        for (i = 0; i < count; i++)
+        {
+            callback = (GFC_Callback*)gfc_list_get_nth(data->callbacks,i);
+            if (callback)
+            {
+                gfc_callback_free(callback);
+            }
+        }
+
+        gfc_list_delete(data->callbacks);
+    }
+    free(data);
+    return 0;
+}
+
+
 int dialog_update(Window *win,GFC_List *updateList)
 {
     int i,count;
     Element *e;
-    GFC_List *callbacks;
+    GF2D_DialogWindowData *data;
     GFC_Callback *callback;
-    if (!win)return 0;
-    callbacks = (GFC_List*)win->data;
+    if ((!win)||(!win->data))return 0;
+    data = win->data;
     if (gf2d_mouse_button_pressed(0))
     {
-        if (callbacks)
+        if (data->callbacks)
         {
-            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
+            callback = (GFC_Callback*)gfc_list_get_nth(data->callbacks,0);
             if (callback)
             {
                 gfc_callback_call(callback);
@@ -184,7 +222,7 @@ int dialog_update(Window *win,GFC_List *updateList)
         if (!e)continue;
         if (strcmp(e->name,"ok")==0)
         {
-            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
+            callback = (GFC_Callback*)gfc_list_get_nth(data->callbacks,0);
             if (callback)
             {
                 gfc_callback_call(callback);
@@ -192,7 +230,13 @@ int dialog_update(Window *win,GFC_List *updateList)
             gf2d_window_free(win);
             return 1;
         }
+        if ((data->allowCancel)&&(strcmp(e->name,"cancel")==0))
+        {
+            gf2d_window_free(win);
+            return 1;
+        }
     }
+    if (data->blocks)return 1;
     return 0;
 }
 
@@ -260,25 +304,33 @@ Window *window_alert(const char *title, const char *text, void(*onOK)(void *),vo
     return win;
 }
 
-Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),void *okData)
+Window *window_dialog(const char *title, const char *text, Uint8 allowCancel, Uint8 blocks,void(*onOK)(void *),void *okData)
 {
+    GF2D_DialogWindowData *data;
     Window *win;
-    GFC_List *callbacks;
     win = gf2d_window_load("menus/dialog.menu");
     if (!win)
     {
         slog("failed to load dialog window");
         return NULL;
     }
+    data = gfc_allocate_array(sizeof(GF2D_DialogWindowData),1);
+    if (!data)
+    {
+        gf2d_window_free(win);
+        return NULL;
+    }
+    win->data = data;
+    data->blocks = blocks;
+    data->allowCancel = allowCancel;
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),title);
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"text"),text);
     win->update = dialog_update;
-    win->free_data = yes_no_free;
+    win->free_data = dialog_free;
     if (onOK)
     {
-        callbacks = gfc_list_new();
-        gfc_list_append(callbacks,gfc_callback_new(onOK,okData));
-        win->data = callbacks;
+        data->callbacks = gfc_list_new();
+        gfc_list_append(data->callbacks,gfc_callback_new(onOK,okData));
     }
     gf2d_window_bring_to_front(win);
     return win;

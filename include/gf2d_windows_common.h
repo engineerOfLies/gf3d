@@ -20,10 +20,18 @@ Window *window_alert(const char *title, const  char *text, void(*onOK)(void *),v
  * @brief open a text dialog box
  * @param title title of the window
  * @param text text of the dialog
+ * @param allowCancel if true, the cancel button will close the window without triggering the callback
+ * @param blocks if true, this dialog blocks windows under it from getting input
  * @param onOK the function to call if the user selects OK
  * @param data data to be provided to the callback functions
  */
-Window *window_dialog(const char *title, const char *text, void(*onOK)(void *),void *okData);
+Window *window_dialog(
+    const char *title,
+    const char *text,
+    Uint8 allowCancel,
+    Uint8 blocks,
+    void(*onOK)(void *),
+    void *okData);
 
 /**
  * @brief open a yes / no dialog box
