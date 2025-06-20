@@ -67,6 +67,13 @@ typedef struct
 }ButtonElement;
 
 /**
+ * @brief set the text for the label on a button
+ * @param e the button element
+ * @param text the text to set it to
+ */
+void gf2d_button_set_label_text(Element *e,const char *text);
+
+/**
  * @brief sets the element to be the button
  * @note the button is now owned by the element, and should not be freed
  * @param e the element to make into a button

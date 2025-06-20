@@ -298,6 +298,14 @@ void gf2d_element_load_button_from_config(Element *e,SJson *json,Window *win)
     }
 }
 
+void gf2d_button_set_label_text(Element *e,const char *text)
+{
+    ButtonElement *button;
+    if (!e)return;
+    button = (ButtonElement*)e->data;
+    if (!button)return;
+    gf2d_element_label_set_text(button->label,text);
+}
 
 Element *gf2d_button_new_label_simple(Window *win,int index,const char *text,FontTypes ft, GFC_Vector2D size, GFC_Color color)
 {
