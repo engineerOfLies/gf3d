@@ -220,7 +220,7 @@ int dialog_update(Window *win,GFC_List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if (strcmp(e->name,"ok")==0)
+        if (strcmp(e->name,"enter")==0)
         {
             callback = (GFC_Callback*)gfc_list_get_nth(data->callbacks,0);
             if (callback)
@@ -267,7 +267,7 @@ int alert_update(Window *win,GFC_List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
-        if ((strcmp(e->name,"ok")==0)||(strcmp(e->name,"cancel")==0))
+        if ((strcmp(e->name,"enter")==0)||(strcmp(e->name,"cancel")==0))
         {
             callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
             if (callback)
@@ -485,7 +485,7 @@ int window_color_select_update(Window *win,GFC_List *updateList)
             }
             return 1;
         }
-        if (strcmp(e->name,"ok")==0)
+        if (strcmp(e->name,"enter")==0)
         {
             gfc_color_copy((*data->color),data->color8);
             gfc_callback_call(&data->okay);

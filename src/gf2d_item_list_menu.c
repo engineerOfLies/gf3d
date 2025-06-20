@@ -70,7 +70,7 @@ int item_list_menu_update(Window *win,GFC_List *updateList)
             gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1000 + data->selectedOption));
             return 1;
         }
-        else if ((data->allowClose)&&(strcmp(e->name,"close")==0))
+        else if ((data->allowClose)&&(strcmp(e->name,"cancel")==0))
         {
             if (data->result)
             {
