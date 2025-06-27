@@ -46,6 +46,13 @@ void gf3d_camera_set_view_mat4(GFC_Matrix4 *view);
 void gf3d_camera_look_at(GFC_Vector3D target,const GFC_Vector3D *position);
 
 /**
+ * @brief make sure the camera is a set distance away from the view target.
+ * @note lookTargetPosition must have been set by gf3d_camera_look_at or gf3d_camera_set_look_target previously
+ * @param set the set distance to be at
+ */
+void gf3d_camera_set_distance_to_target(float set);
+
+/**
  * @brief set the movement step for camera movement with gf3d_camera_controls_update
  * @param step how much to move per update
  */
@@ -268,10 +275,5 @@ void gf3d_camera_set_auto_pan(Bool enable);
  * @return if it is
  */
 Bool gf3d_camera_free_look_enabled();
-
-/**
- * @brief set a look target for the camera
- */
-void gf3d_camera_set_look_target(GFC_Vector3D target);
 
 #endif

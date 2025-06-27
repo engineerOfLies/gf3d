@@ -397,6 +397,7 @@ Window *window_key_value(const char *question, char *defaultKey,char *defaultVal
 
 typedef struct
 {
+    GFC_Vector2D selection;
     GFC_Color *color;
     GFC_Color color8;
     GFC_Callback okay;
@@ -425,6 +426,32 @@ int window_color_select_update(Window *win,GFC_List *updateList)
     {
         e = gfc_list_get_nth(updateList,i);
         if (!e)continue;
+        if (strcmp(e->name,"item_right")==0)
+        {
+            if (!data->selection.x)data->selection.x = 1;
+            gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,data->selection.y + (data->selection.x * 10) + 1));
+            return 1;
+        }
+        if (strcmp(e->name,"item_left")==0)
+        {
+            if (data->selection.x)data->selection.x = 0;
+            gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,data->selection.y + (data->selection.x * 10) + 1));
+            return 1;
+        }
+        if (strcmp(e->name,"item_down")==0)
+        {
+            data->selection.y++;
+            if (data->selection.y >= 4)data->selection.y = 0;
+            gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,data->selection.y + (data->selection.x * 10) + 1));
+            return 1;
+        }
+        if (strcmp(e->name,"item_up")==0)
+        {
+            data->selection.y--;
+            if (data->selection.y < 0)data->selection.y = 3;
+            gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,data->selection.y + (data->selection.x * 10) + 1));
+            return 1;
+        }
         if (strcmp(e->name,"red_up")==0)
         {
             if (data->color8.r < 255)
@@ -541,6 +568,7 @@ Window *window_color_select(const char *title, GFC_Color *color, void(*onOK)(voi
     data->cancel.callback = onCancel;
     data->cancel.data = okData;
     gf2d_element_label_set_text(gf2d_window_get_element_by_name(win,"title"),title);
+    data->selection.y = 1;
     data->color = color;
     data->color8 = gfc_color_to_int8(*color);
     //set colors
@@ -548,6 +576,7 @@ Window *window_color_select(const char *title, GFC_Color *color, void(*onOK)(voi
     win->refresh = window_color_refresh;
     win->update = window_color_select_update;
     win->free_data = window_color_select_free;
+    gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,1));
     return win;
 }
 

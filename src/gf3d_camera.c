@@ -44,6 +44,7 @@ void gf3d_camera_look_at(GFC_Vector3D target,const GFC_Vector3D *position)
     {
         pos = gf3d_camera_get_position();
     }
+    gf3d_camera.lookTargetPosition = target;
     gfc_vector3d_sub(delta,target,pos);
     gfc_vector3d_angles (delta, &angles);
     angles.z -= GFC_HALF_PI;
@@ -184,6 +185,15 @@ GFC_Vector3D gf3d_camera_get_up()
 }
 
 
+void gf3d_camera_set_distance_to_target(float set)
+{
+    float distance;
+    float delta;
+    distance = gfc_vector3d_magnitude_between(gf3d_camera_get_position(),gf3d_camera.lookTargetPosition);
+    delta = distance - set;
+    gf3d_camera_walk_forward(delta);
+}
+
 void gf3d_camera_fly_forward(float magnitude)
 {
     GFC_Vector3D forward;
@@ -213,6 +223,10 @@ void gf3d_camera_calc_view_vectors()
     gf3d_camera.forward = gfc_vector3d(0,-1,0);
     gf3d_camera.right   = gfc_vector3d(1,0,0);
     gf3d_camera.up      = gfc_vector3d(0,0,-1);
+    //snap rotation to reasonable sizes
+    gfc_angle_clamp_radians(&gf3d_camera.rotation.x);
+    gfc_angle_clamp_radians(&gf3d_camera.rotation.y);
+    gfc_angle_clamp_radians(&gf3d_camera.rotation.z);
     //first rotate by roll
     gfc_vector3d_rotate_about_y(&gf3d_camera.right, -gf3d_camera.rotation.y);
     gfc_vector3d_rotate_about_y(&gf3d_camera.up, -gf3d_camera.rotation.y);
