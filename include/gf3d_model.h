@@ -163,6 +163,24 @@ void gf3d_model_draw(
     Uint32 frame);
 
 /**
+ * @brief queue up a model for rendering using the provided armature
+ * @param model the model to render
+ * @param modelMat the model matrix (MVP)
+ * @param colorMod color modulation (values from 0 to 1);
+ * @param lighting the lighting that should be applied
+ * @param armature use this armature if provided
+ * @param frame the animation frame to use for armature based animations
+ */
+void gf3d_model_armature_draw(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    LightUBO *lighting,
+    Armature3D *armature,
+    Uint32 frame);
+
+
+/**
  * @brief queue up a model for rendering, specifying one mesh in the model (this can be for animation, or sub-meshes)
  * @param model the model to render
  * @param index the mesh to render from the mesh_list, could be animation frames of a sequence of objs, or sub-meshes
@@ -180,6 +198,25 @@ void gf3d_model_draw_index(
     Uint32 frame);
 
 /**
+ * @brief queue up a model for rendering, specifying one mesh in the model (this can be for animation, or sub-meshes) using the provided armature (instead of the one with the model)
+ * @param model the model to render
+ * @param index the mesh to render from the mesh_list, could be animation frames of a sequence of objs, or sub-meshes
+ * @param modelMat the model matrix (MVP)
+ * @param colorMod color modulation (values from 0 to 1);
+ * @param lighting the lighting that should be applied
+ * @param armature the armature to use for this.  If none is provided, none is used
+ * @param frame the animation frame to use for armature based animations
+ */
+void gf3d_model_draw_armature_frame(
+    Model *model,
+    Uint32 index,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    LightUBO *lighting,
+    Armature3D *armature,
+    Uint32 frame);
+
+/**
  * @brief draw all of the meshes of a model.  This is meant for multi-mesh models
  * @param model the model to render
  * @param modelMat the model matrix (MVP)
@@ -194,6 +231,25 @@ void gf3d_model_draw_all_meshes(
     GFC_Color   colorMod,
     LightUBO *lighting,
     Uint32 frame);
+
+/**
+ * @brief draw all of the meshes of a model with the provided armature.  This is meant for multi-mesh models
+ * @param model the model to render
+ * @param modelMat the model matrix (MVP)
+ * @param colorMod color modulation
+ * @param lighting the lighting that should be applied
+ * @param armature the armature to use for the model if provided
+ * @param frame used to access a frame of armature based animation
+ * @note this is called by gf3d_model_draw when not using a sequence of meshes
+ */
+void gf3d_model_draw_all_meshes_armature(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color colorMod,
+    LightUBO *lighting,
+    Armature3D *armature,
+    Uint32 frame);
+
 
 /**
  * @brief queue up a model for rendering as highlight wireframe

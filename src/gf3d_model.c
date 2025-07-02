@@ -640,14 +640,32 @@ void gf3d_model_draw_all_meshes(
     LightUBO *lighting,
     Uint32 frame)
 {
+    gf3d_model_draw_all_meshes_armature(
+        model,
+        modelMat,
+        colorMod,
+        lighting,
+        model->armature,
+        frame);
+}
+
+void gf3d_model_draw_all_meshes_armature(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color colorMod,
+    LightUBO *lighting,
+    Armature3D *armature,
+    Uint32 frame)
+{
     int i,c;
     if (!model)return;
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw_index(model,i,modelMat,colorMod,lighting,frame);
+        gf3d_model_draw_armature_frame(model,i,modelMat,colorMod,lighting,armature,frame);
     }
 }
+
 
 void gf3d_model_draw(
     Model *model,
@@ -656,23 +674,42 @@ void gf3d_model_draw(
     LightUBO *lighting,
     Uint32 frame)
 {
+    gf3d_model_armature_draw(
+        model,
+        modelMat,
+        colorMod,
+        lighting,
+        model->armature,
+        frame);
+}
+
+void gf3d_model_armature_draw(
+    Model *model,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    LightUBO *lighting,
+    Armature3D *armature,
+    Uint32 frame)
+{
     if (!model)return;
     if (model->mesh_as_frame)
     {
-        gf3d_model_draw_index(
+        gf3d_model_draw_armature_frame(
             model,
             frame,
             modelMat,
             colorMod,
             lighting,
+            armature,
             0);
         return;
     }
-    gf3d_model_draw_all_meshes(
+    gf3d_model_draw_all_meshes_armature(
         model,
         modelMat,
         colorMod,
         lighting,
+        armature,
         frame);
 }
 
@@ -683,6 +720,25 @@ void gf3d_model_draw_index(
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
     LightUBO *lighting,
+    Uint32 frame)
+{
+    gf3d_model_draw_armature_frame(
+        model,
+        index,
+        modelMat,
+        colorMod,
+        lighting,
+        model->armature,
+        frame);
+}
+
+void gf3d_model_draw_armature_frame(
+    Model *model,
+    Uint32 index,
+    GFC_Matrix4 modelMat,
+    GFC_Color   colorMod,
+    LightUBO *lighting,
+    Armature3D *armature,
     Uint32 frame)
 {
     Mesh *mesh;
@@ -713,9 +769,9 @@ void gf3d_model_draw_index(
         gfc_vector4d_scale_by(uboData.material.diffuse,uboData.material.diffuse,modColor);
     }
     else uboData.material = gf3d_material_make_basic_ubo(colorMod);
-    if (model->armature)
+    if (armature)
     {
-        uboData.armature = gf3d_armature_get_ubo(model->armature,frame);
+        uboData.armature = gf3d_armature_get_ubo(armature,frame);
         uboData.flags.x = 1;
     }
     if (!model->texture)
@@ -733,6 +789,7 @@ void gf3d_model_draw_index(
     uboData.flags.y = 1.0;//setup the pipeline to know
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
 }
+
 
 void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
 {
