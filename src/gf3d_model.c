@@ -211,14 +211,8 @@ Model *gf3d_model_copy(Model *in)
         out->armature = in->armature;       //if set, use this material when sending draw calls
         out->armature->refCount++;
     }
-    
+    gfc_matrix4_copy(out->matrix,in->matrix);
     memcpy(&out->bounds,&in->bounds,sizeof(GFC_Box));
-
-    if (in->armature)
-    {
-        out->armature = in->armature;       //if set, use this material when sending draw calls
-        out->armature->refCount++;
-    }
 
     if (in->action_list)
     {
