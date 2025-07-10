@@ -283,11 +283,6 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
     {
         model = gf3d_gltf_parse_model(modelFile);
         if (!model)return NULL;
-        armatureFile = sj_get_string_value(sj_object_get_value(json,"armature"));
-        if (armatureFile)
-        {
-            model->armature = gf3d_armature_load(armatureFile);
-        }
     }    
     else
     {
@@ -342,12 +337,17 @@ Model *gf3d_model_load_from_config(SJson *json,const char *filename)
         }
         else
         {
+            //Dummy model, leave it alone for now
             if (__DEBUG)slog("no known way to parse model file");
-            gf3d_model_free(model);
-            return NULL;
         }
     }
     
+    armatureFile = sj_get_string_value(sj_object_get_value(json,"armature"));
+    if (armatureFile)
+    {
+        model->armature = gf3d_armature_load(armatureFile);
+    }
+
     if (filename)gfc_line_cpy(model->filename,filename);
     
     item = sj_object_get_value(json,"matrix");
