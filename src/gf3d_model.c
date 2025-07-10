@@ -110,6 +110,19 @@ Model * gf3d_model_new()
 {
     int i;
     if (!gf3d_model.initiliazed)return NULL;
+    //first pass for unused spots
+    for (i = 0; i < gf3d_model.max_models;i++)
+    {
+        if (!strlen(gf3d_model.model_list[i].filename))
+        {
+            gf3d_model_delete(&gf3d_model.model_list[i]);
+            gf3d_model.model_list[i].refCount = 1;
+            gfc_matrix4_identity(gf3d_model.model_list[i].matrix);
+            gf3d_model.model_list[i].mesh_list = gfc_list_new();
+            return &gf3d_model.model_list[i];
+        }
+    }
+    //second pass to reuse slots no longer active
     for (i = 0; i < gf3d_model.max_models;i++)
     {
         if (!gf3d_model.model_list[i].refCount)
@@ -391,10 +404,6 @@ void gf3d_model_free(Model *model)
     if (!model)return;
     if (!gf3d_model.initiliazed)return;
     model->refCount--;
-    if (model->refCount<=0)
-    {
-        gf3d_model_delete(model);
-    }
 }
 
 void gf3d_model_delete(Model *model)
