@@ -404,11 +404,8 @@ void gf3d_effect_square_emitter(GFC_Vector3D centerPosition, GFC_Vector3D direct
     sj_object_get_float(effect,"hSpread",&hSpread);
     sj_object_get_float(effect,"vSpread",&vSpread);
     sj_object_get_float(effect,"fSpread",&fSpread);
-    up = gfc_vector3d(0,0,1);
-    gfc_vector3d_normalize(&direction);
-    gfc_vector3d_copy(right,direction);
-    gfc_vector3d_rotate_about_z(&right,GFC_HALF_PI);
-
+    
+    gfc_vector3d_get_directions(direction, &right, &up);
     gfc_vector3d_scale(rSpread,right,hSpread);
     gfc_vector3d_scale(uSpread,up,vSpread);
     gfc_vector3d_scale(dSpread,up,vSpread);
