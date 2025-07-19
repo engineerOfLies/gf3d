@@ -68,7 +68,6 @@ GFC_Vector2D gf2d_element_get_item_position(Element *element,int i,GFC_Vector2D 
     }
     if ((list->listStyle == LS_Horizontal) && (list->wraps))
     {
-        list->itemsPerLine = element->drawBounds.w / itemSize.x;
         if (((i % list->itemsPerLine) == 0)&&(i != 0))
         {
             // this is a new line
@@ -224,6 +223,7 @@ void gf2d_element_list_recalibrate(Element *e)
     if (!e)return;
     list = (GF2D_ListElement*)e->data;
     if (!list)return;
+    list->itemsPerLine = e->drawBounds.w / list->itemSize.x;
     c = gfc_list_count(list->list);
     for (i = 0; i < c; i++)
     {
