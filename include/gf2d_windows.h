@@ -255,6 +255,13 @@ void gf2d_window_set_position(Window *win,GFC_Vector2D position);
 void gf2d_window_set_dimensions(Window *win,GFC_Rect dimensions);
 
 /**
+ * @brief get the dimensions of a window
+ * @param win the window
+ * @return all zeros on error, or the dimenions otherwise
+ */
+GFC_Rect gf2d_window_get_dimensions(Window *win);
+
+/**
  * @brief get the first window in the window list by the name provided
  * @param name the search criteria
  * @return NULL on error or not found, the window otherwise

@@ -485,6 +485,13 @@ void gf2d_window_refresh_by_name(const char *name)
     win->refresh(win);
 }
 
+GFC_Rect gf2d_window_get_dimensions(Window *win)
+{
+    GFC_Rect bad = {0};
+    if (!win)return bad;
+    return win->dimensions;
+}
+
 
 void gf2d_window_set_dimensions(Window *win,GFC_Rect dimensions)
 {
