@@ -554,12 +554,13 @@ void gf2d_font_draw_text_wrap(
     Font    *font
 )
 {
-    GFC_TextBlock textline;
-    GFC_TextBlock temptextline;
-    GFC_TextBlock tempBuffer;
+    GFC_TextBlock textline = "";
+    GFC_TextBlock temptextline = "";
+    GFC_TextBlock tempBuffer = "";
     GFC_TextBlock text;
     GFC_TextLine word;
     Bool whitespace;
+    Uint8 init = 0;
     int drawheight = block.y;
     int w,h = 0;
     int row = 0;
@@ -583,7 +584,6 @@ void gf2d_font_draw_text_wrap(
     }
 
     gfc_block_cpy(text,thetext);
-    temptextline[0] = '\0';
     do
     {
         space = 0;
@@ -618,7 +618,14 @@ void gf2d_font_draw_text_wrap(
             gfc_block_sprintf(tempBuffer,"%s%c",temptextline,' '); /*add spaces*/
             gfc_block_cpy(temptextline,tempBuffer);
         }
-        gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
+        if (init)
+        {
+            gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
+        }else 
+        {
+            gfc_block_cpy(tempBuffer,word); /*add a word*/
+            init = 1;
+        }
         gfc_block_cpy(temptextline,tempBuffer);
         TTF_SizeText(font->font, temptextline, &w, &h); /*see how big it is now*/
         h += font_manager.row_padding;
