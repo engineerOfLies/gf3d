@@ -464,6 +464,7 @@ GFC_Rect gf2d_font_get_text_wrap_bounds(
     GFC_TextBlock text;
     GFC_TextLine word;
     Bool whitespace;
+    Uint8 init = 0;
     int tw = 0, th = 0;
     int drawheight = 0;
     int i = 0;
@@ -513,7 +514,14 @@ GFC_Rect gf2d_font_get_text_wrap_bounds(
             gfc_block_sprintf(tempBuffer,"%s%c",temptextline,' '); /*add spaces*/
             gfc_block_cpy(temptextline,tempBuffer);
         }
-        gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
+        if (init)
+        {
+            gfc_block_sprintf(tempBuffer,"%s %s",temptextline,word); /*add a word*/
+        }else 
+        {
+            gfc_block_cpy(tempBuffer,word); /*add a word*/
+            init = 1;
+        }
         gfc_block_cpy(temptextline,tempBuffer);
         TTF_SizeText(font->font, temptextline, &tw, &th); /*see how big it is now*/
         th += font_manager.row_padding;
