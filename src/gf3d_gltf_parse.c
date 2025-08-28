@@ -7,8 +7,6 @@
 #include "gfc_config.h"
 #include "gfc_pak.h"
 
-#include "gf3d_mesh.h"
-#include "gf3d_model.h"
 #include "gf3d_obj_load.h"
 
 #include "gf3d_gltf_parse.h"
@@ -314,97 +312,4 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
         if (obj->boneWeights)gfc_vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
     }
 }
-
-
-Mesh *gf3d_gltf_parse_mesh(SJson *meshData,GLTF *gltf)
-{
-    int i,c;
-    Mesh *mesh;
-    ObjData *obj;
-    MeshPrimitive *primitive;
-    SJson *primitives,*primitiveData;
-    
-    if ((!meshData)||(!gltf))return NULL;
-    
-    mesh = gf3d_mesh_new();
-    if (!mesh)
-    {
-        return NULL;
-    }
-    primitives = sj_object_get_value(meshData,"primitives");
-    c = sj_array_get_count(primitives);
-    for (i = 0; i < c; i++)
-    {
-        primitiveData = sj_array_get_nth(primitives,i);
-        if (!primitiveData)continue;
-        obj = gf3d_gltf_parse_primitive(gltf,primitiveData);
-        if (!obj)
-        {
-            continue;
-        }
-        primitive = gf3d_mesh_primitive_new();
-        if (!primitive)
-        {
-            gf3d_obj_free(obj);
-            continue;
-        }
-        
-        primitive->objData = obj;
-        gf3d_mesh_create_vertex_buffer_from_vertices(primitive);
-        
-        gfc_list_append(mesh->primitives,primitive);
-        mesh->bounds.x = MIN(mesh->bounds.x,obj->bounds.x);
-        mesh->bounds.y = MIN(mesh->bounds.y,obj->bounds.y);
-        mesh->bounds.z = MIN(mesh->bounds.z,obj->bounds.z);
-
-        mesh->bounds.w = MAX(mesh->bounds.w,obj->bounds.w);
-        mesh->bounds.h = MAX(mesh->bounds.h,obj->bounds.h);
-        mesh->bounds.d = MAX(mesh->bounds.d,obj->bounds.d);
-    }
-    return mesh;
-}
-
-
-Model *gf3d_gltf_parse_model(const char *filename)
-{
-    int i,c;
-    GLTF *gltf;
-    SJson *meshes,*meshData;
-    Mesh *mesh;
-    Model *model;
-    if (!filename)return NULL;
-    
-    //from here start rewriting everything around using the GLTF wrapper
-    gltf = gf3d_gltf_load(filename);
-    if (!gltf)
-    {
-        slog("GLTF file '%s' Failed to load",filename);
-        return NULL;
-    }
-    model = gf3d_model_new();
-    if (!model)
-    {
-        gf3d_gltf_free(gltf);
-        return NULL;
-    }
-    
-    meshes = sj_object_get_value(gltf->json,"meshes");
-    c = sj_array_get_count(meshes);
-    for (i = 0; i< c; i++)
-    {
-        meshData = sj_array_get_nth(meshes,i);
-        if (!meshData)continue;
-        mesh = gf3d_gltf_parse_mesh(meshData,gltf);
-        if (mesh)
-        {
-            gfc_line_cpy(mesh->filename,filename);
-            gfc_box_cpy(model->bounds,mesh->bounds);
-        }
-        gfc_list_append(model->mesh_list,mesh);
-    }
-    gfc_line_cpy(model->filename,filename);
-    gf3d_gltf_free(gltf);
-    return model;
-}
-
 /*EOL@EOF*/

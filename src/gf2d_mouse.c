@@ -138,41 +138,6 @@ float gf2d_mouse_get_angle_to(GFC_Vector2D point)
     return gfc_vector2d_angle(delta);
 }
 
-GFC_Edge3D gf2d_mouse_get_cast_ray()
-{
-    GFC_Vector2D mouse,res,w;
-    GFC_Vector3D position;
-    GFC_Vector3D a = {0,5000,0},b;
-    
-    GFC_Vector3D forward = {0};
-    GFC_Vector3D rightNear,right = {0};
-    GFC_Vector3D upNear,up = {0};
-
-    mouse = gf2d_mouse_get_position();
-    
-    res = gf3d_vgraphics_get_resolution();
-    position = gf3d_camera_get_position();
-    
-    w.x = (mouse.x/res.x *2) -1;//amount right to move
-    w.y = ((mouse.y/res.y *2) -1) * -1;//amount up to move
-    
-    gfc_vector2d_normalize(&res);
-    gfc_vector3d_angle_vectors(gf3d_camera_get_angles(), &forward, &right, &up);
-
-    gfc_vector3d_scale(rightNear,right,-1 * w.x * (res.x * 0.15));
-    gfc_vector3d_scale(upNear,up,-1 * w.y * (res.y * 0.15));
-     a.x = position.x + rightNear.x+ upNear.x;
-     a.y = position.y + rightNear.y+ upNear.y;
-     a.z = position.z + rightNear.z+ upNear.z;
-    gfc_vector3d_scale(forward,forward,5000);
-    gfc_vector3d_scale(right,right,-5000 * w.x);
-    gfc_vector3d_scale(up,up,-5000 * w.y);
-     b.x = forward.x + rightNear.x + upNear.x;
-     b.y = forward.y + rightNear.y + upNear.y;
-     b.z = forward.z + rightNear.z + upNear.z;
-    return gfc_edge3d_from_vectors(a,b);
-}
-
 GFC_Vector2D gf2d_mouse_get_position()
 {
     return _mouse.mouse[0].position;
