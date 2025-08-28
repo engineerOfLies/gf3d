@@ -14,17 +14,18 @@ performable from the following steps from the root of the cloned git repository 
 
 external dependencies:
 1. vulkan (get the Lunar SDK for windows, or the libvulkan-dev library for linux)
-2. SDL2 (get from libsdl.org or from your linux repo)
+2. SDL2 (get from libsdl.org or from your linux repo libsdl2-dev, libsdl2-image-dev, etc)
 3. SDL2_image
 4. SDL2_ttf
 5. SDL2_mixer
 
 build steps:
 1. Obtain the code: `git clone <repo name>`
-2. Checkout seed branch: `git checkout <branch name>`
+2. Checkout seed branch: `git checkout main`
 3. Make sure ou fetch submodules: `git submodule update --init --recursive`
+--linux steps--
 4. Build libraries: `pushd gfc/src; make; popd`
-5. Build this library: `pushd src; make; make static; popd`
+5. Build this sample project: `pushd src; make; popd`
 
 You should now have a `libgf3d.a` static library and `libgf3d.so.1` dynamic library in the libs/ folder 
 
