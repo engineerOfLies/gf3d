@@ -55,7 +55,7 @@ typedef struct
     VkSurfaceKHR                surface;
 
     // color space
-    GFC_Color                       bgcolor;
+    GFC_Color                   bgcolor;
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
     

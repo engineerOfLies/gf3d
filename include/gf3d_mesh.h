@@ -31,9 +31,6 @@ typedef struct
     GFC_Vector3D vertex;
     GFC_Vector3D normal;
     GFC_Vector2D texel;
-    //armature support:
-    GFC_Vector4D bones;   //bone indices
-    GFC_Vector4D weights; //bone weights
 }Vertex;
 
 typedef struct
@@ -104,25 +101,6 @@ void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset,GFC_Vector3D rotation
  */
 MeshPrimitive *gf3d_mesh_primitive_new();
 
-/**
- * @brief append the primitive mesh data of B to the primitive mesh data of A.
- * @note: this merges them at the vertex and face buffer level, making the primitives of A inclusive of the meshes from B.
- * @note: this only applies for the N primitives, which is the smaller of the two lists
- * @param meshA the mesh to gain geometry
- * @param meshB the mesh to provide new geometry, this is unmodified after the process
- * @param offsetB an offset to apply to all the vertices in the second Obj
- * @param rotation apply this rotation to the vertices and normals
- */
-void gf3d_mesh_append(Mesh *meshA, Mesh *meshB, GFC_Vector3D offsetB,GFC_Vector3D rotation);
-
-/**
- * @brief get the scaling factor necessary to make the mesh fit within the bounds
- * @param mesh the mesh to validate (if this is NULL, returns (1,1,1)
- * @param size the dimensions to scale to
- * @return the factor to scale a mesh so that it fits exactly within the size provided.
- * @note: likely you want to uniformly scale based on the SMALLEST of the dimensions
- */
-GFC_Vector3D gf3d_mesh_get_scaled_to(Mesh *mesh,GFC_Vector3D size);
 
 /**
  * @brief get the input attribute descriptions for mesh based rendering
@@ -156,9 +134,7 @@ void gf3d_mesh_submit_pipe_commands();
  * @brief get the current command buffer for the mesh system
  */
 VkCommandBuffer gf3d_mesh_get_model_command_buffer();
-VkCommandBuffer gf3d_mesh_get_alph_model_command_buffer();
-VkCommandBuffer gf3d_mesh_get_highlight_command_buffer();
-VkCommandBuffer gf3d_mesh_get_sky_command_buffer();
+
 
 /**
  * @brief queue up a render for the current draw frame
@@ -177,10 +153,6 @@ void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *tex
  * @param com the command pool to use to handle the request we are rendering with
  */
 void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
-void gf3d_mesh_alpha_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
-
-void gf3d_mesh_render_highlight(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
-void gf3d_mesh_render_sky(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
 
 /**
  * @brief render a mesh through a given pipeline
@@ -199,9 +171,6 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *primitive);
  * @return NULL on error or the pipeline in question
  */
 Pipeline *gf3d_mesh_get_pipeline();
-Pipeline *gf3d_mesh_get_alpha_pipeline();
-Pipeline *gf3d_mesh_get_highlight_pipeline();
-Pipeline *gf3d_mesh_get_sky_pipeline();
 
 /**
  * @brief given a model matrix and basic color, build the meshUBO needed to render a model
