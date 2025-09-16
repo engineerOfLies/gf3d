@@ -93,7 +93,7 @@ void gf3d_obj_load_reorg(ObjData *obj)
 {
     int i,f;
     int vert = 0;
-    int vertexIndex,normalIndex,texelIndex,boneIndex,weightIndex;
+    int vertexIndex,normalIndex,texelIndex;
     
     if (!obj)return;
     
@@ -117,16 +117,6 @@ void gf3d_obj_load_reorg(ObjData *obj)
             {
                 texelIndex = obj->faceTexels[i].verts[f];
                 gfc_vector2d_copy(obj->faceVertices[vert].texel,obj->texels[texelIndex]);
-            }
-            if (obj->faceBones)
-            {
-                boneIndex = obj->faceBones[i].verts[f];
-                gfc_vector4d_copy(obj->faceVertices[vert].bones,obj->boneIndices[boneIndex]);
-            }
-            if (obj->faceWeights)
-            {
-                weightIndex = obj->faceWeights[i].verts[f];
-                gfc_vector4d_copy(obj->faceVertices[vert].weights,obj->boneWeights[weightIndex]);
             }
             
             obj->outFace[i].verts[f] = vert;

@@ -308,8 +308,6 @@ void gf3d_gltf_reorg_obj(ObjData *obj)
         if (obj->vertices)gfc_vector3d_copy(obj->faceVertices[i].vertex,obj->vertices[i]);
         if (obj->normals)gfc_vector3d_copy(obj->faceVertices[i].normal,obj->normals[i]);
         if (obj->texels)gfc_vector2d_copy(obj->faceVertices[i].texel,obj->texels[i]);
-        if (obj->boneIndices)gfc_vector4d_copy(obj->faceVertices[i].bones,(float)obj->boneIndices[i]);
-        if (obj->boneWeights)gfc_vector4d_copy(obj->faceVertices[i].weights,obj->boneWeights[i]);
     }
 }
 /*EOL@EOF*/
