@@ -35,7 +35,7 @@
 typedef struct
 {
     Uint8                       _inuse;
-    GFC_TextLine                    filename;               /**<the name of the file used to create the sprite*/
+    GFC_TextLine                filename;               /**<the name of the file used to create the sprite*/
     Uint32                      frameCount;             /**<how many frames are loaded for this model*/
     Texture                    *texture;                /**<texture memory pointer*/
     Uint8                       framesPerLine;          /**<how many frames are per line in the sprite sheet*/

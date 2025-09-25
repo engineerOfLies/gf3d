@@ -161,4 +161,6 @@ SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h);
  */
 SDL_Surface *gf3d_vgraphics_screen_convert(SDL_Surface **surface);
 
+void gf3d_vgraphics_set_view(GFC_Matrix4 view);
+
 #endif

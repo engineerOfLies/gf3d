@@ -53,7 +53,6 @@ typedef struct
 {
     GFC_TextLine        filename;
     Uint32              _refCount;
-    Uint8               _inuse;
     GFC_List           *primitives;
     GFC_Box             bounds;
 }Mesh;
@@ -78,22 +77,12 @@ Mesh *gf3d_mesh_new();
  * @param filename the name of the file to load
  * @return NULL on error or Mesh data
  */
-Mesh *gf3d_mesh_load_obj(const char *filename);
+Mesh *gf3d_mesh_load(const char *filename);
 
 /**
- * @brief make an exact, but separate copy of the input mesh
- * @param in the mesh to duplicate
- * @return NULL on error, or a copy of in
+ * @brief draw a mesh given the parameters
  */
-Mesh *gf3d_mesh_copy(Mesh *in);
-
-/**
- * @brief move all of the vertices of the mesh by offset at the buffer level
- * @param in the mesh to move
- * @param offset how much to move it
- * @param rotation apply this rotation to the vertices and normals
- */
-void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset,GFC_Vector3D rotation);
+void gf3d_mesh_draw(Mesh *mesh,GFC_Matrix4 modelMat,GFC_Color mod,Texture *texture);
 
 /**
  * @brief allocate a zero initialized mesh primitive
@@ -119,45 +108,6 @@ VkVertexInputBindingDescription * gf3d_mesh_get_bind_description();
  * @brief free a mesh that has been loaded from memory
  */
 void gf3d_mesh_free(Mesh *mesh);
-
-/**
- * @brief needs to be called once at the beginning of each render frame
- */
-void gf3d_mesh_reset_pipes();
-
-/**
- * @brief called to submit all draw commands to the mesh pipelines
- */
-void gf3d_mesh_submit_pipe_commands();
-
-/**
- * @brief get the current command buffer for the mesh system
- */
-VkCommandBuffer gf3d_mesh_get_model_command_buffer();
-
-
-/**
- * @brief queue up a render for the current draw frame
- * @param mesh the mesh to render
- * @param pipe the pipeline to use
- * @param uboData the data to use to draw the mesh
- * @param texture texture data to use
- */
-void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture);
-
-
-/**
- * @brief adds a mesh to the render pass rendered as an outline highlight
- * @note: must be called within the render pass
- * @param mesh the mesh to render
- * @param com the command pool to use to handle the request we are rendering with
- */
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
-
-/**
- * @brief render a mesh through a given pipeline
- */
-void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkDescriptorSet * descriptorSet);
 
 /**
  * @brief create a mesh's internal buffers based on vertices
