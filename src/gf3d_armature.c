@@ -297,7 +297,7 @@ void gf3d_armature_parse_joints(Armature3D *armature,SJson *nodes, SJson *joints
     GFC_Vector4D quaternion;
     GFC_Vector3D position,scale;
     const char *name;
-    int nodeId,childId;
+    int nodeId = 0,childId;
     int i,c,j,d;
     SJson *item,*children,*child;
     if ((!armature)||(!nodes)||(!joints))return;
