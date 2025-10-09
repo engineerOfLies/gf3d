@@ -200,7 +200,9 @@ const char *gf3d_gltf_accessor_get_details(GLTF* gltf,Uint32 accessorIndex, int 
 
 ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
 {
+    int i;
     ObjData *obj;
+    Face16 *faces = NULL;
     GFC_Vector3D min,max;
     int index,bufferIndex;
     SJson *attributes,*accessor;
@@ -286,9 +288,29 @@ ObjData *gf3d_gltf_parse_primitive(GLTF *gltf,SJson *primitive)
         if (gf3d_gltf_accessor_get_details(gltf,index, &bufferIndex, (int *)&obj->face_count))
         {
             obj->face_count /= 3;
-            obj->outFace = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
+            faces = (Face16 *)gfc_allocate_array(sizeof(Face16),obj->face_count);
 
-            gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)obj->outFace);            
+            gf3d_gltf_get_buffer_view_data(gltf,bufferIndex,(char *)faces);
+            if (FACEBITS == 32)
+            {
+                obj->outFace = (Face *)gfc_allocate_array(sizeof(Face),obj->face_count);
+                for (i = 0; i < obj->face_count;i++)
+                {
+                    obj->outFace[i].verts[0] = faces[i].verts[0];
+                    obj->outFace[i].verts[1] = faces[i].verts[1];
+                    obj->outFace[i].verts[2] = faces[i].verts[2];
+                }
+                free(faces);
+            }
+            else 
+            {
+                for (i = 0; i < obj->face_count;i++)
+                {
+                    obj->outFace[i].verts[0] = faces[i].verts[0];
+                    obj->outFace[i].verts[1] = faces[i].verts[1];
+                    obj->outFace[i].verts[2] = faces[i].verts[2];
+                }
+            }
         }
         else slog("failed to get accessor detials");
     }

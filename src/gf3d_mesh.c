@@ -123,7 +123,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
         sizeof(MeshUBO),
-        VK_INDEX_TYPE_UINT16
+        VK_INDEX_TYPE_UINT32
     );
 
     gf3d_mesh.pipe = gf3d_pipeline_create_from_config(
@@ -135,7 +135,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
         sizeof(ModelUBO),
-        VK_INDEX_TYPE_UINT16
+        VK_INDEX_TYPE_UINT32
     );
 
     //pretty much identical to model pipe
@@ -149,7 +149,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
         sizeof(ModelUBO),
-        VK_INDEX_TYPE_UINT16
+        VK_INDEX_TYPE_UINT32
     );
 
     gf3d_mesh.highlight_pipe = gf3d_pipeline_create_from_config(
@@ -161,7 +161,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
         sizeof(MeshUBO),
-        VK_INDEX_TYPE_UINT16
+        VK_INDEX_TYPE_UINT32
     );
 
     if (__DEBUG)slog("mesh system initialized");
@@ -531,22 +531,6 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh)
     faces = mesh->objData->outFace;
     fcount = mesh->objData->face_count;
     bufferSize = sizeof(Vertex) * vcount;
-    
-//     if (bufferSize == 0)
-//     {
-//         slog("buffer size is zero, cannot make buffers");
-//         return;
-//     }
-//     if (fcount == 0)
-//     {
-//         slog("face count is zero, cannot make buffers");
-//         return;
-//     }
-//     if (vcount == 0)
-//     {
-//         slog("vertex count is zero, cannot make buffers");
-//         return;
-//     }
     
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
     

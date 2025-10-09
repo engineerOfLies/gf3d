@@ -12,6 +12,7 @@
 
 #include "gf3d_pipeline.h"
 
+#define FACEBITS 32
 
 //forward declaration:
 typedef struct ObjData_S ObjData;
@@ -38,8 +39,13 @@ typedef struct
 
 typedef struct
 {
-    Uint16  verts[3];
+    Uint32  verts[3];
 }Face;
+
+typedef struct
+{
+    Uint16  verts[3];
+}Face16;
 
 typedef struct
 {
