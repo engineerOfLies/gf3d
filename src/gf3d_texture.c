@@ -227,7 +227,7 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
         SDL_FreeSurface(surface);
         return NULL;
     }
-    tex->surface = gf3d_vgraphics_screen_convert(&surface);
+    tex->surface = surface;
     tex->width = tex->surface->w;
     tex->height = tex->surface->h;
     imageSize = tex->surface->w * tex->surface->h * 4;
@@ -292,21 +292,12 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
     return tex;
 }
 
-
-Texture *gf3d_texture_load(const char *filename)
+SDL_Surface *gf3d_texture_load_surface(const char *filename)
 {
     void *mem;
     SDL_RWops *src;
     size_t fileSize = 0;
     SDL_Surface * surface;
-    Texture *tex;
-
-    tex = gf3d_texture_get_by_filename(filename);
-    if (tex)
-    {
-        tex->_refcount++;
-        return tex;
-    }
     mem = gfc_pak_file_extract(filename,&fileSize);
     if (!mem)
     {
@@ -326,6 +317,22 @@ Texture *gf3d_texture_load(const char *filename)
         slog("failed to load texture file %s",filename);
         return NULL;
     }
+    surface = gf3d_vgraphics_screen_convert(&surface);
+    return surface;
+}
+
+Texture *gf3d_texture_load(const char *filename)
+{
+    SDL_Surface * surface;
+    Texture *tex;
+
+    tex = gf3d_texture_get_by_filename(filename);
+    if (tex)
+    {
+        tex->_refcount++;
+        return tex;
+    }
+    surface = gf3d_texture_load_surface(filename);
     tex = gf3d_texture_convert_surface(surface);
     
     if (!tex)

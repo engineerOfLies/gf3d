@@ -210,6 +210,7 @@ Sprite * gf2d_sprite_from_surface(SDL_Surface *surface,int frame_width,int frame
     {
         return NULL;
     }
+    surface = gf3d_vgraphics_screen_convert(&surface);
     sprite->texture = gf3d_texture_convert_surface(surface);
     if (!sprite->texture)
     {

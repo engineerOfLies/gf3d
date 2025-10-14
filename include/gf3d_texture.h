@@ -41,6 +41,14 @@ Texture *gf3d_texture_load(const char *filename);
 Texture *gf3d_texture_convert_surface(SDL_Surface * surface);
 
 /**
+ * @brief load surface information from disc (or paks if used)
+ * @note converts it to current graphics format
+ * @param filename the name of the image file to load
+ * @return NULL on error or the surface otherwise
+ */
+SDL_Surface *gf3d_texture_load_surface(const char *filename);
+
+/**
 * @brief free a previously loaded texture
  */
 void gf3d_texture_free(Texture *tex);
