@@ -259,6 +259,7 @@ Sprite *gf2d_sprite_parse(SJson *json)
 Sprite * gf2d_sprite_load(const char * filename,int frame_width,int frame_height, Uint32 frames_per_line)
 {
     Sprite *sprite;
+    if (!filename)return NULL;
     sprite = gf2d_sprite_get_by_filename(filename);
     if (sprite)
     {
