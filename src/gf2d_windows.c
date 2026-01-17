@@ -444,7 +444,7 @@ void gf2d_window_close_child(Window *parent,Window *child)
 void gf2d_window_free(Window *win)
 {
     int i,count;
-    if (!win)return;
+    if ((!win)||(!win->_inuse))return;
     if (win->free_data != NULL)
     {
         win->free_data(win);
