@@ -303,6 +303,7 @@ GF3DEffect *gf3d_effect_from_config(
     GFC_Callback *callback)
 {
     const char *effectType;
+    int temp = 0;
     const char *filename;
     float variance = 0;
     GF3DEffect *effect;
@@ -319,7 +320,8 @@ GF3DEffect *gf3d_effect_from_config(
         effect->callback.data = callback->data;
     }
     
-    sj_object_get_int(config,"ttd",(int*)&effect->ttd);
+    sj_object_get_int(config,"ttd",&temp);
+    effect->ttd = temp;
     if (sj_object_get_float(config,"ttdVariance",&variance))effect->ttd += (int)(gfc_random() * variance);
     effect->ttd += gf3d_effect_manager.now;
     
