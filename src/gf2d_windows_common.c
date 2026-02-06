@@ -336,32 +336,149 @@ Window *window_dialog(const char *title, const char *text, Uint8 allowCancel, Ui
     return win;
 }
 
+typedef struct
+{
+    GFC_List *callbacks;
+    Uint8 allowCancel;
+    Uint8 allowPassthrough;
+}WindowsCommonData;
 
-Window *window_text_entry(const char *question, char *defaultText,void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *))
+int window_text_entry_free(Window *win)
+{
+    GFC_List *list;
+    int count,i;
+    GFC_Callback *callback;
+    WindowsCommonData *data;
+
+    if (!win)return 0;
+    if (!win->data)return 0;
+    data = win->data;
+    list = data->callbacks;
+    if (list)
+    {
+        count = gfc_list_get_count(list);
+        for (i = 0; i < count; i++)
+        {
+            callback = (GFC_Callback*)gfc_list_get_nth(list,i);
+            if (callback)
+            {
+                gfc_callback_free(callback);
+            }
+        }
+        gfc_list_delete(list);
+    }
+    free(data);
+    return 0;
+}
+
+int window_text_entry_update(Window *win,GFC_List *updateList)
+{
+    int i,count;
+    Element *e;
+    Element *focus;
+    WindowsCommonData *data;
+    GFC_List *callbacks;
+    GFC_Callback *callback;
+    if ((!win)||(!win->data))return 0;
+    if (!updateList)return 0;
+    data = win->data;
+    if ((gf2d_mouse_hidden())&&(gfc_input_command_pressed("nextelement")))
+    {
+        gf2d_window_next_focus(win);
+        return 1;
+    }
+    callbacks = data->callbacks;
+    count = gfc_list_get_count(updateList);
+    for (i = 0; i < count; i++)
+    {
+        e = gfc_list_get_nth(updateList,i);
+        if (!e)continue;
+        if ((strcmp(e->name,"item_right")==0)||(strcmp(e->name,"item_left")==0))
+        {
+            focus = gf2d_window_get_element_by_focus(win);
+            if ((!focus)||(focus->index == 52))
+            {
+                gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,51));
+            }
+            else
+            {
+                gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,52));
+            }
+            return 1;
+        }
+        if (data->allowCancel)
+        {
+            if (strcmp(e->name,"cancel")==0)
+            {
+                callback = (GFC_Callback*)gfc_list_get_nth(callbacks,1);
+                if (callback)
+                {
+                    gfc_callback_call(callback);
+                }
+                gf2d_window_free(win);
+                return 1;
+            }
+        }
+        if (strcmp(e->name,"enter")==0)
+        {
+            callback = (GFC_Callback*)gfc_list_get_nth(callbacks,0);
+            if (callback)
+            {
+                gfc_callback_call(callback);
+            }
+            gf2d_window_free(win);
+            return 1;
+        }
+    }
+    return !data->allowPassthrough;
+}
+
+Window *window_text_entry(
+    const char *question,
+    char *defaultText,
+    void *callbackData,
+    size_t length,
+    Uint8 allowCancel,
+    Uint8 allowPassthrough,
+    void(*onOk)(void *),
+    void(*onCancel)(void *))
 {
     Window *win;
-    GFC_List *callbacks;
+    WindowsCommonData *data;
     win = gf2d_window_load("menus/text_entry_window.menu");
     if (!win)
     {
         slog("failed to load text entry window");
         return NULL;
     }
+    data = gfc_allocate_array(sizeof(WindowsCommonData),1);
+    if (!data)
+    {
+        slog("failed to load text entry window");
+        gf2d_window_free(win);
+        return NULL;
+    }
     gf2d_element_label_set_text(gf2d_window_get_element_by_id(win,1),question);
     gf2d_element_entry_set_text_pointer(gf2d_window_get_element_by_id(win,2),defaultText,length);
     gf2d_window_set_focus_to(win,gf2d_window_get_element_by_id(win,2));
-    win->update = yes_no_update;
+    win->update = window_text_entry_update;
     win->free_data = yes_no_free;
-    callbacks = gfc_list_new();
+    data->callbacks = gfc_list_new();
     if (onOk)
     {
-        gfc_list_append(callbacks,gfc_callback_new(onOk,callbackData));
+        gfc_list_append(data->callbacks,gfc_callback_new(onOk,callbackData));
     }
     if (onCancel)
     {
-        gfc_list_append(callbacks,gfc_callback_new(onCancel,callbackData));
+        gfc_list_append(data->callbacks,gfc_callback_new(onCancel,callbackData));
     }
-    win->data = callbacks;
+    data->allowCancel = allowCancel;
+    if (!allowCancel)
+    {
+        gf2d_element_set_hidden(gf2d_window_get_element_by_id(win,52), 1);
+    }
+    data->allowPassthrough = allowPassthrough;
+    win->data = data;
     return win;
 }
 

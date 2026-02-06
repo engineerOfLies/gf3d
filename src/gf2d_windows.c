@@ -519,12 +519,14 @@ void gf2d_window_hide(Window *win)
 {
     if (!win)return;
     win->hidden = 1;
+    win->disabled = 1;
 }
 
 void gf2d_window_unhide(Window *win)
 {
     if (!win)return;
     win->hidden = 0;
+    win->disabled = 0;
 }
 
 void gf3d_window_hide_toggle(Window *win)
@@ -559,7 +561,7 @@ int gf2d_window_update(Window *win)
     int count,i;
     int retval = 0;
     GFC_Vector2D offset;
-    GFC_List *updateGFC_List = gfc_list_new();
+    GFC_List *updateList = gfc_list_new();
     GFC_List *updated = NULL;
     Element *e;
     if (!win)return 0;
@@ -574,14 +576,14 @@ int gf2d_window_update(Window *win)
         updated = gf2d_element_update(e, offset);
         if (updated)
         {
-            updateGFC_List = gfc_list_concat_free(updateGFC_List,updated);
+            updateList = gfc_list_concat_free(updateList,updated);
         }
     }
     if (win->update)
     {
-        retval = win->update(win,updateGFC_List);
+        retval = win->update(win,updateList);
     }
-    gfc_list_delete(updateGFC_List);
+    gfc_list_delete(updateList);
     return retval;
 }
 

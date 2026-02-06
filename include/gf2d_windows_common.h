@@ -49,10 +49,20 @@ Window *window_yes_no(Window *parent,const char *text, void(*onYes)(void *),void
  * @param defaultText the text to be prepopulated in the dialog/ what is changed by the dialog
  * @param callbackData data to be provided to the callback functions
  * @param length limit the value to this length
+ * @param allowCancel if true, allow the cancel option to close this early
+ * @param allowPassthrough if true, permit unhandled input to pass through this window to ones below
  * @param onOK the function to call if the user selects okay
  * @param onCancel the function to call if the user selects cancel
  */
-Window *window_text_entry(const char *question, char *defaultText, void *callbackData, size_t length, void(*onOk)(void *),void(*onCancel)(void *));
+Window *window_text_entry(
+    const char *question,
+    char *defaultText,
+    void *callbackData,
+    size_t length,
+    Uint8 allowCancel,
+    Uint8 allowPassthrough,
+    void(*onOk)(void *),
+    void(*onCancel)(void *));
 
 /**
  * @brief open a dialog box to take a key/value pair
