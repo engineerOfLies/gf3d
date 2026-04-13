@@ -191,6 +191,7 @@ void gf3d_material_load_mtl_file(const char *filename)
         }
         p = chomp(p);
     }
+    if (mem)free(mem);//cleanup
 }
 
 GF3D_Material *gf3d_material_duplicate(GF3D_Material *from)

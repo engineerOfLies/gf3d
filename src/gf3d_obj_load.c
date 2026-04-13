@@ -177,9 +177,9 @@ ObjData *gf3d_obj_load_from_file(const char *filename)
     
     gf3d_obj_load_get_data_from_file(obj, mem,fileSize);
     
-    
     gf3d_obj_get_bounds(obj);
     gf3d_obj_load_reorg(obj);
+    free(mem);
     return obj;
 }
 
