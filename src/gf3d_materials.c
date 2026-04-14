@@ -266,7 +266,7 @@ GF3D_Material *gf3d_material_load(const char *filename)
         material->_refCount++;
         return material;
     }
-    json = sj_load(filename);
+    json = gfc_pak_load_json(filename);
     if (!json)return NULL;
     material = gf3d_material_parse_js(sj_object_get_value(json,"material"),filename);
     sj_free(json);
