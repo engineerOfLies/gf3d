@@ -228,8 +228,8 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
         return NULL;
     }
     tex->surface = surface;
-    tex->width = tex->surface->w;
-    tex->height = tex->surface->h;
+    tex->width = surface->w;
+    tex->height = surface->h;
     imageSize = tex->surface->w * tex->surface->h * 4;
     
     gf3d_buffer_create(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
@@ -334,7 +334,6 @@ Texture *gf3d_texture_load(const char *filename)
     }
     surface = gf3d_texture_load_surface(filename);
     tex = gf3d_texture_convert_surface(surface);
-    
     if (!tex)
     {
         return NULL;
