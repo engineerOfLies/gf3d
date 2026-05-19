@@ -428,6 +428,11 @@ GFC_Vector2D gf3d_vgraphics_get_view_extent_as_vector2d()
 SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h)
 {
     SDL_Surface *surface;
+    if ((!w)||(!h))
+    {
+        slog("cannot create a zero dimension surface!");
+        return NULL;
+    }
     surface = SDL_CreateRGBSurface(
         0,w, h,
         gf3d_vgraphics.bitdepth,

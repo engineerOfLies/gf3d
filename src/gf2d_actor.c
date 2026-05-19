@@ -171,6 +171,8 @@ Actor *gf2d_actor_load_json(SJson *json)
     sj_value_as_vector2d(sj_object_get_value(actorJS,"scale"),&actor->scale);
     if ((actor->sprite) && (sj_value_as_vector2d(sj_object_get_value(actorJS,"scaleTo"),&scaleTo)))
     {
+        actor->frameWidth = actor->sprite->frameWidth;
+        actor->frameHeight = actor->sprite->frameHeight;
         actor->scale.x = scaleTo.x / actor->sprite->frameWidth;
         actor->scale.y = scaleTo.y / actor->sprite->frameHeight;
     }
