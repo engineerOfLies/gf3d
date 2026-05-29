@@ -297,7 +297,8 @@ void gf2d_actor_draw(
     GFC_Vector2D * center,
     float    * rotation,
     GFC_Color    * color,
-    GFC_Vector2D * flip
+    GFC_Vector2D * flip,
+    GFC_Vector4D * screenClip
 )
 {
     GFC_Color drawGFC_Color;
@@ -351,6 +352,7 @@ void gf2d_actor_draw(
         flip,
         &drawGFC_Color,
         &drawClip,
+        screenClip,
         (int)frame);
 }
 

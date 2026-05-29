@@ -125,6 +125,7 @@ void gf2d_draw_rect(GFC_Rect rect,GFC_Color color)
             gfc_vector2d(0,0),
             color,
             gfc_vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             0);
         return;
     }
@@ -154,6 +155,7 @@ void gf2d_draw_rect(GFC_Rect rect,GFC_Color color)
         0,
         gfc_vector2d(0,0),
         color,
+        gfc_vector4d(0,0,0,0),
         gfc_vector4d(0,0,0,0),
         0);
 
@@ -189,6 +191,7 @@ void gf2d_draw_edge(GFC_Edge2D edge,GFC_Color color)
             gfc_vector2d(0,0),
             color,
             gfc_vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             0);
         return;
     }
@@ -209,6 +212,7 @@ void gf2d_draw_edge(GFC_Edge2D edge,GFC_Color color)
         angle,
         gfc_vector2d(0,0),
         color,
+        gfc_vector4d(0,0,0,0),
         gfc_vector4d(0,0,0,0),
         0);
     gf2d_draw_image_new(sprite,shape,1);
@@ -241,6 +245,7 @@ void gf2d_draw_rect_filled(GFC_Rect rect,GFC_Color color)
             gfc_vector2d(0,0),
             color,
             gfc_vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             0);
 
         return;
@@ -264,6 +269,7 @@ void gf2d_draw_rect_filled(GFC_Rect rect,GFC_Color color)
         0,
         gfc_vector2d(0,0),
         color,
+        gfc_vector4d(0,0,0,0),
         gfc_vector4d(0,0,0,0),
         0);
     gf2d_draw_image_new(sprite,shape,1);
@@ -348,6 +354,7 @@ void gf2d_draw_circle_filled(GFC_Vector2D center, int radius, GFC_Color color)
             gfc_vector2d(0,0),
             color,
             gfc_vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             0);
         return;
     }
@@ -406,6 +413,7 @@ void gf2d_draw_circle_filled(GFC_Vector2D center, int radius, GFC_Color color)
         gfc_vector2d(0,0),
         color,
         gfc_vector4d(0,0,0,0),
+        gfc_vector4d(0,0,0,0),
         0);
     gf2d_draw_image_new(sprite,shape,1);
 }
@@ -436,6 +444,7 @@ void gf2d_draw_circle(GFC_Vector2D center, int radius, GFC_Color color)
             0,
             gfc_vector2d(0,0),
             color,
+            gfc_vector4d(0,0,0,0),
             gfc_vector4d(0,0,0,0),
             0);
         return;
@@ -492,6 +501,7 @@ void gf2d_draw_circle(GFC_Vector2D center, int radius, GFC_Color color)
         0,
         gfc_vector2d(0,0),
         color,
+        gfc_vector4d(0,0,0,0),
         gfc_vector4d(0,0,0,0),
         0);
     gf2d_draw_image_new(sprite,shape,0);

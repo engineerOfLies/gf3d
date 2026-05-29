@@ -71,6 +71,7 @@ void gf2d_mouse_draw()
         NULL,
         NULL,
         NULL,
+        NULL,
         NULL);
 }
 

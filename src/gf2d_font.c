@@ -368,6 +368,7 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
             gfc_vector2d(0,0),
             gfc_color(1,1,1,1),
             gfc_vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             0);
         return;
     }
@@ -393,6 +394,7 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
         0,
         gfc_vector2d(0,0),
         gfc_color(1,1,1,1),
+        gfc_vector4d(0,0,0,0),
         gfc_vector4d(0,0,0,0),
         0);
 

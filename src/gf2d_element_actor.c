@@ -23,6 +23,7 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
             actor->flip,
             element->color,
             gfc_vector4d(0,0,0,0),
+            gfc_vector4d(0,0,0,0),
             actor->frame);
     }
     else if (actor->actor)
@@ -43,7 +44,8 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
             &actor->center,
             &actor->rotation,
             &element->color,
-            &actor->flip);
+            &actor->flip,
+            NULL);
     }
 }
 

@@ -540,6 +540,7 @@ void gf2d_armature_draw_sprite_to_bone_pose(
         flip,
         colorShift,
         NULL,
+        NULL,
         frame);
 }
 

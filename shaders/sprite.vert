@@ -12,6 +12,7 @@ layout(binding = 0) uniform UniformBufferObject
     vec2    scale;
     vec2    frame_offset;
     vec2    center;
+    vec4    clipRect;
     float   drawOrder;
     vec3    padding;
 } ubo;
@@ -24,9 +25,11 @@ out gl_PerVertex
 layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec2 inTexCoord;
 
-layout(location = 0) out vec2 fragTexCoord;
-layout(location = 1) out vec4 colorMod;
-layout(location = 2) out float drawOrder;
+layout(location = 0) out vec2   fragTexCoord;
+layout(location = 1) out vec4   colorMod;
+layout(location = 2) out float  drawOrder;
+layout(location = 4) out vec4   clipRect;
+
 
 void main()
 {
@@ -70,4 +73,5 @@ void main()
     gl_Position = vec4(r_position.xy/ubo.extent,0,1) - vec4(1,1,0,0) + drawOffset;
     colorMod = ubo.colorMod;
     drawOrder = ubo.drawOrder;
+    clipRect = ubo.clipRect;
 }

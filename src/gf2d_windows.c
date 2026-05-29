@@ -74,6 +74,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             &clip,
+            NULL,
             0);
     }
     if (!border)
@@ -99,6 +100,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             NULL,
+            NULL,
             BE_Top);
         gf2d_sprite_draw(
             border,
@@ -108,6 +110,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             NULL,
             &color,
+            NULL,
             NULL,
             BE_Bottom);
     }
@@ -124,6 +127,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             &clip,
+            NULL,
             BE_Top);
         gf2d_sprite_draw(
             border,
@@ -134,6 +138,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             &clip,
+            NULL,
             BE_Bottom);
     }
     
@@ -149,6 +154,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             NULL,
+            NULL,
             BE_Left);
         gf2d_sprite_draw(
             border,
@@ -158,6 +164,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             NULL,
             &color,
+            NULL,
             NULL,
             BE_Right);
     }
@@ -176,6 +183,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             &clip,
+            NULL,
             BE_Left);
         gf2d_sprite_draw(
             border,
@@ -186,6 +194,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
             NULL,
             &color,
             &clip,
+            NULL,
             BE_Right);
     }
     //corners
@@ -198,6 +207,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
         NULL,
         &color,
         NULL,
+        NULL,
         BE_TR);
     gf2d_sprite_draw(
         border,
@@ -207,6 +217,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
         NULL,
         NULL,
         &color,
+        NULL,
         NULL,
         BE_BL);
     gf2d_sprite_draw(
@@ -218,6 +229,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
         NULL,
         &color,
         NULL,
+        NULL,
         BE_TL);
     gf2d_sprite_draw(
         border,
@@ -227,6 +239,7 @@ void gf2d_draw_window_border_tiled(Sprite *border,Sprite *bg,GFC_Rect rect,GFC_C
         NULL,
         NULL,
         &color,
+        NULL,
         NULL,
         BE_BR);
     if (window_manager.drawbounds)
@@ -252,6 +265,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
             NULL,
             &color,
             NULL,
+            NULL,
             0);
     }
     if ((!border)||(border->frameHeight == 0)||(border->frameWidth == 0))return;
@@ -266,6 +280,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         &color,
         NULL,
+        NULL,
         BE_Top);
     gf2d_sprite_draw(
         border,
@@ -275,6 +290,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         NULL,
         &color,
+        NULL,
         NULL,
         BE_Bottom);
 
@@ -290,6 +306,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         &color,
         NULL,
+        NULL,
         BE_Left);
     gf2d_sprite_draw(
         border,
@@ -299,6 +316,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         NULL,
         &color,
+        NULL,
         NULL,
         BE_Right);
     //corners
@@ -311,6 +329,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         &color,
         NULL,
+        NULL,
         BE_TR);
     gf2d_sprite_draw(
         border,
@@ -320,6 +339,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         NULL,
         &color,
+        NULL,
         NULL,
         BE_BL);
     gf2d_sprite_draw(
@@ -331,6 +351,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         &color,
         NULL,
+        NULL,
         BE_TL);
     gf2d_sprite_draw(
         border,
@@ -340,6 +361,7 @@ void gf2d_draw_window_border_stretched(Sprite *border,Sprite *bg,GFC_Rect rect,G
         NULL,
         NULL,
         &color,
+        NULL,
         NULL,
         BE_BR);
     if (window_manager.drawbounds)

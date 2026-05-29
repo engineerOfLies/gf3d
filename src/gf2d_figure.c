@@ -355,7 +355,8 @@ void gf2d_figure_link_instance_draw(
         NULL,
         &drawRotation,
         color,
-        &flip);
+        &flip,
+        NULL);
 }
 
 void gf2d_figure_link_instance_draw_tweened(
@@ -415,7 +416,8 @@ void gf2d_figure_link_instance_draw_tweened(
         NULL,
         &drawRotation,
         color,
-        &flip);
+        &flip,
+        NULL);
 }
 
 void gf2d_figure_link_instance_update_link(FigureLinkInstance *linkInstance)

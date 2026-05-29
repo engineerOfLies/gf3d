@@ -156,6 +156,7 @@ Uint32 gf2d_actor_get_framecount(Actor *actor);
  * @param rotation (optional) if set it will rotate accordingly
  * @param color (optional) color is used as a modulation (limited)
  * @param flip (optional) if x or y is non-zero it will flip in that direction
+ * @param screenClip (optional) restrict drawing to this rect on the screen
  */
 void gf2d_actor_draw(
     Actor *actor,
@@ -165,7 +166,8 @@ void gf2d_actor_draw(
     GFC_Vector2D * center,
     float    * rotation,
     GFC_Color    * color,
-    GFC_Vector2D * flip
+    GFC_Vector2D * flip,
+    GFC_Vector4D * screenClip
 );
 
 /**
