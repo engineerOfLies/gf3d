@@ -4,10 +4,11 @@
 
 #include "gf2d_element_actor.h"
 
-void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
+void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset,GFC_Rect clipRect)
 {
     ActorElement *actor;
     GFC_Vector2D position;
+    GFC_Vector4D rect;
     if (!element)return;
     actor = (ActorElement*)element->data;
     if (!actor)return;
@@ -23,7 +24,7 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
             actor->flip,
             element->color,
             gfc_vector4d(0,0,0,0),
-            gfc_vector4d(0,0,0,0),
+            gfc_rect_to_vector4d(clipRect),
             actor->frame);
     }
     else if (actor->actor)
@@ -36,6 +37,7 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
         {
             position.y += element->drawBounds.h / 2;
         }
+        rect = gfc_rect_to_vector4d(clipRect);
         gf2d_actor_draw(
             actor->actor,
             actor->frame,
@@ -45,7 +47,7 @@ void gf2d_element_actor_draw(Element *element,GFC_Vector2D offset)
             &actor->rotation,
             &element->color,
             &actor->flip,
-            NULL);
+            &rect);
     }
 }
 

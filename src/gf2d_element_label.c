@@ -5,7 +5,7 @@
 #include "gf2d_font.h"
 #include "gf2d_element_label.h"
 
-void gf2d_element_label_draw(Element *element,GFC_Vector2D offset)
+void gf2d_element_label_draw(Element *element,GFC_Vector2D offset,GFC_Rect clipRect)
 {
     LabelElement *label;
     GFC_Vector2D position;
@@ -59,11 +59,11 @@ void gf2d_element_label_draw(Element *element,GFC_Vector2D offset)
     }
     if (label->wraps)
     {
-        gf2d_font_draw_text_wrap_tag(label->text,label->style,element->color, gfc_rect(position.x, position.y, element->drawBounds.w, element->drawBounds.h));
+        gf2d_font_draw_text_wrap_tag(label->text,label->style,element->color, gfc_rect(position.x, position.y, element->drawBounds.w, element->drawBounds.h),clipRect);
     }
     else 
     {
-        gf2d_font_draw_line_tag(label->text,label->style,element->color, position);
+        gf2d_font_draw_line_tag(label->text,label->style,element->color, position,clipRect);
     }
 }
 

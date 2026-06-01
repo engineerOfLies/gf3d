@@ -561,6 +561,7 @@ void gf3d_window_hide_toggle(Window *win)
 void gf2d_window_draw(Window *win)
 {
     int count,i;
+    GFC_Rect drawBounds = {0};
     GFC_Vector2D offset;
     if (!win)return;
     if (win->hidden)return;
@@ -569,12 +570,16 @@ void gf2d_window_draw(Window *win)
     {
         gf2d_draw_window_border_generic(win->dimensions,win->color);
     }
-    offset.x = win->dimensions.x + win->canvas.x;
-    offset.y = win->dimensions.y + win->canvas.y;
+    offset.x = win->dimensions.x;
+    offset.y = win->dimensions.y;
     count = gfc_list_get_count(win->elements);
+    if (win->clipToWindow)
+    {
+        drawBounds = win->dimensions;
+    }
     for (i = 0;i < count;i++)
     {
-        gf2d_element_draw((Element *)gfc_list_get_nth(win->elements,i), offset);
+        gf2d_element_draw((Element *)gfc_list_get_nth(win->elements,i), offset,drawBounds);
     }
 }
 
@@ -588,8 +593,8 @@ int gf2d_window_update(Window *win)
     Element *e;
     if (!win)return 0;
     if (win->disabled)return 0;
-    offset.x = win->dimensions.x + win->canvas.x;
-    offset.y = win->dimensions.y + win->canvas.y;
+    offset.x = win->dimensions.x;
+    offset.y = win->dimensions.y;
     count = gfc_list_get_count(win->elements);
     for (i = 0;i < count;i++)
     {
@@ -955,6 +960,7 @@ Window *gf2d_window_load_from_json(SJson *json)
     if (buffer)gfc_line_cpy(win->name,buffer);
     sj_get_bool_value(sj_object_get_value(json,"no_draw_generic"),&buul);
     if (buul)win->no_draw_generic = 1;
+    sj_object_get_uint8(json,"clipToWindow",&win->clipToWindow);
     sj_value_as_vector4d(sj_object_get_value(json,"color"),&gfc_vector);
     win->color = gfc_color_from_vector4(gfc_vector);
     

@@ -111,9 +111,11 @@ GFC_Vector2D gf2d_element_get_item_position(Element *element,int i,GFC_Vector2D 
     return position;
 }
 
-void gf2d_element_list_draw(Element *element,GFC_Vector2D offset)
+void gf2d_element_list_draw(Element *element,GFC_Vector2D offset,GFC_Rect clipRect)
 {
     int skip;
+    int right = 0,bottom;
+    GFC_Rect rectBounds = {0};
     GF2D_ListElement *list;
     GFC_Vector2D position = {0};
     GFC_Vector2D drawPosition = {0};
@@ -124,6 +126,24 @@ void gf2d_element_list_draw(Element *element,GFC_Vector2D offset)
     if (!list)return;
     position.x = element->drawBounds.x;
     position.y = element->drawBounds.y;
+    if (list->clipToBounds)
+    {
+        rectBounds = element->drawBounds;
+        gfc_vector2d_add(rectBounds,rectBounds,offset);
+        if ((clipRect.w != 0)&&(clipRect.h != 0))
+        {   //if both limit drawing
+            rectBounds.x = MAX(clipRect.x,rectBounds.x);
+            rectBounds.y = MAX(clipRect.x,rectBounds.y);
+            right = MIN((element->drawBounds.x + element->drawBounds.w),(clipRect.x + clipRect.w));
+            bottom = MIN((element->drawBounds.y + element->drawBounds.h),(clipRect.y + clipRect.h));
+            rectBounds.w = right - rectBounds.x;
+            rectBounds.h = bottom - rectBounds.y;
+        }
+    }
+    else if ((clipRect.w != 0)&&(clipRect.h != 0))
+    {
+        rectBounds = clipRect;
+    }
     if (list->scrolls)
     {
         if ((list->listStyle == LS_Horizontal) && (list->wraps))
@@ -163,9 +183,9 @@ void gf2d_element_list_draw(Element *element,GFC_Vector2D offset)
         }
         gfc_vector2d_add(drawPosition,position,offset);
         if (skip)continue;
-        gf2d_element_draw(e, drawPosition);
+        gf2d_element_draw(e, drawPosition,rectBounds);
     }
-    gf2d_element_draw(list->scrollbar, offset);
+    gf2d_element_draw(list->scrollbar, offset,clipRect);
 }
 
 int gf2d_element_list_get_item_count(Element *element)
@@ -346,7 +366,7 @@ GF2D_ListElement *gf2d_element_list_new()
 }
 
 
-GF2D_ListElement *gf2d_element_list_new_full(GFC_Rect bounds,GFC_Vector2D itemSize,GFC_ListStyle ls,int wraps,int scrolls,int packed,int cropped)
+GF2D_ListElement *gf2d_element_list_new_full(GFC_Rect bounds,GFC_Vector2D itemSize,GFC_ListStyle ls,int wraps,int scrolls,int packed,int cropped,Uint8 clipToBounds)
 {
     GF2D_ListElement *list;
     list = gf2d_element_list_new();
@@ -357,6 +377,7 @@ GF2D_ListElement *gf2d_element_list_new_full(GFC_Rect bounds,GFC_Vector2D itemSi
     if (itemSize.x <= 1)itemSize.x *= bounds.w;
     if (itemSize.y <= 1)itemSize.y *= bounds.h;
     gfc_vector2d_copy(list->itemSize,itemSize);
+    list->clipToBounds = clipToBounds;
     list->listStyle = ls;
     list->wraps = wraps;
     list->scrolls = scrolls;
@@ -432,7 +453,8 @@ Element *gf2d_element_list_new_complete(
     int wraps,
     int scrolls,
     int packed,
-    int cropped)
+    int cropped,
+    Uint8 clipToBounds)
 {
     Element *list;
     GF2D_ListElement *le;
@@ -440,7 +462,7 @@ Element *gf2d_element_list_new_complete(
         gfc_rect(0,0,1,1),
         itemSize,
         ls,
-        wraps,scrolls,packed,cropped);
+        wraps,scrolls,packed,cropped,clipToBounds);
     if (!le)return NULL;
     list = gf2d_element_new_full(
         parent,index,name,
@@ -461,6 +483,7 @@ void gf2d_element_load_list_from_config(Element *e,SJson *json,Window *win)
     GFC_ListStyle ls = 0;
     int i,count;
     const char *style = NULL;
+    Uint8 clipToBounds = 0;
     short int wraps = 0,scrolls = 0;
     short int packed = 0,cropped = 0;
     if ((!e) || (!json))
@@ -482,13 +505,14 @@ void gf2d_element_load_list_from_config(Element *e,SJson *json,Window *win)
         }
     }
     
+    sj_object_get_uint8(json,"clipToBounds",&clipToBounds);
     sj_get_bool_value(sj_object_get_value(json,"cropped"),&cropped);
     sj_get_bool_value(sj_object_get_value(json,"wraps"),&wraps);
     sj_get_bool_value(sj_object_get_value(json,"packed"),&packed);
     sj_get_bool_value(sj_object_get_value(json,"scrolls"),&scrolls);
     sj_value_as_vector2d(sj_object_get_value(json,"item_size"),&gfc_vector);
     
-    list = gf2d_element_list_new_full(e->bounds,gfc_vector,ls,wraps,scrolls,packed,cropped);
+    list = gf2d_element_list_new_full(e->bounds,gfc_vector,ls,wraps,scrolls,packed,cropped,clipToBounds);
     gf2d_element_make_list(e,list);
     
     value = sj_object_get_value(json,"elements");

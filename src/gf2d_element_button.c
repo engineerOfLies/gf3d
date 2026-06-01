@@ -9,7 +9,7 @@
 #include "gf2d_draw.h"
 #include "gf2d_mouse.h"
 
-void gf2d_element_button_draw(Element *element,GFC_Vector2D offset)
+void gf2d_element_button_draw(Element *element,GFC_Vector2D offset,GFC_Rect clipRect)
 {
     GFC_Rect rect;
     ButtonElement *button;
@@ -57,8 +57,8 @@ void gf2d_element_button_draw(Element *element,GFC_Vector2D offset)
         }
 
     }
-    gf2d_element_draw(button->actor,position);
-    gf2d_element_draw(button->label,position);
+    gf2d_element_draw(button->actor,position,clipRect);
+    gf2d_element_draw(button->label,position,clipRect);
 }
 
 GFC_List *gf2d_element_button_update(Element *element,GFC_Vector2D offset)

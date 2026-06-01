@@ -328,17 +328,17 @@ Font *gf2d_font_get_by_tag(FontTypes tag)
     return font_manager.font_tags[tag];
 }
 
-void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position)
+void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position,GFC_Rect clipRect)
 {
-    gf2d_font_draw_line(text,gf2d_font_get_by_filename(filename),color, position);
+    gf2d_font_draw_line(text,gf2d_font_get_by_filename(filename),color, position,clipRect);
 }
 
-void gf2d_font_draw_line_tag(char *text,FontTypes tag,GFC_Color color, GFC_Vector2D position)
+void gf2d_font_draw_line_tag(char *text,FontTypes tag,GFC_Color color, GFC_Vector2D position,GFC_Rect clipRect)
 {
-    gf2d_font_draw_line(text,gf2d_font_get_by_tag(tag),color, position);
+    gf2d_font_draw_line(text,gf2d_font_get_by_tag(tag),color, position,clipRect);
 }
 
-void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D position)
+void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D position,GFC_Rect clipRect)
 {
     SDL_Surface *surface;
     Sprite *sprite;
@@ -368,7 +368,7 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
             gfc_vector2d(0,0),
             gfc_color(1,1,1,1),
             gfc_vector4d(0,0,0,0),
-            gfc_vector4d(0,0,0,0),
+            gfc_rect_to_vector4d(clipRect),
             0);
         return;
     }
@@ -395,7 +395,7 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
         gfc_vector2d(0,0),
         gfc_color(1,1,1,1),
         gfc_vector4d(0,0,0,0),
-        gfc_vector4d(0,0,0,0),
+        gfc_rect_to_vector4d(clipRect),
         0);
 
     gf2d_font_image_new(sprite,text,color,font);
@@ -551,17 +551,18 @@ GFC_Rect gf2d_font_get_text_wrap_bounds(
 
 
 
-void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,GFC_Color color, GFC_Rect block)
+void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,GFC_Color color, GFC_Rect block,GFC_Rect clipRect)
 {
-    gf2d_font_draw_text_wrap(text,block,color, gf2d_font_get_by_tag(tag));
+    gf2d_font_draw_text_wrap(text,block,color, gf2d_font_get_by_tag(tag),clipRect);
 }
 
 
 void gf2d_font_draw_text_wrap(
-    char    *thetext,
-    GFC_Rect     block,
-    GFC_Color    color,
-    Font    *font
+    char       *thetext,
+    GFC_Rect    block,
+    GFC_Color   color,
+    Font       *font,
+    GFC_Rect    clipRect
 )
 {
     GFC_TextBlock textline = "";
@@ -617,7 +618,7 @@ void gf2d_font_draw_text_wrap(
         if (sscanf(text,"%s",word) == EOF)
         {
             block.y=drawheight + (h*row);
-            gf2d_font_draw_line(temptextline,font,color, gfc_vector2d(block.x,block.y));
+            gf2d_font_draw_line(temptextline,font,color, gfc_vector2d(block.x,block.y),clipRect);
             return;
         }
         
@@ -643,7 +644,7 @@ void gf2d_font_draw_text_wrap(
         if(w > block.w)         /*see if we have gone over*/
         {
             block.y=drawheight + (h*row);
-            gf2d_font_draw_line(textline,font,color, gfc_vector2d(block.x,block.y));
+            gf2d_font_draw_line(textline,font,color, gfc_vector2d(block.x,block.y),clipRect);
             row++;
             /*draw the line and get ready for the next line*/
             if (block.h != 0)

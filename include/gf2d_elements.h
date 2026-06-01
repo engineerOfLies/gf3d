@@ -59,7 +59,7 @@ struct Element_S
     int                 hidden;             /**<if true, do not draw or update*/
     int                 state;              /**<if true, drawn with highlight*/
     int                 type;               /**<which type of element this is*/
-    void (*draw)(struct Element_S *element,GFC_Vector2D offset); /**<draw function, offset comes from draw position of window*/
+    void (*draw)(struct Element_S *element,GFC_Vector2D offset,GFC_Rect clipRect); /**<draw function, offset comes from draw position of window*/
     struct Element_S *(*get_next)(struct Element_S *element,struct Element_S *from); /**<search for the next element from (if NULL, it returns itself*/
     GFC_List *(*update)(struct Element_S *element,GFC_Vector2D offset); /**<function called for updates  returns alist of all elements updated with input*/
     void (*free_data)(struct Element_S *element);    /**<free function for the element to clean up any loaded custom data*/
@@ -111,7 +111,7 @@ void gf2d_element_free(Element *element);
  * @param element the element to draw
  * @param offset comes from parent window position
  */
-void gf2d_element_draw(Element *element, GFC_Vector2D offset);
+void gf2d_element_draw(Element *element, GFC_Vector2D offset,GFC_Rect clipRect);
 
 /**
  * @brief get the screen position of the last time this element was drawn

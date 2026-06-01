@@ -80,7 +80,7 @@ void gf2d_element_set_hidden(Element *element, int hidden)
     element->hidden = hidden;
 }
 
-void gf2d_element_draw(Element *e, GFC_Vector2D offset)
+void gf2d_element_draw(Element *e, GFC_Vector2D offset,GFC_Rect clipRect)
 {
     GFC_Rect rect;
     if ((!e)||(e->hidden))
@@ -94,7 +94,7 @@ void gf2d_element_draw(Element *e, GFC_Vector2D offset)
     {
         gf2d_draw_rect_filled(rect,e->backgroundColor);
     }
-    if (e->draw)e->draw(e,offset);
+    if (e->draw)e->draw(e,offset,clipRect);
     if (__DEBUG)
     {
         gf2d_draw_rect(rect,gfc_color8(100,255,100,255));

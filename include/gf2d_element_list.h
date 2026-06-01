@@ -35,13 +35,14 @@ typedef struct
     GFC_List *list;
     GFC_Vector2D itemSize;
     GFC_ListStyle listStyle;
-    int   cropped;          /**<if true, check for items being out bounds of the list, skip the ones that are*/
-    int   packed;           /**<if true, items are spaced by their individual size, otherwise by the list itemSize*/
-    int   wraps;            /**<if true, this will wrap when the items clip the edge*/
-    int   scrolls;          /**<if true, allow for scrolling position*/
-    int   scrollOffset;     /**<offset for drawing based on scrolling position*/
-    int   itemsPerLine;     /**<how many items will fit per line*/
-    int   itemsPerColumn;   /**<how many items will fit per columns*/
+    Uint8 cropped;          /**<if true, check for items being out bounds of the list, skip the ones that are*/
+    Uint8 clipToBounds;     /**<if true, limit element drawing to the list drawing area*/
+    Uint8 packed;           /**<if true, items are spaced by their individual size, otherwise by the list itemSize*/
+    Uint8 wraps;            /**<if true, this will wrap when the items clip the edge*/
+    Uint8 scrolls;          /**<if true, allow for scrolling position*/
+    Uint8 scrollOffset;     /**<offset for drawing based on scrolling position*/
+    Uint8 itemsPerLine;     /**<how many items will fit per line*/
+    Uint8 itemsPerColumn;   /**<how many items will fit per columns*/
     Element *scrollbar;     /**<sub_element*/
 }GF2D_ListElement;
 
@@ -55,6 +56,7 @@ typedef struct
  * @param scrolls if the list should scroll (not yet implemented)
  * @param packed if the items should be spaced according to their own size or the itemSize
  * @param packed if true, items will be skipped if they are out of bounds of the list
+ * @param clipToBounds if true, limit drawing area of sub elements to the bounds of the list
  * @return NULL on error or a formatted listElement otherwise
  */
 GF2D_ListElement *gf2d_element_list_new_full(
@@ -64,7 +66,8 @@ GF2D_ListElement *gf2d_element_list_new_full(
     int wraps,
     int scrolls,
     int packed,
-    int cropped);
+    int cropped,
+    Uint8 clipToBounds);
 
 /**
  * @brief free all of the elements in the list, leaving the list element, but empty
@@ -158,6 +161,7 @@ Element *gf2d_element_list_new_complete(
     int wraps,
     int scrolls,
     int packed,
-    int cropped);
+    int cropped,
+    Uint8 clipToBounds);
 
 #endif

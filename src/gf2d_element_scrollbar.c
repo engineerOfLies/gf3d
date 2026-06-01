@@ -11,7 +11,7 @@
 void gf2d_element_scrollbar_update_range(Element *element);
 
 
-void gf2d_element_scrollbar_draw(Element *element,GFC_Vector2D offset)
+void gf2d_element_scrollbar_draw(Element *element,GFC_Vector2D offset,GFC_Rect clipRect)
 {
     GFC_Rect rect;
     GFC_Vector2D position;
@@ -28,9 +28,9 @@ void gf2d_element_scrollbar_draw(Element *element,GFC_Vector2D offset)
         element->drawBounds.h -40);
     gf2d_draw_rect_filled(rect,element->backgroundColor);
     
-    gf2d_element_draw(data->scrollUp,position);
-    gf2d_element_draw(data->scrollSlider,position);
-    gf2d_element_draw(data->scrollDown,position);
+    gf2d_element_draw(data->scrollUp,position,clipRect);
+    gf2d_element_draw(data->scrollSlider,position,clipRect);
+    gf2d_element_draw(data->scrollDown,position,clipRect);
 }
 
 Element *gf2d_element_scrollbar_get_next(Element *element, Element *from)

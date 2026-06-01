@@ -6,7 +6,7 @@
 #include "gf2d_element_label.h"
 #include "gf2d_mouse.h"
 
-void gf2d_element_entry_draw(Element *element,GFC_Vector2D offset)
+void gf2d_element_entry_draw(Element *element,GFC_Vector2D offset,GFC_Rect clipRect)
 {
     EntryElement *entry;
     GFC_Vector2D position;
@@ -14,7 +14,7 @@ void gf2d_element_entry_draw(Element *element,GFC_Vector2D offset)
     entry = (EntryElement*)element->data;
     if (!entry)return;
     gfc_vector2d_add(position,offset,element->drawBounds);
-    gf2d_element_draw(entry->label,position);
+    gf2d_element_draw(entry->label,position,clipRect);
     if (!element->hasFocus)
     {
         gf2d_draw_rect(

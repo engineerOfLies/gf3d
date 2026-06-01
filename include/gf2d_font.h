@@ -76,11 +76,16 @@ FontTypes gf2d_font_type_from_text(const char *buf);
 
 
 /**
- * @brief draw text to the screen overlay layer
+ * @brief draw text to the screen overlay layer, with a clear background
+ * @param text to draw
+ * @param filename/tag/font which font to use
+ * @param color of the text
+ * @param position screen position to draw to
+ * @param clipRect if nonzero limit drawing to this screen rect
  */
-void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position);
-void gf2d_font_draw_line_tag(char *text,FontTypes tag,GFC_Color color, GFC_Vector2D position);
-void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D position);
+void gf2d_font_draw_line_named(char *text,char *filename,GFC_Color color, GFC_Vector2D position,GFC_Rect clipRect);
+void gf2d_font_draw_line_tag(char *text,FontTypes tag,GFC_Color color, GFC_Vector2D position,GFC_Rect clipRect);
+void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D position,GFC_Rect clipRect);
 
 /**
  * @brief draw a word wrapped block of text to the sceen
@@ -88,12 +93,14 @@ void gf2d_font_draw_line(char *text,Font *font,GFC_Color color, GFC_Vector2D pos
  * @param block the dimensions to keep to
  * @param color the color to draw with
  * @param font the font to use, IF NULL this is a no-op
+ * @param clipRect if nonzero limit drawing to this screen rect
  */
 void gf2d_font_draw_text_wrap(
-    char    *thetext,
-    GFC_Rect     block,
-    GFC_Color    color,
-    Font    *font
+    char       *thetext,
+    GFC_Rect    block,
+    GFC_Color   color,
+    Font       *font,
+    GFC_Rect    clipRect
 );
 
 /**
@@ -102,8 +109,9 @@ void gf2d_font_draw_text_wrap(
  * @param tag the font tag to use to draw
  * @param color the color to draw with
  * @param block the dimensions to keep to
+ * @param clipRect if nonzero limit drawing to this screen rect
  */
-void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,GFC_Color color, GFC_Rect block);
+void gf2d_font_draw_text_wrap_tag(char *text,FontTypes tag,GFC_Color color, GFC_Rect block, GFC_Rect clipRect);
 
 /**
  * @brief get the bounds that will describe the text provided, with word wrap on
