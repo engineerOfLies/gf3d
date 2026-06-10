@@ -243,11 +243,7 @@ void gf2d_element_list_recalibrate(Element *e)
     if (!e)return;
     list = (GF2D_ListElement*)e->data;
     if (!list)return;
-    if (!(int)list->itemSize.x)
-    {
-        list->itemsPerLine = 1;
-    }
-    else list->itemsPerLine = MIN((int)e->drawBounds.w / (int)list->itemSize.x,1);
+    list->itemsPerLine = e->drawBounds.w / list->itemSize.x;
     c = gfc_list_count(list->list);
     for (i = 0; i < c; i++)
     {
