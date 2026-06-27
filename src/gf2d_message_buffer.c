@@ -204,13 +204,24 @@ void message_new_color(const char *newMessage,GFC_Color color)
 
 void message_printf(const char *newMessage,...)
 {
-    GFC_TextLine msg;
+    int size;
+    char *buffer;
     va_list ap;
-    /*echo all logging to stdout*/
-    va_start(ap,newMessage);
-    vsprintf(msg,newMessage,ap);
+    
+    va_start(ap, newMessage);
+    size = vsnprintf(NULL, 0, newMessage, ap);
     va_end(ap);
-    message_new(msg);
+    
+    if (size <= 0)return;
+    
+    buffer = (char *)gfc_allocate_array(sizeof(char),size + 1);
+    if (!buffer)return;
+    
+    va_start(ap,newMessage);
+    vsprintf(buffer,newMessage,ap);
+    va_end(ap);
+    message_new(buffer);
+    free(buffer);
 }
 
 void message_printf_color(GFC_Color color,const char *newMessage,...)
