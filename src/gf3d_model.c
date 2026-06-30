@@ -815,6 +815,7 @@ void gf3d_model_draw_armature_frame(
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
     if (useHighlight)
     {
+        uboData.mesh.color = gfc_color_to_vector4f(highlightColor);
         gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,NULL);
     }
 }

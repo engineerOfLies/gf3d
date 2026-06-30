@@ -684,7 +684,7 @@ MeshUBO gf3d_mesh_get_ubo(
     gfc_vector4d_copy(modelUBO.color,color);
     
     modelUBO.camera = gfc_vector3dw(gf3d_camera_get_position(),1.0);
-    
+    modelUBO.viewportSize = gf3d_vgraphics_get_view_extent_as_vector2d();
     return modelUBO;
 }
 
