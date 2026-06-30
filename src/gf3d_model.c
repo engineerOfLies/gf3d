@@ -641,7 +641,9 @@ void gf3d_model_draw_all_meshes(
     GFC_Matrix4 modelMat,
     GFC_Color colorMod,
     LightUBO *lighting,
-    Uint32 frame)
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor)
 {
     gf3d_model_draw_all_meshes_armature(
         model,
@@ -649,7 +651,9 @@ void gf3d_model_draw_all_meshes(
         colorMod,
         lighting,
         model->armature,
-        frame);
+        frame,
+        useHighlight,
+        highlightColor);
 }
 
 void gf3d_model_draw_all_meshes_armature(
@@ -658,24 +662,28 @@ void gf3d_model_draw_all_meshes_armature(
     GFC_Color colorMod,
     LightUBO *lighting,
     Armature3D *armature,
-    Uint32 frame)
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor)
 {
     int i,c;
     if (!model)return;
     c = gfc_list_get_count(model->mesh_list);
     for (i = 0;i < c; i++)
     {
-        gf3d_model_draw_armature_frame(model,i,modelMat,colorMod,lighting,armature,frame);
+        gf3d_model_draw_armature_frame(model,i,modelMat,colorMod,lighting,armature,frame,useHighlight,highlightColor);
     }
 }
 
 
 void gf3d_model_draw(
-    Model *model,
+    Model      *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
-    Uint32 frame)
+    LightUBO   *lighting,
+    Uint32      frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor)
 {
     gf3d_model_armature_draw(
         model,
@@ -683,7 +691,9 @@ void gf3d_model_draw(
         colorMod,
         lighting,
         model->armature,
-        frame);
+        frame,
+        useHighlight,
+        highlightColor);
 }
 
 void gf3d_model_armature_draw(
@@ -692,7 +702,9 @@ void gf3d_model_armature_draw(
     GFC_Color   colorMod,
     LightUBO *lighting,
     Armature3D *armature,
-    Uint32 frame)
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor)
 {
     if (!model)return;
     if (model->mesh_as_frame)
@@ -704,7 +716,9 @@ void gf3d_model_armature_draw(
             colorMod,
             lighting,
             armature,
-            0);
+            0,
+            useHighlight,
+            highlightColor);
         return;
     }
     gf3d_model_draw_all_meshes_armature(
@@ -713,7 +727,9 @@ void gf3d_model_armature_draw(
         colorMod,
         lighting,
         armature,
-        frame);
+        frame,
+        useHighlight,
+        highlightColor);
 }
 
 
@@ -723,7 +739,9 @@ void gf3d_model_draw_index(
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
     LightUBO *lighting,
-    Uint32 frame)
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor)
 {
     gf3d_model_draw_armature_frame(
         model,
@@ -732,17 +750,21 @@ void gf3d_model_draw_index(
         colorMod,
         lighting,
         model->armature,
-        frame);
+        frame,
+        useHighlight,
+        highlightColor);
 }
 
 void gf3d_model_draw_armature_frame(
-    Model *model,
-    Uint32 index,
+    Model      *model,
+    Uint32      index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
+    LightUBO   *lighting,
     Armature3D *armature,
-    Uint32 frame)
+    Uint32      frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor)
 {
     Mesh *mesh;
     GFC_Matrix4 matrix = {0};
@@ -791,31 +813,10 @@ void gf3d_model_draw_armature_frame(
     //queue up the translucent pass, we can't skip this one because there MIGHT be transparency in the skins
     uboData.flags.y = 1.0;//setup the pipeline to know
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
-}
-
-
-void gf3d_model_draw_highlight(Model *model,Uint32 index,GFC_Matrix4 modelMat,GFC_Color highlight)
-{
-    Mesh *mesh;
-    GFC_Matrix4 matrix = {0};
-    Texture *texture;
-    MeshUBO uboData = {0};
-    
-    if (!gf3d_model.initiliazed)return;
-    if (!model)return;
-
-    //factor in the matrix loaded from disk
-    gfc_matrix4_multiply(matrix,model->matrix,modelMat);
-    uboData = gf3d_model_get_highlight_ubo(matrix,highlight);
-    
-    if (!model->texture)
+    if (useHighlight)
     {
-        texture = gf3d_model.defaultTexture;
+        gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,NULL);
     }
-    else texture = model->texture;
-    // queue up a render for batch rendering
-    mesh = gfc_list_get_nth(model->mesh_list,index);
-    gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,texture);
 }
 
 void gf3d_model_draw_sky(Model *model,GFC_Matrix4 modelMat,GFC_Color color)

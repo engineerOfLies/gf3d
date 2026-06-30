@@ -156,11 +156,13 @@ void gf3d_model_move(Model *in, GFC_Vector3D offset,GFC_Vector3D rotation);
  * @param frame the animation frame to use for armature based animations
  */
 void gf3d_model_draw(
-    Model *model,
+    Model      *model,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,//TODO pass a material instead
-    LightUBO *lighting,
-    Uint32 frame);
+    LightUBO   *lighting,
+    Uint32      frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor);
 
 /**
  * @brief queue up a model for rendering using the provided armature
@@ -177,7 +179,9 @@ void gf3d_model_armature_draw(
     GFC_Color   colorMod,
     LightUBO *lighting,
     Armature3D *armature,
-    Uint32 frame);
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor);
 
 
 /**
@@ -195,7 +199,9 @@ void gf3d_model_draw_index(
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
     LightUBO *lighting,
-    Uint32 frame);
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor);
 
 /**
  * @brief queue up a model for rendering, specifying one mesh in the model (this can be for animation, or sub-meshes) using the provided armature (instead of the one with the model)
@@ -206,15 +212,19 @@ void gf3d_model_draw_index(
  * @param lighting the lighting that should be applied
  * @param armature the armature to use for this.  If none is provided, none is used
  * @param frame the animation frame to use for armature based animations
+ * @param useHighlight use the highlight pipeline
+ * @param highlightColor highlight the model with this color
  */
 void gf3d_model_draw_armature_frame(
-    Model *model,
-    Uint32 index,
+    Model      *model,
+    Uint32      index,
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
-    LightUBO *lighting,
+    LightUBO   *lighting,
     Armature3D *armature,
-    Uint32 frame);
+    Uint32      frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor);
 
 /**
  * @brief draw all of the meshes of a model.  This is meant for multi-mesh models
@@ -230,7 +240,9 @@ void gf3d_model_draw_all_meshes(
     GFC_Matrix4 modelMat,
     GFC_Color   colorMod,
     LightUBO *lighting,
-    Uint32 frame);
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor);
 
 /**
  * @brief draw all of the meshes of a model with the provided armature.  This is meant for multi-mesh models
@@ -248,7 +260,9 @@ void gf3d_model_draw_all_meshes_armature(
     GFC_Color colorMod,
     LightUBO *lighting,
     Armature3D *armature,
-    Uint32 frame);
+    Uint32 frame,
+    Uint8       useHighlight,
+    GFC_Color   highlightColor);
 
 
 /**
