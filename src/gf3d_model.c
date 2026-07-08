@@ -813,10 +813,15 @@ void gf3d_model_draw_armature_frame(
     //queue up the translucent pass, we can't skip this one because there MIGHT be transparency in the skins
     uboData.flags.y = 1.0;//setup the pipeline to know
     gf3d_mesh_queue_render(mesh,gf3d_mesh_get_alpha_pipeline(),&uboData,texture);
+    uboData.flags.y = 0;
     if (useHighlight)
     {
+        if (armature)
+        {
+            uboData.flags.x = 1;
+        }
         uboData.mesh.color = gfc_color_to_vector4f(highlightColor);
-        gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,NULL);
+        gf3d_mesh_queue_render(mesh,gf3d_mesh_get_highlight_pipeline(),&uboData,texture);
     }
 }
 

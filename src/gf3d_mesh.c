@@ -160,7 +160,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
         count,
-        sizeof(MeshUBO),
+        sizeof(ModelUBO),
         VK_INDEX_TYPE_UINT32
     );
 
