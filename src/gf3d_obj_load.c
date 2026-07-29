@@ -24,7 +24,7 @@ int gf3d_obj_edge_test(ObjData *obj,GFC_Matrix4 offset, GFC_Edge3D e,GFC_Vector3
         t.b = gfc_vector4dxyz(out);
         gfc_matrix4_multiply_v(&out,offset,gfc_vector3dw(t.c,0));
         t.c = gfc_vector4dxyz(out);
-        if (gfc_trigfc_angle_edge_test(e,t,contact))return 1;
+        if (gfc_triangle_edge_test(e,t,contact))return 1;
     }
     return 0;
 }
