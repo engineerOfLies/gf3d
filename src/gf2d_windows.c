@@ -1034,12 +1034,14 @@ Element *gf2d_window_get_element_by_name(Window *win,const char *name)
 
 void gf2d_window_bring_to_front(Window *win)
 {
+    if (!win)return;
     gfc_list_delete_data(window_manager.window_deque,win);
     gfc_list_append(window_manager.window_deque,win);
 }
 
 void gf2d_window_send_to_back(Window *win)
 {
+    if (!win)return;
     gfc_list_delete_data(window_manager.window_deque,win);
     gfc_list_prepend(window_manager.window_deque,win);
 }

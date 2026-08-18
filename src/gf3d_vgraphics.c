@@ -57,7 +57,7 @@ typedef struct
     VkSurfaceKHR                surface;
 
     // color space
-    GFC_Color                       bgcolor;
+    GFC_Color                   bgcolor;
     VkFormat                    color_format;
     VkColorSpaceKHR             color_space;
     
@@ -78,6 +78,8 @@ typedef struct
     Uint32                      amask;
     Bool                        enable_3d;
     Bool                        enable_2d;
+    
+    GFC_List                   *resolutions;/**<list of supported resolutions*/
 }vGraphics;
 
 static vGraphics gf3d_vgraphics = {0};
@@ -99,6 +101,7 @@ void gf3d_vgraphics_setup(
     const char *windowName,
     int renderWidth,
     int renderHeight,
+    GFC_Vector2D windowSize,
     Bool fullscreen,
     Bool enableValidation,
     Bool enableDebug,
@@ -108,10 +111,14 @@ void gf3d_vgraphics_setup(
 void gf3d_vgraphics_init(const char *config)
 {
     Bool enable;
+    Uint32 modelMax = 100;
+    Uint32 spriteMax = 100;
+    Uint32 particleMax = 100;
     Pipeline *renderPipe= NULL;
     SJson *json,*setup;
     const char *windowName = NULL;
     GFC_Vector2D resolution = {1024,768};
+    GFC_Vector2D screenSize = {1024,768};
     short int fullscreen = 0;
     short int enableValidation = 0;
     short int enableDebug = 0;
@@ -135,12 +142,16 @@ void gf3d_vgraphics_init(const char *config)
     
     windowName = sj_object_get_value_as_string(setup,"application_name");
     sj_value_as_vector2d(sj_object_get_value(setup,"resolution"),&resolution);
+    sj_value_as_vector2d(sj_object_get_value(setup,"screenSize"),&screenSize);
     gf3d_vgraphics.bgcolor = sj_value_as_color(sj_object_get_value(setup,"background"));
+    sj_object_get_uint32(json,"modelMax",&modelMax);
+    sj_object_get_uint32(json,"spriteMax",&spriteMax);
+    sj_object_get_uint32(json,"particleMax",&particleMax);
     sj_get_bool_value(sj_object_get_value(setup,"fullscreen"),&fullscreen);
     sj_get_bool_value(sj_object_get_value(json,"enable_debug"),&enableDebug);
     sj_get_bool_value(sj_object_get_value(json,"enable_validation"),&enableValidation);
     
-    if (resolution.y == 0)
+    if ((resolution.y == 0)||(screenSize.y == 0))
     {
         slog("invalid resolution (%f,%f), closing",resolution.x,resolution.y);
         sj_free(json);
@@ -166,6 +177,7 @@ void gf3d_vgraphics_init(const char *config)
         windowName,
         resolution.x,
         resolution.y,
+        screenSize,
         fullscreen,
         enableValidation,
         enableDebug,
@@ -197,7 +209,7 @@ void gf3d_vgraphics_init(const char *config)
         gf3d_vgraphics.bmask,
         gf3d_vgraphics.amask);
 
-    gf3d_texture_init(1024);
+    gf3d_texture_init(spriteMax);
 
     gf3d_command_system_init(16 * gf3d_swapchain_get_swap_image_count(), gf3d_vgraphics.device);
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
@@ -205,28 +217,49 @@ void gf3d_vgraphics_init(const char *config)
     if (sj_object_get_value_as_bool(json,"enable_3d",&enable)&&(enable))
     {
         gf3d_vgraphics.enable_3d = 1;
-        gf3d_mesh_init(1024);//TODO: pull this from a parameter
-        gf3d_model_manager_init(1024);
-        gf3d_particle_manager_init(16384);
+        gf3d_mesh_init(modelMax);//TODO: pull this from a parameter
+        gf3d_model_manager_init(modelMax);
+        gf3d_particle_manager_init(particleMax);
         renderPipe = gf3d_mesh_get_pipeline();
     }
     if (sj_object_get_value_as_bool(json,"enable_2d",&enable)&&(enable))
     {
         gf3d_vgraphics.enable_2d = 1;
-        gf2d_sprite_manager_init(1024);
+        gf2d_sprite_manager_init(spriteMax);
         if (!renderPipe)renderPipe = gf2d_sprite_get_pipeline();
     }
-
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(renderPipe);
     gf3d_vgraphics_semaphores_create();
 }
 
+void gf3d_vgraphics_get_supported_display_resolutions(GFC_List *resolutions)
+{
+    int i,c;
+    GFC_Vector2D *resolution;
+    SDL_DisplayMode mode;
+    c = SDL_GetNumDisplayModes(0);//only dealing with one display here
+    for (i = 0; i < c; i++)
+    {
+        if (SDL_GetDisplayMode(0, i,&mode) != 0)continue;
+        resolution = gfc_vector2d_new();
+        if (!resolution)continue;
+        resolution->x = mode.w;
+        resolution->y = mode.h;
+        gfc_list_append(resolutions,resolution);
+    }
+}
+
+GFC_List *gf3d_vgraphics_get_supported_resolutions()
+{
+    return gf3d_vgraphics.resolutions;
+}
 
 void gf3d_vgraphics_setup(
     const char *windowName,
     int renderWidth,
     int renderHeight,
+    GFC_Vector2D windowSize,
     Bool fullscreen,
     Bool enableValidation,
     Bool enableDebug,
@@ -256,10 +289,12 @@ void gf3d_vgraphics_setup(
         }
     }
 	slog_sync();
+    gf3d_vgraphics.resolutions = gfc_list_new();
+    gf3d_vgraphics_get_supported_display_resolutions(gf3d_vgraphics.resolutions);
     gf3d_vgraphics.main_window = SDL_CreateWindow(windowName,
                              SDL_WINDOWPOS_UNDEFINED,
                              SDL_WINDOWPOS_UNDEFINED,
-                             renderWidth, renderHeight,
+                             windowSize.x, windowSize.y,
                              flags);
 	slog_sync();
     if (!gf3d_vgraphics.main_window)
@@ -377,6 +412,11 @@ void gf3d_vgraphics_setup(
 
 void gf3d_vgraphics_close()
 {
+    if (gf3d_vgraphics.resolutions)
+    {
+        gfc_list_foreach(gf3d_vgraphics.resolutions,free);
+        gfc_list_delete(gf3d_vgraphics.resolutions);
+    }
     if (gf3d_vgraphics.sdl_extension_names)
     {
         free(gf3d_vgraphics.sdl_extension_names);

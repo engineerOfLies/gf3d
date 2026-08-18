@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_list.h"
 
 #include "gf3d_pipeline.h"
 #include "gf3d_commands.h"
@@ -160,5 +161,13 @@ SDL_Surface *gf3d_vgraphics_create_surface(Uint32 w,Uint32 h);
  * @note this will clear the data of the original surface if it is successful automatically.
  */
 SDL_Surface *gf3d_vgraphics_screen_convert(SDL_Surface **surface);
+
+/**
+ * @brief get a list of resolutions supported by the primary display
+ * @return NULL on error, or a list of GFC_Vector2D's with the width and heights supported
+ * @note this is owned by gf3d, do not alter or delete
+ */
+GFC_List *gf3d_vgraphics_get_supported_resolutions();
+
 
 #endif
