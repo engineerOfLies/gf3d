@@ -19,13 +19,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -41,14 +41,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\djkehoe\git\gf3d\gfc\simple_logger\include;C:\Users\djkehoe\git\gf3d\gfc\simple_json\include;C:\Users\djkehoe\git\gf3d\gfc\include;C:\Users\djkehoe\git\gf3d\include;C:\Users\djkehoe\git\libs\VulkanSDK\1.1.82.1\Include;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\include;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\include;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\include;C:\Users\djkehoe\git\libs\SDL2-2.0.8\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\djkehoe\git\libs\VulkanSDK\1.1.82.1\Lib32;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\lib\x86;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\lib\x86;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\lib\x86;C:\Users\djkehoe\git\libs\SDL2-2.0.8\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\jddju\Git\libs\VulcanSDK old with x86\Include;C:\Users\jddju\Git\libs\SDL2-2.30.11\include;C:\Users\jddju\Git\libs\SDL2_ttf-2.24.0\include;C:\Users\jddju\Git\libs\SDL2_mixer-2.8.0\include;C:\Users\jddju\Git\libs\SDL2_image-2.8.4\include;C:\Users\jddju\Git\3D-Game-Dev\gfc\simple_logger\include;C:\Users\jddju\Git\3D-Game-Dev\gfc\simple_json\include;C:\Users\jddju\Git\3D-Game-Dev\gfc\include;C:\Users\jddju\Git\3D-Game-Dev\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\jddju\Git\libs\VulcanSDK old with x86\Lib32;C:\Users\jddju\Git\libs\SDL2-2.30.11\lib\x86;C:\Users\jddju\Git\libs\SDL2_ttf-2.24.0\lib\x86;C:\Users\jddju\Git\libs\SDL2_mixer-2.8.0\lib\x86;C:\Users\jddju\Git\libs\SDL2_image-2.8.4\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>..\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\djkehoe\git\gf3d\gfc\simple_logger\include;C:\Users\djkehoe\git\gf3d\gfc\simple_json\include;C:\Users\djkehoe\git\gf3d\gfc\include;C:\Users\djkehoe\git\gf3d\include;C:\Users\djkehoe\git\libs\VulkanSDK\1.2.148.1\Include;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\include;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\include;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\include;C:\Users\djkehoe\git\libs\SDL2-2.0.8\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\djkehoe\git\libs\VulkanSDK\1.2.148.1\Lib32;C:\Users\djkehoe\git\libs\SDL2_ttf-2.0.14\lib\x86;C:\Users\djkehoe\git\libs\SDL2_mixer-2.0.2\lib\x86;C:\Users\djkehoe\git\libs\SDL2_image-2.0.3\lib\x86;C:\Users\djkehoe\git\libs\SDL2-2.0.8\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\jddju\Git\libs\VulcanSDK old with x86\Include;C:\Users\jddju\Git\libs\SDL2-2.30.11\include;C:\Users\jddju\Git\libs\SDL2_ttf-2.24.0\include;C:\Users\jddju\Git\libs\SDL2_mixer-2.8.0\include;C:\Users\jddju\Git\libs\SDL2_image-2.8.4\include;C:\Users\jddju\Git\3D-Game-Dev\gfc\simple_logger\include;C:\Users\jddju\Git\3D-Game-Dev\gfc\simple_json\include;C:\Users\jddju\Git\3D-Game-Dev\gfc\include;C:\Users\jddju\Git\3D-Game-Dev\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\jddju\Git\libs\VulcanSDK old with x86\Lib32;C:\Users\jddju\Git\libs\SDL2-2.30.11\lib\x86;C:\Users\jddju\Git\libs\SDL2_ttf-2.24.0\lib\x86;C:\Users\jddju\Git\libs\SDL2_mixer-2.8.0\lib\x86;C:\Users\jddju\Git\libs\SDL2_image-2.8.4\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>..</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -57,12 +57,12 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>sdl2_ttf.lib;sdl2_mixer.lib;sdl2_image.lib;SDL2.lib;SDL2main.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;SDL2_ttf.lib;SDL2_mixer.lib;SDL2_image.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,7 +73,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -84,36 +84,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\gfc\include\gfc_audio.h" />
-    <ClInclude Include="..\gfc\include\gfc_callbacks.h" />
-    <ClInclude Include="..\gfc\include\gfc_color.h" />
-    <ClInclude Include="..\gfc\include\gfc_input.h" />
-    <ClInclude Include="..\gfc\include\gfc_list.h" />
-    <ClInclude Include="..\gfc\include\gfc_matrix.h" />
-    <ClInclude Include="..\gfc\include\gfc_text.h" />
-    <ClInclude Include="..\gfc\include\gfc_types.h" />
-    <ClInclude Include="..\gfc\include\gfc_vector.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_list.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_object.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_parse.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h" />
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
-    <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
-    <ClInclude Include="..\include\gf3d_camera.h" />
-    <ClInclude Include="..\include\gf3d_commands.h" />
-    <ClInclude Include="..\include\gf3d_extensions.h" />
-    <ClInclude Include="..\include\gf3d_model.h" />
-    <ClInclude Include="..\include\gf3d_pipeline.h" />
-    <ClInclude Include="..\include\gf3d_shaders.h" />
-    <ClInclude Include="..\include\gf3d_swapchain.h" />
-    <ClInclude Include="..\include\gf3d_validation.h" />
-    <ClInclude Include="..\include\gf3d_vgraphics.h" />
-    <ClInclude Include="..\include\gf3d_vqueues.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\gfc\simple_json\src\simple_json.c" />
     <ClCompile Include="..\gfc\simple_json\src\simple_json_array.c" />
     <ClCompile Include="..\gfc\simple_json\src\simple_json_error.c" />
@@ -122,28 +92,103 @@
     <ClCompile Include="..\gfc\simple_json\src\simple_json_parse.c" />
     <ClCompile Include="..\gfc\simple_json\src\simple_json_string.c" />
     <ClCompile Include="..\gfc\simple_logger\src\simple_logger.c" />
+    <ClCompile Include="..\gfc\src\gfc_actions.c" />
     <ClCompile Include="..\gfc\src\gfc_audio.c" />
     <ClCompile Include="..\gfc\src\gfc_callbacks.c" />
+    <ClCompile Include="..\gfc\src\gfc_color.c" />
+    <ClCompile Include="..\gfc\src\gfc_config.c" />
+    <ClCompile Include="..\gfc\src\gfc_config_def.c" />
+    <ClCompile Include="..\gfc\src\gfc_decode.c" />
+    <ClCompile Include="..\gfc\src\gfc_hashmap.c" />
     <ClCompile Include="..\gfc\src\gfc_input.c" />
     <ClCompile Include="..\gfc\src\gfc_list.c" />
     <ClCompile Include="..\gfc\src\gfc_matrix.c" />
+    <ClCompile Include="..\gfc\src\gfc_noise.c" />
+    <ClCompile Include="..\gfc\src\gfc_pak.c" />
+    <ClCompile Include="..\gfc\src\gfc_primitives.c" />
+    <ClCompile Include="..\gfc\src\gfc_shape.c" />
+    <ClCompile Include="..\gfc\src\gfc_string.c" />
     <ClCompile Include="..\gfc\src\gfc_text.c" />
     <ClCompile Include="..\gfc\src\gfc_types.c" />
     <ClCompile Include="..\gfc\src\gfc_vector.c" />
+    <ClCompile Include="..\gfc\src\miniz.c" />
     <ClCompile Include="..\src\game.c" />
-    <ClCompile Include="..\src\gf3d_camera.c" />
+    <ClCompile Include="..\src\gf2d_actor.c" />
+    <ClCompile Include="..\src\gf2d_camera.c" />
+    <ClCompile Include="..\src\gf2d_font.c" />
+    <ClCompile Include="..\src\gf2d_mouse.c" />
+    <ClCompile Include="..\src\gf2d_sprite.c" />
+    <ClCompile Include="..\src\gf3d_buffers.c" />
     <ClCompile Include="..\src\gf3d_commands.c" />
+    <ClCompile Include="..\src\gf3d_config.c" />
+    <ClCompile Include="..\src\gf3d_debug.c" />
+    <ClCompile Include="..\src\gf3d_device.c" />
     <ClCompile Include="..\src\gf3d_extensions.c" />
-    <ClCompile Include="..\src\gf3d_mesh.c" />
-    <ClCompile Include="..\src\gf3d_model.c" />
+    <ClCompile Include="..\src\gf3d_gltf_parse.c" />
     <ClCompile Include="..\src\gf3d_obj_load.c" />
     <ClCompile Include="..\src\gf3d_pipeline.c" />
     <ClCompile Include="..\src\gf3d_shaders.c" />
     <ClCompile Include="..\src\gf3d_swapchain.c" />
     <ClCompile Include="..\src\gf3d_texture.c" />
+    <ClCompile Include="..\src\gf3d_uniform_buffers.c" />
     <ClCompile Include="..\src\gf3d_validation.c" />
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\gfc\include\gfc_actions.h" />
+    <ClInclude Include="..\gfc\include\gfc_audio.h" />
+    <ClInclude Include="..\gfc\include\gfc_callbacks.h" />
+    <ClInclude Include="..\gfc\include\gfc_color.h" />
+    <ClInclude Include="..\gfc\include\gfc_config.h" />
+    <ClInclude Include="..\gfc\include\gfc_config_def.h" />
+    <ClInclude Include="..\gfc\include\gfc_decode.h" />
+    <ClInclude Include="..\gfc\include\gfc_hashmap.h" />
+    <ClInclude Include="..\gfc\include\gfc_input.h" />
+    <ClInclude Include="..\gfc\include\gfc_list.h" />
+    <ClInclude Include="..\gfc\include\gfc_matrix.h" />
+    <ClInclude Include="..\gfc\include\gfc_noise.h" />
+    <ClInclude Include="..\gfc\include\gfc_pak.h" />
+    <ClInclude Include="..\gfc\include\gfc_primitives.h" />
+    <ClInclude Include="..\gfc\include\gfc_shape.h" />
+    <ClInclude Include="..\gfc\include\gfc_string.h" />
+    <ClInclude Include="..\gfc\include\gfc_text.h" />
+    <ClInclude Include="..\gfc\include\gfc_types.h" />
+    <ClInclude Include="..\gfc\include\gfc_vector.h" />
+    <ClInclude Include="..\gfc\include\miniz.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_list.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_object.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_parse.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_types.h" />
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
+    <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
+    <ClInclude Include="..\include\gf2d_actor.h" />
+    <ClInclude Include="..\include\gf2d_camera.h" />
+    <ClInclude Include="..\include\gf2d_font.h" />
+    <ClInclude Include="..\include\gf2d_mouse.h" />
+    <ClInclude Include="..\include\gf2d_sprite.h" />
+    <ClInclude Include="..\include\gf3d_buffers.h" />
+    <ClInclude Include="..\include\gf3d_camera.h" />
+    <ClInclude Include="..\include\gf3d_commands.h" />
+    <ClInclude Include="..\include\gf3d_config.h" />
+    <ClInclude Include="..\include\gf3d_debug.h" />
+    <ClInclude Include="..\include\gf3d_device.h" />
+    <ClInclude Include="..\include\gf3d_extensions.h" />
+    <ClInclude Include="..\include\gf3d_gltf_parse.h" />
+    <ClInclude Include="..\include\gf3d_mesh.h" />
+    <ClInclude Include="..\include\gf3d_obj_load.h" />
+    <ClInclude Include="..\include\gf3d_pipeline.h" />
+    <ClInclude Include="..\include\gf3d_shaders.h" />
+    <ClInclude Include="..\include\gf3d_swapchain.h" />
+    <ClInclude Include="..\include\gf3d_texture.h" />
+    <ClInclude Include="..\include\gf3d_uniform_buffers.h" />
+    <ClInclude Include="..\include\gf3d_validation.h" />
+    <ClInclude Include="..\include\gf3d_vgraphics.h" />
+    <ClInclude Include="..\include\gf3d_vqueues.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
