@@ -231,6 +231,7 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(renderPipe);
     gf3d_vgraphics_semaphores_create();
+    sj_free(json);
 }
 
 void gf3d_vgraphics_get_supported_display_resolutions(GFC_List *resolutions)
