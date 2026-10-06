@@ -649,6 +649,7 @@ Mesh *gf3d_mesh_load_obj(const char *filename)
     
     if (!obj)
     {
+        slog("failed to load obj data from file %s",filename);
         return NULL;
     }
     
@@ -665,7 +666,7 @@ Mesh *gf3d_mesh_load_obj(const char *filename)
 
     gfc_list_append(mesh->primitives,primitive);
     memcpy(&mesh->bounds,&obj->bounds,sizeof(GFC_Box));//TODO: this isn't right
-    
+    gfc_line_cpy(mesh->filename,filename);
     return mesh;
 }
 

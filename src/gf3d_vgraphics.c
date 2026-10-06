@@ -171,8 +171,6 @@ void gf3d_vgraphics_init(const char *config)
         100000
     );
     
-    gf3d_vgraphics.ubo.proj[1][1] *= -1;
-
     gf3d_vgraphics_setup(
         windowName,
         resolution.x,
