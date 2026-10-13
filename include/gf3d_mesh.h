@@ -12,20 +12,12 @@
 
 #include "gf3d_pipeline.h"
 
+#define MESH_ATTRIBUTE_COUNT 3
 
 //forward declaration:
 typedef struct ObjData_S ObjData;
 
-//absolute basics of the mesh information sent to the graphics card
-typedef struct
-{
-    GFC_Matrix4     model;
-    GFC_Matrix4     view;
-    GFC_Matrix4     proj;
-    GFC_Vector4D    color;
-    GFC_Vector4D    camera;
-}MeshUBO;
-
+//this is the information for a vertex (the position of the vertex, the normal, and the tecel from the png for color)
 typedef struct
 {
     GFC_Vector3D vertex;
@@ -33,11 +25,13 @@ typedef struct
     GFC_Vector2D texel;
 }Vertex;
 
+//the colors are interpolated from the vertex texels across the face
 typedef struct
 {
-    Uint16  verts[3];
+    Uint16  verts[3]; //prolly wont need to, but may bug and need to increase to 32 bit int
 }Face;
 
+//these are each group of verticies+faces that makes up an individual thing
 typedef struct
 {
     Uint32          vertexCount;
@@ -49,27 +43,38 @@ typedef struct
     ObjData        *objData;
 }MeshPrimitive;
 
+//these are groups of prims that make up the whole mesh for a bigger thing
 typedef struct
 {
-    GFC_TextLine        filename;
-    Uint32              _refCount;
-    Uint8               _inuse;
-    GFC_List           *primitives;
-    GFC_Box             bounds;
+    GFC_TextLine        filename; //in mesh load
+    Uint32              _refCount; //set to 1 in mesh new
+    GFC_List           *primitives; // allocated in mesh new
+    GFC_Box             bounds; //in mesh load
 }Mesh;
 
 /**
  * @brief initializes the mesh system / configures internal data about mesh based rendering
- * @param mesh_max the maximum allowed simultaneous meshes supported at once.  Must be > 0
- * @note keep in mind that many models will be comprised of multiple sub meshes.  So this number may need to be very large
+ * @param max_meshes the maximum allowed simultaneous meshes supported at once. Must be > 0
+ * @note keep in mind that many models will be comprised of multiple sub meshes. So this number may need to be very large
  */
-void gf3d_mesh_init(Uint32 mesh_max);
+void gf3d_mesh_system_init(Uint32 max_meshes);
 
 /**
  * @brief get a new empty model
  * @return NULL on error, or an empty model
  */
 Mesh *gf3d_mesh_new();
+
+/**
+ * @brief free a mesh that has been loaded from memory
+ */
+void gf3d_mesh_free(Mesh* mesh);
+
+/**
+ * @brief allocate a zero initialized mesh primitive
+ * @return NULL on error or the primitive
+ */
+MeshPrimitive* gf3d_mesh_primitive_new();
 
 /**
  * @brief load mesh data from an obj filename.
@@ -81,11 +86,45 @@ Mesh *gf3d_mesh_new();
 Mesh *gf3d_mesh_load_obj(const char *filename);
 
 /**
+ * @brief queue up a render for the current draw frame
+ * @param mesh the mesh to render
+ * @param pipe the pipeline to use
+ * @param uboData the data to use to draw the mesh
+ * @param texture texture data to use
+ */
+void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* texture);
+
+/**
+ * @brief get the input attribute descriptions for mesh based rendering
+ * @param count (optional, output) the number of attributes
+ * @return a pointer to a vertex input attribute description array
+ */
+VkVertexInputAttributeDescription* gf3d_mesh_get_attribute_descriptions(Uint32* count);
+
+/**
+ * @brief get the binding description for mesh based rendering
+ * @return vertex input binding descriptions compatible with mesh data
+ */
+VkVertexInputBindingDescription* gf3d_mesh_get_bind_description();
+
+/**
+ * @brief needs to be called once at the beginning of each render frame
+ * @note this never gets called
+ */
+void gf3d_mesh_reset_pipes();
+
+/**
+ * @brief called to submit all draw commands to the mesh pipelines
+ * @note this never gets called
+ */
+void gf3d_mesh_submit_pipe_commands();
+
+/**
  * @brief make an exact, but separate copy of the input mesh
  * @param in the mesh to duplicate
  * @return NULL on error, or a copy of in
  */
-Mesh *gf3d_mesh_copy(Mesh *in);
+Mesh* gf3d_mesh_copy(Mesh* in);
 
 /**
  * @brief move all of the vertices of the mesh by offset at the buffer level
@@ -93,58 +132,12 @@ Mesh *gf3d_mesh_copy(Mesh *in);
  * @param offset how much to move it
  * @param rotation apply this rotation to the vertices and normals
  */
-void gf3d_mesh_move_vertices(Mesh *in, GFC_Vector3D offset,GFC_Vector3D rotation);
-
-/**
- * @brief allocate a zero initialized mesh primitive
- * @return NULL on error or the primitive
- */
-MeshPrimitive *gf3d_mesh_primitive_new();
-
-
-/**
- * @brief get the input attribute descriptions for mesh based rendering
- * @param count (optional, output) the number of attributes
- * @return a pointer to a vertex input attribute description array
- */
-VkVertexInputAttributeDescription * gf3d_mesh_get_attribute_descriptions(Uint32 *count);
-
-/**
- * @brief get the binding description for mesh based rendering
- * @return vertex input binding descriptions compatible with mesh data
- */
-VkVertexInputBindingDescription * gf3d_mesh_get_bind_description();
-
-/**
- * @brief free a mesh that has been loaded from memory
- */
-void gf3d_mesh_free(Mesh *mesh);
-
-/**
- * @brief needs to be called once at the beginning of each render frame
- */
-void gf3d_mesh_reset_pipes();
-
-/**
- * @brief called to submit all draw commands to the mesh pipelines
- */
-void gf3d_mesh_submit_pipe_commands();
+void gf3d_mesh_move_vertices(Mesh* in, GFC_Vector3D offset, GFC_Vector3D rotation);
 
 /**
  * @brief get the current command buffer for the mesh system
  */
 VkCommandBuffer gf3d_mesh_get_model_command_buffer();
-
-
-/**
- * @brief queue up a render for the current draw frame
- * @param mesh the mesh to render
- * @param pipe the pipeline to use
- * @param uboData the data to use to draw the mesh
- * @param texture texture data to use
- */
-void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *texture);
-
 
 /**
  * @brief adds a mesh to the render pass rendered as an outline highlight
@@ -152,34 +145,18 @@ void gf3d_mesh_queue_render(Mesh *mesh,Pipeline *pipe,void *uboData,Texture *tex
  * @param mesh the mesh to render
  * @param com the command pool to use to handle the request we are rendering with
  */
-void gf3d_mesh_render(Mesh *mesh,VkCommandBuffer commandBuffer, VkDescriptorSet * descriptorSet);
+void gf3d_mesh_render(Mesh* mesh, VkCommandBuffer commandBuffer, VkDescriptorSet* descriptorSet);
 
 /**
  * @brief render a mesh through a given pipeline
  */
-void gf3d_mesh_render_generic(Mesh *mesh,Pipeline *pipe,VkDescriptorSet * descriptorSet);
+void gf3d_mesh_render_generic(Mesh* mesh, Pipeline* pipe, VkDescriptorSet* descriptorSet);
 
 /**
  * @brief create a mesh's internal buffers based on vertices
  * @param primitive the mesh primitive to populate
  * @note the primitive must have the objData set and it must have be organizes in buffer order
  */
-void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *primitive);
-
-/**
- * @brief get the pipeline that is used to render basic 3d meshes
- * @return NULL on error or the pipeline in question
- */
-Pipeline *gf3d_mesh_get_pipeline();
-
-/**
- * @brief given a model matrix and basic color, build the meshUBO needed to render a model
- * @param modelMat the model Matrix
- * @param colorMod the color for the UBO
- */
-MeshUBO gf3d_mesh_get_ubo(
-    GFC_Matrix4 modelMat,
-    GFC_Color colorMod);
-
+void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive* primitive);
 
 #endif
