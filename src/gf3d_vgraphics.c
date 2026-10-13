@@ -31,6 +31,9 @@
 
 #include "gf3d_vgraphics.h"
 
+#include "gf3d_mesh.h"
+
+#include "model.h"
 
 typedef struct
 {
@@ -113,7 +116,7 @@ void gf3d_vgraphics_init(const char *config)
     short int enableDebug = 0;
     
     json = gfc_pak_load_json(config);
-    if (!json)
+    if (!json) //always error check, never trust a pointer
     {
         slog("graphics config file load failed, exiting");
         exit(0);
@@ -121,10 +124,10 @@ void gf3d_vgraphics_init(const char *config)
     }
     setup = sj_object_get_value(json,"setup");
     
-    if (!setup)
+    if (!setup)//ALWAYS ERROR CHECK
     {
         slog("graphics config file missing setup data, exiting");
-        sj_free(json);
+        sj_free(json); //if you create it you destroy it
         exit(0);
         return;
     }
@@ -156,8 +159,6 @@ void gf3d_vgraphics_init(const char *config)
         100000
     );
     
-    gf3d_vgraphics.ubo.proj[1][1] *= -1;
-
     gf3d_vgraphics_setup(
         windowName,
         resolution.x,
@@ -199,12 +200,14 @@ void gf3d_vgraphics_init(const char *config)
     gf3d_vgraphics.graphicsCommandPool = gf3d_command_graphics_pool_setup(gf3d_swapchain_get_swap_image_count());
 
     gf3d_vgraphics.enable_2d = 1;
+    model_manager_init(1024);
     gf2d_sprite_manager_init(1024);
-    renderPipe = gf2d_sprite_get_pipeline();
+    renderPipe = model_get_pipeline();
 
     gf3d_swapchain_create_depth_image();
     gf3d_swapchain_setup_frame_buffers(renderPipe);
     gf3d_vgraphics_semaphores_create();
+    sj_free(json);
 }
 
 
