@@ -58,6 +58,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,7 +112,37 @@
     <ClCompile Include="..\gfc\src\gfc_text.c" />
     <ClCompile Include="..\gfc\src\gfc_types.c" />
     <ClCompile Include="..\gfc\src\gfc_vector.c" />
-    <ClCompile Include="..\gfc\src\miniz.c" />
+    <ClCompile Include="..\gfc\src\physfs.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_7z.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_csm.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_dir.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_grp.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_hog.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_iso9660.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_lec3d.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_mvl.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_pod.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_qpak.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_rofs.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_slb.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_unpacked.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_vdf.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_wad.c" />
+    <ClCompile Include="..\gfc\src\physfs_archiver_zip.c" />
+    <ClCompile Include="..\gfc\src\physfs_byteorder.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_android.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_cafe.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_ctr.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_libretro.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_ogc.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_os2.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_playdate.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_posix.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_qnx.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_unix.c" />
+    <ClCompile Include="..\gfc\src\physfs_platform_windows.c" />
+    <ClCompile Include="..\gfc\src\physfs_unicode.c" />
+    <ClCompile Include="..\src\entity.c" />
     <ClCompile Include="..\src\game.c" />
     <ClCompile Include="..\src\gf2d_actor.c" />
     <ClCompile Include="..\src\gf2d_camera.c" />
@@ -125,6 +156,7 @@
     <ClCompile Include="..\src\gf3d_device.c" />
     <ClCompile Include="..\src\gf3d_extensions.c" />
     <ClCompile Include="..\src\gf3d_gltf_parse.c" />
+    <ClCompile Include="..\src\gf3d_mesh.c" />
     <ClCompile Include="..\src\gf3d_obj_load.c" />
     <ClCompile Include="..\src\gf3d_pipeline.c" />
     <ClCompile Include="..\src\gf3d_shaders.c" />
@@ -134,6 +166,8 @@
     <ClCompile Include="..\src\gf3d_validation.c" />
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
+    <ClCompile Include="..\src\model.c" />
+    <ClCompile Include="..\src\player.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gfc\include\gfc_actions.h" />
@@ -155,7 +189,12 @@
     <ClInclude Include="..\gfc\include\gfc_text.h" />
     <ClInclude Include="..\gfc\include\gfc_types.h" />
     <ClInclude Include="..\gfc\include\gfc_vector.h" />
-    <ClInclude Include="..\gfc\include\miniz.h" />
+    <ClInclude Include="..\gfc\include\physfs.h" />
+    <ClInclude Include="..\gfc\include\physfs_casefolding.h" />
+    <ClInclude Include="..\gfc\include\physfs_internal.h" />
+    <ClInclude Include="..\gfc\include\physfs_lzmasdk.h" />
+    <ClInclude Include="..\gfc\include\physfs_miniz.h" />
+    <ClInclude Include="..\gfc\include\physfs_platforms.h" />
     <ClInclude Include="..\gfc\simple_json\include\simple_json.h" />
     <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h" />
     <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h" />
@@ -166,6 +205,7 @@
     <ClInclude Include="..\gfc\simple_json\include\simple_json_types.h" />
     <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h" />
     <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h" />
+    <ClInclude Include="..\include\entity.h" />
     <ClInclude Include="..\include\gf2d_actor.h" />
     <ClInclude Include="..\include\gf2d_camera.h" />
     <ClInclude Include="..\include\gf2d_font.h" />
@@ -189,6 +229,31 @@
     <ClInclude Include="..\include\gf3d_validation.h" />
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
     <ClInclude Include="..\include\gf3d_vqueues.h" />
+    <ClInclude Include="..\include\model.h" />
+    <ClInclude Include="..\include\player.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config\audio.cfg" />
+    <None Include="..\config\font.cfg" />
+    <None Include="..\config\input.cfg" />
+    <None Include="..\config\model_pipeline.cfg" />
+    <None Include="..\config\overlay_pipeline.cfg" />
+    <None Include="..\config\setup.cfg" />
+    <None Include="..\config\sky_pipeline.cfg" />
+    <None Include="..\gfc\src\Makefile" />
+    <None Include="..\shaders\model.frag" />
+    <None Include="..\shaders\model.vert" />
+    <None Include="..\shaders\model_frag.spv" />
+    <None Include="..\shaders\model_vert.spv" />
+    <None Include="..\shaders\sky.frag" />
+    <None Include="..\shaders\sky.vert" />
+    <None Include="..\shaders\sprite.frag" />
+    <None Include="..\shaders\sprite.vert" />
+    <None Include="..\shaders\sprite_frag.spv" />
+    <None Include="..\shaders\sprite_vert.spv" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\gfc\src\physfs_version.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,318 +13,544 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\gf2d">
+      <UniqueIdentifier>{f1af7758-8530-4f80-a40d-422e599378fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gf3d">
+      <UniqueIdentifier>{90a623a6-7a73-4d47-ae03-d4bec2822f67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gfc">
+      <UniqueIdentifier>{cd6cf575-3fe6-4f87-828a-216920963ff5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\simple_json">
+      <UniqueIdentifier>{b5c2ecdd-ac18-4640-a4bc-2826e29ed695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\simple_logger">
+      <UniqueIdentifier>{44fc56bf-5538-4d48-9d0e-e0f436529c92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gfc">
+      <UniqueIdentifier>{a9bec3ef-3b2b-40de-8dab-f52ce4f0e19a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gf3d">
+      <UniqueIdentifier>{d0f365d3-d9ce-4481-9d10-24d405ef885a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gf2d">
+      <UniqueIdentifier>{f9013e3f-b833-4ff1-b98f-b5f9c1ef9825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\simple_json">
+      <UniqueIdentifier>{d1080489-801a-45c9-9c47-c668bb953332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\simple_logger">
+      <UniqueIdentifier>{b544db6a-17f9-4404-a5a9-9048d789177e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{bdc9d723-6065-4c42-acdc-d3cff8276446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game">
+      <UniqueIdentifier>{07a4b78f-a983-4194-8357-c456b3bda280}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game">
+      <UniqueIdentifier>{12a3e937-5937-404d-b990-8648899e8ab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{8c03c225-97cd-4595-8c52-36157f521616}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\game.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\gf2d_actor.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\gf2d_camera.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\gf2d_font.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\gf2d_mouse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\gf2d_sprite.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\gf3d_buffers.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_commands.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_config.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_debug.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_device.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_extensions.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_gltf_parse.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_obj_load.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_pipeline.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_shaders.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_swapchain.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_texture.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_uniform_buffers.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_validation.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_vgraphics.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gf3d_vqueues.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gf3d</Filter>
     </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_actions.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\gf2d_actor.c">
+      <Filter>Source Files\gf2d</Filter>
     </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_audio.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\gf2d_camera.c">
+      <Filter>Source Files\gf2d</Filter>
     </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_callbacks.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\gf2d_font.c">
+      <Filter>Source Files\gf2d</Filter>
     </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_color.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\gf2d_mouse.c">
+      <Filter>Source Files\gf2d</Filter>
     </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_config.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_config_def.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_decode.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_hashmap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_input.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_list.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_matrix.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_noise.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_pak.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_primitives.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_shape.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_string.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_text.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_types.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\gfc_vector.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\src\miniz.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\simple_json\src\simple_json.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\simple_json\src\simple_json_array.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\simple_json\src\simple_json_error.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\simple_json\src\simple_json_list.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\simple_json\src\simple_json_object.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gfc\simple_json\src\simple_json_parse.c">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\src\gf2d_sprite.c">
+      <Filter>Source Files\gf2d</Filter>
     </ClCompile>
     <ClCompile Include="..\gfc\simple_json\src\simple_json_string.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\simple_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json.c">
+      <Filter>Source Files\simple_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_array.c">
+      <Filter>Source Files\simple_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_error.c">
+      <Filter>Source Files\simple_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_list.c">
+      <Filter>Source Files\simple_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_object.c">
+      <Filter>Source Files\simple_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\simple_json\src\simple_json_parse.c">
+      <Filter>Source Files\simple_json</Filter>
     </ClCompile>
     <ClCompile Include="..\gfc\simple_logger\src\simple_logger.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\simple_logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\model.c">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gf3d_mesh.c">
+      <Filter>Source Files\gf3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\game.c">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_playdate.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_posix.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_qnx.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_unix.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_windows.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_unicode.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_actions.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_audio.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_callbacks.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_color.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_config.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_config_def.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_decode.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_hashmap.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_input.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_list.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_matrix.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_noise.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_pak.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_primitives.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_shape.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_string.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_text.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_types.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\gfc_vector.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_7z.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_csm.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_dir.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_grp.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_hog.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_iso9660.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_lec3d.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_mvl.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_pod.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_qpak.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_rofs.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_slb.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_unpacked.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_vdf.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_wad.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_archiver_zip.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_byteorder.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_android.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_cafe.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_ctr.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_libretro.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_ogc.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gfc\src\physfs_platform_os2.c">
+      <Filter>Source Files\gfc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\entity.c">
+      <Filter>Source Files\game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\player.c">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_parse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_actions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_audio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_config_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_decode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_hashmap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_noise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_pak.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_primitives.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_shape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_string.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\gfc_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\gfc\include\miniz.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gf2d_actor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf2d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf2d_camera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf2d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf2d_font.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf2d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf2d_mouse.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf2d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf2d_sprite.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf2d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_buffers.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_camera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_commands.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_config.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_debug.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_device.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_extensions.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_gltf_parse.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_mesh.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_obj_load.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_pipeline.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_shaders.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_swapchain.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_texture.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_uniform_buffers.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_validation.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_vgraphics.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gf3d_vqueues.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gf3d</Filter>
     </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_array.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_error.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_list.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_object.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_parse.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_string.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_types.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_json\include\simple_json_value.h">
+      <Filter>Header Files\simple_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h">
+      <Filter>Header Files\simple_logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\model.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_actions.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_audio.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_callbacks.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_color.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_config.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_config_def.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_decode.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_hashmap.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_input.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_list.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_matrix.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_noise.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_pak.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_primitives.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_shape.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_string.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_text.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_types.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\gfc_vector.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\physfs.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\physfs_casefolding.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\physfs_internal.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\physfs_lzmasdk.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\physfs_miniz.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gfc\include\physfs_platforms.h">
+      <Filter>Header Files\gfc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\entity.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\player.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config\audio.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\font.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\input.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\overlay_pipeline.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\setup.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\sky_pipeline.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\shaders\model.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\model.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\model_frag.spv">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\model_vert.spv">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\sprite.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\sprite.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\sprite_frag.spv">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\sprite_vert.spv">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\sky.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\shaders\sky.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\config\model_pipeline.cfg">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\gfc\src\Makefile">
+      <Filter>Source Files\gfc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\gfc\src\physfs_version.rc">
+      <Filter>Source Files\gfc</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
