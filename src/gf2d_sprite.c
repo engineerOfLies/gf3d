@@ -83,6 +83,7 @@ void gf2d_sprite_manager_close()
     {
         free(gf2d_sprite.sprite_list);
     }
+    //handled in mesh
     if (gf2d_sprite.faceBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf2d_sprite.device, gf2d_sprite.faceBuffer, NULL);
@@ -91,7 +92,7 @@ void gf2d_sprite_manager_close()
     {
         vkFreeMemory(gf2d_sprite.device, gf2d_sprite.faceBufferMemory, NULL);
     }
-
+    //to here
     memset(&gf2d_sprite,0,sizeof(SpriteManager));
     if(__DEBUG)slog("sprite manager closed");
 }
@@ -125,18 +126,23 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
 
     bufferSize = sizeof(SpriteFace) * 2;
     
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+    //from here
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
+        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
     vkMapMemory(gf2d_sprite.device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, faces, (size_t) bufferSize);
     vkUnmapMemory(gf2d_sprite.device, stagingBufferMemory);
 
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &gf2d_sprite.faceBuffer, &gf2d_sprite.faceBufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+        &gf2d_sprite.faceBuffer, &gf2d_sprite.faceBufferMemory);
 
     gf3d_buffer_copy(stagingBuffer, gf2d_sprite.faceBuffer, bufferSize);
 
     vkDestroyBuffer(gf2d_sprite.device, stagingBuffer, NULL);
     vkFreeMemory(gf2d_sprite.device, stagingBufferMemory, NULL);
+    //to here is in mesh stuff
 
     gf2d_sprite_get_attribute_descriptions(&count);
     gf2d_sprite.pipe = gf3d_pipeline_create_from_config(
@@ -304,10 +310,12 @@ void gf2d_sprite_delete(Sprite *sprite)
     if (sprite->buffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(gf2d_sprite.device, sprite->buffer, NULL);
+        sprite->buffer = VK_NULL_HANDLE;
     }
     if (sprite->bufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(gf2d_sprite.device, sprite->bufferMemory, NULL);
+        sprite->bufferMemory = VK_NULL_HANDLE;
     }
 
     gf3d_texture_free(sprite->texture);
