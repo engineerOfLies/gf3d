@@ -55,6 +55,14 @@ Model* model_from_mesh(Mesh mesh);
 void model_free(Model* model);
 
 /**
+ * @brief draw a model to the screen through the sky pipeline
+ * @param the model to draw
+ * @param mat where to draw the model?
+ * @param colorMod what color to draw the model?
+ */
+void model_queue_render_sky(Model* model, GFC_Matrix4 mat, GFC_Color colorMod);
+
+/**
  * @brief draw a model to the screen 
  * @param the model to draw
  * @param mat where to draw the model?

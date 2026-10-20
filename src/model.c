@@ -91,8 +91,9 @@ void model_manager_init(Uint32 max_models)
     }
     gf3d_mesh_system_init(MAX_MESHES);
 
+    gf3d_mesh_get_attribute_descriptions(&count);
+
     //sky pipeline
-    /*
     model_manager.sky_pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/sky_pipeline.cfg",
@@ -100,12 +101,11 @@ void model_manager_init(Uint32 max_models)
         10,
         gf3d_mesh_get_bind_description(),
         gf3d_mesh_get_attribute_descriptions(NULL),
-        MESH_ATTRIBUTE_COUNT,
+        count,
         sizeof(ModelUBO),
         VK_INDEX_TYPE_UINT16
     );
-    */
-    gf3d_mesh_get_attribute_descriptions(&count);
+
     model_manager.pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/model_pipeline.cfg",
@@ -119,6 +119,14 @@ void model_manager_init(Uint32 max_models)
     );
 
     if (!model_manager.pipe)
+    {
+        slog("failed to make pipeline for models!");
+        slog_sync();
+        model_system_close();
+        exit(-1);
+        return;
+    }
+    if (!model_manager.sky_pipe)
     {
         slog("failed to make pipeline for models!");
         slog_sync();

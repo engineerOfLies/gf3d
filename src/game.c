@@ -44,7 +44,8 @@ int main(int argc,char *argv[])
 {
     //local variables
     Sprite *bg;
-    GFC_Matrix4 * view;
+    GFC_Matrix4 * view, mat;
+    Model* sky;
     //initializtion    
     parse_arguments(argc,argv);
     //name of log file, should it be erased (0 overwrite, 1 append)
@@ -68,8 +69,8 @@ int main(int argc,char *argv[])
 
     view = gf3d_vgraphics_get_view_matrix();
     player_new(gfc_vector3d(0, 0, 0));
-
-
+    sky = model_load("models/sky/sky.model");
+    gfc_matrix4_identity(mat);
     // main game loop    
     while(!_done)
     {
@@ -89,6 +90,7 @@ int main(int argc,char *argv[])
 
         gf3d_vgraphics_render_start();
                 //3D draws
+                model_queue_render_sky(sky, mat, GFC_COLOR_WHITE);
                 entity_system_queue_render_all();
                 //model_queue_render(model, mat, GFC_COLOR_WHITE);
                 //2D draws
