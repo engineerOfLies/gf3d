@@ -105,7 +105,7 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     SpriteFace faces[2];
     size_t bufferSize;    
     VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
 
     if (max_sprites == 0)
     {
@@ -441,8 +441,8 @@ void gf2d_sprite_create_vertex_buffer(Sprite *sprite)
     void *data = NULL;
     VkDevice device = gf2d_sprite.device;
     size_t bufferSize;
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    VkBuffer stagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
     SpriteVertex vertices[] = {
         {
             {0,0},

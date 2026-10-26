@@ -109,8 +109,8 @@ void gf3d_particle_create_vertex_buffer()
 {
     void *data = NULL;
     size_t bufferSize;
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    VkBuffer stagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
     VkDevice device = gf3d_vgraphics_get_default_logical_device();
     GFC_Vector3D particle = {0};
 

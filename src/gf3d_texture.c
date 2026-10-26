@@ -209,8 +209,8 @@ Texture *gf3d_texture_convert_surface(SDL_Surface * surface)
     void* data;
     Texture *tex;
     VkDeviceSize imageSize;
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    VkBuffer stagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
     VkImageCreateInfo imageInfo = {0};
     VkMemoryRequirements memRequirements;
     VkMemoryAllocateInfo allocInfo = {0};

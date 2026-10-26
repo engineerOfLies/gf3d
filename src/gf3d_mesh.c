@@ -490,8 +490,8 @@ void gf3d_mesh_setup_face_buffers(MeshPrimitive *mesh,Face *faces,Uint32 fcount)
     VkDevice device = gf3d_vgraphics_get_default_logical_device();
     VkDeviceSize bufferSize = sizeof(Face) * fcount;
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    VkBuffer stagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
     
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
@@ -517,8 +517,8 @@ void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive *mesh)
     Face *faces;
     Uint32 fcount;
     size_t bufferSize;    
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
+    VkBuffer stagingBuffer = VK_NULL_HANDLE;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
     
     if (!mesh)
     {
